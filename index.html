@@ -1995,31 +1995,55 @@ const ETAPAS_PIPELINE = [
   {id:"followup", nome:"Follow-up"},
   {id:"fechado", nome:"Fechado"},
 ];
-let LEADS = [
-  {id:1, nome:"Ateliê Cravo", valor:1800, etapa:"followup", origem:"Indicação"},
-  {id:2, nome:"Padaria Trigo Dourado", valor:2200, etapa:"proposta", origem:"Instagram"},
-  {id:3, nome:"Espaço Vitta", valor:1500, etapa:"contato", origem:"Site"},
-  {id:4, nome:"Doce Ponto", valor:900, etapa:"novo", origem:"Indicação"},
-  {id:5, nome:"Studio Alma", valor:2400, etapa:"fechado", origem:"Indicação"},
-];
+let LEADS = [];
 
-function moverLead(id, direcao){
+async function carregarLeadsSupabase(){
+  const { data, error } = await supa.from('leads').select('*').order('criado_em');
+  if(error){ dispararAutomacao('Erro ao carregar leads', error.message); return; }
+  LEADS = (data || []).map(row => ({
+    id: row.id, nome: row.nome, valor: parseFloat(row.valor_estimado)||0, etapa: row.etapa, origem: row.origem||"—"
+  }));
+}
+async function novoLead(){
+  const nome = prompt("Nome do lead/empresa:");
+  if(!nome || !nome.trim()) return;
+  const valorTxt = prompt("Valor estimado (ex: 1500):", "");
+  const valor = parseFloat((valorTxt||'0').replace(',','.')) || 0;
+  const origem = prompt("Origem (Indicação, Instagram, Site...):", "Indicação") || "—";
+  const { data, error } = await supa.from('leads').insert({
+    nome: nome.trim(), valor_estimado: valor, origem, etapa: 'novo'
+  }).select().single();
+  if(error){ dispararAutomacao('Erro ao cadastrar lead', error.message); return; }
+  LEADS.push({id: data.id, nome: nome.trim(), valor, etapa:'novo', origem});
+  dispararAutomacao('Lead cadastrado', nome.trim());
+  renderTela();
+}
+
+async function moverLead(id, direcao){
   const idxAtual = ETAPAS_PIPELINE.findIndex(e=>e.id===LEADS.find(l=>l.id===id).etapa);
   const novoIdx = idxAtual + direcao;
   if(novoIdx<0 || novoIdx>=ETAPAS_PIPELINE.length) return;
   const lead = LEADS.find(l=>l.id===id);
   lead.etapa = ETAPAS_PIPELINE[novoIdx].id;
-  if(lead.etapa === 'fechado'){
-    dispararAutomacao('Cliente criado automaticamente', `"${lead.nome}" fechou negócio e virou cliente. 1ª visita sugerida na Agenda.`);
-  }
+  await supa.from('leads').update({etapa: lead.etapa}).eq('id', id);
   renderTela();
+  if(lead.etapa === 'fechado'){
+    const { data, error } = await supa.from('clientes').insert({
+      nome: lead.nome, responsavel: PERFIL_USUARIO.nome,
+      inicio: new Date().toLocaleDateString('pt-BR',{month:'short',year:'numeric'}),
+    }).select().single();
+    if(!error){
+      CLIENTES.push(linhaParaCliente(data));
+      dispararAutomacao('Cliente criado automaticamente', `"${lead.nome}" fechou negócio e já virou cliente de verdade. Agende a 1ª visita na Agenda.`);
+    }
+  }
 }
 
 function comercialHTML(){
   return `
     <div class="pipeline-topo">
       <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${LEADS.length} leads no pipeline</div>
-      <button class="btn-novo-lead">+ Novo lead</button>
+      <button class="btn-novo-lead" onclick="novoLead()">+ Novo lead</button>
     </div>
     <div class="pipeline-scroll">
       <div class="pipeline">
@@ -2032,8 +2056,8 @@ function comercialHTML(){
                 <div class="lead-valor">${formatarMoeda(l.valor)}</div>
                 <div class="lead-meta">Origem: ${l.origem}</div>
                 <div class="lead-mover">
-                  ${idx>0 ? `<button onclick="moverLead(${l.id},-1)">← ${ETAPAS_PIPELINE[idx-1].nome}</button>` : ''}
-                  ${idx<ETAPAS_PIPELINE.length-1 ? `<button onclick="moverLead(${l.id},1)">${ETAPAS_PIPELINE[idx+1].nome} →</button>` : ''}
+                  ${idx>0 ? `<button onclick="moverLead('${l.id}',-1)">← ${ETAPAS_PIPELINE[idx-1].nome}</button>` : ''}
+                  ${idx<ETAPAS_PIPELINE.length-1 ? `<button onclick="moverLead('${l.id}',1)">${ETAPAS_PIPELINE[idx+1].nome} →</button>` : ''}
                 </div>
               </div>
             `).join('')}
@@ -2304,21 +2328,39 @@ function fichaEstudoHTML(i){
 /* ---------- MÓDULO VIDA PESSOAL ---------- */
 const DIAS_CURTO = ["D","S","T","Q","Q","S","S"];
 
-let HABITOS = [
-  {id:1, nome:"Beber água (2L)", semana:[true,true,true,false,false,false,false]},
-  {id:2, nome:"Exercício físico", semana:[true,false,true,false,true,false,false]},
-  {id:3, nome:"Leitura — 20min", semana:[true,true,false,true,false,false,false]},
-];
-function alternarHabitoDia(id, idx){
+let HABITOS = [];
+async function carregarHabitosSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data: habitosRows, error } = await supa.from('habitos').select('*').eq('user_id', user.id).order('id');
+  if(error){ dispararAutomacao('Erro ao carregar hábitos', error.message); return; }
+  const domingo = inicioDaSemana(REF_DOMINGO);
+  const datasSemana = Array.from({length:7}, (_,i)=> formatoISO(addDias(domingo,i)));
+  const { data: registros } = await supa.from('habito_registros').select('*').in('data', datasSemana);
+  HABITOS = (habitosRows||[]).map(h=>({
+    id: h.id, nome: h.nome,
+    semana: datasSemana.map(d => (registros||[]).some(r=>r.habito_id===h.id && r.data===d && r.concluido))
+  }));
+}
+async function alternarHabitoDia(id, idx){
   const h = HABITOS.find(x=>x.id===id);
   h.semana[idx] = !h.semana[idx];
   renderTela();
+  const domingo = inicioDaSemana(REF_DOMINGO);
+  const dataISO = formatoISO(addDias(domingo, idx));
+  const { data: existente } = await supa.from('habito_registros').select('id').eq('habito_id', id).eq('data', dataISO).maybeSingle();
+  if(existente){
+    await supa.from('habito_registros').update({concluido: h.semana[idx]}).eq('id', existente.id);
+  } else {
+    await supa.from('habito_registros').insert({habito_id: id, data: dataISO, concluido: h.semana[idx]});
+  }
 }
-let proximoIdHabito = 4;
-function novoHabito(){
+async function novoHabito(){
   const nome = prompt("Nome do novo hábito:");
   if(!nome || !nome.trim()) return;
-  HABITOS.push({id: proximoIdHabito++, nome: nome.trim(), semana:[false,false,false,false,false,false,false]});
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('habitos').insert({user_id: user.id, nome: nome.trim()}).select().single();
+  if(error){ dispararAutomacao('Erro ao criar hábito', error.message); return; }
+  HABITOS.push({id: data.id, nome: nome.trim(), semana:[false,false,false,false,false,false,false]});
   dispararAutomacao('Hábito criado', `"${nome.trim()}" adicionado ao seu acompanhamento semanal.`);
   renderTela();
 }
@@ -2332,34 +2374,76 @@ function habitosHTML(){
         <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias</div>
       </div>
       <div class="habito-semana">
-        ${h.semana.map((f,idx)=>`<div class="habito-dia ${f?'feito':''}" onclick="alternarHabitoDia(${h.id},${idx})">${DIAS_CURTO[idx]}</div>`).join('')}
+        ${h.semana.map((f,idx)=>`<div class="habito-dia ${f?'feito':''}" onclick="alternarHabitoDia('${h.id}',${idx})">${DIAS_CURTO[idx]}</div>`).join('')}
       </div>
     </div>
   `).join('')}`;
 }
 
-const METAS_PESSOAIS = [
-  {id:1, titulo:"Fazer pós em Segurança de Alimentos", prazo:"Dez/2026", progresso:40},
-  {id:2, titulo:"Reserva de emergência — 6 meses", prazo:"Jun/2027", progresso:65},
-  {id:3, titulo:"Viagem em família", prazo:"Jan/2027", progresso:20},
-];
+let METAS_PESSOAIS = [];
+async function carregarMetasPessoaisSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('metas_pessoais').select('*').eq('user_id', user.id).order('id');
+  if(error){ dispararAutomacao('Erro ao carregar metas', error.message); return; }
+  METAS_PESSOAIS = (data||[]).map(m=>({id:m.id, titulo:m.titulo, prazo:m.prazo||"—", progresso:m.progresso||0}));
+}
+async function novaMetaPessoal(){
+  const titulo = prompt("Qual é a meta?");
+  if(!titulo || !titulo.trim()) return;
+  const prazo = prompt("Prazo (ex: Dez/2026):", "") || "—";
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('metas_pessoais').insert({user_id:user.id, titulo:titulo.trim(), prazo, progresso:0}).select().single();
+  if(error){ dispararAutomacao('Erro ao criar meta', error.message); return; }
+  METAS_PESSOAIS.push({id:data.id, titulo:titulo.trim(), prazo, progresso:0});
+  dispararAutomacao('Meta criada', titulo.trim());
+  renderTela();
+}
+async function atualizarProgressoMeta(id){
+  const m = METAS_PESSOAIS.find(x=>x.id===id);
+  const novo = prompt("Novo progresso (0 a 100):", m.progresso);
+  const val = parseInt(novo);
+  if(isNaN(val)) return;
+  m.progresso = Math.max(0,Math.min(100,val));
+  renderTela();
+  await supa.from('metas_pessoais').update({progresso:m.progresso}).eq('id', id);
+}
 function metasHTML(){
-  return METAS_PESSOAIS.map(m=>`
-    <div class="meta-pessoal">
+  return `<div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaMetaPessoal()">+ Nova meta</button></div>` +
+  METAS_PESSOAIS.map(m=>`
+    <div class="meta-pessoal" onclick="atualizarProgressoMeta('${m.id}')" style="cursor:pointer;">
       <div class="meta-pessoal-topo"><span class="meta-pessoal-titulo">${m.titulo}</span><span class="meta-pessoal-prazo">${m.prazo}</span></div>
       <div class="proj-barra"><div style="width:${m.progresso}%;"></div></div>
-      <div class="estudo-perc">${m.progresso}% concluído</div>
+      <div class="estudo-perc">${m.progresso}% concluído — toque para atualizar</div>
     </div>
   `).join('');
 }
 
-const CONTAS_PESSOAIS = [
-  {id:1, tipo:"receita", desc:"Pró-labore", valor:6000, vencimento:"05/08", status:"pago"},
-  {id:2, tipo:"despesa", desc:"Aluguel", valor:1800, vencimento:"10/08", status:"aberto"},
-  {id:3, tipo:"despesa", desc:"Faculdade / pós", valor:650, vencimento:"08/08", status:"aberto"},
-  {id:4, tipo:"despesa", desc:"Academia", valor:120, vencimento:"05/08", status:"pago"},
-  {id:5, tipo:"despesa", desc:"Cartão de crédito", valor:940, vencimento:"15/08", status:"atrasado"},
-];
+let CONTAS_PESSOAIS = [];
+async function carregarContasPessoaisSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('contas_pessoais').select('*').eq('user_id', user.id).order('vencimento');
+  if(error){ dispararAutomacao('Erro ao carregar financeiro pessoal', error.message); return; }
+  CONTAS_PESSOAIS = (data || []).map(row => ({
+    id: row.id, tipo: row.tipo, desc: row.descricao, valor: parseFloat(row.valor), status: row.status,
+    vencimento: row.vencimento ? row.vencimento.split('-').reverse().slice(0,2).join('/') : "—"
+  }));
+}
+async function novaContaPessoal(tipo){
+  const desc = prompt(tipo==='receita' ? "Descrição da receita:" : "Descrição da despesa:");
+  if(!desc || !desc.trim()) return;
+  const valorTxt = prompt("Valor (ex: 350):");
+  const valor = parseFloat((valorTxt||'').replace(',','.'));
+  if(!valor || valor<=0) return;
+  const vencimento = prompt("Vencimento (DD/MM, opcional):", "") || "";
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('contas_pessoais').insert({
+    user_id: user.id, tipo, descricao: desc.trim(), valor, vencimento: vencimentoParaISO(vencimento), status:'aberto'
+  }).select().single();
+  if(error){ dispararAutomacao('Erro ao lançar', error.message); return; }
+  CONTAS_PESSOAIS.push({id:data.id, tipo, desc:desc.trim(), valor, vencimento: vencimento||"—", status:"aberto"});
+  dispararAutomacao('Lançamento pessoal adicionado', desc.trim());
+  renderTela();
+}
 let filtroContasPessoais = "todos";
 function selecionarFiltroContasPessoais(f){ filtroContasPessoais = f; renderTela(); }
 function contasHTML(){
@@ -2378,6 +2462,10 @@ function contasHTML(){
       <button class="${filtroContasPessoais==='receita'?'active':''}" onclick="selecionarFiltroContasPessoais('receita')">Receitas</button>
       <button class="${filtroContasPessoais==='despesa'?'active':''}" onclick="selecionarFiltroContasPessoais('despesa')">Despesas</button>
     </div>
+    <div style="display:flex;gap:10px;margin:14px 0;">
+      <button class="btn-secundario" onclick="novaContaPessoal('receita')">+ Nova receita</button>
+      <button class="btn-secundario" onclick="novaContaPessoal('despesa')">+ Nova despesa</button>
+    </div>
     <div class="fin-lista">
       ${lista.map(l=>`
         <div class="fin-lancamento">
@@ -2392,25 +2480,34 @@ function contasHTML(){
     <div style="margin-top:12px;font-size:11.5px;color:var(--cor-texto-suave);">Dados 100% separados do Financeiro da Consultoria — só você vê isso aqui.</div>`;
 }
 
-let LISTA_COMPRAS = [
-  {id:1, item:"Frutas da semana", feito:false},
-  {id:2, item:"Produtos de limpeza", feito:true},
-  {id:3, item:"Presente aniversário — mãe", feito:false},
-];
-let proximoIdCompra = 4;
-function alternarCompra(id){ LISTA_COMPRAS.find(c=>c.id===id).feito = !LISTA_COMPRAS.find(c=>c.id===id).feito; renderTela(); }
-function adicionarCompra(){
+let LISTA_COMPRAS = [];
+async function carregarComprasSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('lista_compras').select('*').eq('user_id', user.id).order('id');
+  if(error){ dispararAutomacao('Erro ao carregar compras', error.message); return; }
+  LISTA_COMPRAS = (data||[]).map(c=>({id:c.id, item:c.item, feito:c.comprado}));
+}
+async function alternarCompra(id){
+  const c = LISTA_COMPRAS.find(x=>x.id===id);
+  c.feito = !c.feito;
+  renderTela();
+  await supa.from('lista_compras').update({comprado:c.feito}).eq('id', id);
+}
+async function adicionarCompra(){
   const input = document.getElementById('novoItemCompra');
   const texto = input.value.trim();
   if(!texto) return;
-  LISTA_COMPRAS.push({id: proximoIdCompra++, item: texto, feito:false});
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('lista_compras').insert({user_id:user.id, item:texto, comprado:false}).select().single();
+  if(error){ dispararAutomacao('Erro ao adicionar item', error.message); return; }
+  LISTA_COMPRAS.push({id: data.id, item: texto, feito:false});
   renderTela();
 }
 function comprasHTML(){
   return `
     ${LISTA_COMPRAS.map(c=>`
-      <div class="compra-item ${c.feito?'feito':''}" onclick="alternarCompra(${c.id})">
-        <input type="checkbox" ${c.feito?'checked':''} onclick="event.stopPropagation(); alternarCompra(${c.id})">
+      <div class="compra-item ${c.feito?'feito':''}" onclick="alternarCompra('${c.id}')">
+        <input type="checkbox" ${c.feito?'checked':''} onclick="event.stopPropagation(); alternarCompra('${c.id}')">
         <span>${c.item}</span>
       </div>
     `).join('')}
@@ -2753,11 +2850,13 @@ function pendenciasHTML(){
 }
 
 /* ---------- CICLO MENSTRUAL ---------- */
-let REGISTROS_CICLO = [
-  {id:1, data:"08/07"},
-  {id:2, data:"05/06"},
-];
-let proximoIdCiclo = 3;
+let REGISTROS_CICLO = [];
+async function carregarCicloSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('registros_ciclo').select('*').eq('user_id', user.id).order('data', {ascending:false});
+  if(error){ dispararAutomacao('Erro ao carregar ciclo', error.message); return; }
+  REGISTROS_CICLO = (data||[]).map(r=>({id:r.id, data: r.data.split('-').reverse().slice(0,2).join('/')}));
+}
 function calcularMediaCiclo(){
   if(REGISTROS_CICLO.length < 2) return null;
   const datas = REGISTROS_CICLO.map(r=>{
@@ -2770,11 +2869,17 @@ function calcularMediaCiclo(){
   }
   return Math.round(diffs.reduce((a,b)=>a+b,0)/diffs.length);
 }
-function registrarInicioCiclo(){
-  const data = prompt("Data de início (formato DD/MM):", "");
-  if(!data || !data.trim()) return;
-  REGISTROS_CICLO.unshift({id: proximoIdCiclo++, data: data.trim()});
-  dispararAutomacao('Ciclo registrado', `Início registrado em ${data.trim()}.`);
+async function registrarInicioCiclo(){
+  const dataTxt = prompt("Data de início (formato DD/MM):", "");
+  if(!dataTxt || !dataTxt.trim()) return;
+  const [dd,mm] = dataTxt.trim().split('/');
+  if(!dd||!mm){ alert('Use o formato DD/MM.'); return; }
+  const dataISO = `2026-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('registros_ciclo').insert({user_id:user.id, data:dataISO}).select().single();
+  if(error){ dispararAutomacao('Erro ao registrar ciclo', error.message); return; }
+  REGISTROS_CICLO.unshift({id: data.id, data: dataTxt.trim()});
+  dispararAutomacao('Ciclo registrado', `Início registrado em ${dataTxt.trim()}.`);
   renderTela();
 }
 function cicloHTML(){
@@ -2794,15 +2899,20 @@ function cicloHTML(){
 }
 
 /* ---------- BANCO DE IDEIAS PESSOAL ---------- */
-let IDEIAS_PESSOAIS = [
-  {id:1, texto:"Criar um kit de boas-vindas pra clientes novos", tags:"Negócio"},
-  {id:2, texto:"Testar receita de pão sem glúten pro fim de semana", tags:"Pessoal"},
-];
-let proximoIdIdeiaPessoal = 3;
-function novaIdeiaPessoal(){
+let IDEIAS_PESSOAIS = [];
+async function carregarIdeiasPessoaisSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('ideias_pessoais').select('*').eq('user_id', user.id).order('id', {ascending:false});
+  if(error){ dispararAutomacao('Erro ao carregar ideias', error.message); return; }
+  IDEIAS_PESSOAIS = (data||[]).map(i=>({id:i.id, texto:i.texto, tags:i.tags||"Geral"}));
+}
+async function novaIdeiaPessoal(){
   const texto = prompt("Sua ideia:");
   if(!texto || !texto.trim()) return;
-  IDEIAS_PESSOAIS.unshift({id: proximoIdIdeiaPessoal++, texto: texto.trim(), tags:"Geral"});
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('ideias_pessoais').insert({user_id:user.id, texto:texto.trim(), tags:"Geral"}).select().single();
+  if(error){ dispararAutomacao('Erro ao salvar ideia', error.message); return; }
+  IDEIAS_PESSOAIS.unshift({id: data.id, texto: texto.trim(), tags:"Geral"});
   renderTela();
 }
 function ideiasPessoaisHTML(){
@@ -2824,14 +2934,28 @@ const HUMORES_PIXEL = [
   {id:"otimo", nome:"Ótimo", classe:"pixel-otimo"},
 ];
 let REGISTROS_PIXEL = {}; // chave: "2026-08-02" -> "tenso"|"bom"|"produtivo"|"otimo"
+async function carregarPixelSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  const { data, error } = await supa.from('registros_pixel').select('*').eq('user_id', user.id);
+  if(error){ dispararAutomacao('Erro ao carregar Ano em Pixels', error.message); return; }
+  REGISTROS_PIXEL = {};
+  (data||[]).forEach(r=>{ REGISTROS_PIXEL[r.data] = r.humor; });
+}
 
-function marcarPixelDia(dataISO){
+async function marcarPixelDia(dataISO){
   const atual = REGISTROS_PIXEL[dataISO];
   const idx = HUMORES_PIXEL.findIndex(h=>h.id===atual);
   const proximo = idx === -1 ? 0 : (idx+1 < HUMORES_PIXEL.length ? idx+1 : -1);
-  if(proximo === -1){ delete REGISTROS_PIXEL[dataISO]; }
-  else { REGISTROS_PIXEL[dataISO] = HUMORES_PIXEL[proximo].id; }
-  renderTela();
+  const { data: { user } } = await supa.auth.getUser();
+  if(proximo === -1){
+    delete REGISTROS_PIXEL[dataISO];
+    renderTela();
+    await supa.from('registros_pixel').delete().eq('user_id', user.id).eq('data', dataISO);
+  } else {
+    REGISTROS_PIXEL[dataISO] = HUMORES_PIXEL[proximo].id;
+    renderTela();
+    await supa.from('registros_pixel').upsert({user_id:user.id, data:dataISO, humor:HUMORES_PIXEL[proximo].id}, {onConflict:'user_id,data'});
+  }
 }
 
 function anoPixelsHTML(){
@@ -2861,28 +2985,35 @@ function anoPixelsHTML(){
 
 /* ---------- MÓDULO ATIVOS (controle simples, estilo Projetos) ---------- */
 const CATEGORIAS_ATIVO = ["Consultoria","Documentação","Treinamento","Produto Digital","Material Comercial","Marketing","Modelo","Biblioteca Técnica"];
-let ATIVOS = [
-  {id:1, nome:"Planejador Digital 2026-2027", categoria:"Produto Digital", status:"Ativo", descricao:"Planner interativo em PowerPoint, à venda no Hotmart."},
-  {id:2, nome:"Kit Abertura sem Multa", categoria:"Material Comercial", status:"Em desenvolvimento", descricao:"Pacote de consultoria para abertura de estabelecimentos."},
-  {id:3, nome:"17 Pôsteres de Segurança Alimentar", categoria:"Marketing", status:"Ativo", descricao:"Material A5 para exibição no cliente."},
-];
-let proximoIdAtivo = 4;
+let ATIVOS = [];
 let ativoSelecionadoId = null;
 let filtroCategoriaAtivo = "Todas";
 
-function novoAtivo(){
+async function carregarAtivosSupabase(){
+  const { data, error } = await supa.from('ativos').select('*').order('criado_em');
+  if(error){ dispararAutomacao('Erro ao carregar ativos', error.message); return; }
+  ATIVOS = (data || []).map(row => ({
+    id: row.id, nome: row.nome, categoria: row.categoria||"Consultoria", status: row.status, descricao: row.descricao||""
+  }));
+}
+async function novoAtivo(){
   const nome = prompt("Nome do ativo/produto:");
   if(!nome || !nome.trim()) return;
-  ATIVOS.push({id: proximoIdAtivo++, nome: nome.trim(), categoria: "Consultoria", status:"Em desenvolvimento", descricao:""});
-  dispararAutomacao('Ativo cadastrado', `"${nome.trim()}" adicionado ao controle de Ativos.`);
+  const { data, error } = await supa.from('ativos').insert({
+    nome: nome.trim(), categoria: "Consultoria", status: "Em desenvolvimento"
+  }).select().single();
+  if(error){ dispararAutomacao('Erro ao cadastrar ativo', error.message); return; }
+  ATIVOS.push({id: data.id, nome: nome.trim(), categoria:"Consultoria", status:"Em desenvolvimento", descricao:""});
+  dispararAutomacao('Ativo cadastrado', `"${nome.trim()}" salvo no banco de dados.`);
   renderTela();
 }
 function abrirAtivo(id){ ativoSelecionadoId = id; renderTela(); }
 function voltarAtivos(){ ativoSelecionadoId = null; renderTela(); }
 function selecionarFiltroCategoriaAtivo(c){ filtroCategoriaAtivo = c; renderTela(); }
-function mudarStatusAtivo(id, status){
+async function mudarStatusAtivo(id, status){
   ATIVOS.find(a=>a.id===id).status = status;
   renderTela();
+  await supa.from('ativos').update({status}).eq('id', id);
 }
 function classeStatusAtivo(s){
   if(s==='Ativo') return 'status-ativo';
@@ -2911,7 +3042,7 @@ function ativosHTML(){
     <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novoAtivo()">+ Novo ativo</button></div>
     <div class="projetos-grid">
       ${lista.map(a=>`
-        <div class="projeto-card" onclick="abrirAtivo(${a.id})">
+        <div class="projeto-card" onclick="abrirAtivo('${a.id}')">
           <div class="projeto-card-nome">${a.nome}</div>
           <div class="projeto-card-cliente">${a.categoria}</div>
           <span class="ativo-status-pill ${classeStatusAtivo(a.status)}">${a.status}</span>
@@ -2933,7 +3064,7 @@ function fichaAtivoHTML(a){
     </div>
     <div class="aba-conteudo">
       <div class="campo"><label>Status</label>
-        <select onchange="mudarStatusAtivo(${a.id}, this.value)" style="border:1px solid var(--cor-borda);border-radius:8px;padding:7px 10px;font-size:12.5px;">
+        <select onchange="mudarStatusAtivo('${a.id}', this.value)" style="border:1px solid var(--cor-borda);border-radius:8px;padding:7px 10px;font-size:12.5px;">
           ${["Em desenvolvimento","Ativo","Em revisão","Arquivado"].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
@@ -3250,6 +3381,15 @@ async function entrarNoApp(){
   await carregarVisitasSupabase();
   await carregarEventosSupabase();
   await carregarLancamentosSupabase();
+  await carregarLeadsSupabase();
+  await carregarAtivosSupabase();
+  await carregarHabitosSupabase();
+  await carregarMetasPessoaisSupabase();
+  await carregarContasPessoaisSupabase();
+  await carregarComprasSupabase();
+  await carregarIdeiasPessoaisSupabase();
+  await carregarCicloSupabase();
+  await carregarPixelSupabase();
   renderSidebar();
   renderTabbar();
   renderTela();
