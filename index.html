@@ -1356,7 +1356,13 @@ function abaConteudoClienteHTML(c){
         <div style="font-size:11px;color:var(--cor-texto-suave);margin-top:10px;">Toque em qualquer campo (✎) para editar.</div>`;
     case "visitas":
       return c.visitas.length ? c.visitas.map(v=>`
-        <div class="item-lista-simples"><span>${v.data} — ${v.status==='concluida'?'Concluída':'Agendada'}</span><span>${v.pontuacao?v.pontuacao+'%':''}</span></div>
+        <div class="item-lista-simples">
+          <span>${v.data} — ${v.status==='concluida'?'Concluída':'Agendada'}</span>
+          <span style="display:flex;align-items:center;gap:10px;">
+            ${v.pontuacao?v.pontuacao+'%':''}
+            ${v.pdfPath ? `<button onclick="verPdfDoHistorico('${v.pdfPath}')" style="color:var(--cor-primaria);font-weight:600;font-size:12px;">📄 Ver PDF</button>` : ''}
+          </span>
+        </div>
       `).join('') : semRegistro();
     case "pendencias":
       return pendenciasDoClienteHTML(c);
@@ -1496,10 +1502,11 @@ async function carregarVisitasSupabase(){
       {id:3, texto:"Revisar pendências da visita anterior", feito:false},
     ],
     checklist: row.status==='agendada' ? gerarChecklistOficial() : [],
+    pdfPath: row.pdf_path || null,
   }));
   // Agenda x Visitas: cada visita aparece automaticamente no histórico do cliente correspondente
   CLIENTES.forEach(c=>{
-    c.visitas = VISITAS.filter(v=>v.clienteId===c.id).map(v=>({data:v.data, status:v.status, pontuacao:v.pontuacao}));
+    c.visitas = VISITAS.filter(v=>v.clienteId===c.id).map(v=>({data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath}));
   });
 }
 function mesAnoPorData(dataISO){
@@ -1593,7 +1600,10 @@ function visitasHTML(){
               <div class="visita-meta">${v.data} · ${v.status==='agendada'?'Agendada':'Concluída'}</div>
             </div>
           </div>
-          ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Preparar visita →</span>`}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Preparar visita →</span>`}
+            ${v.pdfPath ? `<button onclick="event.stopPropagation(); verPdfDoHistorico('${v.pdfPath}')" title="Ver PDF" style="color:var(--cor-primaria);font-size:16px;">📄</button>` : ''}
+          </div>
         </div>
       `).join('')}
     </div>`;
@@ -1824,41 +1834,45 @@ async function gerarPDFVisita(v){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'mm', format:'a4'});
   const margem = 14;
-  let y = 14;
+  const largura = 210 - margem*2;
+  let y = 12;
 
   const logo = pegarLogoBase64();
   if(logo){
-    try{ doc.addImage(logo, 'JPEG', 148-22, y, 44, 22); }catch(e){}
+    try{ doc.addImage(logo, 'JPEG', 105-24, y, 48, 24); }catch(e){}
   }
-  y += 26;
+  y += 27;
 
-  doc.setFillColor(79,165,121); // verde da marca
-  doc.rect(margem, y, 210-margem*2, 9, 'F');
+  // Faixa de título, igual ao modelo (verde + friso laranja)
+  doc.setFillColor(79,165,121);
+  doc.roundedRect(margem, y, largura, 9.5, 1.2, 1.2, 'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(13);
   doc.setFont(undefined,'bold');
-  doc.text('CHECKLIST DE BOAS PRÁTICAS', 105, y+6.2, {align:'center'});
-  y += 9;
-  doc.setFillColor(221,109,45); // laranja da marca
-  doc.rect(margem, y, 210-margem*2, 1.3, 'F');
-  y += 7;
+  doc.text('CHECKLIST DE BOAS PRÁTICAS', 105, y+6.5, {align:'center'});
+  y += 9.5;
+  doc.setFillColor(221,109,45);
+  doc.rect(margem, y, largura, 1.4, 'F');
+  y += 8;
 
-  doc.setTextColor(34,35,31);
-  doc.setFontSize(9);
-  doc.setFont(undefined,'normal');
-  doc.text(`Cliente: ${v.clienteNome}`, margem, y);
-  doc.text(`Mês/Ano: ${v.mesAno}`, margem+90, y);
-  y += 5;
-  doc.text(`Nutricionista Responsável: ${v.nutricionista} — ${v.crn}`, margem, y);
-  y += 5;
-  doc.text(`Data de aplicação: ${v.data}    Data de elaboração: ${v.data}`, margem, y);
-  y += 7;
+  // Tabela de cabeçalho (Cliente / Mês-Ano / Nutricionista / Datas), igual ao modelo
+  doc.autoTable({
+    startY: y,
+    head: [['Cliente','Mês/Ano','Nutricionista Responsável','Data de aplicação','Data de elaboração']],
+    body: [[v.clienteNome, v.mesAno, `${v.nutricionista} — ${v.crn}`, v.data, v.data]],
+    theme: 'grid',
+    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold'},
+    styles: {fontSize:8.5, cellPadding:2, textColor:[34,35,31], lineColor:[226,224,214]},
+    margin:{left:margem, right:margem},
+  });
+  y = doc.lastAutoTable.finalY + 6;
 
   const linhas = [];
   let categoriaAtual = null;
+  const fotosPorItem = []; // {desc, fotos:[...]}
   v.checklist.filter(i=>i.resultado).forEach((item,idx)=>{
     if(item.categoria !== categoriaAtual){
-      linhas.push([{content:item.categoria, colSpan:5, styles:{fillColor:[247,245,239], textColor:[79,165,121], fontStyle:'bold'}}]);
+      linhas.push([{content:item.categoria, colSpan:5, styles:{fillColor:[247,245,239], textColor:[79,165,121], fontStyle:'bold', fontSize:8.5}}]);
       categoriaAtual = item.categoria;
     }
     linhas.push([
@@ -1868,7 +1882,10 @@ async function gerarPDFVisita(v){
       item.resultado==='na' ? 'X' : '',
     ]);
     if(item.resultado==='nao_conforme' && item.obs){
-      linhas.push([{content:'Obs.: '+item.obs + (item.fotos&&item.fotos.length ? ' ('+item.fotos.length+' foto(s) anexada(s))' : ''), colSpan:5, styles:{fontSize:8, textColor:[142,58,74], fillColor:[251,243,244]}}]);
+      linhas.push([{content:'Obs.: '+item.obs, colSpan:5, styles:{fontSize:7.8, textColor:[142,58,74], fillColor:[251,243,244]}}]);
+    }
+    if(item.fotos && item.fotos.length){
+      fotosPorItem.push({desc:item.desc, fotos:item.fotos});
     }
   });
 
@@ -1877,48 +1894,56 @@ async function gerarPDFVisita(v){
     head: [['Nº','Item Avaliado','Sim','Não','N/A']],
     body: linhas,
     theme: 'grid',
-    headStyles: {fillColor:[79,165,121], fontSize:9},
-    styles: {fontSize:8.5, cellPadding:1.6},
-    columnStyles: {0:{cellWidth:8, halign:'center'}, 1:{cellWidth:120}, 2:{cellWidth:14,halign:'center'}, 3:{cellWidth:14,halign:'center'}, 4:{cellWidth:14,halign:'center'}},
+    headStyles: {fillColor:[79,165,121], fontSize:9, halign:'center'},
+    styles: {fontSize:8.3, cellPadding:1.6, lineColor:[226,224,214], textColor:[34,35,31]},
+    columnStyles: {0:{cellWidth:8, halign:'center'}, 1:{cellWidth:118}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
     margin:{left:margem, right:margem},
   });
 
   y = doc.lastAutoTable.finalY + 8;
   const boa = v.pontuacao >= 80;
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setFont(undefined,'bold');
   doc.setTextColor(boa?46:142, boa?107:58, boa?74:74);
   doc.text(`% de Adequação: ${v.pontuacao}%`, margem, y);
   doc.setFont(undefined,'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(108,107,98);
-  doc.text('Recomenda-se, no mínimo, 80% de adequação.', margem, y+5);
-  y += 14;
+  doc.text('Recomenda-se, no mínimo, 80% de adequação. Nota em verde = adequado, vermelho = abaixo do recomendado.', margem, y+5);
+  y += 13;
 
-  // Fotos anexadas (uma grade simples)
-  const todasFotos = [];
-  v.checklist.forEach(item=>{ if(item.fotos) item.fotos.forEach(f=> todasFotos.push({f, desc:item.desc})); });
-  if(todasFotos.length>0){
-    if(y > 230){ doc.addPage(); y = 14; }
-    doc.setFontSize(9); doc.setTextColor(34,35,31); doc.setFont(undefined,'bold');
-    doc.text('Registro fotográfico', margem, y); y += 5;
+  // Fotos anexadas — agrupadas por item, com legenda (não soltas ao final sem contexto)
+  if(fotosPorItem.length>0){
+    if(y > 220){ doc.addPage(); y = 16; }
+    doc.setFontSize(9.5); doc.setTextColor(34,35,31); doc.setFont(undefined,'bold');
+    doc.text('Registro fotográfico', margem, y); y += 6;
     doc.setFont(undefined,'normal');
-    let x = margem;
-    todasFotos.slice(0,6).forEach((item,i)=>{
-      try{ doc.addImage(item.f, 'JPEG', x, y, 40, 30); }catch(e){}
-      x += 44;
-      if((i+1)%4===0){ x = margem; y += 34; }
+
+    fotosPorItem.forEach(grupo=>{
+      if(y > 250){ doc.addPage(); y = 16; }
+      doc.setFontSize(8); doc.setTextColor(108,107,98);
+      doc.text(grupo.desc, margem, y);
+      y += 3;
+      let x = margem;
+      let maiorAltura = 0;
+      grupo.fotos.forEach((f,i)=>{
+        try{ doc.addImage(f, 'JPEG', x, y, 42, 30); }catch(e){}
+        maiorAltura = 30;
+        x += 46;
+        if((i+1)%3===0){ x = margem; y += 34; }
+      });
+      y += maiorAltura + 6;
     });
-    y += 38;
   }
 
   // Assinaturas
-  if(y > 250){ doc.addPage(); y = 14; }
+  if(y > 250){ doc.addPage(); y = 16; }
   y = Math.max(y, 250);
   doc.setDrawColor(34,35,31);
   doc.line(margem, y, margem+70, y);
   doc.line(120, y, 190, y);
   doc.setFontSize(8.5);
+  doc.setTextColor(34,35,31);
   doc.text(`${v.nutricionista} — Nutricionista Responsável`, margem, y+4);
   doc.text(`${v.clienteNome} — Responsável pelo Estabelecimento`, 120, y+4);
 
@@ -1929,13 +1954,38 @@ async function gerarPDFVisita(v){
   const nomeArquivo = `Checklist_${v.clienteNome.replace(/\s+/g,'_')}_${v.mesAno.replace('/','_')}.pdf`;
   ultimoPDFBlob = doc.output('blob');
   ultimoPDFNome = nomeArquivo;
+
+  // Salvar de verdade no Storage e vincular ao histórico do cliente
+  const path = `${v.clienteId}/${v.id}.pdf`;
+  const { error: erroUpload } = await supa.storage.from('relatorios').upload(path, ultimoPDFBlob, {
+    contentType: 'application/pdf', upsert: true
+  });
+  if(erroUpload){
+    dispararAutomacao('PDF gerado, mas não salvo no histórico', erroUpload.message);
+  } else {
+    await supa.from('visitas').update({pdf_path: path}).eq('id', v.id);
+    v.pdfPath = path;
+    const cliente = CLIENTES.find(c=>c.id===v.clienteId);
+    if(cliente){
+      const visitaNoCliente = cliente.visitas.find(x=>x.data===v.data);
+      if(visitaNoCliente) visitaNoCliente.pdfPath = path;
+    }
+    dispararAutomacao('PDF salvo no histórico do cliente', v.clienteNome);
+  }
+}
+
+async function verPdfDoHistorico(path){
+  const { data, error } = await supa.storage.from('relatorios').createSignedUrl(path, 3600);
+  if(error){ dispararAutomacao('Erro ao abrir PDF', error.message); return; }
+  window.open(data.signedUrl, '_blank');
 }
 
 function telaPosPdfHTML(v){
   return `
     <div class="placeholder" style="padding:40px 24px;">
       <div class="serif" style="font-size:19px;margin-bottom:8px;">PDF gerado ✓</div>
-      <div style="margin-bottom:22px;">${v.clienteNome} — ${v.pontuacao}% de adequação</div>
+      <div style="margin-bottom:6px;">${v.clienteNome} — ${v.pontuacao}% de adequação</div>
+      <div style="margin-bottom:22px;font-size:11.5px;color:var(--cor-texto-suave);">${v.pdfPath ? '✅ Já salvo no histórico do cliente' : 'Salvando no histórico do cliente...'}</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn-primario" onclick="visualizarPDF()">👁 Visualizar</button>
         <button class="btn-secundario" onclick="baixarPDF()">⬇ Baixar</button>
