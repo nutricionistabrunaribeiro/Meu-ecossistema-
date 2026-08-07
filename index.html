@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Ecossistema — Bruna Ribeiro Consultoria</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4FA579">
 <meta name="mobile-web-app-capable" content="yes">
@@ -183,10 +185,10 @@
 
   .quick-add{
     position:absolute;z-index:20;background:#fff;border:1px solid var(--cor-borda);border-radius:10px;
-    box-shadow:0 12px 30px rgba(0,0,0,.15);padding:10px;width:200px;top:0;left:0;
+    box-shadow:0 12px 30px rgba(0,0,0,.15);padding:10px;width:240px;top:0;left:0;
   }
   .quick-add input{width:100%;border:1px solid var(--cor-borda);border-radius:7px;padding:7px 8px;font-size:12.5px;font-family:inherit;margin-bottom:8px;}
-  .quick-add .cores{display:flex;gap:6px;margin-bottom:8px;}
+  .quick-add .cores{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
   .quick-add .cor-op{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
   .quick-add .cor-op.sel{border-color:var(--cor-texto);}
   .quick-add .acoes{display:flex;gap:6px;}
@@ -812,6 +814,7 @@ function trocarEspaco(esp){
 
 function irPara(id){
   telaAtual = id;
+  if(id === 'visitas'){ visitaSelecionadaId = null; telaPosPdfVisitaId = null; }
   renderSidebar();
   renderTabbar();
   renderTela();
@@ -852,11 +855,13 @@ const NOMES_TELA = {
 const DIAS_SEMANA = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const MESES_NOME = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const HORAS_PLANNER = Array.from({length:13}, (_,i)=> i+7); // 7h às 19h
-const TIPOS_EVENTO = [
-  {id:"visita", nome:"Visita", cor:"#8E5FB0"},
-  {id:"demanda", nome:"Demanda", cor:"#D98B3F"},
-  {id:"pessoal", nome:"Pessoal", cor:"#4F8A5E"},
-  {id:"financeiro", nome:"Financeiro", cor:"#C9A227"},
+const CATEGORIAS_EVENTO = [
+  {id:"brc", nome:"Cliente Bruna Ribeiro Consultoria", cor:"#8E5FB0"},
+  {id:"saber_nutrir", nome:"Cliente Saber Nutrir", cor:"#3D6E8F"},
+  {id:"pessoal", nome:"Compromisso Pessoal", cor:"#4F8A5E"},
+  {id:"reuniao", nome:"Reunião", cor:"#D98B3F"},
+  {id:"treinamento", nome:"Treinamento", cor:"#C9A227"},
+  {id:"outro", nome:"Outro", cor:"#8A8577"},
 ];
 const REF_DOMINGO = new Date(2026,7,2); // domingo, 2 de agosto de 2026 — âncora do "hoje" do protótipo
 
@@ -867,14 +872,18 @@ function inicioDaSemana(data){ const d = new Date(data); d.setDate(d.getDate()-d
 
 let eventosSemana = [];
 async function carregarEventosSupabase(){
-  const { data, error } = await supa.from('eventos').select('*').order('data').order('hora');
+  const { data, error } = await supa.from('eventos').select('*, clientes(nome)').order('data').order('hora');
   if(error){ dispararAutomacao('Erro ao carregar agenda', error.message); return; }
   eventosSemana = (data || []).map(row => ({
-    id: row.id, dataISO: row.data, hora: row.hora, titulo: row.titulo, tipo: row.tipo, concluido: row.concluido
+    id: row.id, dataISO: row.data, hora: row.hora, titulo: row.titulo,
+    categoria: row.categoria || 'outro', concluido: row.concluido,
+    clienteId: row.cliente_id || null,
+    clienteNomeVinculado: row.clientes ? row.clientes.nome : null,
+    clienteExterno: row.cliente_externo || null,
   }));
 }
 let celulaAtiva = null; // {dataISO, hora}
-let corSelecionada = "visita";
+let categoriaSelecionada = "brc";
 let semanaOffsetAtual = 0;
 let mesOffsetAtual = 0;
 let visaoAgenda = "semana"; // 'semana' | 'mes'
@@ -893,7 +902,7 @@ function abrirSemanaDoDia(dataISO){
 
 function agendaHTML(){
   const legenda = `<div class="legenda">` +
-    TIPOS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot dot-${t.id}"></span>${t.nome}</div>`).join('') +
+    CATEGORIAS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot" style="background:${t.cor}"></span>${t.nome}</div>`).join('') +
     `</div>`;
   const abas = `<div class="etapa-tabs" style="margin:0 0 16px;">
       <button class="${visaoAgenda==='semana'?'active':''}" onclick="mudarVisaoAgenda('semana')">Semana</button>
@@ -930,7 +939,7 @@ function agendaSemanaHTML(){
       const idCel = `cel-${dataISO}-${hora}`;
       const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora);
       let chips = eventos.map(e=>
-        `<div class="evento-chip chip-${e.tipo} ${e.concluido?'concluido':''}" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="Toque para marcar como feito">${e.titulo}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span></div>`
+        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="Toque para marcar como feito">${e.titulo}${e.clienteNomeVinculado?' — '+e.clienteNomeVinculado:''}${e.clienteExterno?' — '+e.clienteExterno:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span></div>`
       ).join('');
       let quickAdd = '';
       if(celulaAtiva && celulaAtiva.dataISO===dataISO && celulaAtiva.hora===hora){
@@ -938,7 +947,7 @@ function agendaSemanaHTML(){
           <div class="quick-add" onclick="event.stopPropagation()">
             <input type="text" id="inputNovoEvento" placeholder="Título do evento" autofocus>
             <div class="cores">
-              ${TIPOS_EVENTO.map(t=>`<div class="cor-op ${corSelecionada===t.id?'sel':''}" style="background:${t.cor}" onclick="selecionarCor('${t.id}')"></div>`).join('')}
+              ${CATEGORIAS_EVENTO.map(t=>`<div class="cor-op ${categoriaSelecionada===t.id?'sel':''}" style="background:${t.cor}" onclick="selecionarCategoriaEvento('${t.id}')" title="${t.nome}"></div>`).join('')}
             </div>
             <div class="acoes">
               <button class="btn-cancelar" onclick="celulaAtiva=null; renderTela()">Cancelar</button>
@@ -976,12 +985,12 @@ function agendaMesHTML(){
     const dataISO = formatoISO(dataCel);
     const eventosNoDia = eventosSemana.filter(e=>e.dataISO===dataISO);
     const ehHoje = dataISO===formatoISO(REF_DOMINGO);
-    const cores = [...new Set(eventosNoDia.map(e=>e.tipo))];
+    const cores = [...new Set(eventosNoDia.map(e=>e.categoria))];
     celulas += `
       <div onclick="abrirSemanaDoDia('${dataISO}')" style="cursor:pointer;border:1px solid var(--cor-borda);border-radius:8px;min-height:64px;padding:6px;${ehHoje?'background:var(--cor-fundo);border-color:var(--cor-primaria);':''}">
         <div style="font-size:11.5px;font-weight:${ehHoje?'700':'500'};color:${ehHoje?'var(--cor-primaria)':'var(--cor-texto)'};">${dia}</div>
         <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;">
-          ${cores.map(t=>`<span style="width:7px;height:7px;border-radius:50%;background:${TIPOS_EVENTO.find(x=>x.id===t).cor};display:inline-block;"></span>`).join('')}
+          ${cores.map(t=>`<span style="width:7px;height:7px;border-radius:50%;background:${CATEGORIAS_EVENTO.find(x=>x.id===t).cor};display:inline-block;"></span>`).join('')}
         </div>
       </div>`;
   }
@@ -996,12 +1005,12 @@ function agendaMesHTML(){
 
 function abrirQuickAdd(dataISO, hora){
   celulaAtiva = {dataISO, hora};
-  corSelecionada = "visita";
+  categoriaSelecionada = "brc";
   renderTela();
   setTimeout(()=>{ const el = document.getElementById('inputNovoEvento'); if(el) el.focus(); }, 0);
 }
-function selecionarCor(tipo){
-  corSelecionada = tipo;
+function selecionarCategoriaEvento(cat){
+  categoriaSelecionada = cat;
   renderTela();
   setTimeout(()=>{ const el = document.getElementById('inputNovoEvento'); if(el) el.focus(); }, 0);
 }
@@ -1009,14 +1018,33 @@ async function confirmarNovoEvento(dataISO, hora){
   const input = document.getElementById('inputNovoEvento');
   const titulo = input ? input.value.trim() : '';
   if(!titulo){ input && input.focus(); return; }
+
+  let clienteId = null;
+  let clienteExterno = null;
+
+  if(categoriaSelecionada === 'brc'){
+    if(CLIENTES.length===0){ alert('Cadastre um cliente da consultoria antes, ou escolha outra categoria.'); return; }
+    const listaNomes = CLIENTES.map((c,i)=>`${i+1}. ${c.nome}`).join('\n');
+    const escolha = prompt(`Vincular a qual cliente da Bruna Ribeiro Consultoria?\n${listaNomes}\n\nDigite o número:`);
+    const idx = parseInt(escolha) - 1;
+    if(isNaN(idx) || !CLIENTES[idx]) return;
+    clienteId = CLIENTES[idx].id;
+  } else if(categoriaSelecionada === 'saber_nutrir'){
+    clienteExterno = prompt("Nome do cliente/compromisso da Saber Nutrir:", "") || null;
+  }
+
   celulaAtiva = null;
   const { data, error } = await supa.from('eventos').insert({
-    titulo, tipo: corSelecionada, data: dataISO, hora
-  }).select().single();
+    titulo, categoria: categoriaSelecionada, data: dataISO, hora,
+    cliente_id: clienteId, cliente_externo: clienteExterno
+  }).select('*, clientes(nome)').single();
   if(error){ dispararAutomacao('Erro ao criar evento', error.message); return; }
-  eventosSemana.push({id: data.id, dataISO, hora, titulo, tipo: corSelecionada, concluido:false});
+  eventosSemana.push({
+    id: data.id, dataISO, hora, titulo, categoria: categoriaSelecionada, concluido:false,
+    clienteId, clienteNomeVinculado: data.clientes ? data.clientes.nome : null, clienteExterno
+  });
   const d = new Date(dataISO+'T00:00:00');
-  dispararAutomacao('Lembrete criado', `"${titulo}" — ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h. Notificação agendada para 1h antes.`);
+  dispararAutomacao('Compromisso criado', `"${titulo}" — ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h.`);
   renderTela();
 }
 async function alternarConcluidoEvento(id){
@@ -1271,14 +1299,13 @@ async function editarCampoCliente(clienteId, campoDb, rotulo){
 }
 
 function pendenciasDoClienteHTML(c){
-  const pendenciasProprias = c.pendencias.filter(p=>!p.startsWith('[BPF]')).map(p=>({texto:p, status:'Aberta'}));
-  const naoConformidades = c.naoConformidades.map(n=>({texto: 'Não conformidade: '+n, status:'Aberta'}));
+  const dbCliente = PENDENCIAS_DB.filter(p=>p.cliente===c.nome).map(p=>({texto:p.titulo, status:rotuloStatusPendencia(p.status)}));
   const financeiras = LANCAMENTOS.filter(l=>l.cliente===c.nome && statusRealLancamento(l)!=='pago')
     .map(l=>({texto: l.desc, status: statusRealLancamento(l)==='atrasado' ? 'Atrasada' : 'Aberta'}));
-  const todas = [...pendenciasProprias, ...naoConformidades, ...financeiras];
+  const todas = [...dbCliente, ...financeiras];
   if(todas.length===0) return semRegistro();
   return todas.map(p=>`
-    <div class="item-lista-simples"><span>${p.texto}</span><span class="tag" style="${p.status==='Atrasada'?'color:#B0413E;font-weight:700;':''}">${p.status}</span></div>
+    <div class="item-lista-simples"><span>${p.texto}</span><span class="tag" style="${corStatusPendencia(p.status.toLowerCase().replace(' ','_'))}">${p.status}</span></div>
   `).join('');
 }
 
@@ -1548,6 +1575,9 @@ function irParaEtapaVisita(etapa){
 let itensPendentesDestacar = [];
 
 function visitasHTML(){
+  if(telaPosPdfVisitaId){
+    return telaPosPdfHTML(VISITAS.find(v=>v.id===telaPosPdfVisitaId));
+  }
   if(visitaSelecionadaId){
     return fichaVisitaHTML(VISITAS.find(v=>v.id===visitaSelecionadaId));
   }
@@ -1614,7 +1644,7 @@ async function marcarResultadoItem(visitaId, itemId, resultado){
         cliente_id: cliente.id, visita_id: v.id, descricao: item.desc, observacao: item.obs || null
       });
       await supa.from('pendencias').insert({
-        cliente_id: cliente.id, origem: 'checklist', titulo: 'Resolver: ' + item.desc, status: 'aberto'
+        cliente_id: cliente.id, origem: 'checklist', titulo: 'Resolver: ' + item.desc, status: 'aberta'
       });
     }
     dispararAutomacao('Não conformidade gerada automaticamente', `"${item.desc}" — pendência criada na ficha de ${v.clienteNome}.`);
@@ -1775,7 +1805,166 @@ async function concluirVisita(id){
     'Relatório em PDF gerado',
     `${v.clienteNome} — ${v.pontuacao}% de adequação, salvo no banco de dados.${naoConf>0 ? ' '+naoConf+' não conformidade(s) registrada(s).' : ''}`
   );
-  voltarVisitas();
+
+  await gerarPDFVisita(v);
+  telaPosPdfVisitaId = v.id;
+  renderTela();
+}
+
+let ultimoPDFBlob = null;
+let ultimoPDFNome = null;
+let telaPosPdfVisitaId = null;
+
+function pegarLogoBase64(){
+  const img = document.querySelector('#telaLogin img');
+  return img ? img.src : null;
+}
+
+async function gerarPDFVisita(v){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const margem = 14;
+  let y = 14;
+
+  const logo = pegarLogoBase64();
+  if(logo){
+    try{ doc.addImage(logo, 'JPEG', 148-22, y, 44, 22); }catch(e){}
+  }
+  y += 26;
+
+  doc.setFillColor(79,165,121); // verde da marca
+  doc.rect(margem, y, 210-margem*2, 9, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13);
+  doc.setFont(undefined,'bold');
+  doc.text('CHECKLIST DE BOAS PRÁTICAS', 105, y+6.2, {align:'center'});
+  y += 9;
+  doc.setFillColor(221,109,45); // laranja da marca
+  doc.rect(margem, y, 210-margem*2, 1.3, 'F');
+  y += 7;
+
+  doc.setTextColor(34,35,31);
+  doc.setFontSize(9);
+  doc.setFont(undefined,'normal');
+  doc.text(`Cliente: ${v.clienteNome}`, margem, y);
+  doc.text(`Mês/Ano: ${v.mesAno}`, margem+90, y);
+  y += 5;
+  doc.text(`Nutricionista Responsável: ${v.nutricionista} — ${v.crn}`, margem, y);
+  y += 5;
+  doc.text(`Data de aplicação: ${v.data}    Data de elaboração: ${v.data}`, margem, y);
+  y += 7;
+
+  const linhas = [];
+  let categoriaAtual = null;
+  v.checklist.filter(i=>i.resultado).forEach((item,idx)=>{
+    if(item.categoria !== categoriaAtual){
+      linhas.push([{content:item.categoria, colSpan:5, styles:{fillColor:[247,245,239], textColor:[79,165,121], fontStyle:'bold'}}]);
+      categoriaAtual = item.categoria;
+    }
+    linhas.push([
+      idx+1, item.desc,
+      item.resultado==='conforme' ? 'X' : '',
+      item.resultado==='nao_conforme' ? 'X' : '',
+      item.resultado==='na' ? 'X' : '',
+    ]);
+    if(item.resultado==='nao_conforme' && item.obs){
+      linhas.push([{content:'Obs.: '+item.obs + (item.fotos&&item.fotos.length ? ' ('+item.fotos.length+' foto(s) anexada(s))' : ''), colSpan:5, styles:{fontSize:8, textColor:[142,58,74], fillColor:[251,243,244]}}]);
+    }
+  });
+
+  doc.autoTable({
+    startY: y,
+    head: [['Nº','Item Avaliado','Sim','Não','N/A']],
+    body: linhas,
+    theme: 'grid',
+    headStyles: {fillColor:[79,165,121], fontSize:9},
+    styles: {fontSize:8.5, cellPadding:1.6},
+    columnStyles: {0:{cellWidth:8, halign:'center'}, 1:{cellWidth:120}, 2:{cellWidth:14,halign:'center'}, 3:{cellWidth:14,halign:'center'}, 4:{cellWidth:14,halign:'center'}},
+    margin:{left:margem, right:margem},
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+  const boa = v.pontuacao >= 80;
+  doc.setFontSize(11);
+  doc.setFont(undefined,'bold');
+  doc.setTextColor(boa?46:142, boa?107:58, boa?74:74);
+  doc.text(`% de Adequação: ${v.pontuacao}%`, margem, y);
+  doc.setFont(undefined,'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(108,107,98);
+  doc.text('Recomenda-se, no mínimo, 80% de adequação.', margem, y+5);
+  y += 14;
+
+  // Fotos anexadas (uma grade simples)
+  const todasFotos = [];
+  v.checklist.forEach(item=>{ if(item.fotos) item.fotos.forEach(f=> todasFotos.push({f, desc:item.desc})); });
+  if(todasFotos.length>0){
+    if(y > 230){ doc.addPage(); y = 14; }
+    doc.setFontSize(9); doc.setTextColor(34,35,31); doc.setFont(undefined,'bold');
+    doc.text('Registro fotográfico', margem, y); y += 5;
+    doc.setFont(undefined,'normal');
+    let x = margem;
+    todasFotos.slice(0,6).forEach((item,i)=>{
+      try{ doc.addImage(item.f, 'JPEG', x, y, 40, 30); }catch(e){}
+      x += 44;
+      if((i+1)%4===0){ x = margem; y += 34; }
+    });
+    y += 38;
+  }
+
+  // Assinaturas
+  if(y > 250){ doc.addPage(); y = 14; }
+  y = Math.max(y, 250);
+  doc.setDrawColor(34,35,31);
+  doc.line(margem, y, margem+70, y);
+  doc.line(120, y, 190, y);
+  doc.setFontSize(8.5);
+  doc.text(`${v.nutricionista} — Nutricionista Responsável`, margem, y+4);
+  doc.text(`${v.clienteNome} — Responsável pelo Estabelecimento`, 120, y+4);
+
+  doc.setFontSize(7.5);
+  doc.setTextColor(108,107,98);
+  doc.text('Bruna Ribeiro Consultoria · Gerado automaticamente pelo Meu Ecossistema', 105, 290, {align:'center'});
+
+  const nomeArquivo = `Checklist_${v.clienteNome.replace(/\s+/g,'_')}_${v.mesAno.replace('/','_')}.pdf`;
+  ultimoPDFBlob = doc.output('blob');
+  ultimoPDFNome = nomeArquivo;
+}
+
+function telaPosPdfHTML(v){
+  return `
+    <div class="placeholder" style="padding:40px 24px;">
+      <div class="serif" style="font-size:19px;margin-bottom:8px;">PDF gerado ✓</div>
+      <div style="margin-bottom:22px;">${v.clienteNome} — ${v.pontuacao}% de adequação</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primario" onclick="visualizarPDF()">👁 Visualizar</button>
+        <button class="btn-secundario" onclick="baixarPDF()">⬇ Baixar</button>
+        <button class="btn-secundario" onclick="compartilharPDF()">↗ Compartilhar</button>
+      </div>
+      <div style="margin-top:20px;"><button onclick="telaPosPdfVisitaId=null; voltarVisitas();" style="color:var(--cor-texto-suave);font-size:12.5px;">← Voltar para Visitas</button></div>
+    </div>`;
+}
+function visualizarPDF(){
+  if(!ultimoPDFBlob) return;
+  window.open(URL.createObjectURL(ultimoPDFBlob), '_blank');
+}
+function baixarPDF(){
+  if(!ultimoPDFBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(ultimoPDFBlob);
+  a.download = ultimoPDFNome;
+  a.click();
+}
+async function compartilharPDF(){
+  if(!ultimoPDFBlob) return;
+  const arquivo = new File([ultimoPDFBlob], ultimoPDFNome, {type:'application/pdf'});
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[arquivo]})){
+    try{ await navigator.share({files:[arquivo], title:ultimoPDFNome}); }
+    catch(e){ /* usuário cancelou */ }
+  } else {
+    dispararAutomacao('Compartilhamento não suportado', 'Este navegador não suporta compartilhar arquivos diretamente — use "Baixar" e compartilhe pelo seu app de mensagens.');
+    baixarPDF();
+  }
 }
 
 /* Assinatura via canvas — funciona com dedo ou caneta/stylus */
@@ -2911,39 +3100,70 @@ document.addEventListener('click', (e)=>{
 });
 
 /* ---------- CENTRAL DE PENDÊNCIAS (agrega dados reais dos outros módulos) ---------- */
-let PENDENCIAS_MANUAIS = [];
-let proximoIdPendManual = 1;
-function novaPendenciaManual(){
+let PENDENCIAS_DB = [];
+async function carregarPendenciasSupabase(){
+  const { data, error } = await supa.from('pendencias').select('*, clientes(nome)').order('criado_em', {ascending:false});
+  if(error){ dispararAutomacao('Erro ao carregar pendências', error.message); return; }
+  PENDENCIAS_DB = (data||[]).map(p=>({
+    id:p.id, titulo:p.titulo, status:p.status, origem:p.origem,
+    cliente: p.clientes ? p.clientes.nome : null,
+    prazo: p.prazo ? p.prazo.split('-').reverse().join('/') : null,
+    responsavel: p.responsavel || null,
+  }));
+}
+async function novaPendenciaManual(){
   const texto = prompt("Descreva a pendência:");
   if(!texto || !texto.trim()) return;
-  PENDENCIAS_MANUAIS.push({id: proximoIdPendManual++, texto: texto.trim()});
+  const prazoTxt = prompt("Prazo (DD/MM/AAAA, opcional):", "") || "";
+  const responsavel = prompt("Responsável:", PERFIL_USUARIO.nome) || PERFIL_USUARIO.nome;
+  const prazoISO = prazoTxt ? (()=>{ const [d,m,a]=prazoTxt.split('/'); return d&&m&&a ? `${a}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` : null; })() : null;
+  const { data, error } = await supa.from('pendencias').insert({
+    titulo: texto.trim(), origem:'manual', status:'aberta', prazo: prazoISO, responsavel
+  }).select().single();
+  if(error){ dispararAutomacao('Erro ao criar pendência', error.message); return; }
+  PENDENCIAS_DB.unshift({id:data.id, titulo:texto.trim(), status:'aberta', origem:'manual', cliente:null, prazo:prazoTxt||null, responsavel});
   dispararAutomacao('Pendência adicionada', texto.trim());
   renderTela();
 }
-function removerPendenciaManual(id){
-  PENDENCIAS_MANUAIS = PENDENCIAS_MANUAIS.filter(p=>p.id!==id);
+async function avancarStatusPendencia(id){
+  const ordem = ['aberta','em_andamento','concluida'];
+  const p = PENDENCIAS_DB.find(x=>x.id===id);
+  const idx = ordem.indexOf(p.status);
+  const proximo = ordem[(idx+1) % ordem.length];
+  p.status = proximo;
   renderTela();
+  await supa.from('pendencias').update({status: proximo}).eq('id', id);
+}
+async function removerPendenciaManual(id){
+  PENDENCIAS_DB = PENDENCIAS_DB.filter(p=>p.id!==id);
+  renderTela();
+  await supa.from('pendencias').delete().eq('id', id);
+}
+
+function rotuloStatusPendencia(s){
+  return {aberta:'Aberta', em_andamento:'Em andamento', concluida:'Concluída', atrasada:'Atrasada'}[s] || s;
+}
+function corStatusPendencia(s){
+  if(s==='concluida') return 'color:#2F6B4A;font-weight:700;';
+  if(s==='atrasada') return 'color:#B0413E;font-weight:700;';
+  if(s==='em_andamento') return 'color:#DD6D2D;font-weight:700;';
+  return '';
 }
 
 function pendenciasHTML(){
-  let itens = [];
-  CLIENTES.forEach(c=>{
-    c.pendencias.forEach(p=>{
-      if(p.startsWith('[BPF]')) return; // já aparece no relatório da visita — não duplica aqui
-      itens.push({origem:"Cliente", cliente:c.nome, texto:p, urgencia:"aberto"});
-    });
-  });
+  let itens = [...PENDENCIAS_DB.map(p=>({
+    origem: p.origem==='checklist' ? 'Checklist BPF' : p.origem==='manual' ? 'Manual' : 'Cliente',
+    cliente: p.cliente || "—", texto: p.titulo, status: p.status,
+    prazo: p.prazo, responsavel: p.responsavel, id: p.id, editavel: p.origem==='manual'
+  }))];
   LANCAMENTOS.forEach(l=>{
     const statusReal = statusRealLancamento(l);
     if(statusReal==='aberto' || statusReal==='atrasado'){
-      itens.push({origem:"Financeiro", cliente:l.cliente||"—", texto: l.desc+' ('+formatarMoeda(l.valor)+')', urgencia:statusReal});
+      itens.push({origem:"Financeiro", cliente:l.cliente||"—", texto: l.desc+' ('+formatarMoeda(l.valor)+')', status: statusReal==='atrasado'?'atrasada':'aberta'});
     }
   });
   LEADS.forEach(l=>{
-    if(l.etapa==='followup') itens.push({origem:"Comercial", cliente:l.nome, texto:"Follow-up pendente", urgencia:"aberto"});
-  });
-  PENDENCIAS_MANUAIS.forEach(p=>{
-    itens.push({origem:"Manual", cliente:"—", texto:p.texto, urgencia:"aberto", idManual:p.id});
+    if(l.etapa==='followup') itens.push({origem:"Comercial", cliente:l.nome, texto:"Follow-up pendente", status:'aberta'});
   });
 
   return `
@@ -2956,11 +3176,11 @@ function pendenciasHTML(){
         <div class="fin-lancamento">
           <div>
             <div class="fin-lanc-desc">${i.texto}</div>
-            <div class="fin-lanc-meta">${i.origem}${i.cliente && i.cliente!=='—' ? ' · '+i.cliente : ''}</div>
+            <div class="fin-lanc-meta">${i.origem}${i.cliente && i.cliente!=='—' ? ' · '+i.cliente : ''}${i.prazo ? ' · prazo '+i.prazo : ''}${i.responsavel ? ' · '+i.responsavel : ''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="tag" style="${i.urgencia==='atrasado'?'color:#B0413E;font-weight:700;':''}">${i.urgencia==='atrasado'?'Atrasado':'Em aberto'}</span>
-            ${i.idManual ? `<button onclick="removerPendenciaManual(${i.idManual})" style="color:var(--cor-texto-suave);font-size:14px;">✕</button>` : ''}
+            <span class="tag" style="${corStatusPendencia(i.status)}" ${i.id?`onclick="avancarStatusPendencia('${i.id}')" title="Toque para avançar o status" `:''}>${rotuloStatusPendencia(i.status)}</span>
+            ${i.editavel ? `<button onclick="removerPendenciaManual('${i.id}')" style="color:var(--cor-texto-suave);font-size:14px;">✕</button>` : ''}
           </div>
         </div>
       `).join('')}
@@ -3273,13 +3493,12 @@ function dashboardHTML(){
   const proximoEvento = eventosHoje.find(e=>!e.concluido);
 
   const pendenciasCount =
-    CLIENTES.reduce((s,c)=>s + c.pendencias.filter(p=>!p.startsWith('[BPF]')).length, 0) +
+    PENDENCIAS_DB.filter(p=>p.status!=='concluida').length +
     LANCAMENTOS.filter(l=>statusRealLancamento(l)!=='pago').length +
-    LEADS.filter(l=>l.etapa==='followup').length +
-    PENDENCIAS_MANUAIS.length;
+    LEADS.filter(l=>l.etapa==='followup').length;
 
   const listaPendenciasResumo = [];
-  CLIENTES.forEach(c=> c.pendencias.filter(p=>!p.startsWith('[BPF]')).forEach(p=> listaPendenciasResumo.push({texto:p, tag:c.nome})));
+  PENDENCIAS_DB.filter(p=>p.status!=='concluida').forEach(p=> listaPendenciasResumo.push({texto:p.titulo, tag:p.cliente||rotuloStatusPendencia(p.status)}));
   LANCAMENTOS.filter(l=>statusRealLancamento(l)!=='pago').forEach(l=> listaPendenciasResumo.push({texto:l.desc, tag: statusRealLancamento(l)==='atrasado'?'atrasado':'financeiro'}));
 
   const clientesPrioritarios = [...CLIENTES].filter(c=>c.prioridade==='alta').slice(0,3);
@@ -3314,7 +3533,7 @@ function dashboardHTML(){
     <div class="card">
       <h3>Agenda de hoje <button onclick="irPara('agenda')">ver tudo</button></h3>
       ${eventosHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nada agendado para hoje.</div>` :
-        eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${e.titulo}${e.concluido?' ✓':''}<div class="agenda-tipo">${TIPOS_EVENTO.find(t=>t.id===e.tipo)?.nome||e.tipo}</div></div></div>`).join('')}
+        eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${e.titulo}${e.concluido?' ✓':''}<div class="agenda-tipo">${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria)?.nome||e.categoria}</div></div></div>`).join('')}
     </div>
 
     <div class="card">
@@ -3383,8 +3602,6 @@ async function carregarEstado(){
       if(d.VISITAS) VISITAS.splice(0, VISITAS.length, ...d.VISITAS);
       if(d.LANCAMENTOS) LANCAMENTOS.splice(0, LANCAMENTOS.length, ...d.LANCAMENTOS);
       if(d.proximoIdEvento) proximoIdEvento = d.proximoIdEvento;
-      if(d.PENDENCIAS_MANUAIS) PENDENCIAS_MANUAIS = d.PENDENCIAS_MANUAIS;
-      if(d.proximoIdPendManual) proximoIdPendManual = d.proximoIdPendManual;
       if(d.proximoIdCliente) proximoIdCliente = d.proximoIdCliente;
       if(d.proximoIdLancamento) proximoIdLancamento = d.proximoIdLancamento;
       if(d.REGISTROS_PIXEL) REGISTROS_PIXEL = d.REGISTROS_PIXEL;
@@ -3403,7 +3620,7 @@ async function salvarEstado(){
   registrarAcaoOffline('Alteração de dados');
   try{
     if(!window.storage) return;
-    const d = { CLIENTES, eventosSemana, VISITAS, LANCAMENTOS, proximoIdEvento, PENDENCIAS_MANUAIS, proximoIdPendManual, proximoIdCliente, proximoIdLancamento, REGISTROS_PIXEL, ATIVOS, proximoIdAtivo, PERFIL_USUARIO };
+    const d = { CLIENTES, eventosSemana, VISITAS, LANCAMENTOS, proximoIdEvento, proximoIdCliente, proximoIdLancamento, REGISTROS_PIXEL, ATIVOS, proximoIdAtivo, PERFIL_USUARIO };
     await window.storage.set(CHAVE_ESTADO, JSON.stringify(d));
   } catch(e){ /* silencioso — não interrompe o uso do app */ }
 }
@@ -3552,6 +3769,7 @@ async function entrarNoApp(){
   await carregarPixelSupabase();
   await carregarProjetosSupabase();
   await carregarMarketingSupabase();
+  await carregarPendenciasSupabase();
   renderSidebar();
   renderTabbar();
   renderTela();
