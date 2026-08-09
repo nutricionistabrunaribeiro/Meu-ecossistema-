@@ -1730,7 +1730,7 @@ function fichaVisitaHTML(v){
                   <button class="opcao-btn ${item.resultado==='na'?'sel-na':''}" onclick="marcarResultadoItem('${v.id}','${item.id}','na')">N/A</button>
                 </div>
               </div>
-              ${item.resultado==='nao_conforme' ? `<textarea class="checklist-obs" rows="2" placeholder="Descreva a não conformidade encontrada..." onchange="atualizarObsItem('${v.id}','${item.id}', this.value)">${item.obs}</textarea>` : ''}
+              ${item.resultado ? `<textarea class="checklist-obs" rows="2" placeholder="${item.resultado==='nao_conforme' ? 'Descreva a não conformidade encontrada...' : 'Observação (opcional)...'}" onchange="atualizarObsItem('${v.id}','${item.id}', this.value)">${item.obs||''}</textarea>` : ''}
               ${item.resultado ? `
               <div class="checklist-fotos">
                 ${(item.fotos||[]).map((f,idx)=>`
@@ -1919,8 +1919,9 @@ async function gerarPDFVisita(v){
       item.resultado==='nao_conforme' ? 'X' : '',
       item.resultado==='na' ? 'X' : '',
     ]);
-    if(item.resultado==='nao_conforme' && item.obs){
-      linhas.push([{content:'Obs.: '+item.obs, colSpan:5, styles:{fontSize:7.8, textColor:[142,58,74], fillColor:[251,243,244]}}]);
+    if(item.obs && item.obs.trim()){
+      const alerta = item.resultado==='nao_conforme';
+      linhas.push([{content:'Obs.: '+item.obs, colSpan:5, styles:{fontSize:7.8, textColor: alerta?[142,58,74]:[34,35,31], fillColor: alerta?[251,243,244]:[249,248,245]}}]);
     }
     if(item.fotos && item.fotos.length){
       fotosPorItem.push({desc:item.desc, fotos:item.fotos});
