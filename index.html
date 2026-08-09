@@ -97,7 +97,7 @@
   }
   .menu-toggle{display:none;}
 
-  .grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:18px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:18px;}
   .card{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:var(--radius);padding:20px;}
   .card h3{font-size:13.5px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
   .card h3 button{font-size:11.5px;color:var(--cor-primaria);font-weight:600;}
@@ -604,7 +604,7 @@
   }
   .modal-busca .dica{padding:14px 20px;font-size:12px;color:var(--cor-texto-suave);}
 
-  @media (max-width:980px){
+  @media (max-width:1100px){
     .sidebar{display:none;}
     .menu-toggle{display:block;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:9px;padding:8px 10px;font-size:13px;flex-shrink:0;}
     .grid{grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));}
@@ -1938,17 +1938,31 @@ async function gerarPDFVisita(v){
     margin:{left:margem, right:margem},
   });
 
-  y = doc.lastAutoTable.finalY + 8;
+  y = doc.lastAutoTable.finalY + 6;
+  const respondidos = v.checklist.filter(i=>i.resultado);
+  const totalItens = respondidos.length;
+  const totalConforme = respondidos.filter(i=>i.resultado==='conforme').length;
+  const totalNaoConforme = respondidos.filter(i=>i.resultado==='nao_conforme').length;
+  const totalNA = respondidos.filter(i=>i.resultado==='na').length;
   const boa = v.pontuacao >= 80;
-  doc.setFontSize(12);
-  doc.setFont(undefined,'bold');
-  doc.setTextColor(boa?46:142, boa?107:58, boa?74:74);
-  doc.text(`% de Adequação: ${v.pontuacao}%`, margem, y);
+
+  doc.autoTable({
+    startY: y,
+    head: [['Total de Itens','Conforme','Não Conforme','N/A','% de Adequação']],
+    body: [[totalItens, totalConforme, totalNaoConforme, totalNA, `${v.pontuacao}%`]],
+    theme: 'grid',
+    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold', halign:'center'},
+    styles: {fontSize:10, cellPadding:2.5, halign:'center', lineColor:[226,224,214]},
+    columnStyles: {4:{textColor: boa?[46,107,74]:[142,58,74], fontStyle:'bold', fontSize:11}},
+    margin:{left:margem, right:margem},
+  });
+  y = doc.lastAutoTable.finalY + 5;
+
   doc.setFont(undefined,'normal');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(108,107,98);
-  doc.text('Recomenda-se, no mínimo, 80% de adequação. Nota em verde = adequado, vermelho = abaixo do recomendado.', margem, y+5);
-  y += 13;
+  doc.text('Recomenda-se atingir, no mínimo, 80% de adequação. N/A = Não se Aplica.', margem, y);
+  y += 11;
 
   // Fotos anexadas — agrupadas por item, com legenda (não soltas ao final sem contexto)
   if(fotosPorItem.length>0){
@@ -3701,7 +3715,7 @@ async function carregarEstado(){
       if(d.REGISTROS_PIXEL) REGISTROS_PIXEL = d.REGISTROS_PIXEL;
       if(d.ATIVOS) ATIVOS.splice(0, ATIVOS.length, ...d.ATIVOS);
       if(d.proximoIdAtivo) proximoIdAtivo = d.proximoIdAtivo;
-      if(d.PERFIL_USUARIO) Object.assign(PERFIL_USUARIO, d.PERFIL_USUARIO);
+      if(d.PERFIL_USUARIO) { /* obsoleto — perfil agora vem do Supabase */ }
     }
   } catch(e){
     // Ainda não há dados salvos, ou o app está sendo aberto fora do ambiente de artefatos do Claude
@@ -3714,7 +3728,7 @@ async function salvarEstado(){
   registrarAcaoOffline('Alteração de dados');
   try{
     if(!window.storage) return;
-    const d = { CLIENTES, eventosSemana, VISITAS, LANCAMENTOS, proximoIdEvento, proximoIdCliente, proximoIdLancamento, REGISTROS_PIXEL, ATIVOS, proximoIdAtivo, PERFIL_USUARIO };
+    const d = { CLIENTES, eventosSemana, VISITAS, LANCAMENTOS, proximoIdEvento, proximoIdCliente, proximoIdLancamento, REGISTROS_PIXEL, ATIVOS, proximoIdAtivo };
     await window.storage.set(CHAVE_ESTADO, JSON.stringify(d));
   } catch(e){ /* silencioso — não interrompe o uso do app */ }
 }
@@ -3765,13 +3779,35 @@ let PERFIL_USUARIO = {
   email: "nutricionistabrunaribeiro@gmail.com",
   crn: "CRN X XX.XXX",
 };
-function editarPerfilCampo(campo, rotulo){
+async function carregarPerfilSupabase(){
+  const { data: { user } } = await supa.auth.getUser();
+  if(!user) return;
+  const { data, error } = await supa.from('perfil_usuario').select('*').eq('user_id', user.id).maybeSingle();
+  if(error){ dispararAutomacao('Erro ao carregar perfil', error.message); return; }
+  if(data){
+    PERFIL_USUARIO.nome = data.nome || PERFIL_USUARIO.nome;
+    PERFIL_USUARIO.email = data.email || user.email || PERFIL_USUARIO.email;
+    PERFIL_USUARIO.crn = data.crn || PERFIL_USUARIO.crn;
+  } else {
+    // primeira vez — cria o registro do perfil já com o e-mail da conta
+    PERFIL_USUARIO.email = user.email || PERFIL_USUARIO.email;
+    await supa.from('perfil_usuario').insert({
+      user_id: user.id, nome: PERFIL_USUARIO.nome, email: PERFIL_USUARIO.email, crn: PERFIL_USUARIO.crn
+    });
+  }
+}
+async function editarPerfilCampo(campo, rotulo){
   const valor = prompt(`Editar ${rotulo}:`, PERFIL_USUARIO[campo]);
   if(valor===null || !valor.trim()) return;
   PERFIL_USUARIO[campo] = valor.trim();
-  dispararAutomacao('Perfil atualizado', `${rotulo} alterado.`);
-  salvarEstado();
   renderTela();
+  const { data: { user } } = await supa.auth.getUser();
+  if(!user){ dispararAutomacao('Erro ao salvar perfil', 'Sessão não encontrada.'); return; }
+  const { error } = await supa.from('perfil_usuario').upsert({
+    user_id: user.id, nome: PERFIL_USUARIO.nome, email: PERFIL_USUARIO.email, crn: PERFIL_USUARIO.crn
+  }, {onConflict:'user_id'});
+  if(error){ dispararAutomacao('Erro ao salvar perfil', error.message); return; }
+  dispararAutomacao('Perfil atualizado', `${rotulo} alterado e salvo.`);
 }
 
 /* ---------- LOGIN REAL (Supabase Auth) ---------- */
@@ -3847,6 +3883,7 @@ async function tentarLogin(){
 async function entrarNoApp(){
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
+  await carregarPerfilSupabase();
   await carregarClientesSupabase();
   await carregarModeloChecklistSupabase();
   await carregarVisitasSupabase();
