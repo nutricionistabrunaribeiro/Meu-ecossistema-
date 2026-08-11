@@ -648,7 +648,8 @@
   .login-btn{width:100%;background:var(--cor-primaria);color:#fff;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;margin-top:6px;}
   .login-erro{color:#B0413E;font-size:12px;margin-top:8px;text-align:center;}
   .login-aviso{font-size:10.5px;color:var(--cor-texto-suave);text-align:center;margin-top:18px;line-height:1.5;}
-  #appRoot{display:none;}
+  #appRoot{display:none;width:100%;min-height:100vh;min-height:100dvh;}
+  #appRoot.ativo{display:flex;}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -886,7 +887,8 @@ const CATEGORIAS_EVENTO = [
   {id:"treinamento", nome:"Treinamento", cor:"#C9A227"},
   {id:"outro", nome:"Outro", cor:"#8A8577"},
 ];
-const REF_DOMINGO = new Date(2026,7,2); // domingo, 2 de agosto de 2026 — âncora do "hoje" do protótipo
+const HOJE_REAL = new Date(); HOJE_REAL.setHours(0,0,0,0);
+const REF_DOMINGO = inicioDaSemana(HOJE_REAL); // domingo da semana atual, calculado com a data real de hoje
 
 function addDias(data, n){ const d = new Date(data); d.setDate(d.getDate()+n); return d; }
 function formatoISO(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -1333,6 +1335,17 @@ function pendenciasDoClienteHTML(c){
   `).join('');
 }
 
+async function excluirCliente(id){
+  const c = CLIENTES.find(x=>x.id===id);
+  if(!confirm(`Excluir "${c.nome}"? Isso remove o cliente da lista (o histórico fica guardado no banco, não é apagado permanentemente).`)) return;
+  const { error } = await supa.from('clientes').update({excluido_em: new Date().toISOString()}).eq('id', id);
+  if(error){ dispararAutomacao('Erro ao excluir cliente', error.message); return; }
+  const idx = CLIENTES.findIndex(x=>x.id===id);
+  if(idx>-1) CLIENTES.splice(idx,1);
+  voltarClientes();
+  dispararAutomacao('Cliente excluído', c.nome);
+}
+
 function iniciais(nome){
   return nome.split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
 }
@@ -1345,10 +1358,11 @@ function fichaClienteHTML(c){
     <button class="ficha-voltar" onclick="voltarClientes()">← Voltar para Clientes</button>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(c.nome)}</div>
-      <div>
+      <div style="flex:1;">
         <div class="ficha-nome">${c.nome}</div>
         <div class="ficha-sub">${c.status} · Responsável: ${c.responsavel}</div>
       </div>
+      <button onclick="excluirCliente('${c.id}')" style="color:#B0413E;font-size:12px;font-weight:600;border:1px solid #F6E1E5;padding:8px 12px;border-radius:8px;">🗑 Excluir cliente</button>
     </div>
     <div class="abas">
       ${ABAS_CLIENTE.map(a=>`<button class="${abaClienteAtiva===a.id?'active':''}" onclick="selecionarAbaCliente('${a.id}')">${a.nome}</button>`).join('')}
@@ -1580,6 +1594,22 @@ async function novaVisita(){
 let visitaSelecionadaId = null;
 let etapaVisitaAtual = "antes";
 
+async function excluirVisita(id){
+  const v = VISITAS.find(x=>x.id===id);
+  if(!confirm(`Excluir a visita de ${v.clienteNome} em ${v.data}? Essa ação não pode ser desfeita.`)) return;
+  const { error } = await supa.from('visitas').delete().eq('id', id);
+  if(error){ dispararAutomacao('Erro ao excluir visita', error.message); return; }
+  const idx = VISITAS.findIndex(x=>x.id===id);
+  if(idx>-1) VISITAS.splice(idx,1);
+  const cliente = CLIENTES.find(c=>c.id===v.clienteId);
+  if(cliente){
+    const idxC = cliente.visitas.findIndex(x=>x.data===v.data);
+    if(idxC>-1) cliente.visitas.splice(idxC,1);
+  }
+  dispararAutomacao('Visita excluída', `${v.clienteNome} — ${v.data}`);
+  renderTela();
+}
+
 function abrirVisita(id){
   visitaSelecionadaId = id;
   const v = VISITAS.find(x=>x.id===id);
@@ -1628,6 +1658,7 @@ function visitasHTML(){
           <div style="display:flex;align-items:center;gap:8px;">
             ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Preparar visita →</span>`}
             ${v.pdfPath ? `<button onclick="event.stopPropagation(); verPdfDoHistorico('${v.pdfPath}')" title="Ver PDF" style="color:var(--cor-primaria);font-size:16px;">📄</button>` : ''}
+            <button onclick="event.stopPropagation(); excluirVisita('${v.id}')" title="Excluir visita" style="color:var(--cor-texto-suave);font-size:15px;">🗑</button>
           </div>
         </div>
       `).join('')}
@@ -1899,11 +1930,11 @@ async function gerarPDFVisita(v){
     head: [['Cliente','Mês/Ano','Nutricionista Responsável','Data de aplicação','Data de elaboração']],
     body: [[v.clienteNome, v.mesAno, `${v.nutricionista} — ${v.crn}`, v.data, v.data]],
     theme: 'grid',
-    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold'},
-    styles: {fontSize:8.5, cellPadding:2, textColor:[34,35,31], lineColor:[226,224,214]},
+    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold', cellPadding:{top:2.5,bottom:2.5,left:3,right:3}},
+    styles: {fontSize:8.5, cellPadding:{top:3,bottom:3,left:3,right:3}, textColor:[34,35,31], lineColor:[226,224,214], lineWidth:0.15, valign:'middle'},
     margin:{left:margem, right:margem},
   });
-  y = doc.lastAutoTable.finalY + 6;
+  y = doc.lastAutoTable.finalY + 8;
 
   const linhas = [];
   let categoriaAtual = null;
@@ -1933,13 +1964,16 @@ async function gerarPDFVisita(v){
     head: [['Nº','Item Avaliado','Sim','Não','N/A']],
     body: linhas,
     theme: 'grid',
-    headStyles: {fillColor:[79,165,121], fontSize:9, halign:'center'},
-    styles: {fontSize:8.3, cellPadding:1.6, lineColor:[226,224,214], textColor:[34,35,31]},
-    columnStyles: {0:{cellWidth:8, halign:'center'}, 1:{cellWidth:118}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
-    margin:{left:margem, right:margem},
+    headStyles: {fillColor:[79,165,121], fontSize:9.5, halign:'center', cellPadding:{top:3,bottom:3,left:2,right:2}, valign:'middle'},
+    styles: {fontSize:8.5, cellPadding:{top:2.6,bottom:2.6,left:3,right:2}, lineColor:[226,224,214], lineWidth:0.15, textColor:[34,35,31], valign:'middle'},
+    columnStyles: {0:{cellWidth:9, halign:'center'}, 1:{cellWidth:116}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
+    alternateRowStyles: {fillColor:[252,251,249]},
+    margin:{left:margem, right:margem, top:16},
+    showHead: 'everyPage',
+    rowPageBreak: 'avoid',
   });
 
-  y = doc.lastAutoTable.finalY + 6;
+  y = doc.lastAutoTable.finalY + 8;
   const respondidos = v.checklist.filter(i=>i.resultado);
   const totalItens = respondidos.length;
   const totalConforme = respondidos.filter(i=>i.resultado==='conforme').length;
@@ -1947,17 +1981,19 @@ async function gerarPDFVisita(v){
   const totalNA = respondidos.filter(i=>i.resultado==='na').length;
   const boa = v.pontuacao >= 80;
 
+  if(y > 255){ doc.addPage(); y = 16; }
+
   doc.autoTable({
     startY: y,
     head: [['Total de Itens','Conforme','Não Conforme','N/A','% de Adequação']],
     body: [[totalItens, totalConforme, totalNaoConforme, totalNA, `${v.pontuacao}%`]],
     theme: 'grid',
-    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold', halign:'center'},
-    styles: {fontSize:10, cellPadding:2.5, halign:'center', lineColor:[226,224,214]},
-    columnStyles: {4:{textColor: boa?[46,107,74]:[142,58,74], fontStyle:'bold', fontSize:11}},
+    headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:8, fontStyle:'bold', halign:'center', cellPadding:3},
+    styles: {fontSize:11, cellPadding:3.5, halign:'center', lineColor:[226,224,214], lineWidth:0.15, valign:'middle'},
+    columnStyles: {4:{textColor: boa?[46,107,74]:[142,58,74], fontStyle:'bold', fontSize:13}},
     margin:{left:margem, right:margem},
   });
-  y = doc.lastAutoTable.finalY + 5;
+  y = doc.lastAutoTable.finalY + 6;
 
   doc.setFont(undefined,'normal');
   doc.setFontSize(8);
@@ -3883,7 +3919,7 @@ async function tentarLogin(){
 }
 async function entrarNoApp(){
   document.getElementById('telaLogin').style.display = 'none';
-  document.getElementById('appRoot').style.display = 'block';
+  document.getElementById('appRoot').classList.add('ativo');
   await carregarPerfilSupabase();
   await carregarClientesSupabase();
   await carregarModeloChecklistSupabase();
@@ -3921,7 +3957,7 @@ function restaurarTelaAtualSessao(){
 }
 async function sairDaConta(){
   await supa.auth.signOut();
-  document.getElementById('appRoot').style.display = 'none';
+  document.getElementById('appRoot').classList.remove('ativo');
   document.getElementById('telaLogin').style.display = 'flex';
   telaLoginNormal();
 }
