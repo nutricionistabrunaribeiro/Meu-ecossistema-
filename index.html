@@ -1933,6 +1933,7 @@ async function gerarPDFVisita(v){
     headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold', cellPadding:{top:2.5,bottom:2.5,left:3,right:3}},
     styles: {fontSize:8.5, cellPadding:{top:3,bottom:3,left:3,right:3}, textColor:[34,35,31], lineColor:[226,224,214], lineWidth:0.15, valign:'middle'},
     margin:{left:margem, right:margem},
+    tableWidth: largura,
   });
   y = doc.lastAutoTable.finalY + 8;
 
@@ -1966,7 +1967,8 @@ async function gerarPDFVisita(v){
     theme: 'grid',
     headStyles: {fillColor:[79,165,121], fontSize:9.5, halign:'center', cellPadding:{top:3,bottom:3,left:2,right:2}, valign:'middle'},
     styles: {fontSize:8.5, cellPadding:{top:2.6,bottom:2.6,left:3,right:2}, lineColor:[226,224,214], lineWidth:0.15, textColor:[34,35,31], valign:'middle'},
-    columnStyles: {0:{cellWidth:9, halign:'center'}, 1:{cellWidth:116}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
+    columnStyles: {0:{cellWidth:9, halign:'center'}, 1:{cellWidth:128}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
+    tableWidth: largura,
     alternateRowStyles: {fillColor:[252,251,249]},
     margin:{left:margem, right:margem, top:16},
     showHead: 'everyPage',
@@ -1992,6 +1994,7 @@ async function gerarPDFVisita(v){
     styles: {fontSize:11, cellPadding:3.5, halign:'center', lineColor:[226,224,214], lineWidth:0.15, valign:'middle'},
     columnStyles: {4:{textColor: boa?[46,107,74]:[142,58,74], fontStyle:'bold', fontSize:13}},
     margin:{left:margem, right:margem},
+    tableWidth: largura,
   });
   y = doc.lastAutoTable.finalY + 6;
 
@@ -2896,6 +2899,29 @@ async function novaContaPessoal(tipo){
   dispararAutomacao('Lançamento pessoal adicionado', desc.trim());
   renderTela();
 }
+async function editarContaPessoal(id){
+  const l = CONTAS_PESSOAIS.find(x=>x.id===id);
+  const novaDesc = prompt("Descrição:", l.desc);
+  if(novaDesc===null || !novaDesc.trim()) return;
+  const novoValorTxt = prompt("Valor:", l.valor);
+  const novoValor = parseFloat((novoValorTxt||'').replace(',','.'));
+  if(!novoValor || novoValor<=0) return;
+  l.desc = novaDesc.trim(); l.valor = novoValor;
+  renderTela();
+  const { error } = await supa.from('contas_pessoais').update({descricao:novaDesc.trim(), valor:novoValor}).eq('id', id);
+  if(error){ dispararAutomacao('Erro ao editar lançamento', error.message); return; }
+  dispararAutomacao('Lançamento pessoal editado', novaDesc.trim());
+}
+async function excluirContaPessoal(id){
+  const l = CONTAS_PESSOAIS.find(x=>x.id===id);
+  if(!confirm(`Excluir "${l.desc}"? Essa ação não pode ser desfeita.`)) return;
+  const idx = CONTAS_PESSOAIS.findIndex(x=>x.id===id);
+  if(idx>-1) CONTAS_PESSOAIS.splice(idx,1);
+  renderTela();
+  const { error } = await supa.from('contas_pessoais').delete().eq('id', id);
+  if(error){ dispararAutomacao('Erro ao excluir lançamento', error.message); return; }
+  dispararAutomacao('Lançamento pessoal excluído', l.desc);
+}
 let filtroContasPessoais = "todos";
 function selecionarFiltroContasPessoais(f){ filtroContasPessoais = f; renderTela(); }
 function contasHTML(){
@@ -2922,9 +2948,13 @@ function contasHTML(){
       ${lista.map(l=>`
         <div class="fin-lancamento">
           <div><div class="fin-lanc-desc">${l.desc}</div><div class="fin-lanc-meta">Vencimento ${l.vencimento}</div></div>
-          <div style="text-align:right;">
-            <div class="fin-lanc-valor ${l.tipo==='receita'?'fin-pos':'fin-neg'}">${l.tipo==='despesa'?'-':''}${formatarMoeda(l.valor)}</div>
-            <div class="fin-lanc-meta status-${l.status}">${l.status==='pago'?'Pago':l.status==='atrasado'?'Atrasado':'Em aberto'}</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="text-align:right;">
+              <div class="fin-lanc-valor ${l.tipo==='receita'?'fin-pos':'fin-neg'}">${l.tipo==='despesa'?'-':''}${formatarMoeda(l.valor)}</div>
+              <div class="fin-lanc-meta status-${l.status}">${l.status==='pago'?'Pago':l.status==='atrasado'?'Atrasado':'Em aberto'}</div>
+            </div>
+            <button onclick="editarContaPessoal('${l.id}')" title="Editar" style="color:var(--cor-texto-suave);font-size:14px;">✎</button>
+            <button onclick="excluirContaPessoal('${l.id}')" title="Excluir" style="color:var(--cor-texto-suave);font-size:14px;">✕</button>
           </div>
         </div>
       `).join('')}
