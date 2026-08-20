@@ -16,15 +16,12 @@ Conectado ao banco de dados real no Supabase.
 6. Em menos de um minuto você recebe um link, algo como
    `meu-ecossistema.vercel.app`.
 
-## Testando
+## Atualizando pelo GitHub (sem token)
 
-Abra esse link no celular, no tablet e no computador — todos vão mostrar a
-mesma tela de login, e os dados (clientes, visitas, agenda, financeiro)
-já vêm do banco de dados real (Supabase), então tudo que você cadastrar
-em um aparelho aparece nos outros.
+No repositório → abrir `index.html` → ✏️ Edit → apagar tudo → colar o
+conteúdo do novo `index.html` → Commit changes. A Vercel detecta e
+republica sozinha.
 
-## Domínio próprio (opcional, depois)
+## Domínio próprio (opcional)
 
-Na Vercel: Project → Settings → Domains → adicionar o domínio que você
-comprar (ex: meuecossistema.com.br) e seguir as instruções de DNS que
-ela mesma mostra.
+Vercel → Project → Settings → Domains → adicionar o domínio.

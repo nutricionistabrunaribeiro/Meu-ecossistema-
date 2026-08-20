@@ -1515,6 +1515,19 @@ function gerarChecklistOficial(){
 
 let VISITAS = [];
 
+function recalcularHistoricoCliente(c){
+  const visitasDoCliente = VISITAS.filter(v=>v.clienteId===c.id);
+  c.visitas = visitasDoCliente.map(v=>({data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath}));
+  c.historicoChecklist = visitasDoCliente
+    .filter(v=>v.status==='concluida' && v.pontuacao!==null && v.pontuacao!==undefined)
+    .sort((a,b)=>{
+      const [da,ma,aa] = a.data.split('/').map(Number);
+      const [db,mb,ab] = b.data.split('/').map(Number);
+      return new Date(aa,ma-1,da) - new Date(ab,mb-1,db);
+    })
+    .map(v=>({data: v.data.slice(0,5), pontuacao: v.pontuacao}));
+}
+
 async function carregarVisitasSupabase(){
   const { data, error } = await supa
     .from('visitas')
@@ -1542,10 +1555,8 @@ async function carregarVisitasSupabase(){
     checklist: row.status==='agendada' ? gerarChecklistOficial() : [],
     pdfPath: row.pdf_path || null,
   }));
-  // Agenda x Visitas: cada visita aparece automaticamente no histórico do cliente correspondente
-  CLIENTES.forEach(c=>{
-    c.visitas = VISITAS.filter(v=>v.clienteId===c.id).map(v=>({data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath}));
-  });
+  // Agenda x Visitas + gráfico de evolução: cada visita aparece automaticamente no histórico do cliente correspondente
+  CLIENTES.forEach(c=> recalcularHistoricoCliente(c));
 }
 function mesAnoPorData(dataISO){
   const [ano,mes] = dataISO.split('-');
@@ -1613,7 +1624,7 @@ async function excluirVisita(id){
 function abrirVisita(id){
   visitaSelecionadaId = id;
   const v = VISITAS.find(x=>x.id===id);
-  etapaVisitaAtual = v.status === 'concluida' ? 'apos' : 'antes';
+  etapaVisitaAtual = v.status === 'concluida' ? 'apos' : 'durante';
   salvarTelaAtualSessao();
   renderTela();
 }
@@ -1710,7 +1721,7 @@ async function marcarResultadoItem(visitaId, itemId, resultado){
         cliente_id: cliente.id, visita_id: v.id, descricao: item.desc, observacao: item.obs || null
       });
       await supa.from('pendencias').insert({
-        cliente_id: cliente.id, origem: 'checklist', titulo: 'Resolver: ' + item.desc, status: 'aberta'
+        cliente_id: cliente.id, visita_id: v.id, origem: 'checklist', titulo: 'Resolver: ' + item.desc, status: 'aberta'
       });
     }
     dispararAutomacao('Não conformidade gerada automaticamente', `"${item.desc}" — pendência criada na ficha de ${v.clienteNome}.`);
@@ -1776,7 +1787,7 @@ function fichaVisitaHTML(v){
         </div>
       `).join('')}
       <div style="display:flex;gap:10px;">
-        <button class="btn-secundario" onclick="irParaEtapaVisita('antes')">← Voltar</button>
+        <button class="btn-secundario" onclick="voltarVisitas()">← Voltar para Visitas</button>
         <button class="btn-primario" onclick="irParaEtapaVisita('apos')">Finalizar Checklist BPF →</button>
       </div>`;
   } else {
@@ -1829,8 +1840,7 @@ function fichaVisitaHTML(v){
       </div>
     </div>
     <div class="etapa-tabs">
-      <button class="${etapaVisitaAtual==='antes'?'active':''}" onclick="irParaEtapaVisita('antes')">Antes</button>
-      <button class="${etapaVisitaAtual==='durante'?'active':''}" onclick="irParaEtapaVisita('durante')">Durante</button>
+      <button class="${etapaVisitaAtual==='durante'?'active':''}" onclick="irParaEtapaVisita('durante')">Checklist</button>
       <button class="${etapaVisitaAtual==='apos'?'active':''}" onclick="irParaEtapaVisita('apos')">Após</button>
     </div>
     ${corpoEtapa}`;
@@ -1874,12 +1884,7 @@ async function concluirVisita(id){
   }
 
   const cliente = CLIENTES.find(c=>c.id===v.clienteId);
-  if(cliente){
-    if(!cliente.historicoChecklist) cliente.historicoChecklist = [];
-    cliente.historicoChecklist.push({data: v.data.slice(0,5), pontuacao: v.pontuacao});
-    const visitaNoCliente = cliente.visitas.find(x=>x.data===v.data);
-    if(visitaNoCliente){ visitaNoCliente.status='concluida'; visitaNoCliente.pontuacao=v.pontuacao; }
-  }
+  if(cliente) recalcularHistoricoCliente(cliente);
   dispararAutomacao(
     'Relatório em PDF gerado',
     `${v.clienteNome} — ${v.pontuacao}% de adequação, salvo no banco de dados.${naoConf>0 ? ' '+naoConf+' não conformidade(s) registrada(s).' : ''}`
@@ -3326,10 +3331,12 @@ function corStatusPendencia(s){
 }
 
 function pendenciasHTML(){
-  let itens = [...PENDENCIAS_DB.map(p=>({
-    origem: p.origem==='checklist' ? 'Checklist BPF' : p.origem==='manual' ? 'Manual' : 'Cliente',
+  // Painel geral: só pendências manuais e de gestão (Financeiro/Comercial).
+  // Pendências geradas por Checklist ficam vinculadas ao cliente/visita de origem, sem duplicar aqui.
+  let itens = [...PENDENCIAS_DB.filter(p=>p.origem==='manual').map(p=>({
+    origem: 'Manual',
     cliente: p.cliente || "—", texto: p.titulo, status: p.status,
-    prazo: p.prazo, responsavel: p.responsavel, id: p.id, editavel: p.origem==='manual'
+    prazo: p.prazo, responsavel: p.responsavel, id: p.id, editavel: true
   }))];
   LANCAMENTOS.forEach(l=>{
     const statusReal = statusRealLancamento(l);
@@ -3594,6 +3601,9 @@ function renderTela(){
     const saudacao = hora<12 ? 'Bom dia' : hora<18 ? 'Boa tarde' : 'Boa noite';
     document.getElementById('tituloTela').innerText = `${saudacao}, ${PERFIL_USUARIO.nome.split(' ')[0]}`;
     document.getElementById('subtituloTela').innerText = agora.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
+  } else if(telaAtual === 'clientes'){
+    document.getElementById('tituloTela').innerText = titulo;
+    document.getElementById('subtituloTela').innerText = `${CLIENTES.length} cliente${CLIENTES.length!==1?'s':''} cadastrado${CLIENTES.length!==1?'s':''}`;
   } else {
     document.getElementById('tituloTela').innerText = titulo;
     document.getElementById('subtituloTela').innerText = sub;
@@ -3668,12 +3678,12 @@ function dashboardHTML(){
   const proximoEvento = eventosHoje.find(e=>!e.concluido);
 
   const pendenciasCount =
-    PENDENCIAS_DB.filter(p=>p.status!=='concluida').length +
+    PENDENCIAS_DB.filter(p=>p.origem==='manual' && p.status!=='concluida').length +
     LANCAMENTOS.filter(l=>statusRealLancamento(l)!=='pago').length +
     LEADS.filter(l=>l.etapa==='followup').length;
 
   const listaPendenciasResumo = [];
-  PENDENCIAS_DB.filter(p=>p.status!=='concluida').forEach(p=> listaPendenciasResumo.push({texto:p.titulo, tag:p.cliente||rotuloStatusPendencia(p.status)}));
+  PENDENCIAS_DB.filter(p=>p.origem==='manual' && p.status!=='concluida').forEach(p=> listaPendenciasResumo.push({texto:p.titulo, tag:p.cliente||rotuloStatusPendencia(p.status)}));
   LANCAMENTOS.filter(l=>statusRealLancamento(l)!=='pago').forEach(l=> listaPendenciasResumo.push({texto:l.desc, tag: statusRealLancamento(l)==='atrasado'?'atrasado':'financeiro'}));
 
   const clientesPrioritarios = [...CLIENTES].filter(c=>c.prioridade==='alta').slice(0,3);
