@@ -335,7 +335,7 @@
   .doc-fav{color:var(--cor-acento);font-size:13px;}
 
   /* Modulo Financeiro */
-  .fin-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+  .fin-resumo{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px,1fr));gap:14px;margin-bottom:18px;}
   .fin-resumo-card{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:var(--radius);padding:16px;}
   .fin-resumo-label{font-size:11.5px;color:var(--cor-texto-suave);margin-bottom:6px;}
   .fin-resumo-valor{font-family:'Fraunces',serif;font-size:24px;}
@@ -2269,8 +2269,8 @@ async function darBaixaLancamento(id){
   } else {
     dispararAutomacao('Pagamento recebido', `${l.desc} — ${formatarMoeda(l.valor)} baixado.`);
   }
-  l.valor = novoValor; l.status = 'pago';
-  await supa.from('lancamentos_financeiros').update({status:'pago', valor: novoValor}).eq('id', id);
+  l.valor = novoValor; l.status = 'pago'; l.dataPagamento = formatoISO(new Date());
+  await supa.from('lancamentos_financeiros').update({status:'pago', valor: novoValor, data_pagamento: l.dataPagamento}).eq('id', id);
   renderTela();
 }
 async function editarLancamento(id){
@@ -2342,29 +2342,33 @@ async function novoContratoParcelado(){
 }
 
 function financeiroHTML(){
-  const receitas = LANCAMENTOS.filter(l=>l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
-  const despesas = LANCAMENTOS.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
-  const saldo = receitas - despesas;
-  const metaMes = 20000;
-  const percMeta = Math.round((receitas/metaMes)*100);
+  const entradasPrevistas = LANCAMENTOS.filter(l=>l.tipo==='receita' && l.status!=='pago' && l.status!=='cancelado').reduce((s,l)=>s+l.valor,0);
+  const entradasEfetivadas = LANCAMENTOS.filter(l=>l.tipo==='receita' && l.status==='pago').reduce((s,l)=>s+l.valor,0);
+  const despesas = LANCAMENTOS.filter(l=>l.tipo==='despesa' && l.status!=='cancelado').reduce((s,l)=>s+l.valor,0);
+  const saldo = entradasEfetivadas - despesas;
 
   const lista = LANCAMENTOS.filter(l => filtroFinanceiro==='todos' || l.tipo===filtroFinanceiro);
 
   return `
     <div class="fin-resumo">
       <div class="fin-resumo-card">
-        <div class="fin-resumo-label">Entradas do mês</div>
-        <div class="fin-resumo-valor fin-pos">${formatarMoeda(receitas)}</div>
+        <div class="fin-resumo-label">Entradas Previstas</div>
+        <div class="fin-resumo-valor" style="color:var(--cor-acento);">${formatarMoeda(entradasPrevistas)}</div>
       </div>
       <div class="fin-resumo-card">
-        <div class="fin-resumo-label">Saídas do mês</div>
+        <div class="fin-resumo-label">Entradas Efetivadas</div>
+        <div class="fin-resumo-valor fin-pos">${formatarMoeda(entradasEfetivadas)}</div>
+      </div>
+      <div class="fin-resumo-card">
+        <div class="fin-resumo-label">Despesas</div>
         <div class="fin-resumo-valor fin-neg">${formatarMoeda(despesas)}</div>
       </div>
       <div class="fin-resumo-card">
-        <div class="fin-resumo-label">Saldo do mês</div>
-        <div class="fin-resumo-valor">${formatarMoeda(saldo)}</div>
+        <div class="fin-resumo-label">Saldo</div>
+        <div class="fin-resumo-valor" style="color:${saldo>=0?'#2F6B4A':'#8E3A4A'};">${formatarMoeda(saldo)}</div>
       </div>
     </div>
+    <div style="font-size:11px;color:var(--cor-texto-suave);margin:-10px 0 16px;">Saldo = Entradas Efetivadas − Despesas. Receitas previstas (parcelas futuras) não entram no saldo.</div>
 
     <div class="fin-tabs" style="justify-content:space-between;width:100%;">
       <div style="display:flex;gap:6px;">
@@ -2403,9 +2407,9 @@ function financeiroHTML(){
     </div>
 
     <div class="meta-card">
-      <div class="fin-resumo-label" style="margin-bottom:10px;">Meta de faturamento do mês — ${percMeta}%</div>
-      <div class="barra"><div style="width:${Math.min(percMeta,100)}%;"></div></div>
-      <div style="font-size:11.5px;color:var(--cor-texto-suave);margin-top:8px;">${formatarMoeda(receitas)} de ${formatarMoeda(metaMes)}</div>
+      <div class="fin-resumo-label" style="margin-bottom:10px;">Meta de faturamento do mês — ${Math.round((entradasEfetivadas/20000)*100)}%</div>
+      <div class="barra"><div style="width:${Math.min(Math.round((entradasEfetivadas/20000)*100),100)}%;"></div></div>
+      <div style="font-size:11.5px;color:var(--cor-texto-suave);margin-top:8px;">${formatarMoeda(entradasEfetivadas)} de ${formatarMoeda(20000)} (baseado nas entradas já efetivadas)</div>
     </div>`;
 }
 
@@ -2930,16 +2934,19 @@ async function excluirContaPessoal(id){
 let filtroContasPessoais = "todos";
 function selecionarFiltroContasPessoais(f){ filtroContasPessoais = f; renderTela(); }
 function contasHTML(){
-  const receitas = CONTAS_PESSOAIS.filter(l=>l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
+  const entradasPrevistas = CONTAS_PESSOAIS.filter(l=>l.tipo==='receita' && l.status!=='pago').reduce((s,l)=>s+l.valor,0);
+  const entradasEfetivadas = CONTAS_PESSOAIS.filter(l=>l.tipo==='receita' && l.status==='pago').reduce((s,l)=>s+l.valor,0);
   const despesas = CONTAS_PESSOAIS.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
-  const saldo = receitas - despesas;
+  const saldo = entradasEfetivadas - despesas;
   const lista = CONTAS_PESSOAIS.filter(l => filtroContasPessoais==='todos' || l.tipo===filtroContasPessoais);
   return `
     <div class="fin-resumo">
-      <div class="fin-resumo-card"><div class="fin-resumo-label">Entradas do mês</div><div class="fin-resumo-valor fin-pos">${formatarMoeda(receitas)}</div></div>
-      <div class="fin-resumo-card"><div class="fin-resumo-label">Saídas do mês</div><div class="fin-resumo-valor fin-neg">${formatarMoeda(despesas)}</div></div>
-      <div class="fin-resumo-card"><div class="fin-resumo-label">Saldo do mês</div><div class="fin-resumo-valor">${formatarMoeda(saldo)}</div></div>
+      <div class="fin-resumo-card"><div class="fin-resumo-label">Entradas Previstas</div><div class="fin-resumo-valor" style="color:var(--cor-acento);">${formatarMoeda(entradasPrevistas)}</div></div>
+      <div class="fin-resumo-card"><div class="fin-resumo-label">Entradas Efetivadas</div><div class="fin-resumo-valor fin-pos">${formatarMoeda(entradasEfetivadas)}</div></div>
+      <div class="fin-resumo-card"><div class="fin-resumo-label">Despesas</div><div class="fin-resumo-valor fin-neg">${formatarMoeda(despesas)}</div></div>
+      <div class="fin-resumo-card"><div class="fin-resumo-label">Saldo</div><div class="fin-resumo-valor" style="color:${saldo>=0?'#2F6B4A':'#8E3A4A'};">${formatarMoeda(saldo)}</div></div>
     </div>
+    <div style="font-size:11px;color:var(--cor-texto-suave);margin:-10px 0 16px;">Saldo = Entradas Efetivadas − Despesas. Receitas previstas não entram no saldo.</div>
     <div class="fin-tabs">
       <button class="${filtroContasPessoais==='todos'?'active':''}" onclick="selecionarFiltroContasPessoais('todos')">Todos</button>
       <button class="${filtroContasPessoais==='receita'?'active':''}" onclick="selecionarFiltroContasPessoais('receita')">Receitas</button>
@@ -2958,6 +2965,7 @@ function contasHTML(){
               <div class="fin-lanc-valor ${l.tipo==='receita'?'fin-pos':'fin-neg'}">${l.tipo==='despesa'?'-':''}${formatarMoeda(l.valor)}</div>
               <div class="fin-lanc-meta status-${l.status}">${l.status==='pago'?'Pago':l.status==='atrasado'?'Atrasado':'Em aberto'}</div>
             </div>
+            ${l.status!=='pago' ? `<button class="btn-secundario" style="padding:6px 10px;font-size:11px;" onclick="darBaixaContaPessoal('${l.id}')">Dar baixa</button>` : ''}
             <button onclick="editarContaPessoal('${l.id}')" title="Editar" style="color:var(--cor-texto-suave);font-size:14px;">✎</button>
             <button onclick="excluirContaPessoal('${l.id}')" title="Excluir" style="color:var(--cor-texto-suave);font-size:14px;">✕</button>
           </div>
@@ -2965,6 +2973,14 @@ function contasHTML(){
       `).join('')}
     </div>
     <div style="margin-top:12px;font-size:11.5px;color:var(--cor-texto-suave);">Dados 100% separados do Financeiro da Consultoria — só você vê isso aqui.</div>`;
+}
+async function darBaixaContaPessoal(id){
+  const l = CONTAS_PESSOAIS.find(x=>x.id===id);
+  l.status = 'pago';
+  renderTela();
+  const { error } = await supa.from('contas_pessoais').update({status:'pago'}).eq('id', id);
+  if(error){ dispararAutomacao('Erro ao dar baixa', error.message); return; }
+  dispararAutomacao('Lançamento pessoal efetivado', l.desc);
 }
 
 let LISTA_COMPRAS = [];
@@ -3578,19 +3594,41 @@ function fichaAtivoHTML(a){
     <button class="ficha-voltar" onclick="voltarAtivos()">← Voltar para Ativos</button>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(a.nome)}</div>
-      <div>
+      <div style="flex:1;">
         <div class="ficha-nome">${a.nome}</div>
         <div class="ficha-sub">${a.categoria}</div>
       </div>
+      <button onclick="excluirAtivo('${a.id}')" style="color:#B0413E;font-size:12px;font-weight:600;border:1px solid #F6E1E5;padding:8px 12px;border-radius:8px;">🗑 Excluir</button>
     </div>
     <div class="aba-conteudo">
+      <div class="campo"><label>Nome</label><div class="valor editavel" onclick="editarCampoAtivo('${a.id}','nome','Nome do ativo')">${a.nome} ✎</div></div>
       <div class="campo"><label>Status</label>
         <select onchange="mudarStatusAtivo('${a.id}', this.value)" style="border:1px solid var(--cor-borda);border-radius:8px;padding:7px 10px;font-size:12.5px;">
           ${["Em desenvolvimento","Ativo","Em revisão","Arquivado"].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
-      <div class="campo"><label>Descrição</label><div class="valor">${a.descricao || '—'}</div></div>
+      <div class="campo"><label>Descrição</label><div class="valor editavel" onclick="editarCampoAtivo('${a.id}','descricao','Descrição')">${a.descricao || 'Toque para adicionar uma descrição'} ✎</div></div>
     </div>`;
+}
+async function editarCampoAtivo(id, campo, rotulo){
+  const a = ATIVOS.find(x=>x.id===id);
+  const novo = prompt(`Editar ${rotulo}:`, a[campo] || '');
+  if(novo===null) return;
+  a[campo] = novo.trim();
+  renderTela();
+  const { error } = await supa.from('ativos').update({[campo]: a[campo]}).eq('id', id);
+  if(error){ dispararAutomacao('Erro ao salvar ativo', error.message); return; }
+  dispararAutomacao('Ativo atualizado', `${rotulo} de "${a.nome}" alterado.`);
+}
+async function excluirAtivo(id){
+  const a = ATIVOS.find(x=>x.id===id);
+  if(!confirm(`Excluir "${a.nome}"? Essa ação não pode ser desfeita.`)) return;
+  const idx = ATIVOS.findIndex(x=>x.id===id);
+  if(idx>-1) ATIVOS.splice(idx,1);
+  voltarAtivos();
+  const { error } = await supa.from('ativos').delete().eq('id', id);
+  if(error){ dispararAutomacao('Erro ao excluir ativo', error.message); return; }
+  dispararAutomacao('Ativo excluído', a.nome);
 }
 
 function renderTela(){
