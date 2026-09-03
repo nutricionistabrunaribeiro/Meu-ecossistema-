@@ -1359,13 +1359,25 @@ async function editarCampoCliente(clienteId, campoDb, rotulo){
 }
 
 function pendenciasDoClienteHTML(c){
-  const abertas = PENDENCIAS_DB.filter(p=>p.clienteId===c.id && p.status!=='concluida');
-  const concluidas = PENDENCIAS_DB.filter(p=>p.clienteId===c.id && p.status==='concluida');
+  const abertas = PENDENCIAS_DB.filter(p=>p.clienteId===c.id && p.origem==='manual' && p.status!=='concluida');
+  const concluidas = PENDENCIAS_DB.filter(p=>p.clienteId===c.id && p.origem==='manual' && p.status==='concluida');
   return `
+    <div style="margin-bottom:14px"><button class="btn-primario" onclick="novaPendenciaCliente('${c.id}')">+ Incluir pendência deste cliente</button></div>
     <h4 style="margin-bottom:8px;font-size:12px;text-transform:uppercase;color:var(--cor-texto-suave);">Pendências em aberto</h4>
     ${abertas.length ? abertas.map(p=>`<div class="item-lista-simples"><span>${p.titulo}</span><button class="tag" onclick="concluirPendenciaCliente('${p.id}')">${rotuloStatusPendencia(p.status)} · concluir</button></div>`).join('') : semRegistro()}
     <h4 style="margin:20px 0 8px;font-size:12px;text-transform:uppercase;color:var(--cor-texto-suave);">Histórico de concluídas</h4>
     ${concluidas.length ? concluidas.map(p=>`<div class="item-lista-simples" style="opacity:.7;"><span>${p.titulo}</span><span class="tag">Concluída</span></div>`).join('') : semRegistro()}`;
+}
+async function novaPendenciaCliente(clienteId){
+  const c=CLIENTES.find(x=>x.id===clienteId);if(!c)return;
+  const titulo=prompt(`Pendência operacional de ${c.nome}:`);if(!titulo?.trim())return;
+  const prazoTxt=prompt('Prazo (DD/MM/AAAA, opcional):','')||'';
+  const [d,m,a]=prazoTxt.split('/');const prazoISO=d&&m&&a?`${a}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`:null;
+  const responsavel=prompt('Responsável:',PERFIL_USUARIO.nome)||PERFIL_USUARIO.nome;
+  const {data,error}=await supa.from('pendencias').insert({cliente_id:c.id,titulo:titulo.trim(),origem:'manual',status:'aberta',prazo:prazoISO,responsavel}).select().single();
+  if(error){dispararAutomacao('Erro ao criar pendência',error.message);return;}
+  PENDENCIAS_DB.unshift({id:data.id,clienteId:c.id,cliente:c.nome,titulo:titulo.trim(),origem:'manual',status:'aberta',prazo:prazoTxt||null,responsavel});
+  dispararAutomacao('Pendência do cliente adicionada',titulo.trim());renderTela();
 }
 async function concluirPendenciaCliente(id){
   const p = PENDENCIAS_DB.find(x=>x.id===id);
@@ -1806,15 +1818,11 @@ async function marcarResultadoItem(visitaId, itemId, resultado){
     const cliente = CLIENTES.find(c=>c.id===v.clienteId);
     if(cliente){
       cliente.naoConformidades.push(item.desc + (item.obs ? ' — ' + item.obs : ''));
-      cliente.pendencias.push('[BPF] Resolver: ' + item.desc);
       await supa.from('nao_conformidades').insert({
         cliente_id: cliente.id, visita_id: v.id, descricao: item.desc, observacao: item.obs || null
       });
-      await supa.from('pendencias').insert({
-        cliente_id: cliente.id, visita_id: v.id, origem: 'checklist', titulo: 'Resolver: ' + item.desc, status: 'aberta'
-      });
     }
-    dispararAutomacao('Não conformidade gerada automaticamente', `"${item.desc}" — pendência criada na ficha de ${v.clienteNome}.`);
+    dispararAutomacao('Não conformidade registrada', `"${item.desc}" permanece no checklist e no relatório de ${v.clienteNome}.`);
   }
 }
 const timersObsChecklist = {};
@@ -1913,7 +1921,7 @@ function fichaVisitaHTML(v){
           </div>
         `).join('') : `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhuma não conformidade registrada.</div>`}
         <div style="margin-top:10px;font-size:12px;color:var(--cor-texto-suave);">
-          ${naoConformidades.length>0 ? naoConformidades.length+' pendência(s) criada(s) automaticamente na ficha do cliente.' : ''}
+          ${naoConformidades.length>0 ? naoConformidades.length+' não conformidade(s) registrada(s) no checklist para compor o plano de ação.' : ''}
         </div>
       </div>
       <div class="aba-conteudo" style="margin-bottom:16px;">
@@ -2022,7 +2030,7 @@ async function gerarPDFVisita(v){
   doc.setTextColor(255,255,255);
   doc.setFontSize(13);
   doc.setFont(undefined,'bold');
-  doc.text('CHECKLIST DE BOAS PRÁTICAS', 105, y+6.5, {align:'center'});
+  doc.text((v.modeloNome||'CHECKLIST').toUpperCase(), 105, y+6.5, {align:'center'});
   y += 9.5;
   doc.setFillColor(221,109,45);
   doc.rect(margem, y, largura, 1.4, 'F');
@@ -2041,45 +2049,33 @@ async function gerarPDFVisita(v){
   });
   y = doc.lastAutoTable.finalY + 8;
 
-  const linhas = [];
   let categoriaAtual = null;
-  const fotosPorItem = []; // {desc, fotos:[...]}
-  v.checklist.filter(i=>i.resultado).forEach((item,idx)=>{
-    if(item.categoria !== categoriaAtual){
-      linhas.push([{content:item.categoria, colSpan:5, styles:{fillColor:[247,245,239], textColor:[79,165,121], fontStyle:'bold', fontSize:8.5}}]);
-      categoriaAtual = item.categoria;
+  const itensRespondidos=v.checklist.filter(i=>i.resultado);
+  const novaPagina=()=>{doc.addPage();y=16;categoriaAtual=null;};
+  itensRespondidos.forEach((item,idx)=>{
+    if(item.categoria!==categoriaAtual){
+      if(y>270)novaPagina();
+      doc.setFillColor(79,165,121);doc.roundedRect(margem,y,largura,8,1,1,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
+      doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;
     }
-    linhas.push([
-      idx+1, item.desc,
-      item.resultado==='conforme' ? 'X' : '',
-      item.resultado==='nao_conforme' ? 'X' : '',
-      item.resultado==='na' ? 'X' : '',
-    ]);
-    if(item.obs && item.obs.trim()){
-      const alerta = item.resultado==='nao_conforme';
-      linhas.push([{content:'Obs.: '+item.obs, colSpan:5, styles:{fontSize:7.8, textColor: alerta?[142,58,74]:[34,35,31], fillColor: alerta?[251,243,244]:[249,248,245]}}]);
-    }
-    if(item.fotos && item.fotos.length){
-      fotosPorItem.push({desc:item.desc, fotos:item.fotos});
-    }
+    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,138);
+    const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-10):[];
+    const fotos=item.fotos||[];
+    const linhasFotos=Math.ceil(fotos.length/3);
+    const altura=Math.max(17,8+desc.length*4+obs.length*3.6)+(linhasFotos?linhasFotos*37+4:0);
+    if(y+altura>278){novaPagina();doc.setFillColor(79,165,121);doc.roundedRect(margem,y,largura,8,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;}
+    const cor=item.resultado==='conforme'?[79,165,121]:item.resultado==='nao_conforme'?[176,65,62]:[108,107,98];
+    doc.setFillColor(252,251,249);doc.setDrawColor(226,224,214);doc.roundedRect(margem,y,largura,altura,2,2,'FD');
+    doc.setFillColor(...cor);doc.roundedRect(margem,y,2.2,altura,1,1,'F');
+    doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);doc.text(desc,margem+6,y+6);
+    const status=item.resultado==='conforme'?'CONFORME':item.resultado==='nao_conforme'?'NÃO CONFORME':'N/A';
+    doc.setFillColor(...cor);doc.roundedRect(165,y+3,27,6,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.7);doc.text(status,178.5,y+7,{align:'center'});
+    let yi=y+7+desc.length*4;
+    if(obs.length){doc.setFont(undefined,'normal');doc.setFontSize(7.7);doc.setTextColor(item.resultado==='nao_conforme'?142:108,item.resultado==='nao_conforme'?58:107,item.resultado==='nao_conforme'?74:98);doc.text(obs,margem+6,yi);yi+=obs.length*3.6+3;}
+    fotos.forEach((foto,i)=>{const col=i%3;if(i>0&&col===0)yi+=37;const x=margem+6+col*56;try{doc.addImage(foto,'JPEG',x,yi,52,33);}catch(e){try{doc.addImage(foto,'PNG',x,yi,52,33);}catch(e2){}}});
+    y+=altura+4;
   });
-
-  doc.autoTable({
-    startY: y,
-    head: [['Nº','Item Avaliado','Sim','Não','N/A']],
-    body: linhas,
-    theme: 'grid',
-    headStyles: {fillColor:[79,165,121], fontSize:9.5, halign:'center', cellPadding:{top:3,bottom:3,left:2,right:2}, valign:'middle'},
-    styles: {fontSize:8.5, cellPadding:{top:2.6,bottom:2.6,left:3,right:2}, lineColor:[226,224,214], lineWidth:0.15, textColor:[34,35,31], valign:'middle'},
-    columnStyles: {0:{cellWidth:9, halign:'center'}, 1:{cellWidth:128}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:15,halign:'center'}, 4:{cellWidth:15,halign:'center'}},
-    tableWidth: largura,
-    alternateRowStyles: {fillColor:[252,251,249]},
-    margin:{left:margem, right:margem, top:16},
-    showHead: 'everyPage',
-    rowPageBreak: 'avoid',
-  });
-
-  y = doc.lastAutoTable.finalY + 8;
   const respondidos = v.checklist.filter(i=>i.resultado);
   const totalItens = respondidos.length;
   const totalConforme = respondidos.filter(i=>i.resultado==='conforme').length;
@@ -2105,32 +2101,8 @@ async function gerarPDFVisita(v){
   doc.setFont(undefined,'normal');
   doc.setFontSize(8);
   doc.setTextColor(108,107,98);
-  doc.text('Recomenda-se atingir, no mínimo, 80% de adequação. N/A = Não se Aplica.', margem, y);
+  doc.text('Resultado consolidado do checklist. N/A = Não se Aplica.', margem, y);
   y += 11;
-
-  // Fotos anexadas — agrupadas por item, com legenda (não soltas ao final sem contexto)
-  if(fotosPorItem.length>0){
-    if(y > 220){ doc.addPage(); y = 16; }
-    doc.setFontSize(9.5); doc.setTextColor(34,35,31); doc.setFont(undefined,'bold');
-    doc.text('Registro fotográfico', margem, y); y += 6;
-    doc.setFont(undefined,'normal');
-
-    fotosPorItem.forEach(grupo=>{
-      if(y > 250){ doc.addPage(); y = 16; }
-      doc.setFontSize(8); doc.setTextColor(108,107,98);
-      doc.text(grupo.desc, margem, y);
-      y += 3;
-      let x = margem;
-      let maiorAltura = 0;
-      grupo.fotos.forEach((f,i)=>{
-        try{ doc.addImage(f, 'JPEG', x, y, 42, 30); }catch(e){}
-        maiorAltura = 30;
-        x += 46;
-        if((i+1)%3===0){ x = margem; y += 34; }
-      });
-      y += maiorAltura + 6;
-    });
-  }
 
   // Assinaturas
   if(y > 235){ doc.addPage(); y = 16; }
@@ -3255,12 +3227,20 @@ async function adicionarCompra(){
   LISTA_COMPRAS.push({id: data.id, item: texto, feito:false});
   renderTela();
 }
+async function excluirCompra(id){
+  const c=LISTA_COMPRAS.find(x=>x.id===id);if(!c)return;
+  if(!confirm(`Excluir "${c.item}" da lista de compras?`))return;
+  const {error}=await supa.from('lista_compras').delete().eq('id',id);
+  if(error){dispararAutomacao('Erro ao excluir item',error.message);return;}
+  LISTA_COMPRAS=LISTA_COMPRAS.filter(x=>x.id!==id);renderTela();
+}
 function comprasHTML(){
   return `
     ${LISTA_COMPRAS.map(c=>`
       <div class="compra-item ${c.feito?'feito':''}" onclick="alternarCompra('${c.id}')">
         <input type="checkbox" ${c.feito?'checked':''} onclick="event.stopPropagation(); alternarCompra('${c.id}')">
         <span>${c.item}</span>
+        <button onclick="event.stopPropagation();excluirCompra('${c.id}')" title="Excluir" style="margin-left:auto;color:#B0413E;font-size:15px">🗑</button>
       </div>
     `).join('')}
     <div class="add-compra">
