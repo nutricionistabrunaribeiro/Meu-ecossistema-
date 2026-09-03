@@ -1547,7 +1547,7 @@ function abaConteudoClienteHTML(c){
     case "visitas":
       return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaVisita('${c.id}')">+ Iniciar checklist para este cliente</button></div>`+(c.visitas.length ? c.visitas.map(v=>`
         <div class="item-lista-simples">
-          <button onclick="telaAtual='visitas';renderSidebar();abrirVisita('${v.id}')" style="text-align:left"><strong>${v.modeloNome||'Checklist'}</strong><br><span style="color:var(--cor-texto-suave)">${v.data} — ${v.status==='concluida'?'Concluído':'Em preenchimento'}</span></button>
+          <button onclick="telaAtual='visitas';renderSidebar();abrirVisita('${v.id}')" style="text-align:left"><strong>${v.modeloNome||'Checklist'}</strong><br><span style="color:var(--cor-texto-suave)">Aplicação: ${v.data}${v.dataElaboracao?' · Elaboração: '+v.dataElaboracao:''} — ${v.status==='concluida'?'Concluído':'Em preenchimento'}</span></button>
           <span style="display:flex;align-items:center;gap:10px;">
             ${v.pontuacao?v.pontuacao+'%':''}
             ${v.pdfPath ? `<button onclick="verPdfDoHistorico('${v.pdfPath}')" style="color:var(--cor-primaria);font-weight:600;font-size:12px;">📄 Ver PDF</button>` : ''}
@@ -1684,7 +1684,7 @@ let VISITAS = [];
 
 function recalcularHistoricoCliente(c){
   const visitasDoCliente = VISITAS.filter(v=>v.clienteId===c.id);
-  c.visitas = visitasDoCliente.map(v=>({id:v.id,data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath,modeloNome:v.modeloNome}));
+  c.visitas = visitasDoCliente.map(v=>({id:v.id,data:v.data,dataElaboracao:v.dataElaboracaoISO?v.dataElaboracao:null,status:v.status,pontuacao:v.pontuacao,pdfPath:v.pdfPath,modeloNome:v.modeloNome}));
   c.historicoChecklist = visitasDoCliente
     .filter(v=>v.status==='concluida' && v.pontuacao!==null && v.pontuacao!==undefined)
     .sort((a,b)=>{
@@ -1708,7 +1708,10 @@ async function carregarVisitasSupabase(){
     id: row.id,
     clienteId: row.cliente_id,
     clienteNome: row.clientes ? row.clientes.nome : "Cliente",
-    data: row.data ? row.data.split('-').reverse().join('/') : "—",
+    dataAplicacaoISO: row.data_aplicacao || row.data || null,
+    dataElaboracaoISO: row.data_elaboracao || null,
+    data: (row.data_aplicacao || row.data) ? (row.data_aplicacao || row.data).split('-').reverse().join('/') : "—",
+    dataElaboracao: row.data_elaboracao ? row.data_elaboracao.split('-').reverse().join('/') : "—",
     status: row.status,
     modeloId: row.modelo_id,
     modeloNome: row.modelo_nome_snapshot || MODELOS_CHECKLIST.find(m=>m.id===row.modelo_id)?.nome || 'Checklist',
@@ -1774,6 +1777,7 @@ async function novaVisita(clienteId=null){
   const { data, error } = await supa.from('visitas').insert({
     cliente_id: clienteEscolhido.id,
     data: dataISO,
+    data_aplicacao: dataISO,
     status: 'agendada',
     nutricionista_nome: PERFIL_USUARIO.nome,
     nutricionista_crn: PERFIL_USUARIO.crn,
@@ -1794,7 +1798,8 @@ async function novaVisita(clienteId=null){
   }
   VISITAS.unshift({
     id: data.id, clienteId: clienteEscolhido.id, clienteNome: clienteEscolhido.nome,
-    data: dataTxt, status:'agendada', mesAno: mesAnoPorData(dataISO),
+    dataAplicacaoISO:dataISO, dataElaboracaoISO:null,
+    data: dataTxt, dataElaboracao:'—', status:'agendada', mesAno: mesAnoPorData(dataISO),
     modeloId:modelo.id, modeloNome:modelo.nome,
     nutricionista: PERFIL_USUARIO.nome, crn: PERFIL_USUARIO.crn,
     preparo:[
@@ -2035,6 +2040,10 @@ function fichaVisitaHTML(v){
           </div>
         </div>
       </div>
+      <div class="aba-conteudo" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div><strong style="font-size:12px;">Data de aplicação</strong><div style="color:var(--cor-texto-suave);font-size:12px;">${v.data}</div></div>
+        <div style="font-size:11.5px;color:var(--cor-texto-suave);">A data de elaboração será escolhida no calendário ao concluir.</div>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn-secundario" onclick="irParaEtapaVisita('durante')">← Voltar ao checklist</button>
         <button class="btn-primario" onclick="concluirVisita('${v.id}')">Concluir visita e gerar PDF</button>
@@ -2047,7 +2056,7 @@ function fichaVisitaHTML(v){
       <div class="ficha-ini">${iniciais(v.clienteNome)}</div>
       <div>
         <div class="ficha-nome">${v.clienteNome}</div>
-        <div class="ficha-sub">${v.data} · Visita técnica</div>
+        <div class="ficha-sub">Aplicação: ${v.data}${v.dataElaboracaoISO?' · Elaboração: '+v.dataElaboracao:''} · ${v.modeloNome||'Checklist'}</div>
       </div>
     </div>
     <div class="etapa-tabs">
@@ -2066,10 +2075,14 @@ function canvasVazio(canvas){
 
 async function concluirVisita(id){
   const v = VISITAS.find(x=>x.id===id);
+  const dataElaboracaoISO=await selecionarDataVisual({titulo:'Data de elaboração/finalização',valor:v.dataElaboracaoISO||formatoISO(new Date()),opcional:false});
+  if(!dataElaboracaoISO)return;
+  if(v.dataAplicacaoISO&&dataElaboracaoISO<v.dataAplicacaoISO&&!confirm('A data de elaboração é anterior à data de aplicação. Deseja manter assim mesmo?'))return;
   v.status = 'concluida';
   v.pontuacao = calcularPontuacao(v.checklist);
+  v.dataElaboracaoISO=dataElaboracaoISO;
+  v.dataElaboracao=isoParaBRCompleto(dataElaboracaoISO);
   const naoConf = v.checklist.filter(i=>i.resultado==='nao_conforme').length;
-  const hoje = new Date().toISOString().slice(0,10);
 
   // Captura as assinaturas do canvas AGORA, antes de qualquer re-renderização da tela
   const canvasCliente = document.getElementById('assCliente');
@@ -2078,7 +2091,8 @@ async function concluirVisita(id){
   v.assinaturaTecnico = (canvasTecnico && !canvasVazio(canvasTecnico)) ? canvasTecnico.toDataURL('image/png') : null;
 
   const { error: erroUpdate } = await supa.from('visitas').update({
-    status: 'concluida', pontuacao: v.pontuacao, data_aplicacao: hoje, data_elaboracao: hoje
+    status: 'concluida', pontuacao: v.pontuacao,
+    data_aplicacao: v.dataAplicacaoISO, data_elaboracao: dataElaboracaoISO
   }).eq('id', v.id);
 
   const resultadosSalvos = await Promise.all(v.checklist.filter(i=>i.resultado).map(i=>salvarRascunhoItem(v,i)));
@@ -2138,7 +2152,7 @@ async function gerarPDFVisita(v){
   doc.autoTable({
     startY: y,
     head: [['Cliente','Mês/Ano','Nutricionista Responsável','Data de aplicação','Data de elaboração']],
-    body: [[v.clienteNome, v.mesAno, `${v.nutricionista} — ${v.crn}`, v.data, v.data]],
+    body: [[v.clienteNome, v.mesAno, `${v.nutricionista} — ${v.crn}`, v.data, v.dataElaboracao||'—']],
     theme: 'grid',
     headStyles: {fillColor:[247,245,239], textColor:[108,107,98], fontSize:7.5, fontStyle:'bold', cellPadding:{top:2.5,bottom:2.5,left:3,right:3}},
     styles: {fontSize:8.5, cellPadding:{top:3,bottom:3,left:3,right:3}, textColor:[34,35,31], lineColor:[226,224,214], lineWidth:0.15, valign:'middle'},

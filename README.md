@@ -11,6 +11,13 @@ conectado ao Supabase e preparado para instalação como PWA.
 - filtros de camadas e faixa separada de itens do dia inteiro;
 - ícones do PWA apontando para a pasta `icons/` e cache atualizado para V12.
 
+## Rodada V13 — Datas do checklist
+
+- calendário visual para escolher a data de aplicação ao iniciar o checklist;
+- calendário visual para escolher a data de elaboração/finalização ao concluir;
+- datas independentes no banco, na tela do cliente e nos novos PDFs;
+- preservação e correção das datas de aplicação dos checklists já existentes.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
