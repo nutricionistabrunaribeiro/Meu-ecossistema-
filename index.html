@@ -8,7 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
 <meta name="theme-color" content="#4FA579">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -572,7 +573,8 @@
   .pixel-mes{margin-bottom:18px;}
   .pixel-mes-nome{font-size:12px;font-weight:700;color:var(--cor-texto-suave);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
   .pixel-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-width:260px;}
-  .pixel-dia{aspect-ratio:1;border-radius:3px;background:var(--cor-borda);cursor:pointer;}
+  .pixel-dia{aspect-ratio:1;border-radius:3px;background:var(--cor-borda);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#5F5E57;font-weight:600;}
+  .pixel-dia.pixel-tenso,.pixel-dia.pixel-bom,.pixel-dia.pixel-produtivo,.pixel-dia.pixel-otimo{color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.22);}
   .pixel-dia.vazio{visibility:hidden;}
   .pixel-tenso{background:#B0413E;}
   .pixel-bom{background:#8FA87A;}
@@ -823,10 +825,12 @@ function renderSidebar(){
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
-  telaAtual = esp === 'trabalho' ? 'dashboard' : 'habitos';
+  telaAtual = esp === 'trabalho' ? 'dashboard' : 'menu_pessoal';
+  salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
-  fecharMenuMobile();
+  if(esp==='pessoal' && window.innerWidth<=900) abrirMenuMobile();
+  else fecharMenuMobile();
 }
 
 function irPara(id){
@@ -873,6 +877,7 @@ const NOMES_TELA = {
   ano_pixels:["Meu Ano em Pixels","Um quadradinho por dia"],
   metas:["Metas","Seus objetivos pessoais"],
   contas:["Financeiro Pessoal","Separado da Consultoria"],
+  menu_pessoal:["Vida Pessoal","Escolha uma área no menu"],
   compras:["Compras","Sua lista"],
   estudos:["Estudos","4 itens em andamento"],
 };
@@ -2566,6 +2571,15 @@ async function moverLead(id, direcao){
     }
   }
 }
+async function excluirLead(id){
+  const lead=LEADS.find(l=>l.id===id);
+  if(!lead || !confirm(`Excluir "${lead.nome}" do pipeline comercial?`)) return;
+  const {error}=await supa.from('leads').delete().eq('id',id);
+  if(error){dispararAutomacao('Erro ao excluir contato',error.message);return;}
+  LEADS=LEADS.filter(l=>l.id!==id);
+  dispararAutomacao('Contato excluído do pipeline',lead.nome);
+  renderTela();
+}
 
 function comercialHTML(){
   return `
@@ -2583,6 +2597,7 @@ function comercialHTML(){
                 <div class="lead-nome">${l.nome}</div>
                 <div class="lead-valor">${formatarMoeda(l.valor)}</div>
                 <div class="lead-meta">Origem: ${l.origem}</div>
+                <div style="display:flex;justify-content:flex-end;margin-top:6px;"><button onclick="excluirLead('${l.id}')" title="Excluir do pipeline" style="color:#B0413E;font-size:11px;font-weight:600;">🗑 Excluir</button></div>
                 <div class="lead-mover">
                   ${idx>0 ? `<button onclick="moverLead('${l.id}',-1)">← ${ETAPAS_PIPELINE[idx-1].nome}</button>` : ''}
                   ${idx<ETAPAS_PIPELINE.length-1 ? `<button onclick="moverLead('${l.id}',1)">${ETAPAS_PIPELINE[idx+1].nome} →</button>` : ''}
@@ -2613,7 +2628,7 @@ async function carregarProjetosSupabase(){
   PROJETOS = (projetosRows||[]).map(p=>({
     id: p.id, nome: p.nome, clienteId:p.cliente_id, cliente: p.clientes ? p.clientes.nome : "—",
     etapas: (etapasRows||[]).filter(e=>e.projeto_id===p.id).map(e=>({
-      id: e.id, nome: e.nome,
+      id: e.id, nome: e.nome, ordem:e.ordem,
       checklist: (checklistRows||[]).filter(c=>c.etapa_id===e.id).map(c=>({id:c.id, t:c.item, c:c.concluido}))
     }))
   }));
@@ -2678,6 +2693,33 @@ async function alternarChecklistProjeto(projId, etapaId, idx){
   renderTela();
   await supa.from('checklist_etapa_projeto').update({concluido: et.checklist[idx].c}).eq('id', et.checklist[idx].id);
 }
+async function adicionarEtapaProjeto(projId){
+  const p=PROJETOS.find(x=>x.id===projId);if(!p)return;
+  const nome=prompt('Nome da nova etapa:');if(!nome?.trim())return;
+  const ordem=Math.max(0,...p.etapas.map(e=>Number(e.ordem)||0))+1;
+  const {data,error}=await supa.from('etapas_projeto').insert({projeto_id:projId,nome:nome.trim(),ordem}).select().single();
+  if(error){dispararAutomacao('Erro ao adicionar etapa',error.message);return;}
+  p.etapas.push({id:data.id,nome:data.nome,ordem:data.ordem,checklist:[]});renderTela();
+}
+async function adicionarItemProjeto(projId,etapaId){
+  const p=PROJETOS.find(x=>x.id===projId);const et=p?.etapas.find(e=>e.id===etapaId);if(!et)return;
+  const item=prompt(`Novo item de "${et.nome}":`);if(!item?.trim())return;
+  const {data,error}=await supa.from('checklist_etapa_projeto').insert({etapa_id:etapaId,item:item.trim(),concluido:false}).select().single();
+  if(error){dispararAutomacao('Erro ao adicionar item',error.message);return;}
+  et.checklist.push({id:data.id,t:data.item,c:false});renderTela();
+}
+async function excluirItemProjeto(projId,etapaId,itemId){
+  const p=PROJETOS.find(x=>x.id===projId);const et=p?.etapas.find(e=>e.id===etapaId);const item=et?.checklist.find(i=>i.id===itemId);
+  if(!item||!confirm(`Excluir o item "${item.t}"?`))return;
+  const {error}=await supa.from('checklist_etapa_projeto').delete().eq('id',itemId);if(error){dispararAutomacao('Erro ao excluir item',error.message);return;}
+  et.checklist=et.checklist.filter(i=>i.id!==itemId);renderTela();
+}
+async function excluirEtapaProjeto(projId,etapaId){
+  const p=PROJETOS.find(x=>x.id===projId);const et=p?.etapas.find(e=>e.id===etapaId);
+  if(!et||!confirm(`Excluir a etapa "${et.nome}" e os itens dela?`))return;
+  const {error}=await supa.from('etapas_projeto').delete().eq('id',etapaId);if(error){dispararAutomacao('Erro ao excluir etapa',error.message);return;}
+  p.etapas=p.etapas.filter(e=>e.id!==etapaId);renderTela();
+}
 
 function progressoEtapa(etapa){
   const total = etapa.checklist.length;
@@ -2732,6 +2774,7 @@ function fichaProjetoHTML(p){
       </div>
     </div>
     <div class="proj-barra" style="margin-bottom:20px;"><div style="width:${perc}%;"></div></div>
+    <div style="margin-bottom:16px;"><button class="btn-primario" onclick="adicionarEtapaProjeto('${p.id}')">+ Adicionar etapa</button></div>
     <div class="etapas-timeline">
       ${p.etapas.map(et=>{
         const st = statusEtapa(et);
@@ -2741,14 +2784,15 @@ function fichaProjetoHTML(p){
           <div class="etapa-linha"></div>
           <div class="etapa-marca ${st}">${iconeEt}</div>
           <div class="etapa-conteudo">
-            <div class="etapa-titulo">${et.nome}</div>
+            <div style="display:flex;justify-content:space-between;gap:10px;"><div class="etapa-titulo">${et.nome}</div><button onclick="excluirEtapaProjeto('${p.id}','${et.id}')" style="color:#B0413E;font-size:11px;">Excluir etapa</button></div>
             <div class="etapa-status-txt">${st==='concluida'?'Concluída':st==='andamento'?'Em andamento':'Pendente'}</div>
             ${et.checklist.map((item,idx)=>`
               <div class="etapa-check-item ${item.c?'done':''}" onclick="alternarChecklistProjeto('${p.id}','${et.id}',${idx})">
                 <input type="checkbox" ${item.c?'checked':''} onclick="event.stopPropagation(); alternarChecklistProjeto('${p.id}','${et.id}',${idx})">
-                <span>${item.t}</span>
+                <span style="flex:1">${item.t}</span><button onclick="event.stopPropagation();excluirItemProjeto('${p.id}','${et.id}','${item.id}')" title="Excluir item" style="color:#B0413E">✕</button>
               </div>
             `).join('')}
+            <button class="btn-secundario" style="padding:7px 10px;font-size:11px;margin-top:8px;" onclick="adicionarItemProjeto('${p.id}','${et.id}')">+ Adicionar item</button>
           </div>
         </div>`;
       }).join('')}
@@ -3756,7 +3800,7 @@ function anoPixelsHTML(){
       const dataISO = ano+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
       const humor = REGISTROS_PIXEL[dataISO];
       const classeCor = humor ? HUMORES_PIXEL.find(h=>h.id===humor).classe : '';
-      celulas += `<div class="pixel-dia ${classeCor}" title="${d}/${m+1}" onclick="marcarPixelDia('${dataISO}')"></div>`;
+      celulas += `<div class="pixel-dia ${classeCor}" title="${d}/${m+1}" aria-label="Dia ${d} de ${MESES_NOME[m]}" onclick="marcarPixelDia('${dataISO}')">${d}</div>`;
     }
     meses += `<div class="pixel-mes"><div class="pixel-mes-nome">${MESES_NOME[m]}</div><div class="pixel-grid">${celulas}</div></div>`;
   }
@@ -3921,6 +3965,8 @@ function renderTela(){
     document.getElementById('conteudoTela').innerHTML = estudosHTML();
   } else if(telaAtual === 'habitos'){
     document.getElementById('conteudoTela').innerHTML = habitosHTML();
+  } else if(telaAtual === 'menu_pessoal'){
+    document.getElementById('conteudoTela').innerHTML = `<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0">${i.nome} →</h3></button>`).join('')}</div>`;
   } else if(telaAtual === 'ciclo'){
     document.getElementById('conteudoTela').innerHTML = cicloHTML();
   } else if(telaAtual === 'ideias_pessoais'){
@@ -3967,12 +4013,6 @@ function dashboardHTML(){
   const listaPendenciasResumo = [];
   PENDENCIAS_DB.filter(p=>p.origem==='manual' && p.status!=='concluida').forEach(p=> listaPendenciasResumo.push({texto:p.titulo, tag:p.cliente||rotuloStatusPendencia(p.status)}));
 
-  const clientesPrioritarios = [...CLIENTES].filter(c=>c.prioridade==='alta').slice(0,3);
-
-  const lancamentosMes = LANCAMENTOS.filter(l=>estaNoMes(l.vencimentoISO) && l.status!=='cancelado');
-  const receitasMes = LANCAMENTOS.filter(l=>l.tipo==='receita' && l.status==='pago' && estaNoMes(l.dataPagamentoISO || l.vencimentoISO)).reduce((s,l)=>s+l.valor,0);
-  const despesasMes = lancamentosMes.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
-
   const projetosAtivos = PROJETOS.slice(0,3);
 
   const conteudoHoje = CONTEUDOS_MKT.filter(c=>c.status!=='publicado').slice(0,3);
@@ -4011,19 +4051,6 @@ function dashboardHTML(){
         ${listaPendenciasResumo.slice(0,3).map(p=>`<li>${p.texto} <span class="tag">${p.tag}</span></li>`).join('')}
         ${listaPendenciasResumo.length===0 ? `<li style="color:var(--cor-texto-suave);">Tudo em dia 🎉</li>` : ''}
       </ul>
-    </div>
-
-    <div class="card">
-      <h3>Clientes prioritários <button onclick="irPara('clientes')">ver tudo</button></h3>
-      ${clientesPrioritarios.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum cliente com prioridade alta ainda.</div>` :
-        clientesPrioritarios.map(c=>`<div class="cliente-row"><div class="cliente-ini">${iniciais(c.nome)}</div><div><div>${c.nome}</div><div class="cliente-sub">${c.status}</div></div></div>`).join('')}
-    </div>
-
-    <div class="card">
-      <h3>Financeiro <button onclick="irPara('financeiro')">detalhes</button></h3>
-      <div class="fin-row"><span>Entradas</span><span class="fin-val fin-pos">${formatarMoeda(receitasMes)}</span></div>
-      <div class="fin-row"><span>Saídas</span><span class="fin-val fin-neg">${formatarMoeda(despesasMes)}</span></div>
-      <div class="peq" style="font-size:11.5px;color:var(--cor-texto-suave);">Saldo: ${formatarMoeda(receitasMes-despesasMes)}</div>
     </div>
 
     <div class="card">
