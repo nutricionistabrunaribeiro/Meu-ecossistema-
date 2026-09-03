@@ -15,8 +15,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Meu Ecossistema">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="icon" type="image/png" href="/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -741,6 +739,7 @@ const MODULOS = {
       {id:"clientes", nome:"Clientes"},
       {id:"visitas", nome:"Visitas Técnicas"},
       {id:"pendencias", nome:"Pendências"},
+      {id:"lideranca", nome:"Liderança"},
     ]},
     {grupo:"Crescimento", itens:[
       {id:"marketing", nome:"Marketing"},
@@ -865,6 +864,7 @@ const NOMES_TELA = {
   visitas:["Visitas Técnicas","Checklist BPF Inteligente"],
   biblioteca:["Biblioteca","8 documentos"],
   pendencias:["Pendências","Central combinada"],
+  lideranca:["Liderança","Delegações e acompanhamento"],
   marketing:["Marketing","Calendário editorial"],
   comercial:["Comercial","Pipeline de leads"],
   financeiro:["Financeiro","Visão do mês"],
@@ -1430,15 +1430,15 @@ function abaConteudoClienteHTML(c){
         </div>
         <div style="font-size:11px;color:var(--cor-texto-suave);margin-top:10px;">Toque em qualquer campo (✎) para editar.</div>`;
     case "visitas":
-      return c.visitas.length ? c.visitas.map(v=>`
+      return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaVisita('${c.id}')">+ Iniciar checklist para este cliente</button></div>`+(c.visitas.length ? c.visitas.map(v=>`
         <div class="item-lista-simples">
-          <span>${v.data} — ${v.status==='concluida'?'Concluída':'Agendada'}</span>
+          <button onclick="telaAtual='visitas';renderSidebar();abrirVisita('${v.id}')" style="text-align:left"><strong>${v.modeloNome||'Checklist'}</strong><br><span style="color:var(--cor-texto-suave)">${v.data} — ${v.status==='concluida'?'Concluído':'Em preenchimento'}</span></button>
           <span style="display:flex;align-items:center;gap:10px;">
             ${v.pontuacao?v.pontuacao+'%':''}
             ${v.pdfPath ? `<button onclick="verPdfDoHistorico('${v.pdfPath}')" style="color:var(--cor-primaria);font-weight:600;font-size:12px;">📄 Ver PDF</button>` : ''}
           </span>
         </div>
-      `).join('') : semRegistro();
+      `).join('') : semRegistro());
     case "pendencias":
       return pendenciasDoClienteHTML(c);
     case "financeiro":
@@ -1535,8 +1535,14 @@ const CATEGORIAS_BPF_OFICIAL = [
 let ITENS_CHECKLIST_BPF = [];
 let TODOS_ITENS_CHECKLIST = [];
 let MODELO_CHECKLIST_ID = null;
+let MODELOS_CHECKLIST = [];
+let MODELO_CHECKLIST_ADMIN_ID = null;
 
 async function carregarModeloChecklistSupabase(){
+  const { data:modelos, error:erroModelos } = await supa
+    .from('modelos_checklist').select('id, nome, ativo').order('nome');
+  if(erroModelos){ dispararAutomacao('Erro ao carregar modelos de checklist', erroModelos.message); return; }
+  MODELOS_CHECKLIST = modelos || [];
   const { data, error } = await supa
     .from('itens_modelo_checklist')
     .select('id, modelo_id, categoria, descricao, ordem, ativo')
@@ -1548,19 +1554,20 @@ async function carregarModeloChecklistSupabase(){
   TODOS_ITENS_CHECKLIST = (data || []).map(row=>({
     id: row.id, modeloId:row.modelo_id, categoria: row.categoria, desc: row.descricao, ordem:row.ordem, ativo:row.ativo!==false, resultado: null, obs: "", fotos: []
   }));
-  MODELO_CHECKLIST_ID = TODOS_ITENS_CHECKLIST[0]?.modeloId || null;
-  ITENS_CHECKLIST_BPF = TODOS_ITENS_CHECKLIST.filter(i=>i.ativo);
+  MODELO_CHECKLIST_ID = MODELOS_CHECKLIST.find(m=>m.ativo)?.id || MODELOS_CHECKLIST[0]?.id || TODOS_ITENS_CHECKLIST[0]?.modeloId || null;
+  MODELO_CHECKLIST_ADMIN_ID = MODELO_CHECKLIST_ADMIN_ID || MODELO_CHECKLIST_ID;
+  ITENS_CHECKLIST_BPF = TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===MODELO_CHECKLIST_ID);
 }
-function gerarChecklistOficial(){
+function gerarChecklistOficial(modeloId=MODELO_CHECKLIST_ID){
   // clona o modelo carregado do banco, pronto pra uma nova visita responder do zero
-  return ITENS_CHECKLIST_BPF.map(i => ({...i, resultado:null, obs:"", fotos:[]}));
+  return TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===modeloId).map(i => ({...i, resultado:null, obs:"", fotos:[]}));
 }
 
 let VISITAS = [];
 
 function recalcularHistoricoCliente(c){
   const visitasDoCliente = VISITAS.filter(v=>v.clienteId===c.id);
-  c.visitas = visitasDoCliente.map(v=>({data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath}));
+  c.visitas = visitasDoCliente.map(v=>({id:v.id,data:v.data, status:v.status, pontuacao:v.pontuacao, pdfPath:v.pdfPath,modeloNome:v.modeloNome}));
   c.historicoChecklist = visitasDoCliente
     .filter(v=>v.status==='concluida' && v.pontuacao!==null && v.pontuacao!==undefined)
     .sort((a,b)=>{
@@ -1586,6 +1593,8 @@ async function carregarVisitasSupabase(){
     clienteNome: row.clientes ? row.clientes.nome : "Cliente",
     data: row.data ? row.data.split('-').reverse().join('/') : "—",
     status: row.status,
+    modeloId: row.modelo_id,
+    modeloNome: row.modelo_nome_snapshot || MODELOS_CHECKLIST.find(m=>m.id===row.modelo_id)?.nome || 'Checklist',
     pontuacao: row.pontuacao,
     mesAno: row.data ? mesAnoPorData(row.data) : "—",
     nutricionista: row.nutricionista_nome || PERFIL_USUARIO.nome,
@@ -1595,7 +1604,7 @@ async function carregarVisitasSupabase(){
       {id:2, texto:"Confirmar horário com responsável no local", feito:false},
       {id:3, texto:"Revisar pendências da visita anterior", feito:false},
     ],
-    checklist: row.status==='agendada' ? gerarChecklistOficial() : [],
+    checklist: row.status==='agendada' ? gerarChecklistOficial(row.modelo_id) : [],
     pdfPath: row.pdf_path || null,
   }));
   const idsVisitas = VISITAS.map(v=>v.id);
@@ -1629,14 +1638,22 @@ function mesAnoPorData(dataISO){
   return MESES_NOME[parseInt(mes)-1] + '/' + ano;
 }
 
-async function novaVisita(){
+async function novaVisita(clienteId=null){
   if(CLIENTES.length===0){ alert('Cadastre um cliente antes de agendar uma visita.'); return; }
-  const listaNomes = CLIENTES.map((c,i)=>`${i+1}. ${c.nome}`).join('\n');
-  const escolha = prompt(`Qual cliente?\n${listaNomes}\n\nDigite o número:`);
-  const idx = parseInt(escolha) - 1;
-  if(isNaN(idx) || !CLIENTES[idx]) return;
-  const clienteEscolhido = CLIENTES[idx];
-  const dataTxt = prompt("Data da visita (DD/MM/AAAA):", "");
+  let clienteEscolhido=CLIENTES.find(c=>c.id===clienteId);
+  if(!clienteEscolhido){
+    const listaNomes = CLIENTES.map((c,i)=>`${i+1}. ${c.nome}`).join('\n');
+    const escolha = prompt(`Selecione o cliente:\n${listaNomes}\n\nDigite o número:`);
+    const idx = parseInt(escolha) - 1;
+    if(isNaN(idx) || !CLIENTES[idx]) return;
+    clienteEscolhido = CLIENTES[idx];
+  }
+  const modelosAtivos=MODELOS_CHECKLIST.filter(m=>m.ativo && TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo));
+  if(!modelosAtivos.length){ alert('Crie e ative um modelo com pelo menos um item em Configurações.'); return; }
+  const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome}`).join('\n')}\n\nDigite o número:`);
+  const modelo=modelosAtivos[parseInt(escolhaModelo)-1]; if(!modelo)return;
+  const hojeTxt=new Date().toLocaleDateString('pt-BR');
+  const dataTxt = prompt("Data de aplicação (DD/MM/AAAA):", hojeTxt);
   if(!dataTxt) return;
   const [dd,mm,aaaa] = dataTxt.split('/');
   if(!dd||!mm||!aaaa){ alert('Data inválida, use DD/MM/AAAA.'); return; }
@@ -1647,12 +1664,14 @@ async function novaVisita(){
     status: 'agendada',
     nutricionista_nome: PERFIL_USUARIO.nome,
     nutricionista_crn: PERFIL_USUARIO.crn,
+    modelo_id:modelo.id,
+    modelo_nome_snapshot:modelo.nome,
   }).select().single();
   if(error){
     dispararAutomacao('Erro ao agendar visita', error.message);
     return;
   }
-  const checklistNovo = gerarChecklistOficial();
+  const checklistNovo = gerarChecklistOficial(modelo.id);
   if(checklistNovo.length){
     const { data: respostas, error: erroChecklist } = await supa.from('checklist_respostas_itens').insert(checklistNovo.map(i=>({
       visita_id:data.id,item_modelo_id:i.id,categoria_snapshot:i.categoria,descricao_snapshot:i.desc
@@ -1663,6 +1682,7 @@ async function novaVisita(){
   VISITAS.unshift({
     id: data.id, clienteId: clienteEscolhido.id, clienteNome: clienteEscolhido.nome,
     data: dataTxt, status:'agendada', mesAno: mesAnoPorData(dataISO),
+    modeloId:modelo.id, modeloNome:modelo.nome,
     nutricionista: PERFIL_USUARIO.nome, crn: PERFIL_USUARIO.crn,
     preparo:[
       {id:1, texto:"Levar checklist BPF (tablet)", feito:true},
@@ -1671,13 +1691,14 @@ async function novaVisita(){
     ],
     checklist: checklistNovo,
   });
-  clienteEscolhido.visitas.push({data: dataTxt, status:'agendada', pontuacao:null});
-  dispararAutomacao('Visita agendada', `${clienteEscolhido.nome} — ${dataTxt}`);
+  recalcularHistoricoCliente(clienteEscolhido);
+  visitaSelecionadaId=data.id; etapaVisitaAtual='durante'; telaAtual='visitas'; renderSidebar(); salvarTelaAtualSessao();
+  dispararAutomacao('Checklist iniciado', `${modelo.nome} · ${clienteEscolhido.nome}`);
   renderTela();
 }
 
 let visitaSelecionadaId = null;
-let etapaVisitaAtual = "antes";
+let etapaVisitaAtual = "durante";
 
 async function excluirVisita(id){
   const v = VISITAS.find(x=>x.id===id);
@@ -1729,7 +1750,7 @@ function visitasHTML(){
     return fichaVisitaHTML(VISITAS.find(v=>v.id===visitaSelecionadaId));
   }
   return `
-    <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaVisita()">+ Nova visita</button></div>
+    <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaVisita()">+ Iniciar checklist</button></div>
     <div class="visitas-lista">
       ${VISITAS.length===0 ? `<div class="placeholder"><div class="serif">Nenhuma visita agendada</div><div>Toque em "+ Nova visita" pra agendar a primeira.</div></div>` : VISITAS.map(v=>`
         <div class="visita-card" onclick="abrirVisita('${v.id}')">
@@ -1737,11 +1758,11 @@ function visitasHTML(){
             <span class="visita-status-dot status-${v.status}"></span>
             <div>
               <div class="visita-nome">${v.clienteNome}</div>
-              <div class="visita-meta">${v.data} · ${v.status==='agendada'?'Agendada':'Concluída'}</div>
+              <div class="visita-meta">${v.modeloNome} · ${v.data} · ${v.status==='agendada'?'Em preenchimento':'Concluído'}</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Preparar visita →</span>`}
+            ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Continuar preenchimento →</span>`}
             ${v.pdfPath ? `<button onclick="event.stopPropagation(); verPdfDoHistorico('${v.pdfPath}')" title="Ver PDF" style="color:var(--cor-primaria);font-size:16px;">📄</button>` : ''}
             <button onclick="event.stopPropagation(); excluirVisita('${v.id}')" title="Excluir visita" style="color:var(--cor-texto-suave);font-size:15px;">🗑</button>
           </div>
@@ -1822,6 +1843,7 @@ function atualizarObsItem(visitaId, itemId, texto){
 }
 
 function fichaVisitaHTML(v){
+  if(etapaVisitaAtual==='antes') etapaVisitaAtual='durante';
   const categorias = [...new Set(v.checklist.map(i=>i.categoria))];
   const pontuacao = v.status==='concluida' ? v.pontuacao : calcularPontuacao(v.checklist);
   const naoConformidades = v.checklist.filter(i=>i.resultado==='nao_conforme');
@@ -1844,7 +1866,7 @@ function fichaVisitaHTML(v){
       <div class="score-box">
         <div class="score-num ${pontuacao>=80?'score-boa':'score-baixa'}">${pontuacao}%</div>
         <div style="flex:1;">
-          <div style="font-size:12.5px;color:var(--cor-texto-suave);margin-bottom:6px;">Conformidade BPF — calculada em tempo real</div>
+          <div style="font-size:12.5px;color:var(--cor-texto-suave);margin-bottom:6px;">${v.modeloNome||'Checklist'} — resultado calculado em tempo real</div>
           <div class="score-barra"><div style="width:${pontuacao}%;"></div></div>
         </div>
       </div>
@@ -1877,7 +1899,7 @@ function fichaVisitaHTML(v){
       `).join('')}
       <div style="display:flex;gap:10px;">
         <button class="btn-secundario" onclick="voltarVisitas()">← Voltar para Visitas</button>
-        <button class="btn-primario" onclick="irParaEtapaVisita('apos')">Finalizar Checklist BPF →</button>
+        <button class="btn-primario" onclick="irParaEtapaVisita('apos')">Finalizar checklist →</button>
       </div>`;
   } else {
     corpoEtapa = `
@@ -3343,13 +3365,14 @@ function configuracoesHTML(){
 
 async function novoItemModeloChecklist(){
   const descricao=prompt('Descrição do novo item:'); if(!descricao?.trim()) return;
-  const categoria=prompt('Seção/categoria:', TODOS_ITENS_CHECKLIST[0]?.categoria||'Geral'); if(!categoria?.trim()) return;
-  if(!MODELO_CHECKLIST_ID){ alert('Nenhum modelo de checklist ativo foi encontrado.'); return; }
-  const ordem=(Math.max(0,...TODOS_ITENS_CHECKLIST.map(i=>Number(i.ordem)||0))+1);
-  const {data,error}=await supa.from('itens_modelo_checklist').insert({modelo_id:MODELO_CHECKLIST_ID,descricao:descricao.trim(),categoria:categoria.trim(),ordem,ativo:true}).select().single();
+  const itensModelo=TODOS_ITENS_CHECKLIST.filter(i=>i.modeloId===MODELO_CHECKLIST_ADMIN_ID);
+  const categoria=prompt('Seção/categoria:', itensModelo[0]?.categoria||'Geral'); if(!categoria?.trim()) return;
+  if(!MODELO_CHECKLIST_ADMIN_ID){ alert('Selecione ou crie um modelo de checklist.'); return; }
+  const ordem=(Math.max(0,...itensModelo.map(i=>Number(i.ordem)||0))+1);
+  const {data,error}=await supa.from('itens_modelo_checklist').insert({modelo_id:MODELO_CHECKLIST_ADMIN_ID,descricao:descricao.trim(),categoria:categoria.trim(),ordem,ativo:true}).select().single();
   if(error){dispararAutomacao('Erro ao adicionar item',error.message);return;}
   TODOS_ITENS_CHECKLIST.push({id:data.id,modeloId:data.modelo_id,desc:data.descricao,categoria:data.categoria,ordem:data.ordem,ativo:true});
-  ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(i=>i.ativo);renderTela();
+  ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(i=>i.ativo&&i.modeloId===MODELO_CHECKLIST_ID);renderTela();
 }
 async function editarItemModeloChecklist(id){
   const i=TODOS_ITENS_CHECKLIST.find(x=>x.id===id);if(!i)return;
@@ -3357,19 +3380,40 @@ async function editarItemModeloChecklist(id){
   const categoria=prompt('Seção/categoria:',i.categoria);if(categoria===null||!categoria.trim())return;
   const {error}=await supa.from('itens_modelo_checklist').update({descricao:descricao.trim(),categoria:categoria.trim(),atualizado_em:new Date().toISOString()}).eq('id',id);
   if(error){dispararAutomacao('Erro ao editar item',error.message);return;}
-  Object.assign(i,{desc:descricao.trim(),categoria:categoria.trim()});ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(x=>x.ativo);renderTela();
+  Object.assign(i,{desc:descricao.trim(),categoria:categoria.trim()});ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(x=>x.ativo&&x.modeloId===MODELO_CHECKLIST_ID);renderTela();
 }
 async function alternarItemModeloChecklist(id){
   const i=TODOS_ITENS_CHECKLIST.find(x=>x.id===id);if(!i)return;
   if(i.ativo&&!confirm('Desativar este item para os próximos checklists? Os históricos não serão alterados.'))return;
   const {error}=await supa.from('itens_modelo_checklist').update({ativo:!i.ativo,atualizado_em:new Date().toISOString()}).eq('id',id);
   if(error){dispararAutomacao('Erro ao alterar item',error.message);return;}
-  i.ativo=!i.ativo;ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(x=>x.ativo);renderTela();
+  i.ativo=!i.ativo;ITENS_CHECKLIST_BPF=TODOS_ITENS_CHECKLIST.filter(x=>x.ativo&&x.modeloId===MODELO_CHECKLIST_ID);renderTela();
+}
+function selecionarModeloChecklistAdmin(id){ MODELO_CHECKLIST_ADMIN_ID=id; renderTela(); }
+async function novoModeloChecklist(){
+  const nome=prompt('Nome do novo checklist (ex.: Auditoria):'); if(!nome?.trim())return;
+  const {data,error}=await supa.from('modelos_checklist').insert({nome:nome.trim(),ativo:true}).select().single();
+  if(error){dispararAutomacao('Erro ao criar checklist',error.message);return;}
+  MODELOS_CHECKLIST.push(data); MODELO_CHECKLIST_ADMIN_ID=data.id; renderTela();
+}
+async function editarModeloChecklist(id){
+  const m=MODELOS_CHECKLIST.find(x=>x.id===id); if(!m)return;
+  const nome=prompt('Nome do checklist:',m.nome); if(nome===null||!nome.trim())return;
+  const {error}=await supa.from('modelos_checklist').update({nome:nome.trim()}).eq('id',id);
+  if(error){dispararAutomacao('Erro ao renomear checklist',error.message);return;} m.nome=nome.trim();renderTela();
+}
+async function alternarModeloChecklist(id){
+  const m=MODELOS_CHECKLIST.find(x=>x.id===id);if(!m)return;
+  if(m.ativo&&!confirm('Desativar este modelo para novos checklists? Os históricos permanecerão intactos.'))return;
+  const {error}=await supa.from('modelos_checklist').update({ativo:!m.ativo}).eq('id',id);
+  if(error){dispararAutomacao('Erro ao alterar checklist',error.message);return;}m.ativo=!m.ativo;renderTela();
 }
 function configChecklistsHTML(){
-  return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novoItemModeloChecklist()">+ Adicionar item</button></div>
-  <div class="config-secao"><h4>Modelo utilizado nos próximos checklists</h4>
-  ${TODOS_ITENS_CHECKLIST.map(i=>`<div class="config-linha" style="opacity:${i.ativo?1:.55}"><div><div class="config-linha-label">${i.desc}</div><div class="config-linha-desc">${i.categoria} · ${i.ativo?'Ativo':'Desativado'}</div></div><div style="display:flex;gap:6px"><button class="btn-secundario" onclick="editarItemModeloChecklist('${i.id}')">Editar</button><button class="btn-secundario" onclick="alternarItemModeloChecklist('${i.id}')">${i.ativo?'Desativar':'Reativar'}</button></div></div>`).join('')}</div>
+  const modelo=MODELOS_CHECKLIST.find(m=>m.id===MODELO_CHECKLIST_ADMIN_ID)||MODELOS_CHECKLIST[0];
+  const itens=TODOS_ITENS_CHECKLIST.filter(i=>i.modeloId===modelo?.id);
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"><button class="btn-primario" onclick="novoModeloChecklist()">+ Novo checklist</button>${MODELOS_CHECKLIST.map(m=>`<button class="btn-secundario" style="${m.id===modelo?.id?'border-color:var(--cor-primaria);color:var(--cor-primaria)':''};opacity:${m.ativo?1:.55}" onclick="selecionarModeloChecklistAdmin('${m.id}')">${m.nome}</button>`).join('')}</div>
+  ${modelo?`<div class="config-secao"><h4>${modelo.nome}</h4><div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn-secundario" onclick="editarModeloChecklist('${modelo.id}')">Renomear</button><button class="btn-secundario" onclick="alternarModeloChecklist('${modelo.id}')">${modelo.ativo?'Desativar':'Reativar'}</button><button class="btn-primario" onclick="novoItemModeloChecklist()">+ Adicionar item</button></div>
+  ${itens.length?itens.map(i=>`<div class="config-linha" style="opacity:${i.ativo?1:.55}"><div><div class="config-linha-label">${i.desc}</div><div class="config-linha-desc">${i.categoria} · ${i.ativo?'Ativo':'Desativado'}</div></div><div style="display:flex;gap:6px"><button class="btn-secundario" onclick="editarItemModeloChecklist('${i.id}')">Editar</button><button class="btn-secundario" onclick="alternarItemModeloChecklist('${i.id}')">${i.ativo?'Desativar':'Reativar'}</button></div></div>`).join(''):semRegistro()}</div>`:`<div class="placeholder">Crie o primeiro modelo de checklist.</div>`}
   <div style="font-size:11.5px;color:var(--cor-texto-suave)">Mudanças valem apenas para novos checklists. Visitas finalizadas e PDFs antigos permanecem preservados.</div>`;
 }
 
@@ -3920,6 +3964,62 @@ async function excluirAtivo(id){
   dispararAutomacao('Ativo excluído', a.nome);
 }
 
+/* ---------- LIDERANÇA (área privada da titular) ---------- */
+let LIDERANCA_RESPONSAVEIS=[];
+let LIDERANCA_DELEGACOES=[];
+let LIDERANCA_ATUALIZACOES=[];
+let filtroLideranca='ativas';
+async function carregarLiderancaSupabase(){
+  const [r,d,a]=await Promise.all([
+    supa.from('lideranca_responsaveis').select('*').order('nome'),
+    supa.from('lideranca_delegacoes').select('*').order('criado_em',{ascending:false}),
+    supa.from('lideranca_atualizacoes').select('*').order('criado_em',{ascending:false})
+  ]);
+  if(r.error||d.error||a.error){dispararAutomacao('Erro ao carregar Liderança',(r.error||d.error||a.error).message);return;}
+  LIDERANCA_RESPONSAVEIS=r.data||[];LIDERANCA_DELEGACOES=d.data||[];LIDERANCA_ATUALIZACOES=a.data||[];
+}
+async function novoResponsavelLideranca(){
+  const nome=prompt('Nome do responsável:');if(!nome?.trim())return;
+  const funcao=prompt('Função (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lideranca_responsaveis').insert({user_id:user.id,nome:nome.trim(),funcao:funcao.trim()||null}).select().single();
+  if(error){dispararAutomacao('Erro ao incluir responsável',error.message);return;}LIDERANCA_RESPONSAVEIS.push(data);renderTela();
+}
+async function alternarResponsavelLideranca(id){
+  const r=LIDERANCA_RESPONSAVEIS.find(x=>x.id===id);if(!r)return;
+  const {error}=await supa.from('lideranca_responsaveis').update({ativo:!r.ativo}).eq('id',id);if(error){dispararAutomacao('Erro ao alterar responsável',error.message);return;}r.ativo=!r.ativo;renderTela();
+}
+async function novaDelegacao(){
+  const ativos=LIDERANCA_RESPONSAVEIS.filter(r=>r.ativo);if(!ativos.length){alert('Inclua um responsável primeiro.');return;}
+  const titulo=prompt('Atividade a delegar:');if(!titulo?.trim())return;
+  const er=prompt(`Responsável:\n${ativos.map((r,i)=>`${i+1}. ${r.nome}`).join('\n')}\n\nDigite o número:`);const resp=ativos[parseInt(er)-1];if(!resp)return;
+  const ec=prompt(`Cliente (opcional):\n0. Sem cliente\n${CLIENTES.map((c,i)=>`${i+1}. ${c.nome}`).join('\n')}\n\nDigite o número:`, '0');const cliente=CLIENTES[parseInt(ec)-1]||null;
+  const contexto=prompt('Contexto/orientações:','')||'';const resultado=prompt('Resultado esperado:','')||'';
+  const prazo=prompt('Prazo (AAAA-MM-DD, opcional):','')||null;const prioridade=(prompt('Prioridade: baixa, media ou alta','media')||'media').toLowerCase();
+  const acompanhamento=prompt('Próximo acompanhamento (AAAA-MM-DD, opcional):','')||null;const {data:{user}}=await supa.auth.getUser();
+  const payload={user_id:user.id,responsavel_id:resp.id,cliente_id:cliente?.id||null,titulo:titulo.trim(),contexto:contexto.trim()||null,resultado_esperado:resultado.trim()||null,prazo,prioridade:['baixa','media','alta'].includes(prioridade)?prioridade:'media',proximo_acompanhamento:acompanhamento};
+  const {data,error}=await supa.from('lideranca_delegacoes').insert(payload).select().single();if(error){dispararAutomacao('Erro ao delegar',error.message);return;}LIDERANCA_DELEGACOES.unshift(data);renderTela();
+}
+async function mudarStatusDelegacao(id,status){
+  const d=LIDERANCA_DELEGACOES.find(x=>x.id===id);if(!d)return;const payload={status,atualizado_em:new Date().toISOString(),concluido_em:status==='concluida'?new Date().toISOString():null};
+  const {error}=await supa.from('lideranca_delegacoes').update(payload).eq('id',id);if(error){dispararAutomacao('Erro ao atualizar delegação',error.message);return;}Object.assign(d,payload);renderTela();
+}
+async function registrarAtualizacaoLideranca(id){
+  const nota=prompt('Registre atualização, cobrança ou decisão:');if(!nota?.trim())return;const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lideranca_atualizacoes').insert({user_id:user.id,delegacao_id:id,nota:nota.trim()}).select().single();if(error){dispararAutomacao('Erro ao registrar atualização',error.message);return;}LIDERANCA_ATUALIZACOES.unshift(data);renderTela();
+}
+async function incluirEvidenciaLideranca(id){
+  const d=LIDERANCA_DELEGACOES.find(x=>x.id===id);const evidencia=prompt('Link ou referência da entrega:',d.evidencia||'');if(evidencia===null)return;
+  const {error}=await supa.from('lideranca_delegacoes').update({evidencia:evidencia.trim()||null,atualizado_em:new Date().toISOString()}).eq('id',id);if(error){dispararAutomacao('Erro ao salvar evidência',error.message);return;}d.evidencia=evidencia.trim()||null;renderTela();
+}
+function rotuloStatusLideranca(s){return ({delegada:'Delegada',em_andamento:'Em andamento',aguardando_validacao:'Aguardando minha validação',concluida:'Concluída'})[s]||s;}
+function liderancaHTML(){
+  const hoje=new Date().toISOString().slice(0,10);const lista=LIDERANCA_DELEGACOES.filter(d=>filtroLideranca==='historico'?d.status==='concluida':d.status!=='concluida');
+  const atrasadas=LIDERANCA_DELEGACOES.filter(d=>d.status!=='concluida'&&d.prazo&&d.prazo<hoje).length;const validar=LIDERANCA_DELEGACOES.filter(d=>d.status==='aguardando_validacao').length;
+  return `<div class="grid"><div class="card"><h3>Visão rápida</h3><div class="serif" style="font-size:28px">${lista.length}</div><div style="color:var(--cor-texto-suave)">${filtroLideranca==='historico'?'concluídas':'delegações ativas'} · ${atrasadas} atrasada(s) · ${validar} aguardando validação</div></div><div class="card"><h3>Responsáveis</h3><button class="btn-primario" onclick="novoResponsavelLideranca()">+ Incluir responsável</button>${LIDERANCA_RESPONSAVEIS.map(r=>`<div class="item-lista-simples" style="opacity:${r.ativo?1:.55}"><span>${r.nome}${r.funcao?' · '+r.funcao:''}</span><button class="tag" onclick="alternarResponsavelLideranca('${r.id}')">${r.ativo?'Ativo':'Inativo'}</button></div>`).join('')}</div></div>
+  <div style="display:flex;gap:8px;margin:16px 0"><button class="btn-primario" onclick="novaDelegacao()">+ Nova delegação</button><button class="btn-secundario" onclick="filtroLideranca='ativas';renderTela()">Ativas</button><button class="btn-secundario" onclick="filtroLideranca='historico';renderTela()">Histórico</button></div>
+  ${lista.length?lista.map(d=>{const r=LIDERANCA_RESPONSAVEIS.find(x=>x.id===d.responsavel_id);const c=CLIENTES.find(x=>x.id===d.cliente_id);const notas=LIDERANCA_ATUALIZACOES.filter(a=>a.delegacao_id===d.id).slice(0,3);return `<div class="card" style="margin-bottom:12px;border-left:4px solid ${d.prioridade==='alta'?'#B0413E':d.prioridade==='baixa'?'#7398B2':'var(--cor-acento)'}"><h3>${d.titulo}</h3><div style="font-size:12px;color:var(--cor-texto-suave)">${r?.nome||'Responsável preservado'}${c?' · '+c.nome:''} · ${rotuloStatusLideranca(d.status)}${d.prazo?' · prazo '+d.prazo.split('-').reverse().join('/'):''}</div>${d.contexto?`<p>${d.contexto}</p>`:''}${d.resultado_esperado?`<p><strong>Resultado esperado:</strong> ${d.resultado_esperado}</p>`:''}${d.evidencia?`<p><strong>Evidência:</strong> <a href="${d.evidencia}" target="_blank">abrir referência</a></p>`:''}${notas.map(n=>`<div style="font-size:12px;padding:6px 0;border-top:1px solid var(--cor-borda)">${new Date(n.criado_em).toLocaleDateString('pt-BR')} · ${n.nota}</div>`).join('')}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="btn-secundario" onclick="registrarAtualizacaoLideranca('${d.id}')">+ Atualização</button><button class="btn-secundario" onclick="incluirEvidenciaLideranca('${d.id}')">Evidência</button>${d.status!=='em_andamento'&&d.status!=='concluida'?`<button class="btn-secundario" onclick="mudarStatusDelegacao('${d.id}','em_andamento')">Em andamento</button>`:''}${d.status!=='aguardando_validacao'&&d.status!=='concluida'?`<button class="btn-secundario" onclick="mudarStatusDelegacao('${d.id}','aguardando_validacao')">Validar</button>`:''}${d.status!=='concluida'?`<button class="btn-primario" onclick="mudarStatusDelegacao('${d.id}','concluida')">Concluir</button>`:`<button class="btn-secundario" onclick="mudarStatusDelegacao('${d.id}','em_andamento')">Reabrir</button>`}</div></div>`;}).join(''):`<div class="placeholder">Nenhuma delegação nesta lista.</div>`}`;
+}
+
 function renderTela(){
   const [titulo, sub] = NOMES_TELA[telaAtual] || ["", ""];
   if(telaAtual === 'dashboard'){
@@ -3951,6 +4051,8 @@ function renderTela(){
     document.getElementById('conteudoTela').innerHTML = bibliotecaHTML();
   } else if(telaAtual === 'pendencias'){
     document.getElementById('conteudoTela').innerHTML = pendenciasHTML();
+  } else if(telaAtual === 'lideranca'){
+    document.getElementById('conteudoTela').innerHTML = liderancaHTML();
   } else if(telaAtual === 'financeiro'){
     document.getElementById('conteudoTela').innerHTML = financeiroHTML();
   } else if(telaAtual === 'comercial'){
@@ -4070,6 +4172,12 @@ function dashboardHTML(){
         ${conteudoHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum conteúdo no calendário ainda.</div>` :
           conteudoHoje.map(c=>`<div class="conteudo-card"><div class="status">${c.status}</div><div class="titulo">${c.tipo} — ${c.titulo}</div><div class="meta">${c.data}</div></div>`).join('')}
       </div>
+    </div>
+
+    <div class="card">
+      <h3>Liderança <button onclick="irPara('lideranca')">acompanhar</button></h3>
+      <div class="pend-num">${LIDERANCA_DELEGACOES.filter(d=>d.status!=='concluida').length}</div>
+      <div class="pend-desc">delegações ativas · ${LIDERANCA_DELEGACOES.filter(d=>d.status==='aguardando_validacao').length} aguardando sua validação</div>
     </div>
 
     <div class="rapidos">
@@ -4288,6 +4396,7 @@ async function entrarNoApp(){
   await carregarProjetosSupabase();
   await carregarMarketingSupabase();
   await carregarPendenciasSupabase();
+  await carregarLiderancaSupabase();
   restaurarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -4304,7 +4413,7 @@ function restaurarTelaAtualSessao(){
     if(tela){ telaAtual = tela; }
     if(visita){ visitaSelecionadaId = visita; const v = VISITAS.find(x=>x.id===visita); if(v) etapaVisitaAtual = v.status==='concluida'?'apos':etapaVisitaAtual; }
     if(cliente){ clienteSelecionadoId = cliente; }
-    if(etapa && ['antes','durante','apos'].includes(etapa)) etapaVisitaAtual = etapa;
+    if(etapa && ['durante','apos'].includes(etapa)) etapaVisitaAtual = etapa;
   } catch(e){}
 }
 async function sairDaConta(){
