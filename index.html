@@ -737,7 +737,7 @@ const MODULOS = {
       {id:"dashboard", nome:"Dashboard"},
       {id:"agenda", nome:"Agenda"},
       {id:"clientes", nome:"Clientes"},
-      {id:"visitas", nome:"Visitas Técnicas"},
+      {id:"visitas", nome:"Checklists"},
       {id:"pendencias", nome:"Pendências"},
       {id:"lideranca", nome:"Liderança"},
     ]},
@@ -861,7 +861,7 @@ const NOMES_TELA = {
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
-  visitas:["Visitas Técnicas","Checklist BPF Inteligente"],
+  visitas:["Checklists","Inicie um checklist e arquive no cliente"],
   biblioteca:["Biblioteca","8 documentos"],
   pendencias:["Pendências","Central combinada"],
   lideranca:["Liderança","Delegações e acompanhamento"],
@@ -1095,8 +1095,7 @@ async function removerEvento(id){
 const ABAS_CLIENTE = [
   {id:"cadastro", nome:"Dados do cliente"},
   {id:"documentacao", nome:"Controle de documentação"},
-  {id:"visitas", nome:"Visitas"},
-  {id:"checklist", nome:"Checklists"},
+  {id:"visitas", nome:"Checklists"},
   {id:"projetos", nome:"Projetos"},
   {id:"pendencias", nome:"Pendências"},
   {id:"financeiro", nome:"Financeiro"},
@@ -1245,7 +1244,13 @@ async function novoCliente(){
     dispararAutomacao('Erro ao cadastrar cliente', error.message);
     return;
   }
-  CLIENTES.push(linhaParaCliente(data));
+  const novoClienteSalvo=linhaParaCliente(data);
+  CLIENTES.push(novoClienteSalvo);
+  clienteSelecionadoId=novoClienteSalvo.id;
+  abaClienteAtiva='cadastro';
+  telaAtual='clientes';
+  renderSidebar();
+  salvarTelaAtualSessao();
   dispararAutomacao('Cliente cadastrado', `"${nome.trim()}" salvo no banco de dados.`);
   renderTela();
 }
@@ -1438,7 +1443,7 @@ function abaConteudoClienteHTML(c){
             ${v.pdfPath ? `<button onclick="verPdfDoHistorico('${v.pdfPath}')" style="color:var(--cor-primaria);font-weight:600;font-size:12px;">📄 Ver PDF</button>` : ''}
           </span>
         </div>
-      `).join('') : semRegistro());
+      `).join('') : semRegistro())+`<h4 style="margin:22px 0 10px;font-size:12px;text-transform:uppercase;color:var(--cor-texto-suave)">Evolução dos resultados</h4>`+graficoEvolucaoChecklist(c);
     case "pendencias":
       return pendenciasDoClienteHTML(c);
     case "financeiro":
@@ -1446,8 +1451,6 @@ function abaConteudoClienteHTML(c){
       return lancsCliente.length ? lancsCliente.map(f=>`
         <div class="item-lista-simples"><span>${f.desc}</span><span>${formatarMoeda(f.valor)} · ${statusRealLancamento(f)}</span></div>
       `).join('') : semRegistro();
-    case "checklist":
-      return graficoEvolucaoChecklist(c);
     case "projetos":
       return projetosDoClienteHTML(c);
     case "documentacao":
@@ -1723,7 +1726,12 @@ function abrirVisita(id){
   salvarTelaAtualSessao();
   renderTela();
 }
-function voltarVisitas(){ visitaSelecionadaId = null; renderTela(); }
+function voltarVisitas(visitaId=null){
+  const v=VISITAS.find(x=>x.id===(visitaId||visitaSelecionadaId||telaPosPdfVisitaId));
+  visitaSelecionadaId=null;telaPosPdfVisitaId=null;
+  if(v){clienteSelecionadoId=v.clienteId;abaClienteAtiva='visitas';telaAtual='clientes';renderSidebar();salvarTelaAtualSessao();}
+  renderTela();
+}
 function irParaEtapaVisita(etapa){
   if(etapa === 'apos' && visitaSelecionadaId){
     const v = VISITAS.find(x=>x.id===visitaSelecionadaId);
@@ -1750,24 +1758,10 @@ function visitasHTML(){
     return fichaVisitaHTML(VISITAS.find(v=>v.id===visitaSelecionadaId));
   }
   return `
-    <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaVisita()">+ Iniciar checklist</button></div>
-    <div class="visitas-lista">
-      ${VISITAS.length===0 ? `<div class="placeholder"><div class="serif">Nenhuma visita agendada</div><div>Toque em "+ Nova visita" pra agendar a primeira.</div></div>` : VISITAS.map(v=>`
-        <div class="visita-card" onclick="abrirVisita('${v.id}')">
-          <div class="visita-card-info">
-            <span class="visita-status-dot status-${v.status}"></span>
-            <div>
-              <div class="visita-nome">${v.clienteNome}</div>
-              <div class="visita-meta">${v.modeloNome} · ${v.data} · ${v.status==='agendada'?'Em preenchimento':'Concluído'}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            ${v.status==='concluida' ? `<span class="visita-score-pill" style="color:${v.pontuacao>=80?'#2F6B4A':'#8E3A4A'};">${v.pontuacao}% conformidade</span>` : `<span class="visita-score-pill">Continuar preenchimento →</span>`}
-            ${v.pdfPath ? `<button onclick="event.stopPropagation(); verPdfDoHistorico('${v.pdfPath}')" title="Ver PDF" style="color:var(--cor-primaria);font-size:16px;">📄</button>` : ''}
-            <button onclick="event.stopPropagation(); excluirVisita('${v.id}')" title="Excluir visita" style="color:var(--cor-texto-suave);font-size:15px;">🗑</button>
-          </div>
-        </div>
-      `).join('')}
+    <div class="card" style="max-width:680px">
+      <h3>Iniciar um checklist</h3>
+      <p style="color:var(--cor-texto-suave);font-size:13px;line-height:1.55;margin:0 0 16px">Selecione o cliente e depois o modelo que deseja preencher. Checklists em andamento, concluídos e seus PDFs ficam organizados exclusivamente dentro da ficha de cada cliente.</p>
+      <button class="btn-primario" onclick="novaVisita()">+ Iniciar checklist</button>
     </div>`;
 }
 
@@ -1898,7 +1892,7 @@ function fichaVisitaHTML(v){
         </div>
       `).join('')}
       <div style="display:flex;gap:10px;">
-        <button class="btn-secundario" onclick="voltarVisitas()">← Voltar para Visitas</button>
+        <button class="btn-secundario" onclick="voltarVisitas()">← Voltar para o cliente</button>
         <button class="btn-primario" onclick="irParaEtapaVisita('apos')">Finalizar checklist →</button>
       </div>`;
   } else {
@@ -1942,7 +1936,7 @@ function fichaVisitaHTML(v){
   }
 
   return `
-    <button class="ficha-voltar" onclick="voltarVisitas()">← Voltar para Visitas</button>
+    <button class="ficha-voltar" onclick="voltarVisitas()">← Voltar para o cliente</button>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(v.clienteNome)}</div>
       <div>
@@ -2199,7 +2193,7 @@ function telaPosPdfHTML(v){
         <button class="btn-secundario" onclick="baixarPDF()">⬇ Baixar</button>
         <button class="btn-secundario" onclick="compartilharPDF()">↗ Compartilhar</button>
       </div>
-      <div style="margin-top:20px;"><button onclick="telaPosPdfVisitaId=null; voltarVisitas();" style="color:var(--cor-texto-suave);font-size:12.5px;">← Voltar para Visitas</button></div>
+      <div style="margin-top:20px;"><button onclick="voltarVisitas('${v.id}');" style="color:var(--cor-texto-suave);font-size:12.5px;">← Voltar para o cliente</button></div>
     </div>`;
 }
 function visualizarPDF(){
@@ -4181,9 +4175,9 @@ function dashboardHTML(){
     </div>
 
     <div class="rapidos">
-      <button class="btn-rapido" onclick="irPara('clientes')">+ Novo cliente</button>
+      <button class="btn-rapido" onclick="novoCliente()">+ Novo cliente</button>
       <button class="btn-rapido" onclick="irPara('agenda')">+ Agendar visita</button>
-      <button class="btn-rapido" onclick="irPara('agenda')">+ Nova tarefa</button>
+      <button class="btn-rapido" onclick="irPara('pendencias');setTimeout(novaPendenciaManual,0)">+ Nova pendência</button>
     </div>
   </div>`;
 }
