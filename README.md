@@ -1,15 +1,21 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
-Site estático (HTML + CSS + JS puro, sem build, sem dependências de instalação).
-Conectado ao banco de dados real no Supabase.
+Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
+conectado ao Supabase e preparado para instalação como PWA.
+
+## Conteúdo do pacote
+
+- `index.html`: aplicação completa;
+- `manifest.json`, `service-worker.js` e `icons/`: instalação e funcionamento
+  básico em modo offline;
+- `supabase/migrations/`: histórico das alterações de estrutura do banco.
 
 ## Como publicar na Vercel (sem usar linha de comando)
 
 1. Acesse **vercel.com** e entre na sua conta.
 2. No painel, clique em **"Add New..." → "Project"**.
-3. Escolha a opção de **importar uma pasta** (ou arraste esta pasta inteira
-   `deploy-meu-ecossistema` direto pra área indicada na tela — a Vercel aceita
-   isso, é literalmente arrastar e soltar).
+3. Importe o projeto pelo GitHub ou envie esta pasta completa, mantendo
+   `icons/` e `service-worker.js` junto do `index.html`.
 4. Não precisa configurar nada (sem "Build Command", sem "Install Command") —
    é um site estático puro. Se ela pedir, escolha **"Other"** como framework.
 5. Clique em **"Deploy"**.
@@ -18,9 +24,8 @@ Conectado ao banco de dados real no Supabase.
 
 ## Atualizando pelo GitHub (sem token)
 
-No repositório → abrir `index.html` → ✏️ Edit → apagar tudo → colar o
-conteúdo do novo `index.html` → Commit changes. A Vercel detecta e
-republica sozinha.
+Substitua todos os arquivos alterados no repositório e faça o commit. A Vercel
+detecta a mudança e republica automaticamente.
 
 ## Domínio próprio (opcional)
 
