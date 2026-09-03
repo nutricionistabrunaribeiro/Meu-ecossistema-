@@ -914,7 +914,7 @@ async function carregarEventosSupabase(){
   if(error){ dispararAutomacao('Erro ao carregar agenda', error.message); return; }
   eventosSemana = (data || []).map(row => ({
     id: row.id, dataISO: row.data, hora: row.hora, titulo: row.titulo,
-    categoria: row.categoria || 'outro', concluido: row.concluido,
+    categoria: row.categoria || 'outro', tipo:row.tipo||null, concluido: row.concluido,
     clienteId: row.cliente_id || null,
     clienteNomeVinculado: row.clientes ? row.clientes.nome : null,
     clienteExterno: row.cliente_externo || null,
@@ -977,7 +977,7 @@ function agendaSemanaHTML(){
       const idCel = `cel-${dataISO}-${hora}`;
       const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora);
       let chips = eventos.map(e=>
-        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="Toque para marcar como feito">${e.titulo}${e.clienteNomeVinculado?' — '+e.clienteNomeVinculado:''}${e.clienteExterno?' — '+e.clienteExterno:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span></div>`
+        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${e.tipo||'Tipo não definido'} · toque para marcar como feito">${e.titulo}${e.clienteNomeVinculado?' — '+e.clienteNomeVinculado:''}${e.clienteExterno?' — '+e.clienteExterno:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
       ).join('');
       let quickAdd = '';
       if(celulaAtiva && celulaAtiva.dataISO===dataISO && celulaAtiva.hora===hora){
@@ -1059,6 +1059,9 @@ async function confirmarNovoEvento(dataISO, hora){
 
   let clienteId = null;
   let clienteExterno = null;
+  const escolhaTipo=prompt('Tipo do compromisso:\n1. Visita\n2. Reunião\n3. Treinamento\n4. Demanda administrativa\n5. Pessoal\n6. Financeiro\n7. Outro','1');
+  const tiposEvento=['visita','reuniao','treinamento','demanda','pessoal','financeiro','outro'];
+  const tipoEvento=tiposEvento[parseInt(escolhaTipo)-1];if(!tipoEvento)return;
 
   if(categoriaSelecionada === 'brc'){
     if(CLIENTES.length===0){ alert('Cadastre um cliente da consultoria antes, ou escolha outra categoria.'); return; }
@@ -1077,12 +1080,12 @@ async function confirmarNovoEvento(dataISO, hora){
 
   celulaAtiva = null;
   const { data, error } = await supa.from('eventos').insert({
-    titulo, categoria: categoriaSelecionada, data: dataISO, hora,
+    titulo, categoria: categoriaSelecionada, tipo:tipoEvento, data: dataISO, hora,
     cliente_id: clienteId, cliente_externo: clienteExterno
   }).select('*, clientes(nome)').single();
   if(error){ dispararAutomacao('Erro ao criar evento', error.message); return; }
   eventosSemana.push({
-    id: data.id, dataISO, hora, titulo, categoria: categoriaSelecionada, concluido:false,
+    id: data.id, dataISO, hora, titulo, categoria: categoriaSelecionada, tipo:tipoEvento, concluido:false,
     clienteId, clienteNomeVinculado: data.clientes ? data.clientes.nome : null, clienteExterno
   });
   const d = new Date(dataISO+'T00:00:00');
@@ -1095,6 +1098,7 @@ async function alternarConcluidoEvento(id){
   await supa.from('eventos').update({concluido: ev.concluido}).eq('id', id);
   renderTela();
 }
+async function classificarEvento(id){const e=eventosSemana.find(x=>x.id===id);const n=prompt('Tipo:\n1. Visita\n2. Reunião\n3. Treinamento\n4. Demanda administrativa\n5. Pessoal\n6. Financeiro\n7. Outro',String(Math.max(1,['visita','reuniao','treinamento','demanda','pessoal','financeiro','outro'].indexOf(e.tipo)+1)));const tipos=['visita','reuniao','treinamento','demanda','pessoal','financeiro','outro'];const tipo=tipos[parseInt(n)-1];if(!tipo)return;const {error}=await supa.from('eventos').update({tipo}).eq('id',id);if(error){dispararAutomacao('Erro ao classificar compromisso',error.message);return;}e.tipo=tipo;renderTela();}
 async function removerEvento(id){
   eventosSemana = eventosSemana.filter(e=>e.id!==id);
   renderTela();
@@ -1280,7 +1284,7 @@ async function novoCliente(contratanteInicial=null){
   dispararAutomacao('Cliente cadastrado', `"${nome.trim()}" salvo no banco de dados.`);
   renderTela();
 }
-function visitasRealizadasMes(clienteId){const mes=new Date().toISOString().slice(0,7);return eventosSemana.filter(e=>e.clienteId===clienteId&&e.concluido&&e.dataISO?.startsWith(mes)&&['brc','saber_nutrir'].includes(e.categoria)).length;}
+function visitasRealizadasMes(clienteId){const mes=new Date().toISOString().slice(0,7);return eventosSemana.filter(e=>e.clienteId===clienteId&&e.concluido&&e.tipo==='visita'&&e.dataISO?.startsWith(mes)).length;}
 function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);return {prev:filhos.reduce((s,x)=>s+x.visitasPrevistasMes,0),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
 function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
 function carteiraContratanteHTML(c){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')"><strong>${f.nome}</strong></button><span>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>`;}
@@ -4187,6 +4191,16 @@ function dashboardHTML(){
     ...OBRIGACOES.filter(o=>o.status!=='realizada'&&diasAte(o.vencimento)<=30).map(o=>({titulo:o.titulo,cliente:CLIENTES.find(c=>c.id===o.cliente_id)?.nome,dias:diasAte(o.vencimento)})),
     ...TREINAMENTOS.filter(t=>t.status==='realizado'&&diasAte(t.validade)<=30).map(t=>({titulo:'Reciclagem: '+t.tema,cliente:CLIENTES.find(c=>c.id===t.cliente_id)?.nome,dias:diasAte(t.validade)}))
   ].sort((a,b)=>a.dias-b.dias);
+  const mesAtual=hoje.slice(0,7),anoAtual=hoje.slice(0,4);
+  const visitasConcluidas=eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido);
+  const realizadasBRC=visitasConcluidas.filter(e=>e.categoria==='brc'&&e.dataISO?.startsWith(mesAtual)).length;
+  const realizadasSN=visitasConcluidas.filter(e=>e.categoria==='saber_nutrir'&&e.dataISO?.startsWith(mesAtual)).length;
+  const metaBRC=CLIENTES.filter(c=>c.tipoCliente==='direto').reduce((s,c)=>s+c.visitasPrevistasMes,0);
+  const saberNutrir=CLIENTES.find(c=>c.tipoCliente==='contratante'&&c.nome.toLowerCase().includes('saber'));
+  const metaFilhosSN=saberNutrir?CLIENTES.filter(c=>c.contratanteId===saberNutrir.id).reduce((s,c)=>s+c.visitasPrevistasMes,0):0;
+  const metaSN=metaFilhosSN||(saberNutrir?.visitasPrevistasMes||((saberNutrir?.visitasPrevistasSemana||0)*4));
+  const visitasAno=visitasConcluidas.filter(e=>e.dataISO?.startsWith(anoAtual));
+  const mesesVisitas=Array.from({length:12},(_,i)=>{const chave=`${anoAtual}-${String(i+1).padStart(2,'0')}`;return {nome:MESES_NOME[i].slice(0,3),qtd:visitasAno.filter(e=>e.dataISO?.startsWith(chave)).length};});
 
   return `
   <div class="grid">
@@ -4228,6 +4242,17 @@ function dashboardHTML(){
       <h3>Próximos vencimentos <button onclick="irPara('obrigacoes')">programar</button></h3>
       <div class="pend-num">${vencimentos30.length}</div><div class="pend-desc">alertas para os próximos 30 dias</div>
       <ul class="pend-list">${vencimentos30.slice(0,4).map(v=>`<li>${v.titulo} <span class="tag" style="color:${v.dias<=15?'#B0413E':'#DD6D2D'}">${v.dias<0?'vencido':v.dias+' dias'} · ${v.cliente||''}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhum vencimento próximo.</li>'}</ul>
+    </div>
+
+    <div class="card">
+      <h3>Visitas do mês <button onclick="irPara('clientes')">ver clientes</button></h3>
+      <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px"><strong>Bruna Ribeiro</strong><span>${realizadasBRC}/${metaBRC} · faltam ${Math.max(0,metaBRC-realizadasBRC)}</span></div><div class="proj-barra" style="margin-top:6px"><div style="width:${metaBRC?Math.min(100,realizadasBRC/metaBRC*100):0}%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:12px"><strong>Saber Nutrir</strong><span>${realizadasSN}/${metaSN} · faltam ${Math.max(0,metaSN-realizadasSN)}</span></div><div class="proj-barra" style="margin-top:6px"><div style="width:${metaSN?Math.min(100,realizadasSN/metaSN*100):0}%"></div></div></div>
+    </div>
+
+    <div class="card conteudo-full">
+      <h3>Visitas realizadas em ${anoAtual}</h3><div class="pend-num">${visitasAno.length}</div><div class="pend-desc">${visitasAno.filter(e=>e.categoria==='brc').length} Bruna Ribeiro · ${visitasAno.filter(e=>e.categoria==='saber_nutrir').length} Saber Nutrir</div>
+      <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end;height:90px;margin-top:14px">${mesesVisitas.map(m=>`<div style="text-align:center;font-size:9px;color:var(--cor-texto-suave)"><div style="font-weight:700;color:var(--cor-primaria);margin-bottom:3px">${m.qtd}</div><div style="height:${Math.max(3,m.qtd*3)}px;max-height:55px;background:var(--cor-primaria);border-radius:4px 4px 0 0"></div><div style="margin-top:3px">${m.nome}</div></div>`).join('')}</div>
     </div>
 
     <div class="card">
