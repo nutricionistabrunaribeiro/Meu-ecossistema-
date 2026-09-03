@@ -739,6 +739,7 @@ const MODULOS = {
       {id:"clientes", nome:"Clientes"},
       {id:"visitas", nome:"Checklists"},
       {id:"pendencias", nome:"Pendências"},
+      {id:"obrigacoes", nome:"Obrigações"},
       {id:"lideranca", nome:"Liderança"},
     ]},
     {grupo:"Crescimento", itens:[
@@ -747,6 +748,8 @@ const MODULOS = {
       {id:"financeiro", nome:"Financeiro"},
       {id:"projetos", nome:"Projetos"},
       {id:"ativos", nome:"Ativos"},
+      {id:"produtos_rotulagem", nome:"Produtos e Rotulagem"},
+      {id:"rotas_custos", nome:"Rotas e Custos"},
     ]},
     {grupo:"Sistema", itens:[
       {id:"configuracoes", nome:"Configurações"},
@@ -864,12 +867,15 @@ const NOMES_TELA = {
   visitas:["Checklists","Inicie um checklist e arquive no cliente"],
   biblioteca:["Biblioteca","8 documentos"],
   pendencias:["Pendências","Central combinada"],
+  obrigacoes:["Obrigações","Vencimentos e programação"],
   lideranca:["Liderança","Delegações e acompanhamento"],
   marketing:["Marketing","Calendário editorial"],
   comercial:["Comercial","Pipeline de leads"],
   financeiro:["Financeiro","Visão do mês"],
   projetos:["Projetos","2 projetos ativos"],
   ativos:["Ativos","Controle do que você já criou"],
+  produtos_rotulagem:["Produtos e Rotulagem","Comandos, prazos e próximas ações"],
+  rotas_custos:["Rotas e Custos","Deslocamentos e custo real da operação"],
   configuracoes:["Configurações","Tema, usuários e sistema"],
   habitos:["Hábitos","Sua semana"],
   ciclo:["Ciclo Menstrual","Espaço privado"],
@@ -1096,6 +1102,8 @@ const ABAS_CLIENTE = [
   {id:"cadastro", nome:"Dados do cliente"},
   {id:"documentacao", nome:"Controle de documentação"},
   {id:"visitas", nome:"Checklists"},
+  {id:"obrigacoes", nome:"Obrigações"},
+  {id:"treinamentos", nome:"Treinamentos"},
   {id:"projetos", nome:"Projetos"},
   {id:"pendencias", nome:"Pendências"},
   {id:"financeiro", nome:"Financeiro"},
@@ -1458,6 +1466,10 @@ function abaConteudoClienteHTML(c){
       `).join('') : semRegistro())+`<h4 style="margin:22px 0 10px;font-size:12px;text-transform:uppercase;color:var(--cor-texto-suave)">Evolução dos resultados</h4>`+graficoEvolucaoChecklist(c);
     case "pendencias":
       return pendenciasDoClienteHTML(c);
+    case "obrigacoes":
+      return obrigacoesClienteHTML(c);
+    case "treinamentos":
+      return treinamentosClienteHTML(c);
     case "financeiro":
       const lancsCliente = LANCAMENTOS.filter(l=>l.cliente===c.nome);
       return lancsCliente.length ? lancsCliente.map(f=>`
@@ -2865,11 +2877,12 @@ function marketingHTML(){
       <div class="mkt-tabs">
         <button class="${abaMarketingAtiva==='calendario'?'active':''}" onclick="selecionarAbaMarketing('calendario')">Calendário editorial</button>
         <button class="${abaMarketingAtiva==='ideias'?'active':''}" onclick="selecionarAbaMarketing('ideias')">Banco de ideias</button>
+        <button class="${abaMarketingAtiva==='inteligente'?'active':''}" onclick="selecionarAbaMarketing('inteligente')">Conteúdo inteligente</button>
         <button class="${abaMarketingAtiva==='datas'?'active':''}" onclick="selecionarAbaMarketing('datas')">Datas comemorativas</button>
       </div>
       <button class="btn-nova-ideia" onclick="novoConteudoMarketing()">+ Novo conteúdo</button>
     </div>
-    ${abaMarketingAtiva==='calendario' ? marketingKanbanHTML() : abaMarketingAtiva==='ideias' ? marketingIdeiasHTML() : marketingDatasHTML()}
+    ${abaMarketingAtiva==='calendario' ? marketingKanbanHTML() : abaMarketingAtiva==='ideias' ? marketingIdeiasHTML() : abaMarketingAtiva==='inteligente' ? conteudoInteligenteHTML() : marketingDatasHTML()}
   `;
 }
 
@@ -3938,6 +3951,50 @@ async function excluirAtivo(id){
   dispararAutomacao('Ativo excluído', a.nome);
 }
 
+/* ---------- CENTRAL DE COMANDO (sem armazenamento de arquivos) ---------- */
+let OBRIGACOES=[],TREINAMENTOS=[],ROTAS_CUSTOS=[],PRODUTOS_ROTULAGEM=[],CONTEUDO_INTELIGENTE=[];
+const dataBR=d=>d?d.split('-').reverse().join('/'):'—';
+const moeda=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const diasAte=d=>d?Math.ceil((new Date(d+'T12:00:00')-new Date())/86400000):99999;
+async function carregarCentralComandoSupabase(){
+ const [o,t,r,p,i]=await Promise.all([supa.from('obrigacoes_cliente').select('*').order('vencimento'),supa.from('treinamentos_cliente').select('*').order('data',{ascending:false}),supa.from('rotas_custos').select('*').order('data',{ascending:false}),supa.from('produtos_rotulagem').select('*').order('prazo'),supa.from('conteudo_inteligente').select('*').order('criado_em',{ascending:false})]);
+ const erro=[o,t,r,p,i].find(x=>x.error)?.error;if(erro){dispararAutomacao('Erro ao carregar central de comando',erro.message);return;}
+ OBRIGACOES=o.data||[];TREINAMENTOS=t.data||[];ROTAS_CUSTOS=r.data||[];PRODUTOS_ROTULAGEM=p.data||[];CONTEUDO_INTELIGENTE=i.data||[];
+}
+async function novaObrigacao(clienteId=null){
+ let c=CLIENTES.find(x=>x.id===clienteId);if(!c){const n=prompt(`Cliente:\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);c=CLIENTES[parseInt(n)-1];}if(!c)return;
+ const titulo=prompt('Obrigação ou entregável:');if(!titulo?.trim())return;const categoria=prompt('Categoria (Licença, Documento, Higienização, Treinamento...):','Documento')||'Geral';
+ const venc=prompt('Vencimento (AAAA-MM-DD):','')||null;const rec=parseInt(prompt('Recorrência em meses (deixe vazio se não repetir):',''))||null;const obs=prompt('Observações/ação necessária:','')||'';const {data:{user}}=await supa.auth.getUser();
+ const {data,error}=await supa.from('obrigacoes_cliente').insert({user_id:user.id,cliente_id:c.id,titulo:titulo.trim(),categoria,vencimento:venc,recorrencia_meses:rec,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar obrigação',error.message);return;}OBRIGACOES.push(data);renderTela();
+}
+async function statusObrigacao(id){
+ const o=OBRIGACOES.find(x=>x.id===id);const ordem=['programada','em_andamento','realizada'];const status=ordem[(ordem.indexOf(o.status)+1)%3];
+ const {error}=await supa.from('obrigacoes_cliente').update({status,realizado_em:status==='realizada'?new Date().toISOString():null}).eq('id',id);if(error){dispararAutomacao('Erro ao atualizar obrigação',error.message);return;}o.status=status;
+ if(status==='realizada'&&o.recorrencia_meses&&o.vencimento){const d=new Date(o.vencimento+'T12:00:00');d.setMonth(d.getMonth()+o.recorrencia_meses);const {data:{user}}=await supa.auth.getUser();const {data}=await supa.from('obrigacoes_cliente').insert({user_id:user.id,cliente_id:o.cliente_id,titulo:o.titulo,categoria:o.categoria,vencimento:d.toISOString().slice(0,10),recorrencia_meses:o.recorrencia_meses,observacoes:o.observacoes}).select().single();if(data)OBRIGACOES.push(data);}
+ renderTela();
+}
+async function excluirObrigacao(id){if(!confirm('Excluir esta obrigação?'))return;const {error}=await supa.from('obrigacoes_cliente').delete().eq('id',id);if(!error){OBRIGACOES=OBRIGACOES.filter(x=>x.id!==id);renderTela();}}
+function cardObrigacao(o){const c=CLIENTES.find(x=>x.id===o.cliente_id);const dias=diasAte(o.vencimento);const alerta=o.status!=='realizada'&&dias<=30;return `<div class="item-lista-simples" style="${alerta?'border-left:4px solid '+(dias<=15?'#B0413E':'#DD6D2D')+';padding-left:10px':''}"><div><strong>${o.titulo}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${c?.nome||'Cliente'} · ${o.categoria||'Geral'} · ${dataBR(o.vencimento)}${alerta?` · ${dias<0?'Vencida há '+Math.abs(dias)+' dias':'vence em '+dias+' dias'}`:''}</div></div><div style="display:flex;gap:6px"><button class="tag" onclick="statusObrigacao('${o.id}')">${o.status.replace('_',' ')}</button><button onclick="excluirObrigacao('${o.id}')" style="color:#B0413E">✕</button></div></div>`;}
+function obrigacoesClienteHTML(c){const itens=OBRIGACOES.filter(o=>o.cliente_id===c.id);return `<button class="btn-primario" onclick="novaObrigacao('${c.id}')">+ Nova obrigação</button><div style="margin-top:12px">${itens.length?itens.map(cardObrigacao).join(''):semRegistro()}</div>`;}
+function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizada');return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaObrigacao()">+ Nova obrigação</button></div><div class="card"><h3>Programação geral</h3>${ativas.length?ativas.map(cardObrigacao).join(''):semRegistro()}</div>`;}
+async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===clienteId);const tema=prompt('Tema do treinamento:');if(!tema?.trim())return;const dataT=prompt('Data prevista/realizada (AAAA-MM-DD):','')||null;const validade=prompt('Validade/reciclagem (AAAA-MM-DD, opcional):','')||null;const participantes=parseInt(prompt('Quantidade de participantes:',''))||null;const obs=prompt('Observações:','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('treinamentos_cliente').insert({user_id:user.id,cliente_id:c.id,tema:tema.trim(),data:dataT,validade,participantes,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar treinamento',error.message);return;}TREINAMENTOS.unshift(data);renderTela();}
+async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);const ordem=['planejado','realizado','cancelado'];const status=ordem[(ordem.indexOf(t.status)+1)%3];const {error}=await supa.from('treinamentos_cliente').update({status}).eq('id',id);if(!error){t.status=status;renderTela();}}
+async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
+function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Novo treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${t.tema}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">${t.status}</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
+async function novaRota(){let c=null;const n=prompt(`Cliente (0 para outro):\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const dataR=prompt('Data (AAAA-MM-DD):',new Date().toISOString().slice(0,10));if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const km=parseFloat((prompt('Quilômetros totais:','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0;const pedagio=parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0;const estacionamento=parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
+async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
+function custoRota(r){return Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
+function rotasCustosHTML(){const mes=new Date().toISOString().slice(0,7);const atuais=ROTAS_CUSTOS.filter(r=>r.data?.startsWith(mes));return `<div class="grid"><div class="card"><h3>Este mês</h3><div class="pend-num">${moeda(atuais.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${atuais.reduce((s,r)=>s+Number(r.quilometros),0)} km · ${Math.round(atuais.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas em deslocamento</div></div><div class="card"><h3>Como usar</h3><div style="font-size:12px;color:var(--cor-texto-suave)">Registre o percurso após cada visita. O total revela quanto cada cliente realmente consome de dinheiro e tempo.</div></div></div><button class="btn-primario" style="margin:16px 0" onclick="novaRota()">+ Registrar deslocamento</button>${ROTAS_CUSTOS.map(r=>`<div class="item-lista-simples"><div><strong>${r.origem||'Origem'} → ${r.destino||'Destino'}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(r.data)} · ${r.quilometros} km · ${r.tempo_minutos} min</div></div><span>${moeda(custoRota(r))} <button onclick="excluirRota('${r.id}')" style="color:#B0413E">✕</button></span></div>`).join('')}`;}
+async function novoProdutoRotulagem(){let c=null;const n=prompt(`Cliente:\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const produto=prompt('Produto/projeto:');if(!produto?.trim())return;const tipo=prompt('Tipo (ficha técnica, tabela nutricional, rótulo...):','Tabela nutricional')||'';const prazo=prompt('Prazo (AAAA-MM-DD, opcional):','')||null;const acao=prompt('Próxima ação:','')||'';const pasta=prompt('Nome ou caminho da pasta no computador (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('produtos_rotulagem').insert({user_id:user.id,cliente_id:c?.id||null,produto:produto.trim(),tipo,prazo,proxima_acao:acao||null,pasta_referencia:pasta||null}).select().single();if(error){dispararAutomacao('Erro ao criar controle',error.message);return;}PRODUTOS_ROTULAGEM.push(data);renderTela();}
+async function statusProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id),ordem=['a_fazer','em_andamento','aguardando_cliente','concluido'];const status=ordem[(ordem.indexOf(p.status)+1)%4];const {error}=await supa.from('produtos_rotulagem').update({status,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){p.status=status;renderTela();}}
+async function editarProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id);const acao=prompt('Próxima ação:',p.proxima_acao||'');if(acao===null)return;const prazo=prompt('Prazo (AAAA-MM-DD):',p.prazo||'')||null;const pasta=prompt('Pasta no computador:',p.pasta_referencia||'')||null;const {error}=await supa.from('produtos_rotulagem').update({proxima_acao:acao||null,prazo,pasta_referencia:pasta,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){Object.assign(p,{proxima_acao:acao||null,prazo,pasta_referencia:pasta});renderTela();}}
+async function excluirProduto(id){if(!confirm('Excluir este controle?'))return;const {error}=await supa.from('produtos_rotulagem').delete().eq('id',id);if(!error){PRODUTOS_ROTULAGEM=PRODUTOS_ROTULAGEM.filter(x=>x.id!==id);renderTela();}}
+function produtosRotulagemHTML(){return `<button class="btn-primario" style="margin-bottom:14px" onclick="novoProdutoRotulagem()">+ Novo controle</button>${PRODUTOS_ROTULAGEM.map(p=>{const c=CLIENTES.find(x=>x.id===p.cliente_id);return `<div class="card" style="margin-bottom:10px"><h3>${p.produto}<button onclick="statusProduto('${p.id}')">${p.status.replaceAll('_',' ')}</button></h3><div style="font-size:12px;color:var(--cor-texto-suave)">${c?.nome||'Sem cliente'} · ${p.tipo||'Projeto'} · prazo ${dataBR(p.prazo)}</div><p><strong>Próxima ação:</strong> ${p.proxima_acao||'Definir'}</p>${p.pasta_referencia?`<div class="tag">Pasta no computador: ${p.pasta_referencia}</div>`:''}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn-secundario" onclick="editarProduto('${p.id}')">Editar comando</button><button class="btn-secundario" style="color:#B0413E" onclick="excluirProduto('${p.id}')">Excluir</button></div></div>`;}).join('')||semRegistro()}`;}
+async function novaIdeiaInteligente(){const situacao=prompt('O que aconteceu na sua rotina?');if(!situacao?.trim())return;const gancho=prompt('Que aprendizado ou gancho isso pode gerar?','')||'';const pilar=prompt('Pilar (bastidores, educativo, autoridade, pessoal...):','Bastidores')||'';const formato=prompt('Formato provável (Reels, Stories, carrossel...):','Reels')||'';const acao=prompt('Próxima ação:','Gravar')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('conteudo_inteligente').insert({user_id:user.id,situacao:situacao.trim(),gancho,pilar,formato,proxima_acao:acao}).select().single();if(error){dispararAutomacao('Erro ao salvar ideia',error.message);return;}CONTEUDO_INTELIGENTE.unshift(data);renderTela();}
+async function usarIdeiaInteligente(id){const i=CONTEUDO_INTELIGENTE.find(x=>x.id===id);const {data,error}=await supa.from('conteudos_marketing').insert({titulo:i.gancho||i.situacao,tipo:i.formato||'Reels',status:'ideia'}).select().single();if(error){dispararAutomacao('Erro ao enviar ao calendário',error.message);return;}await supa.from('conteudo_inteligente').update({status:'usada'}).eq('id',id);i.status='usada';CONTEUDOS_MKT.push({id:data.id,tipo:data.tipo,titulo:data.titulo,status:'ideia',data:'—'});renderTela();}
+async function excluirIdeiaInteligente(id){if(!confirm('Excluir esta ideia?'))return;const {error}=await supa.from('conteudo_inteligente').delete().eq('id',id);if(!error){CONTEUDO_INTELIGENTE=CONTEUDO_INTELIGENTE.filter(x=>x.id!==id);renderTela();}}
+function conteudoInteligenteHTML(){return `<button class="btn-primario" style="margin-bottom:12px" onclick="novaIdeiaInteligente()">+ Capturar situação da rotina</button>${CONTEUDO_INTELIGENTE.map(i=>`<div class="ideia-card"><div><div class="ideia-titulo">${i.situacao}</div><div class="ideia-tags">${i.pilar||'Sem pilar'} · ${i.formato||'Sem formato'} · ${i.proxima_acao||'Definir ação'}${i.gancho?'<br>'+i.gancho:''}</div></div><div style="display:flex;gap:6px">${i.status!=='usada'?`<button class="btn-usar-ideia" onclick="usarIdeiaInteligente('${i.id}')">Enviar ao calendário →</button>`:'<span class="tag">Usada</span>'}<button onclick="excluirIdeiaInteligente('${i.id}')" style="color:#B0413E">✕</button></div></div>`).join('')||semRegistro()}`;}
+
 /* ---------- LIDERANÇA (área privada da titular) ---------- */
 let LIDERANCA_RESPONSAVEIS=[];
 let LIDERANCA_DELEGACOES=[];
@@ -4027,6 +4084,12 @@ function renderTela(){
     document.getElementById('conteudoTela').innerHTML = pendenciasHTML();
   } else if(telaAtual === 'lideranca'){
     document.getElementById('conteudoTela').innerHTML = liderancaHTML();
+  } else if(telaAtual === 'obrigacoes'){
+    document.getElementById('conteudoTela').innerHTML = obrigacoesHTML();
+  } else if(telaAtual === 'rotas_custos'){
+    document.getElementById('conteudoTela').innerHTML = rotasCustosHTML();
+  } else if(telaAtual === 'produtos_rotulagem'){
+    document.getElementById('conteudoTela').innerHTML = produtosRotulagemHTML();
   } else if(telaAtual === 'financeiro'){
     document.getElementById('conteudoTela').innerHTML = financeiroHTML();
   } else if(telaAtual === 'comercial'){
@@ -4092,6 +4155,10 @@ function dashboardHTML(){
   const projetosAtivos = PROJETOS.slice(0,3);
 
   const conteudoHoje = CONTEUDOS_MKT.filter(c=>c.status!=='publicado').slice(0,3);
+  const vencimentos30=[
+    ...OBRIGACOES.filter(o=>o.status!=='realizada'&&diasAte(o.vencimento)<=30).map(o=>({titulo:o.titulo,cliente:CLIENTES.find(c=>c.id===o.cliente_id)?.nome,dias:diasAte(o.vencimento)})),
+    ...TREINAMENTOS.filter(t=>t.status==='realizado'&&diasAte(t.validade)<=30).map(t=>({titulo:'Reciclagem: '+t.tema,cliente:CLIENTES.find(c=>c.id===t.cliente_id)?.nome,dias:diasAte(t.validade)}))
+  ].sort((a,b)=>a.dias-b.dias);
 
   return `
   <div class="grid">
@@ -4127,6 +4194,12 @@ function dashboardHTML(){
         ${listaPendenciasResumo.slice(0,3).map(p=>`<li>${p.texto} <span class="tag">${p.tag}</span></li>`).join('')}
         ${listaPendenciasResumo.length===0 ? `<li style="color:var(--cor-texto-suave);">Tudo em dia 🎉</li>` : ''}
       </ul>
+    </div>
+
+    <div class="card">
+      <h3>Próximos vencimentos <button onclick="irPara('obrigacoes')">programar</button></h3>
+      <div class="pend-num">${vencimentos30.length}</div><div class="pend-desc">alertas para os próximos 30 dias</div>
+      <ul class="pend-list">${vencimentos30.slice(0,4).map(v=>`<li>${v.titulo} <span class="tag" style="color:${v.dias<=15?'#B0413E':'#DD6D2D'}">${v.dias<0?'vencido':v.dias+' dias'} · ${v.cliente||''}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhum vencimento próximo.</li>'}</ul>
     </div>
 
     <div class="card">
@@ -4371,6 +4444,7 @@ async function entrarNoApp(){
   await carregarMarketingSupabase();
   await carregarPendenciasSupabase();
   await carregarLiderancaSupabase();
+  await carregarCentralComandoSupabase();
   restaurarTelaAtualSessao();
   renderSidebar();
   renderTela();
