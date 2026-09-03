@@ -1068,7 +1068,11 @@ async function confirmarNovoEvento(dataISO, hora){
     if(isNaN(idx) || !CLIENTES[idx]) return;
     clienteId = CLIENTES[idx].id;
   } else if(categoriaSelecionada === 'saber_nutrir'){
-    clienteExterno = prompt("Nome do cliente/compromisso da Saber Nutrir:", "") || null;
+    const vinculados=CLIENTES.filter(c=>c.tipoCliente==='vinculado');
+    const escolha=prompt(`Estabelecimento da Saber Nutrir:\n0. Outro/não cadastrado\n${vinculados.map((c,i)=>`${i+1}. ${c.nome}`).join('\n')}\n\nDigite o número:`,'0');
+    const escolhido=vinculados[parseInt(escolha)-1];
+    if(escolhido)clienteId=escolhido.id;
+    else clienteExterno=prompt("Nome do cliente/compromisso:", "") || null;
   }
 
   celulaAtiva = null;
@@ -1193,10 +1197,11 @@ function clientesHTML(){
             <div class="cliente-card-ini">${iniciais(c.nome)}</div>
             <div>
               <div class="cliente-card-nome">${c.nome}</div>
-              <div class="cliente-card-status">${c.status}</div>
+              <div class="cliente-card-status">${c.status} · ${c.tipoCliente==='contratante'?'Contratante/parceira':c.tipoCliente==='vinculado'?'Vinculado a '+(CLIENTES.find(x=>x.id===c.contratanteId)?.nome||'contratante'):'Cliente direto'}</div>
             </div>
           </div>
           <span class="prioridade-pill prioridade-${c.prioridade}">${labelPrioridade(c.prioridade)}</span>
+          ${resumoVisitasClienteHTML(c)}
         </div>
       `).join('')}
     </div>`;
@@ -1214,6 +1219,8 @@ function linhaParaCliente(row){
     responsavel: row.responsavel || PERFIL_USUARIO.nome,
     inicio: row.inicio || "—",
     frequenciaVisitas: row.frequencia_visitas || "—",
+    tipoCliente:row.tipo_cliente||'direto', contratanteId:row.contratante_id||null,
+    visitasPrevistasMes:Number(row.visitas_previstas_mes)||0, visitasPrevistasSemana:Number(row.visitas_previstas_semana)||0,
     contrato: { tipo: row.contrato_tipo || "—", valor: row.contrato_valor || "—", vigencia: row.contrato_vigencia || "—" },
     contatos: [], historico: [], visitas: [], pendencias: [],
     naoConformidades: [], financeiro: [], historicoChecklist: [], documentacao: [],
@@ -1240,13 +1247,24 @@ async function carregarClientesSupabase(){
   CLIENTES.splice(0, CLIENTES.length, ...novosClientes);
 }
 
-async function novoCliente(){
+async function novoCliente(contratanteInicial=null){
   const nome = prompt("Nome do novo cliente:");
   if(!nome || !nome.trim()) return;
+  const tipoEscolha=contratanteInicial?'3':prompt('Tipo de cadastro:\n1. Cliente direto\n2. Contratante/parceira\n3. Cliente vinculado','1');
+  const tipoCliente=tipoEscolha==='2'?'contratante':tipoEscolha==='3'?'vinculado':'direto';
+  let contratanteId=contratanteInicial;
+  if(tipoCliente==='vinculado'&&!contratanteId){
+    const contratantes=CLIENTES.filter(c=>c.tipoCliente==='contratante');
+    if(!contratantes.length){alert('Cadastre primeiro a contratante/parceira.');return;}
+    const n=prompt(`Vincular a qual contratante?\n${contratantes.map((c,i)=>`${i+1}. ${c.nome}`).join('\n')}`);const contratante=contratantes[parseInt(n)-1];if(!contratante)return;contratanteId=contratante.id;
+  }
+  const visitasPrevistasSemana=parseInt(prompt('Visitas previstas por semana (0 se não se aplica):','0'))||0;
+  const visitasPrevistasMes=parseInt(prompt('Visitas previstas por mês (0 se não se aplica):','0'))||0;
   const { data, error } = await supa.from('clientes').insert({
     nome: nome.trim(),
     responsavel: PERFIL_USUARIO.nome,
     inicio: new Date().toLocaleDateString('pt-BR',{month:'short',year:'numeric'}),
+    tipo_cliente:tipoCliente,contratante_id:contratanteId,visitas_previstas_semana:visitasPrevistasSemana,visitas_previstas_mes:visitasPrevistasMes,
   }).select().single();
   if(error){
     dispararAutomacao('Erro ao cadastrar cliente', error.message);
@@ -1262,6 +1280,11 @@ async function novoCliente(){
   dispararAutomacao('Cliente cadastrado', `"${nome.trim()}" salvo no banco de dados.`);
   renderTela();
 }
+function visitasRealizadasMes(clienteId){const mes=new Date().toISOString().slice(0,7);return eventosSemana.filter(e=>e.clienteId===clienteId&&e.concluido&&e.dataISO?.startsWith(mes)&&['brc','saber_nutrir'].includes(e.categoria)).length;}
+function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);return {prev:filhos.reduce((s,x)=>s+x.visitasPrevistasMes,0),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
+function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
+function carteiraContratanteHTML(c){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')"><strong>${f.nome}</strong></button><span>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>`;}
+async function configurarCarteiraCliente(id){const c=CLIENTES.find(x=>x.id===id);const tipo=prompt('Tipo: direto, contratante ou vinculado',c.tipoCliente);if(!['direto','contratante','vinculado'].includes(tipo))return;let contratanteId=null;if(tipo==='vinculado'){const lista=CLIENTES.filter(x=>x.tipoCliente==='contratante'&&x.id!==id);const n=prompt(`Contratante:\n${lista.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);const pai=lista[parseInt(n)-1];if(!pai)return;contratanteId=pai.id;}const semana=parseInt(prompt('Visitas previstas por semana:',String(c.visitasPrevistasSemana||0)))||0;const mes=parseInt(prompt('Visitas previstas por mês:',String(c.visitasPrevistasMes||0)))||0;const {error}=await supa.from('clientes').update({tipo_cliente:tipo,contratante_id:contratanteId,visitas_previstas_semana:semana,visitas_previstas_mes:mes}).eq('id',id);if(error){dispararAutomacao('Erro ao salvar carteira',error.message);return;}Object.assign(c,{tipoCliente:tipo,contratanteId,visitasPrevistasSemana:semana,visitasPrevistasMes:mes});renderTela();}
 
 function graficoEvolucaoChecklist(c){
   const hist = c.historicoChecklist || [];
@@ -1446,6 +1469,9 @@ function abaConteudoClienteHTML(c){
           <div class="campo"><label>Responsável</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','responsavel','Responsável')">${c.responsavel} ✎</div></div>
           <div class="campo"><label>Cliente desde</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','inicio','Cliente desde')">${c.inicio} ✎</div></div>
           <div class="campo"><label>Frequência de visitas</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','frequencia_visitas','Frequência (ex: 2x/semana, 4x/mês)')">${c.frequenciaVisitas||'—'} ✎</div></div>
+          <div class="campo"><label>Carteira / vínculo</label><div class="valor editavel" onclick="configurarCarteiraCliente('${c.id}')">${c.tipoCliente==='contratante'?'Contratante/parceira':c.tipoCliente==='vinculado'?'Vinculado a '+(CLIENTES.find(x=>x.id===c.contratanteId)?.nome||'—'):'Cliente direto'} ✎</div></div>
+          <div class="campo"><label>Meta de visitas</label><div class="valor editavel" onclick="configurarCarteiraCliente('${c.id}')">${c.visitasPrevistasSemana||0}/semana · ${c.visitasPrevistasMes||0}/mês ✎</div></div>
+          <div class="campo"><label>Realizado no mês</label><div class="valor">${numerosVisitasCliente(c).real} visita(s) concluída(s) na Agenda</div></div>
         </div>
         <h4 style="margin:18px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--cor-texto-suave);">Contrato</h4>
         <div class="linha-2">
@@ -1453,6 +1479,7 @@ function abaConteudoClienteHTML(c){
           <div class="campo"><label>Valor</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','contrato_valor','Valor do contrato')">${c.contrato.valor} ✎</div></div>
           <div class="campo"><label>Vigência</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','contrato_vigencia','Vigência')">${c.contrato.vigencia} ✎</div></div>
         </div>
+        ${c.tipoCliente==='contratante'?carteiraContratanteHTML(c):''}
         <div style="font-size:11px;color:var(--cor-texto-suave);margin-top:10px;">Toque em qualquer campo (✎) para editar.</div>`;
     case "visitas":
       return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaVisita('${c.id}')">+ Iniciar checklist para este cliente</button></div>`+(c.visitas.length ? c.visitas.map(v=>`
@@ -1484,7 +1511,7 @@ function abaConteudoClienteHTML(c){
   }
 }
 function semRegistro(){
-  return `<div style="color:var(--cor-texto-suave);font-size:13px;padding:10px 0;">Nenhum registro ainda — pronto para receber dados assim que conectarmos ao banco de dados real.</div>`;
+  return `<div style="color:var(--cor-texto-suave);font-size:13px;padding:10px 0;">Nenhum registro cadastrado.</div>`;
 }
 
 /* ---------- MÓDULO VISITAS TÉCNICAS + CHECKLIST BPF INTELIGENTE ---------- */
@@ -3981,10 +4008,11 @@ async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===client
 async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);const ordem=['planejado','realizado','cancelado'];const status=ordem[(ordem.indexOf(t.status)+1)%3];const {error}=await supa.from('treinamentos_cliente').update({status}).eq('id',id);if(!error){t.status=status;renderTela();}}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
 function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Novo treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${t.tema}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">${t.status}</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
-async function novaRota(){let c=null;const n=prompt(`Cliente (0 para outro):\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const dataR=prompt('Data (AAAA-MM-DD):',new Date().toISOString().slice(0,10));if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const km=parseFloat((prompt('Quilômetros totais:','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0;const pedagio=parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0;const estacionamento=parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
+async function novaRota(){let c=null;const n=prompt(`Cliente visitado:\n0. Sem cliente\n${CLIENTES.filter(x=>x.tipoCliente!=='contratante').map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');c=operacionais[parseInt(n)-1]||null;const dataR=prompt('Data (AAAA-MM-DD):',new Date().toISOString().slice(0,10));if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
 async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
-function custoRota(r){return Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
-function rotasCustosHTML(){const mes=new Date().toISOString().slice(0,7);const atuais=ROTAS_CUSTOS.filter(r=>r.data?.startsWith(mes));return `<div class="grid"><div class="card"><h3>Este mês</h3><div class="pend-num">${moeda(atuais.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${atuais.reduce((s,r)=>s+Number(r.quilometros),0)} km · ${Math.round(atuais.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas em deslocamento</div></div><div class="card"><h3>Como usar</h3><div style="font-size:12px;color:var(--cor-texto-suave)">Registre o percurso após cada visita. O total revela quanto cada cliente realmente consome de dinheiro e tempo.</div></div></div><button class="btn-primario" style="margin:16px 0" onclick="novaRota()">+ Registrar deslocamento</button>${ROTAS_CUSTOS.map(r=>`<div class="item-lista-simples"><div><strong>${r.origem||'Origem'} → ${r.destino||'Destino'}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(r.data)} · ${r.quilometros} km · ${r.tempo_minutos} min</div></div><span>${moeda(custoRota(r))} <button onclick="excluirRota('${r.id}')" style="color:#B0413E">✕</button></span></div>`).join('')}`;}
+function custoRota(r){return Number(r.custo_passagens||0)+Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
+function nomeTransporte(t){return ({transporte_publico:'Transporte público combinado',trem:'Trem',metro:'Metrô',onibus:'Ônibus',carro:'Carro',moto:'Moto',aplicativo:'Aplicativo/Táxi',a_pe:'A pé'})[t]||'Transporte público';}
+function rotasCustosHTML(){const mes=new Date().toISOString().slice(0,7);const atuais=ROTAS_CUSTOS.filter(r=>r.data?.startsWith(mes));const contratantes=CLIENTES.filter(c=>c.tipoCliente==='contratante');return `<div class="grid"><div class="card"><h3>Este mês</h3><div class="pend-num">${moeda(atuais.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${atuais.reduce((s,r)=>s+Number(r.quilometros),0)} km · ${Math.round(atuais.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas · ${atuais.reduce((s,r)=>s+Number(r.quantidade_conducoes||0),0)} conduções</div></div><div class="card"><h3>Como usar</h3><div style="font-size:12px;color:var(--cor-texto-suave)">Registre ida e volta após cada visita. Em transporte público, informe todas as conduções e o total realmente pago.</div></div>${contratantes.map(c=>{const filhos=CLIENTES.filter(x=>x.contratanteId===c.id).map(x=>x.id);const rr=atuais.filter(r=>filhos.includes(r.cliente_id));return `<div class="card"><h3>${c.nome}</h3><div class="pend-num">${moeda(rr.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${rr.length} deslocamentos · ${Math.round(rr.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas</div></div>`;}).join('')}</div><button class="btn-primario" style="margin:16px 0" onclick="novaRota()">+ Registrar deslocamento</button>${ROTAS_CUSTOS.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);const pai=CLIENTES.find(x=>x.id===c?.contratanteId);return `<div class="item-lista-simples"><div><strong>${r.origem||'Origem'} → ${r.destino||'Destino'}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(r.data)} · ${nomeTransporte(r.tipo_transporte)}${r.quantidade_conducoes?' · '+r.quantidade_conducoes+' conduções':''} · ${r.tempo_minutos} min${pai?' · '+pai.nome:''}</div></div><span>${moeda(custoRota(r))} <button onclick="excluirRota('${r.id}')" style="color:#B0413E">✕</button></span></div>`;}).join('')}`;}
 async function novoProdutoRotulagem(){let c=null;const n=prompt(`Cliente:\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const produto=prompt('Produto/projeto:');if(!produto?.trim())return;const tipo=prompt('Tipo (ficha técnica, tabela nutricional, rótulo...):','Tabela nutricional')||'';const prazo=prompt('Prazo (AAAA-MM-DD, opcional):','')||null;const acao=prompt('Próxima ação:','')||'';const pasta=prompt('Nome ou caminho da pasta no computador (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('produtos_rotulagem').insert({user_id:user.id,cliente_id:c?.id||null,produto:produto.trim(),tipo,prazo,proxima_acao:acao||null,pasta_referencia:pasta||null}).select().single();if(error){dispararAutomacao('Erro ao criar controle',error.message);return;}PRODUTOS_ROTULAGEM.push(data);renderTela();}
 async function statusProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id),ordem=['a_fazer','em_andamento','aguardando_cliente','concluido'];const status=ordem[(ordem.indexOf(p.status)+1)%4];const {error}=await supa.from('produtos_rotulagem').update({status,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){p.status=status;renderTela();}}
 async function editarProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id);const acao=prompt('Próxima ação:',p.proxima_acao||'');if(acao===null)return;const prazo=prompt('Prazo (AAAA-MM-DD):',p.prazo||'')||null;const pasta=prompt('Pasta no computador:',p.pasta_referencia||'')||null;const {error}=await supa.from('produtos_rotulagem').update({proxima_acao:acao||null,prazo,pasta_referencia:pasta,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){Object.assign(p,{proxima_acao:acao||null,prazo,pasta_referencia:pasta});renderTela();}}
