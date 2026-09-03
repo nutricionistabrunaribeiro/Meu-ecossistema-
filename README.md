@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V12 — Calendário Inteligente
+
+- seletor visual de datas com navegação por mês e ano;
+- datas retroativas, futuras, opção “Hoje” e campos sem data;
+- prazos, vencimentos, treinamentos e conteúdo exibidos na Agenda sem duplicar registros;
+- filtros de camadas e faixa separada de itens do dia inteiro;
+- ícones do PWA apontando para a pasta `icons/` e cache atualizado para V12.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;

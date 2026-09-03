@@ -8,8 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="icon" type="image/png" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
 <meta name="theme-color" content="#4FA579">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -115,6 +115,15 @@
   .agenda-item:last-child{border-bottom:none;}
   .agenda-hora{color:var(--cor-primaria);font-weight:600;width:44px;flex-shrink:0;}
   .agenda-tipo{font-size:10.5px;color:var(--cor-texto-suave);}
+  .date-modal-bg{position:fixed;inset:0;background:rgba(35,43,35,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
+  .date-modal{width:min(390px,100%);background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:20px;padding:20px;box-shadow:0 24px 70px rgba(20,35,24,.25)}
+  .date-modal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.date-modal-top h3{font-family:'Fraunces',serif;font-size:19px;margin:0}.date-modal-top p{font-size:11px;color:var(--cor-texto-suave);margin-top:3px}
+  .date-nav{display:grid;grid-template-columns:38px 1fr 38px;gap:7px;align-items:center;margin-bottom:12px}.date-nav button,.date-modal-actions button{border:1px solid var(--cor-borda);border-radius:9px;padding:8px;background:var(--cor-fundo)}
+  .date-month-selects{display:grid;grid-template-columns:1.3fr .8fr;gap:7px}.date-month-selects select{width:100%;border:1px solid var(--cor-borda);border-radius:9px;padding:8px;background:var(--cor-superficie);color:var(--cor-texto);font:inherit}
+  .date-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.date-week{font-size:10px;text-align:center;color:var(--cor-texto-suave);padding:4px}.date-day{aspect-ratio:1;border-radius:10px;font-size:12px}.date-day:hover{background:#E6EFE7}.date-day.today{border:1px solid var(--cor-acento);color:var(--cor-primaria);font-weight:700}.date-day.selected{background:var(--cor-primaria);color:#fff;font-weight:700}.date-day.out{opacity:.28}
+  .date-modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:16px}.date-modal-actions .confirm{background:var(--cor-primaria);color:#fff;border-color:var(--cor-primaria)}
+  .agenda-filtros{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 16px}.agenda-filtro{border:1px solid var(--cor-borda);border-radius:20px;padding:6px 10px;font-size:11px;background:var(--cor-superficie)}.agenda-filtro.off{opacity:.42;text-decoration:line-through}
+  .agenda-dia-inteiro{display:grid;grid-template-columns:70px repeat(7,minmax(90px,1fr));gap:5px;min-width:780px;margin-bottom:8px}.agenda-dia-inteiro>div{border:1px solid var(--cor-borda);border-radius:8px;padding:6px;min-height:42px;font-size:10px}.agenda-dia-inteiro .label{border:0;color:var(--cor-texto-suave);display:flex;align-items:center}.prazo-chip{display:block;border-left:3px solid var(--cor-acento);background:var(--cor-fundo);border-radius:5px;padding:4px;margin-bottom:4px;line-height:1.2}.prazo-chip.vencimento{border-color:#B0413E}.prazo-chip.treinamento{border-color:#7398B2}.prazo-chip.conteudo{border-color:#805A9B}
 
   .pend-num{font-family:'Fraunces',serif;font-size:38px;font-weight:600;color:var(--cor-primaria);}
   .pend-desc{font-size:12px;color:var(--cor-texto-suave);margin-top:2px;}
@@ -908,6 +917,36 @@ function formatoISO(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padSta
 function formatoBR(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
 function inicioDaSemana(data){ const d = new Date(data); d.setDate(d.getDate()-d.getDay()); return d; }
 
+function normalizarDataISO(valor){
+  if(!valor || valor==='—') return null;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor;
+  const p=String(valor).split('/');
+  if(p.length===3) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+  if(p.length===2) return `${new Date().getFullYear()}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+  return null;
+}
+function isoParaBRCompleto(iso){if(!iso)return '';const [a,m,d]=iso.split('-');return `${d}/${m}/${a}`;}
+function selecionarDataVisual({titulo='Selecionar data',valor=null,opcional=true}={}){
+  return new Promise(resolve=>{
+    const inicialISO=normalizarDataISO(valor)||formatoISO(new Date());let cursor=new Date(inicialISO+'T12:00:00');let selecionada=normalizarDataISO(valor);
+    const bg=document.createElement('div');bg.className='date-modal-bg';document.body.appendChild(bg);
+    const encerrar=v=>{bg.remove();resolve(v)};
+    const desenhar=()=>{
+      const ano=cursor.getFullYear(),mes=cursor.getMonth(),inicio=new Date(ano,mes,1),primeiro=inicio.getDay(),total=new Date(ano,mes+1,0).getDate();
+      const anos=Array.from({length:31},(_,i)=>ano-10+i);
+      let dias=DIAS_SEMANA.map(d=>`<div class="date-week">${d.slice(0,1)}</div>`).join('');
+      for(let i=0;i<primeiro;i++)dias+='<div></div>';
+      for(let d=1;d<=total;d++){const iso=formatoISO(new Date(ano,mes,d));dias+=`<button class="date-day ${iso===formatoISO(new Date())?'today':''} ${iso===selecionada?'selected':''}" data-date="${iso}">${d}</button>`;}
+      bg.innerHTML=`<div class="date-modal" role="dialog" aria-modal="true"><div class="date-modal-top"><div><h3>${titulo}</h3><p>${selecionada?'Selecionada: '+isoParaBRCompleto(selecionada):'Escolha qualquer data, passada ou futura'}</p></div><button data-close aria-label="Fechar">✕</button></div><div class="date-nav"><button data-prev>←</button><div class="date-month-selects"><select data-month>${MESES_NOME.map((n,i)=>`<option value="${i}" ${i===mes?'selected':''}>${n}</option>`).join('')}</select><select data-year>${anos.map(a=>`<option value="${a}" ${a===ano?'selected':''}>${a}</option>`).join('')}</select></div><button data-next>→</button></div><div class="date-grid">${dias}</div><div class="date-modal-actions">${opcional?'<button data-clear>Sem data</button>':'<span></span>'}<div><button data-today>Hoje</button> <button class="confirm" data-confirm ${selecionada?'':'disabled'}>Confirmar</button></div></div></div>`;
+      bg.querySelector('[data-close]').onclick=()=>encerrar(null);bg.onclick=e=>{if(e.target===bg)encerrar(null)};
+      bg.querySelector('[data-prev]').onclick=()=>{cursor=new Date(ano,mes-1,1);desenhar()};bg.querySelector('[data-next]').onclick=()=>{cursor=new Date(ano,mes+1,1);desenhar()};
+      bg.querySelector('[data-month]').onchange=e=>{cursor=new Date(ano,Number(e.target.value),1);desenhar()};bg.querySelector('[data-year]').onchange=e=>{cursor=new Date(Number(e.target.value),mes,1);desenhar()};
+      bg.querySelectorAll('[data-date]').forEach(b=>b.onclick=()=>{selecionada=b.dataset.date;desenhar()});
+      if(opcional)bg.querySelector('[data-clear]').onclick=()=>encerrar('');bg.querySelector('[data-today]').onclick=()=>{selecionada=formatoISO(new Date());cursor=new Date();desenhar()};bg.querySelector('[data-confirm]').onclick=()=>encerrar(selecionada);
+    };desenhar();
+  });
+}
+
 let eventosSemana = [];
 async function carregarEventosSupabase(){
   const { data, error } = await supa.from('eventos').select('*, clientes(nome)').order('data').order('hora');
@@ -925,6 +964,20 @@ let categoriaSelecionada = "brc";
 let semanaOffsetAtual = 0;
 let mesOffsetAtual = 0;
 let visaoAgenda = "semana"; // 'semana' | 'mes'
+const CAMADAS_AGENDA={prazo:true,vencimento:true,treinamento:true,conteudo:true};
+const CORES_CAMADAS={prazo:'#D9822B',vencimento:'#B0413E',treinamento:'#7398B2',conteudo:'#805A9B'};
+function alternarCamadaAgenda(tipo){CAMADAS_AGENDA[tipo]=!CAMADAS_AGENDA[tipo];renderTela();}
+function itensCalendarioInteligente(){
+  const itens=[];const add=(dataISO,titulo,tipo,clienteId=null)=>{dataISO=normalizarDataISO(dataISO);if(dataISO&&CAMADAS_AGENDA[tipo])itens.push({dataISO,titulo,tipo,clienteId})};
+  (PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').forEach(p=>add(p.prazo,'Pendência: '+p.titulo,'prazo',p.clienteId));
+  (OBRIGACOES||[]).filter(o=>o.status!=='realizada').forEach(o=>add(o.vencimento,'Vencimento: '+o.titulo,'vencimento',o.cliente_id));
+  (TREINAMENTOS||[]).filter(t=>t.status!=='cancelado').forEach(t=>{add(t.data,'Treinamento: '+t.tema,'treinamento',t.cliente_id);if(t.validade)add(t.validade,'Reciclagem: '+t.tema,'vencimento',t.cliente_id)});
+  (PRODUTOS_ROTULAGEM||[]).filter(p=>p.status!=='concluido').forEach(p=>add(p.prazo,'Entrega: '+p.produto,'prazo',p.cliente_id));
+  (LIDERANCA_DELEGACOES||[]).filter(d=>d.status!=='concluida').forEach(d=>{add(d.prazo,'Delegação: '+d.titulo,'prazo',d.cliente_id);add(d.proximo_acompanhamento,'Acompanhar: '+d.titulo,'prazo',d.cliente_id)});
+  (CONTEUDOS_MKT||[]).filter(c=>c.status!=='publicado').forEach(c=>add(c.dataISO,'Conteúdo: '+c.titulo,'conteudo'));
+  (CLIENTES||[]).forEach(c=>(c.documentacao||[]).forEach(d=>{if(statusAutomaticoDoc(d.validade)!=='Vigente')add(d.validade,'Documento: '+d.nome,'vencimento',c.id)}));
+  return itens;
+}
 
 function irSemana(delta){ semanaOffsetAtual += delta; renderTela(); }
 function irSemanaHoje(){ semanaOffsetAtual = 0; renderTela(); }
@@ -942,11 +995,12 @@ function agendaHTML(){
   const legenda = `<div class="legenda">` +
     CATEGORIAS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot" style="background:${t.cor}"></span>${t.nome}</div>`).join('') +
     `</div>`;
+  const filtros=`<div class="agenda-filtros"><strong style="font-size:11px;padding:6px 2px">Exibir:</strong>${Object.entries({prazo:'Prazos',vencimento:'Vencimentos',treinamento:'Treinamentos',conteudo:'Conteúdo'}).map(([id,nome])=>`<button class="agenda-filtro ${CAMADAS_AGENDA[id]?'':'off'}" onclick="alternarCamadaAgenda('${id}')"><span style="color:${CORES_CAMADAS[id]}">●</span> ${nome}</button>`).join('')}</div>`;
   const abas = `<div class="etapa-tabs" style="margin:0 0 16px;">
       <button class="${visaoAgenda==='semana'?'active':''}" onclick="mudarVisaoAgenda('semana')">Semana</button>
       <button class="${visaoAgenda==='mes'?'active':''}" onclick="mudarVisaoAgenda('mes')">Mês / Calendário</button>
     </div>`;
-  return legenda + abas + (visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
+  return legenda + filtros + abas + (visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
 }
 
 function agendaSemanaHTML(){
@@ -963,6 +1017,8 @@ function agendaSemanaHTML(){
       <div style="font-weight:600;font-size:13px;">${rotulo}</div>
     </div>`;
 
+  const inteligentes=itensCalendarioInteligente();
+  const faixa=`<div class="planner-scroll"><div class="agenda-dia-inteiro"><div class="label">Dia inteiro</div>${diasDaSemana.map(d=>{const iso=formatoISO(d);return `<div>${inteligentes.filter(i=>i.dataISO===iso).map(i=>`<span class="prazo-chip ${i.tipo}" title="Registro original — não é uma cópia">${i.titulo}${i.clienteId?' · '+(CLIENTES.find(c=>c.id===i.clienteId)?.nome||''):''}</span>`).join('')}</div>`}).join('')}</div></div>`;
   let grid = `<div class="planner-scroll"><div class="planner-grid">`;
   grid += `<div class="canto"></div>`;
   diasDaSemana.forEach(d=>{
@@ -998,7 +1054,7 @@ function agendaSemanaHTML(){
   });
   grid += `</div></div>`;
 
-  return `${nav}${grid}
+  return `${nav}${faixa}${grid}
     <div class="peq" style="margin-top:12px;font-size:12px;color:var(--cor-texto-suave);">
       Toque em qualquer horário vazio para adicionar rápido. Toque num evento pra riscar (marcar como feito) — toque no ✕ pra removê-lo de vez. Use as setas pra navegar pelas próximas semanas e já deixar compromissos marcados.
     </div>`;
@@ -1022,13 +1078,14 @@ function agendaMesHTML(){
     const dataCel = new Date(baseMes.getFullYear(), baseMes.getMonth(), dia);
     const dataISO = formatoISO(dataCel);
     const eventosNoDia = eventosSemana.filter(e=>e.dataISO===dataISO);
+    const inteligentesNoDia=itensCalendarioInteligente().filter(i=>i.dataISO===dataISO);
     const ehHoje = dataISO===formatoISO(REF_DOMINGO);
-    const cores = [...new Set(eventosNoDia.map(e=>e.categoria))];
+    const cores = [...new Set(eventosNoDia.map(e=>CATEGORIAS_EVENTO.find(x=>x.id===e.categoria)?.cor).filter(Boolean).concat(inteligentesNoDia.map(i=>CORES_CAMADAS[i.tipo])))];
     celulas += `
       <div onclick="abrirSemanaDoDia('${dataISO}')" style="cursor:pointer;border:1px solid var(--cor-borda);border-radius:8px;min-height:64px;padding:6px;${ehHoje?'background:var(--cor-fundo);border-color:var(--cor-primaria);':''}">
         <div style="font-size:11.5px;font-weight:${ehHoje?'700':'500'};color:${ehHoje?'var(--cor-primaria)':'var(--cor-texto)'};">${dia}</div>
         <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;">
-          ${cores.map(t=>`<span style="width:7px;height:7px;border-radius:50%;background:${CATEGORIAS_EVENTO.find(x=>x.id===t).cor};display:inline-block;"></span>`).join('')}
+          ${cores.map(cor=>`<span style="width:7px;height:7px;border-radius:50%;background:${cor};display:inline-block;"></span>`).join('')}
         </div>
       </div>`;
   }
@@ -1327,8 +1384,10 @@ async function novoDocumentoCliente(clienteId){
   const nome = prompt("Nome do documento (ex: Manual de Boas Práticas, Contrato, Licença...):");
   if(!nome || !nome.trim()) return;
   const tipo = prompt("Tipo (Manual, POP, MBP, Contrato, Licença, Certificado...):", "Documento") || "Documento";
-  const emissao = prompt("Data de emissão (DD/MM/AAAA, ou deixe em branco):", "") || "—";
-  const validade = prompt("Data de validade (DD/MM/AAAA, ou deixe em branco se não tiver):", "") || "—";
+  const emissaoISO = await selecionarDataVisual({titulo:'Data de emissão',opcional:true});if(emissaoISO===null)return;
+  const validadeISO = await selecionarDataVisual({titulo:'Data de validade',opcional:true});if(validadeISO===null)return;
+  const emissao = emissaoISO ? isoParaBRCompleto(emissaoISO) : "—";
+  const validade = validadeISO ? isoParaBRCompleto(validadeISO) : "—";
   const c = CLIENTES.find(x=>x.id===clienteId);
   const statusTela = statusAutomaticoDoc(validade);
   const statusBanco = statusTela==='Vigente' ? 'Válido' : statusTela==='Próximo do vencimento' ? 'Vencendo' : statusTela;
@@ -1406,8 +1465,8 @@ function pendenciasDoClienteHTML(c){
 async function novaPendenciaCliente(clienteId){
   const c=CLIENTES.find(x=>x.id===clienteId);if(!c)return;
   const titulo=prompt(`Pendência operacional de ${c.nome}:`);if(!titulo?.trim())return;
-  const prazoTxt=prompt('Prazo (DD/MM/AAAA, opcional):','')||'';
-  const [d,m,a]=prazoTxt.split('/');const prazoISO=d&&m&&a?`${a}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`:null;
+  const prazoISO=await selecionarDataVisual({titulo:'Prazo da pendência',opcional:true});if(prazoISO===null)return;
+  const prazoTxt=prazoISO?isoParaBRCompleto(prazoISO):'';
   const responsavel=prompt('Responsável:',PERFIL_USUARIO.nome)||PERFIL_USUARIO.nome;
   const {data,error}=await supa.from('pendencias').insert({cliente_id:c.id,titulo:titulo.trim(),origem:'manual',status:'aberta',prazo:prazoISO,responsavel}).select().single();
   if(error){dispararAutomacao('Erro ao criar pendência',error.message);return;}
@@ -1710,12 +1769,8 @@ async function novaVisita(clienteId=null){
   if(!modelosAtivos.length){ alert('Crie e ative um modelo com pelo menos um item em Configurações.'); return; }
   const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome}`).join('\n')}\n\nDigite o número:`);
   const modelo=modelosAtivos[parseInt(escolhaModelo)-1]; if(!modelo)return;
-  const hojeTxt=new Date().toLocaleDateString('pt-BR');
-  const dataTxt = prompt("Data de aplicação (DD/MM/AAAA):", hojeTxt);
-  if(!dataTxt) return;
-  const [dd,mm,aaaa] = dataTxt.split('/');
-  if(!dd||!mm||!aaaa){ alert('Data inválida, use DD/MM/AAAA.'); return; }
-  const dataISO = `${aaaa}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  const dataISO=await selecionarDataVisual({titulo:'Data de aplicação do checklist',valor:formatoISO(new Date()),opcional:false});
+  if(!dataISO)return;const dataTxt=isoParaBRCompleto(dataISO);
   const { data, error } = await supa.from('visitas').insert({
     cliente_id: clienteEscolhido.id,
     data: dataISO,
@@ -2369,9 +2424,10 @@ async function novoLancamento(tipo){
   const valorTxt = prompt("Valor (só números, ex: 350):");
   const valor = parseFloat((valorTxt||'').replace(',','.'));
   if(!valor || valor<=0) return;
-  const vencimento = prompt("Data de vencimento (DD/MM, ou deixe em branco):", "") || "";
+  const vencimentoISO=await selecionarDataVisual({titulo:'Data de vencimento',opcional:true});if(vencimentoISO===null)return;
+  const vencimento=vencimentoISO?isoParaBRCompleto(vencimentoISO).slice(0,5):"";
   const { data, error } = await supa.from('lancamentos_financeiros').insert({
-    tipo, descricao: desc.trim(), valor, vencimento: vencimentoParaISO(vencimento), status: 'aberto'
+    tipo, descricao: desc.trim(), valor, vencimento: vencimentoISO||null, status: 'aberto'
   }).select().single();
   if(error){ dispararAutomacao('Erro ao lançar', error.message); return; }
   LANCAMENTOS.push({id: data.id, tipo, desc: desc.trim(), cliente:null, valor, vencimento: vencimento||"—", vencimentoISO: data.vencimento, status:"aberto"});
@@ -2858,15 +2914,14 @@ async function editarConteudoMarketing(id){
   if(titulo===null || !titulo.trim()) return;
   const tipo = prompt('Tipo (Reels, Story, Feed...):', c.tipo);
   if(tipo===null || !tipo.trim()) return;
-  const dataTxt = prompt('Data de publicação (DD/MM, deixe vazio para remover):', c.data==='—'?'':c.data);
-  if(dataTxt===null) return;
+  const dataISO = await selecionarDataVisual({titulo:'Data de publicação',valor:c.dataISO,opcional:true});
+  if(dataISO===null) return;const dataTxt=dataISO?isoParaBRCompleto(dataISO):'';
   const status = prompt('Status (ideia, producao, agendado ou publicado):', c.status);
   if(status===null || !STATUS_MKT.some(s=>s.id===status.trim())){ alert('Status inválido.'); return; }
-  const dataISO = dataTxt.trim() ? vencimentoParaISO(dataTxt.trim()) : null;
   const atualizacao = {titulo:titulo.trim(), tipo:tipo.trim(), data_publicacao:dataISO, status:status.trim()};
   const { error } = await supa.from('conteudos_marketing').update(atualizacao).eq('id', id);
   if(error){ dispararAutomacao('Erro ao editar conteúdo', error.message); return; }
-  Object.assign(c, {titulo:atualizacao.titulo, tipo:atualizacao.tipo, status:atualizacao.status, dataISO, data:dataTxt.trim()||'—'});
+  Object.assign(c, {titulo:atualizacao.titulo, tipo:atualizacao.tipo, status:atualizacao.status, dataISO, data:dataISO?dataTxt.slice(0,5):'—'});
   dispararAutomacao('Conteúdo atualizado', c.titulo);
   renderTela();
 }
@@ -2883,13 +2938,12 @@ async function novoConteudoMarketing(){
   const titulo = prompt("Título do conteúdo:");
   if(!titulo || !titulo.trim()) return;
   const tipo = prompt("Tipo (Reels, Story, Feed...):", "Reels") || "Reels";
-  const dataTxt = prompt("Data de publicação (DD/MM, opcional):", "") || "";
-  const dataISO = dataTxt ? vencimentoParaISO(dataTxt) : null;
+  const dataISO = await selecionarDataVisual({titulo:'Data de publicação',opcional:true});if(dataISO===null)return;
   const { data, error } = await supa.from('conteudos_marketing').insert({
     titulo: titulo.trim(), tipo, data_publicacao: dataISO, status: 'ideia'
   }).select().single();
   if(error){ dispararAutomacao('Erro ao criar conteúdo', error.message); return; }
-  CONTEUDOS_MKT.push({id:data.id, tipo, titulo:titulo.trim(), status:'ideia', data: dataTxt||"—"});
+  CONTEUDOS_MKT.push({id:data.id, tipo, titulo:titulo.trim(), status:'ideia', dataISO, data:dataISO?isoParaBRCompleto(dataISO).slice(0,5):"—"});
   dispararAutomacao('Conteúdo adicionado ao calendário', titulo.trim());
   renderTela();
 }
@@ -3102,7 +3156,8 @@ async function carregarMetasPessoaisSupabase(){
 async function novaMetaPessoal(){
   const titulo = prompt("Qual é a meta?");
   if(!titulo || !titulo.trim()) return;
-  const prazo = prompt("Prazo (ex: Dez/2026):", "") || "—";
+  const prazoISO=await selecionarDataVisual({titulo:'Prazo da meta',opcional:true});if(prazoISO===null)return;
+  const prazo=prazoISO?isoParaBRCompleto(prazoISO):"—";
   const { data: { user } } = await supa.auth.getUser();
   const { data, error } = await supa.from('metas_pessoais').insert({user_id:user.id, titulo:titulo.trim(), prazo, progresso:0}).select().single();
   if(error){ dispararAutomacao('Erro ao criar meta', error.message); return; }
@@ -3148,10 +3203,11 @@ async function novaContaPessoal(tipo){
   const valorTxt = prompt("Valor (ex: 350):");
   const valor = parseFloat((valorTxt||'').replace(',','.'));
   if(!valor || valor<=0) return;
-  const vencimento = prompt("Vencimento (DD/MM, opcional):", "") || "";
+  const vencimentoISO=await selecionarDataVisual({titulo:'Data de vencimento',opcional:true});if(vencimentoISO===null)return;
+  const vencimento=vencimentoISO?isoParaBRCompleto(vencimentoISO).slice(0,5):"";
   const { data: { user } } = await supa.auth.getUser();
   const { data, error } = await supa.from('contas_pessoais').insert({
-    user_id: user.id, tipo, descricao: desc.trim(), valor, vencimento: vencimentoParaISO(vencimento), status:'aberto'
+    user_id: user.id, tipo, descricao: desc.trim(), valor, vencimento:vencimentoISO||null, status:'aberto'
   }).select().single();
   if(error){ dispararAutomacao('Erro ao lançar', error.message); return; }
   CONTAS_PESSOAIS.push({id:data.id, tipo, desc:desc.trim(), valor, vencimento: vencimento||"—", vencimentoISO:data.vencimento, dataPagamentoISO:null, status:"aberto"});
@@ -3670,9 +3726,9 @@ async function carregarPendenciasSupabase(){
 async function novaPendenciaManual(){
   const texto = prompt("Descreva a pendência:");
   if(!texto || !texto.trim()) return;
-  const prazoTxt = prompt("Prazo (DD/MM/AAAA, opcional):", "") || "";
+  const prazoISO = await selecionarDataVisual({titulo:'Prazo da pendência',opcional:true});if(prazoISO===null)return;
+  const prazoTxt = prazoISO?isoParaBRCompleto(prazoISO):"";
   const responsavel = prompt("Responsável:", PERFIL_USUARIO.nome) || PERFIL_USUARIO.nome;
-  const prazoISO = prazoTxt ? (()=>{ const [d,m,a]=prazoTxt.split('/'); return d&&m&&a ? `${a}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` : null; })() : null;
   const { data, error } = await supa.from('pendencias').insert({
     titulo: texto.trim(), origem:'manual', status:'aberta', prazo: prazoISO, responsavel
   }).select().single();
@@ -3995,7 +4051,7 @@ async function carregarCentralComandoSupabase(){
 async function novaObrigacao(clienteId=null){
  let c=CLIENTES.find(x=>x.id===clienteId);if(!c){const n=prompt(`Cliente:\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);c=CLIENTES[parseInt(n)-1];}if(!c)return;
  const titulo=prompt('Obrigação ou entregável:');if(!titulo?.trim())return;const categoria=prompt('Categoria (Licença, Documento, Higienização, Treinamento...):','Documento')||'Geral';
- const venc=prompt('Vencimento (AAAA-MM-DD):','')||null;const rec=parseInt(prompt('Recorrência em meses (deixe vazio se não repetir):',''))||null;const obs=prompt('Observações/ação necessária:','')||'';const {data:{user}}=await supa.auth.getUser();
+ const venc=await selecionarDataVisual({titulo:'Vencimento da obrigação',opcional:true});if(venc===null)return;const rec=parseInt(prompt('Recorrência em meses (deixe vazio se não repetir):',''))||null;const obs=prompt('Observações/ação necessária:','')||'';const {data:{user}}=await supa.auth.getUser();
  const {data,error}=await supa.from('obrigacoes_cliente').insert({user_id:user.id,cliente_id:c.id,titulo:titulo.trim(),categoria,vencimento:venc,recorrencia_meses:rec,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar obrigação',error.message);return;}OBRIGACOES.push(data);renderTela();
 }
 async function statusObrigacao(id){
@@ -4008,18 +4064,18 @@ async function excluirObrigacao(id){if(!confirm('Excluir esta obrigação?'))ret
 function cardObrigacao(o){const c=CLIENTES.find(x=>x.id===o.cliente_id);const dias=diasAte(o.vencimento);const alerta=o.status!=='realizada'&&dias<=30;return `<div class="item-lista-simples" style="${alerta?'border-left:4px solid '+(dias<=15?'#B0413E':'#DD6D2D')+';padding-left:10px':''}"><div><strong>${o.titulo}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${c?.nome||'Cliente'} · ${o.categoria||'Geral'} · ${dataBR(o.vencimento)}${alerta?` · ${dias<0?'Vencida há '+Math.abs(dias)+' dias':'vence em '+dias+' dias'}`:''}</div></div><div style="display:flex;gap:6px"><button class="tag" onclick="statusObrigacao('${o.id}')">${o.status.replace('_',' ')}</button><button onclick="excluirObrigacao('${o.id}')" style="color:#B0413E">✕</button></div></div>`;}
 function obrigacoesClienteHTML(c){const itens=OBRIGACOES.filter(o=>o.cliente_id===c.id);return `<button class="btn-primario" onclick="novaObrigacao('${c.id}')">+ Nova obrigação</button><div style="margin-top:12px">${itens.length?itens.map(cardObrigacao).join(''):semRegistro()}</div>`;}
 function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizada');return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaObrigacao()">+ Nova obrigação</button></div><div class="card"><h3>Programação geral</h3>${ativas.length?ativas.map(cardObrigacao).join(''):semRegistro()}</div>`;}
-async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===clienteId);const tema=prompt('Tema do treinamento:');if(!tema?.trim())return;const dataT=prompt('Data prevista/realizada (AAAA-MM-DD):','')||null;const validade=prompt('Validade/reciclagem (AAAA-MM-DD, opcional):','')||null;const participantes=parseInt(prompt('Quantidade de participantes:',''))||null;const obs=prompt('Observações:','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('treinamentos_cliente').insert({user_id:user.id,cliente_id:c.id,tema:tema.trim(),data:dataT,validade,participantes,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar treinamento',error.message);return;}TREINAMENTOS.unshift(data);renderTela();}
+async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===clienteId);const tema=prompt('Tema do treinamento:');if(!tema?.trim())return;const dataT=await selecionarDataVisual({titulo:'Data prevista ou realizada',opcional:true});if(dataT===null)return;const validade=await selecionarDataVisual({titulo:'Validade ou reciclagem',opcional:true});if(validade===null)return;const participantes=parseInt(prompt('Quantidade de participantes:',''))||null;const obs=prompt('Observações:','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('treinamentos_cliente').insert({user_id:user.id,cliente_id:c.id,tema:tema.trim(),data:dataT||null,validade:validade||null,participantes,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar treinamento',error.message);return;}TREINAMENTOS.unshift(data);renderTela();}
 async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);const ordem=['planejado','realizado','cancelado'];const status=ordem[(ordem.indexOf(t.status)+1)%3];const {error}=await supa.from('treinamentos_cliente').update({status}).eq('id',id);if(!error){t.status=status;renderTela();}}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
 function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Novo treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${t.tema}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">${t.status}</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
-async function novaRota(){let c=null;const n=prompt(`Cliente visitado:\n0. Sem cliente\n${CLIENTES.filter(x=>x.tipoCliente!=='contratante').map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');c=operacionais[parseInt(n)-1]||null;const dataR=prompt('Data (AAAA-MM-DD):',new Date().toISOString().slice(0,10));if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
+async function novaRota(){let c=null;const n=prompt(`Cliente visitado:\n0. Sem cliente\n${CLIENTES.filter(x=>x.tipoCliente!=='contratante').map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');c=operacionais[parseInt(n)-1]||null;const dataR=await selecionarDataVisual({titulo:'Data do deslocamento',valor:formatoISO(new Date()),opcional:false});if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
 async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
 function custoRota(r){return Number(r.custo_passagens||0)+Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
 function nomeTransporte(t){return ({transporte_publico:'Transporte público combinado',trem:'Trem',metro:'Metrô',onibus:'Ônibus',carro:'Carro',moto:'Moto',aplicativo:'Aplicativo/Táxi',a_pe:'A pé'})[t]||'Transporte público';}
 function rotasCustosHTML(){const mes=new Date().toISOString().slice(0,7);const atuais=ROTAS_CUSTOS.filter(r=>r.data?.startsWith(mes));const contratantes=CLIENTES.filter(c=>c.tipoCliente==='contratante');return `<div class="grid"><div class="card"><h3>Este mês</h3><div class="pend-num">${moeda(atuais.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${atuais.reduce((s,r)=>s+Number(r.quilometros),0)} km · ${Math.round(atuais.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas · ${atuais.reduce((s,r)=>s+Number(r.quantidade_conducoes||0),0)} conduções</div></div><div class="card"><h3>Como usar</h3><div style="font-size:12px;color:var(--cor-texto-suave)">Registre ida e volta após cada visita. Em transporte público, informe todas as conduções e o total realmente pago.</div></div>${contratantes.map(c=>{const filhos=CLIENTES.filter(x=>x.contratanteId===c.id).map(x=>x.id);const rr=atuais.filter(r=>filhos.includes(r.cliente_id));return `<div class="card"><h3>${c.nome}</h3><div class="pend-num">${moeda(rr.reduce((s,r)=>s+custoRota(r),0))}</div><div class="pend-desc">${rr.length} deslocamentos · ${Math.round(rr.reduce((s,r)=>s+Number(r.tempo_minutos),0)/60*10)/10} horas</div></div>`;}).join('')}</div><button class="btn-primario" style="margin:16px 0" onclick="novaRota()">+ Registrar deslocamento</button>${ROTAS_CUSTOS.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);const pai=CLIENTES.find(x=>x.id===c?.contratanteId);return `<div class="item-lista-simples"><div><strong>${r.origem||'Origem'} → ${r.destino||'Destino'}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(r.data)} · ${nomeTransporte(r.tipo_transporte)}${r.quantidade_conducoes?' · '+r.quantidade_conducoes+' conduções':''} · ${r.tempo_minutos} min${pai?' · '+pai.nome:''}</div></div><span>${moeda(custoRota(r))} <button onclick="excluirRota('${r.id}')" style="color:#B0413E">✕</button></span></div>`;}).join('')}`;}
-async function novoProdutoRotulagem(){let c=null;const n=prompt(`Cliente:\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const produto=prompt('Produto/projeto:');if(!produto?.trim())return;const tipo=prompt('Tipo (ficha técnica, tabela nutricional, rótulo...):','Tabela nutricional')||'';const prazo=prompt('Prazo (AAAA-MM-DD, opcional):','')||null;const acao=prompt('Próxima ação:','')||'';const pasta=prompt('Nome ou caminho da pasta no computador (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('produtos_rotulagem').insert({user_id:user.id,cliente_id:c?.id||null,produto:produto.trim(),tipo,prazo,proxima_acao:acao||null,pasta_referencia:pasta||null}).select().single();if(error){dispararAutomacao('Erro ao criar controle',error.message);return;}PRODUTOS_ROTULAGEM.push(data);renderTela();}
+async function novoProdutoRotulagem(){let c=null;const n=prompt(`Cliente:\n0. Sem cliente\n${CLIENTES.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`,'0');c=CLIENTES[parseInt(n)-1]||null;const produto=prompt('Produto/projeto:');if(!produto?.trim())return;const tipo=prompt('Tipo (ficha técnica, tabela nutricional, rótulo...):','Tabela nutricional')||'';const prazo=await selecionarDataVisual({titulo:'Prazo da entrega',opcional:true});if(prazo===null)return;const acao=prompt('Próxima ação:','')||'';const pasta=prompt('Nome ou caminho da pasta no computador (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('produtos_rotulagem').insert({user_id:user.id,cliente_id:c?.id||null,produto:produto.trim(),tipo,prazo,proxima_acao:acao||null,pasta_referencia:pasta||null}).select().single();if(error){dispararAutomacao('Erro ao criar controle',error.message);return;}PRODUTOS_ROTULAGEM.push(data);renderTela();}
 async function statusProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id),ordem=['a_fazer','em_andamento','aguardando_cliente','concluido'];const status=ordem[(ordem.indexOf(p.status)+1)%4];const {error}=await supa.from('produtos_rotulagem').update({status,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){p.status=status;renderTela();}}
-async function editarProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id);const acao=prompt('Próxima ação:',p.proxima_acao||'');if(acao===null)return;const prazo=prompt('Prazo (AAAA-MM-DD):',p.prazo||'')||null;const pasta=prompt('Pasta no computador:',p.pasta_referencia||'')||null;const {error}=await supa.from('produtos_rotulagem').update({proxima_acao:acao||null,prazo,pasta_referencia:pasta,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){Object.assign(p,{proxima_acao:acao||null,prazo,pasta_referencia:pasta});renderTela();}}
+async function editarProduto(id){const p=PRODUTOS_ROTULAGEM.find(x=>x.id===id);const acao=prompt('Próxima ação:',p.proxima_acao||'');if(acao===null)return;const prazo=await selecionarDataVisual({titulo:'Prazo da entrega',valor:p.prazo,opcional:true});if(prazo===null)return;const pasta=prompt('Pasta no computador:',p.pasta_referencia||'')||null;const {error}=await supa.from('produtos_rotulagem').update({proxima_acao:acao||null,prazo,pasta_referencia:pasta,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){Object.assign(p,{proxima_acao:acao||null,prazo,pasta_referencia:pasta});renderTela();}}
 async function excluirProduto(id){if(!confirm('Excluir este controle?'))return;const {error}=await supa.from('produtos_rotulagem').delete().eq('id',id);if(!error){PRODUTOS_ROTULAGEM=PRODUTOS_ROTULAGEM.filter(x=>x.id!==id);renderTela();}}
 function produtosRotulagemHTML(){return `<button class="btn-primario" style="margin-bottom:14px" onclick="novoProdutoRotulagem()">+ Novo controle</button>${PRODUTOS_ROTULAGEM.map(p=>{const c=CLIENTES.find(x=>x.id===p.cliente_id);return `<div class="card" style="margin-bottom:10px"><h3>${p.produto}<button onclick="statusProduto('${p.id}')">${p.status.replaceAll('_',' ')}</button></h3><div style="font-size:12px;color:var(--cor-texto-suave)">${c?.nome||'Sem cliente'} · ${p.tipo||'Projeto'} · prazo ${dataBR(p.prazo)}</div><p><strong>Próxima ação:</strong> ${p.proxima_acao||'Definir'}</p>${p.pasta_referencia?`<div class="tag">Pasta no computador: ${p.pasta_referencia}</div>`:''}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn-secundario" onclick="editarProduto('${p.id}')">Editar comando</button><button class="btn-secundario" style="color:#B0413E" onclick="excluirProduto('${p.id}')">Excluir</button></div></div>`;}).join('')||semRegistro()}`;}
 async function novaIdeiaInteligente(){const situacao=prompt('O que aconteceu na sua rotina?');if(!situacao?.trim())return;const gancho=prompt('Que aprendizado ou gancho isso pode gerar?','')||'';const pilar=prompt('Pilar (bastidores, educativo, autoridade, pessoal...):','Bastidores')||'';const formato=prompt('Formato provável (Reels, Stories, carrossel...):','Reels')||'';const acao=prompt('Próxima ação:','Gravar')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('conteudo_inteligente').insert({user_id:user.id,situacao:situacao.trim(),gancho,pilar,formato,proxima_acao:acao}).select().single();if(error){dispararAutomacao('Erro ao salvar ideia',error.message);return;}CONTEUDO_INTELIGENTE.unshift(data);renderTela();}
@@ -4057,8 +4113,8 @@ async function novaDelegacao(){
   const er=prompt(`Responsável:\n${ativos.map((r,i)=>`${i+1}. ${r.nome}`).join('\n')}\n\nDigite o número:`);const resp=ativos[parseInt(er)-1];if(!resp)return;
   const ec=prompt(`Cliente (opcional):\n0. Sem cliente\n${CLIENTES.map((c,i)=>`${i+1}. ${c.nome}`).join('\n')}\n\nDigite o número:`, '0');const cliente=CLIENTES[parseInt(ec)-1]||null;
   const contexto=prompt('Contexto/orientações:','')||'';const resultado=prompt('Resultado esperado:','')||'';
-  const prazo=prompt('Prazo (AAAA-MM-DD, opcional):','')||null;const prioridade=(prompt('Prioridade: baixa, media ou alta','media')||'media').toLowerCase();
-  const acompanhamento=prompt('Próximo acompanhamento (AAAA-MM-DD, opcional):','')||null;const {data:{user}}=await supa.auth.getUser();
+  const prazo=await selecionarDataVisual({titulo:'Prazo da delegação',opcional:true});if(prazo===null)return;const prioridade=(prompt('Prioridade: baixa, media ou alta','media')||'media').toLowerCase();
+  const acompanhamento=await selecionarDataVisual({titulo:'Próximo acompanhamento',opcional:true});if(acompanhamento===null)return;const {data:{user}}=await supa.auth.getUser();
   const payload={user_id:user.id,responsavel_id:resp.id,cliente_id:cliente?.id||null,titulo:titulo.trim(),contexto:contexto.trim()||null,resultado_esperado:resultado.trim()||null,prazo,prioridade:['baixa','media','alta'].includes(prioridade)?prioridade:'media',proximo_acompanhamento:acompanhamento};
   const {data,error}=await supa.from('lideranca_delegacoes').insert(payload).select().single();if(error){dispararAutomacao('Erro ao delegar',error.message);return;}LIDERANCA_DELEGACOES.unshift(data);renderTela();
 }
