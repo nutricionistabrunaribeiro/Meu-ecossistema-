@@ -18,6 +18,13 @@ conectado ao Supabase e preparado para instalação como PWA.
 - datas independentes no banco, na tela do cliente e nos novos PDFs;
 - preservação e correção das datas de aplicação dos checklists já existentes.
 
+## Rodada V14 — Validade por item
+
+- validade opcional e individual em todos os itens do checklist;
+- seleção pelo calendário visual, com opção de alterar ou remover;
+- salvamento automático no rascunho e persistência no Supabase;
+- validade exibida junto ao item nos novos PDFs, antes das fotos.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;

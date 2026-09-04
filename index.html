@@ -1677,7 +1677,7 @@ async function carregarModeloChecklistSupabase(){
 }
 function gerarChecklistOficial(modeloId=MODELO_CHECKLIST_ID){
   // clona o modelo carregado do banco, pronto pra uma nova visita responder do zero
-  return TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===modeloId).map(i => ({...i, resultado:null, obs:"", fotos:[]}));
+  return TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===modeloId).map(i => ({...i, resultado:null, obs:"", validade:null, fotos:[]}));
 }
 
 let VISITAS = [];
@@ -1730,7 +1730,7 @@ async function carregarVisitasSupabase(){
   const idsVisitas = VISITAS.map(v=>v.id);
   if(idsVisitas.length){
     const { data: respostas, error: erroRespostas } = await supa.from('checklist_respostas_itens')
-      .select('id, visita_id, item_modelo_id, resultado, observacao, categoria_snapshot, descricao_snapshot, atualizado_em')
+      .select('id, visita_id, item_modelo_id, resultado, observacao, validade, categoria_snapshot, descricao_snapshot, atualizado_em')
       .in('visita_id', idsVisitas).order('atualizado_em',{ascending:false});
     if(!erroRespostas){
       const vistas = new Set();
@@ -1746,7 +1746,7 @@ async function carregarVisitasSupabase(){
           item={id:r.item_modelo_id,categoria:r.categoria_snapshot||modelo?.categoria||'Histórico',desc:r.descricao_snapshot||modelo?.desc||'Item histórico',fotos:[]};
           v.checklist.push(item);
         }
-        if(item) Object.assign(item,{respostaId:r.id,resultado:r.resultado,obs:r.observacao||'',categoria:r.categoria_snapshot||item.categoria,desc:r.descricao_snapshot||item.desc});
+        if(item) Object.assign(item,{respostaId:r.id,resultado:r.resultado,obs:r.observacao||'',validade:r.validade||null,categoria:r.categoria_snapshot||item.categoria,desc:r.descricao_snapshot||item.desc});
       });
     }
   }
@@ -1930,13 +1930,21 @@ async function marcarResultadoItem(visitaId, itemId, resultado){
 }
 const timersObsChecklist = {};
 async function salvarRascunhoItem(v,item){
-  const valores={resultado:item.resultado||null,observacao:item.obs||null,categoria_snapshot:item.categoria,descricao_snapshot:item.desc,atualizado_em:new Date().toISOString()};
+  const valores={resultado:item.resultado||null,observacao:item.obs||null,validade:item.validade||null,categoria_snapshot:item.categoria,descricao_snapshot:item.desc,atualizado_em:new Date().toISOString()};
   let resultado;
   if(item.respostaId) resultado=await supa.from('checklist_respostas_itens').update(valores).eq('id',item.respostaId);
   else resultado=await supa.from('checklist_respostas_itens').insert({...valores,visita_id:v.id,item_modelo_id:item.id}).select('id').single();
   if(resultado.error){ dispararAutomacao('Erro no salvamento automático', resultado.error.message); return false; }
   if(resultado.data?.id) item.respostaId=resultado.data.id;
   return true;
+}
+async function atualizarValidadeItem(visitaId,itemId){
+  const v=VISITAS.find(x=>x.id===visitaId);const item=v?.checklist.find(i=>i.id===itemId);if(!v||!item)return;
+  const validade=await selecionarDataVisual({titulo:'Validade deste item',valor:item.validade,opcional:true});
+  if(validade===null)return;item.validade=validade||null;
+  const salvo=await salvarRascunhoItem(v,item);
+  if(salvo)dispararAutomacao(validade?'Validade salva':'Validade removida',item.desc);
+  renderTela();
 }
 function atualizarObsItem(visitaId, itemId, texto){
   const v = VISITAS.find(x=>x.id===visitaId);
@@ -1989,6 +1997,10 @@ function fichaVisitaHTML(v){
                 </div>
               </div>
               ${item.resultado ? `<textarea class="checklist-obs" rows="2" placeholder="${item.resultado==='nao_conforme' ? 'Descreva a não conformidade encontrada...' : 'Observação (opcional)...'}" oninput="atualizarObsItem('${v.id}','${item.id}', this.value)">${item.obs||''}</textarea>` : ''}
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;padding:9px 11px;background:var(--cor-fundo);border-radius:9px;">
+                <div><strong style="font-size:11px;">Validade</strong><div style="font-size:10.5px;color:var(--cor-texto-suave);">${item.validade?isoParaBRCompleto(item.validade):'Sem validade informada'}</div></div>
+                <button class="btn-secundario" style="padding:7px 10px;font-size:11px;" onclick="atualizarValidadeItem('${v.id}','${item.id}')">📅 ${item.validade?'Alterar':'Selecionar'}</button>
+              </div>
               ${item.resultado ? `
               <div class="checklist-fotos">
                 ${(item.fotos||[]).map((f,idx)=>`
@@ -2173,9 +2185,10 @@ async function gerarPDFVisita(v){
     }
     const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,138);
     const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-10):[];
+    const validade=item.validade?`Validade: ${isoParaBRCompleto(item.validade)}`:'';
     const fotos=item.fotos||[];
     const linhasFotos=Math.ceil(fotos.length/3);
-    const altura=Math.max(17,8+desc.length*4+obs.length*3.6)+(linhasFotos?linhasFotos*37+4:0);
+    const altura=Math.max(17,8+desc.length*4+obs.length*3.6+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
     if(y+altura>278){novaPagina();doc.setFillColor(79,165,121);doc.roundedRect(margem,y,largura,8,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;}
     const cor=item.resultado==='conforme'?[79,165,121]:item.resultado==='nao_conforme'?[176,65,62]:[108,107,98];
     doc.setFillColor(252,251,249);doc.setDrawColor(226,224,214);doc.roundedRect(margem,y,largura,altura,2,2,'FD');
@@ -2185,6 +2198,7 @@ async function gerarPDFVisita(v){
     doc.setFillColor(...cor);doc.roundedRect(165,y+3,27,6,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.7);doc.text(status,178.5,y+7,{align:'center'});
     let yi=y+7+desc.length*4;
     if(obs.length){doc.setFont(undefined,'normal');doc.setFontSize(7.7);doc.setTextColor(item.resultado==='nao_conforme'?142:108,item.resultado==='nao_conforme'?58:107,item.resultado==='nao_conforme'?74:98);doc.text(obs,margem+6,yi);yi+=obs.length*3.6+3;}
+    if(validade){doc.setFont(undefined,'bold');doc.setFontSize(7.7);doc.setTextColor(217,130,43);doc.text(validade,margem+6,yi);yi+=5;}
     fotos.forEach((foto,i)=>{const col=i%3;if(i>0&&col===0)yi+=37;const x=margem+6+col*56;try{doc.addImage(foto,'JPEG',x,yi,52,33);}catch(e){try{doc.addImage(foto,'PNG',x,yi,52,33);}catch(e2){}}});
     y+=altura+4;
   });
