@@ -1169,6 +1169,7 @@ const ABAS_CLIENTE = [
   {id:"visitas", nome:"Checklists"},
   {id:"obrigacoes", nome:"Obrigações"},
   {id:"treinamentos", nome:"Treinamentos"},
+  {id:"asseio", nome:"Asseio Pessoal"},
   {id:"projetos", nome:"Projetos"},
   {id:"pendencias", nome:"Pendências"},
   {id:"financeiro", nome:"Financeiro"},
@@ -1560,6 +1561,8 @@ function abaConteudoClienteHTML(c){
       return obrigacoesClienteHTML(c);
     case "treinamentos":
       return treinamentosClienteHTML(c);
+    case "asseio":
+      return asseioClienteHTML(c);
     case "financeiro":
       const lancsCliente = LANCAMENTOS.filter(l=>l.cliente===c.nome);
       return lancsCliente.length ? lancsCliente.map(f=>`
@@ -2006,8 +2009,11 @@ function fichaVisitaHTML(v){
                 ${(item.fotos||[]).map((f,idx)=>`
                   <div class="foto-thumb"><img src="${f}"><div class="remover-foto" onclick="removerFotoItem('${v.id}','${item.id}',${idx})">✕</div></div>
                 `).join('')}
-                <label class="btn-add-foto">📷
+                <label class="btn-add-foto" title="Tirar foto">📷
                   <input type="file" accept="image/*" capture="environment" onchange="adicionarFotoItem('${v.id}','${item.id}', this)">
+                </label>
+                <label class="btn-add-foto" title="Escolher da galeria">🖼️
+                  <input type="file" accept="image/*" onchange="adicionarFotoItem('${v.id}','${item.id}', this)">
                 </label>
               </div>` : ''}
             </div>
@@ -4111,6 +4117,55 @@ async function usarIdeiaInteligente(id){const i=CONTEUDO_INTELIGENTE.find(x=>x.i
 async function excluirIdeiaInteligente(id){if(!confirm('Excluir esta ideia?'))return;const {error}=await supa.from('conteudo_inteligente').delete().eq('id',id);if(!error){CONTEUDO_INTELIGENTE=CONTEUDO_INTELIGENTE.filter(x=>x.id!==id);renderTela();}}
 function conteudoInteligenteHTML(){return `<button class="btn-primario" style="margin-bottom:12px" onclick="novaIdeiaInteligente()">+ Capturar situação da rotina</button>${CONTEUDO_INTELIGENTE.map(i=>`<div class="ideia-card"><div><div class="ideia-titulo">${i.situacao}</div><div class="ideia-tags">${i.pilar||'Sem pilar'} · ${i.formato||'Sem formato'} · ${i.proxima_acao||'Definir ação'}${i.gancho?'<br>'+i.gancho:''}</div></div><div style="display:flex;gap:6px">${i.status!=='usada'?`<button class="btn-usar-ideia" onclick="usarIdeiaInteligente('${i.id}')">Enviar ao calendário →</button>`:'<span class="tag">Usada</span>'}<button onclick="excluirIdeiaInteligente('${i.id}')" style="color:#B0413E">✕</button></div></div>`).join('')||semRegistro()}`;}
 
+/* ---------- CONTROLE MENSAL DE ASSEIO PESSOAL ---------- */
+const CRITERIOS_ASSEIO=[
+  ['uniforme','Uniforme completo, limpo e conservado'],['cabelos','Cabelos totalmente protegidos'],
+  ['barba','Barba e bigode adequadamente protegidos'],['unhas','Unhas curtas, limpas e sem esmalte'],
+  ['alongamentos','Ausência de unhas postiças ou alongamentos'],['adornos','Ausência de adornos'],
+  ['calcado','Calçado fechado e adequado'],['maos','Higiene correta das mãos'],
+  ['ferimentos','Ferimentos protegidos adequadamente'],['odores','Ausência de perfume ou cosméticos com odor intenso'],
+  ['sintomas','Ausência de sintomas que possam comprometer os alimentos'],['epis','Utilização correta dos EPIs exigidos']
+];
+let ASSEIO_COLABORADORES=[],ASSEIO_VERIFICACOES=[],ASSEIO_VERIFICACAO_ATIVA=null,RELATORIO_ASSEIO_PRONTO_CLIENTE=null;
+async function carregarAsseioSupabase(){
+  const [c,v]=await Promise.all([supa.from('asseio_colaboradores').select('*').order('nome'),supa.from('asseio_verificacoes').select('*').order('data',{ascending:false})]);
+  if(c.error||v.error){dispararAutomacao('Erro ao carregar Asseio Pessoal',(c.error||v.error).message);return;}
+  ASSEIO_COLABORADORES=c.data||[];ASSEIO_VERIFICACOES=v.data||[];
+}
+async function novoColaboradorAsseio(clienteId){
+  const nome=prompt('Nome do colaborador:');if(!nome?.trim())return;const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('asseio_colaboradores').insert({user_id:user.id,cliente_id:clienteId,nome:nome.trim()}).select().single();
+  if(error){dispararAutomacao('Erro ao cadastrar colaborador',error.message);return;}ASSEIO_COLABORADORES.push(data);renderTela();
+}
+async function alternarColaboradorAsseio(id){const c=ASSEIO_COLABORADORES.find(x=>x.id===id);if(!c)return;const {error}=await supa.from('asseio_colaboradores').update({ativo:!c.ativo}).eq('id',id);if(!error){c.ativo=!c.ativo;renderTela();}}
+function avaliacoesIniciaisAsseio(clienteId){return ASSEIO_COLABORADORES.filter(c=>c.cliente_id===clienteId&&c.ativo).map(c=>({colaboradorId:c.id,nome:c.nome,respostas:Object.fromEntries(CRITERIOS_ASSEIO.map(([id])=>[id,{resultado:null,observacao:'',fotos:[]}]))}));}
+async function novaVerificacaoAsseio(clienteId){
+  const cols=ASSEIO_COLABORADORES.filter(c=>c.cliente_id===clienteId&&c.ativo);if(!cols.length){alert('Cadastre pelo menos um colaborador ativo.');return;}
+  const dataV=await selecionarDataVisual({titulo:'Data da verificação de asseio',valor:formatoISO(new Date()),opcional:false});if(!dataV)return;
+  const {data:{user}}=await supa.auth.getUser();const competencia=dataV.slice(0,7)+'-01';
+  const {data,error}=await supa.from('asseio_verificacoes').insert({user_id:user.id,cliente_id:clienteId,data:dataV,competencia,avaliacoes:avaliacoesIniciaisAsseio(clienteId)}).select().single();
+  if(error){dispararAutomacao('Erro ao iniciar verificação',error.message);return;}ASSEIO_VERIFICACOES.unshift(data);ASSEIO_VERIFICACAO_ATIVA=data.id;renderTela();
+}
+async function salvarVerificacaoAsseio(v){const {error}=await supa.from('asseio_verificacoes').update({avaliacoes:v.avaliacoes,observacoes:v.observacoes||null,orientacoes:v.orientacoes||null,atualizado_em:new Date().toISOString()}).eq('id',v.id);if(error){dispararAutomacao('Erro no autosave do asseio',error.message);return false;}return true;}
+function marcarAsseio(verId,colId,criterio,resultado){const v=ASSEIO_VERIFICACOES.find(x=>x.id===verId),a=v?.avaliacoes.find(x=>x.colaboradorId===colId);if(!a)return;a.respostas[criterio].resultado=resultado;salvarVerificacaoAsseio(v);renderTela();}
+const timersAsseio={};
+function observacaoAsseio(verId,colId,criterio,texto){const v=ASSEIO_VERIFICACOES.find(x=>x.id===verId),a=v?.avaliacoes.find(x=>x.colaboradorId===colId);if(!a)return;a.respostas[criterio].observacao=texto;const k=`${verId}:${colId}:${criterio}`;clearTimeout(timersAsseio[k]);timersAsseio[k]=setTimeout(()=>salvarVerificacaoAsseio(v),600);}
+function lerImagemComprimida(arquivo){return new Promise((resolve,reject)=>{const leitor=new FileReader();leitor.onerror=reject;leitor.onload=e=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1000,esc=Math.min(1,max/Math.max(img.width,img.height)),cv=document.createElement('canvas');cv.width=Math.round(img.width*esc);cv.height=Math.round(img.height*esc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);resolve(cv.toDataURL('image/jpeg',.72));};img.src=e.target.result;};leitor.readAsDataURL(arquivo);});}
+async function fotoAsseio(verId,colId,criterio,input){const arquivo=input.files?.[0];if(!arquivo)return;const v=ASSEIO_VERIFICACOES.find(x=>x.id===verId),a=v?.avaliacoes.find(x=>x.colaboradorId===colId);if(!a)return;try{const foto=await lerImagemComprimida(arquivo);a.respostas[criterio].fotos.push(foto);await salvarVerificacaoAsseio(v);renderTela();}catch(e){dispararAutomacao('Erro ao processar foto',e.message);}}
+async function removerFotoAsseio(verId,colId,criterio,idx){const v=ASSEIO_VERIFICACOES.find(x=>x.id===verId),a=v?.avaliacoes.find(x=>x.colaboradorId===colId);if(!a)return;a.respostas[criterio].fotos.splice(idx,1);await salvarVerificacaoAsseio(v);renderTela();}
+async function finalizarAsseio(id){const v=ASSEIO_VERIFICACOES.find(x=>x.id===id);const faltam=v.avaliacoes.reduce((s,a)=>s+CRITERIOS_ASSEIO.filter(([k])=>!a.respostas[k]?.resultado).length,0);if(faltam&&!confirm(`${faltam} avaliação(ões) estão sem resposta. Finalizar mesmo assim?`))return;const {error}=await supa.from('asseio_verificacoes').update({status:'finalizada',avaliacoes:v.avaliacoes,atualizado_em:new Date().toISOString()}).eq('id',id);if(!error){v.status='finalizada';ASSEIO_VERIFICACAO_ATIVA=null;renderTela();}}
+function verificacaoAsseioHTML(v){return `<button class="ficha-voltar" onclick="ASSEIO_VERIFICACAO_ATIVA=null;renderTela()">← Voltar ao mês</button><div class="card"><h3>Verificação de ${dataBR(v.data)} <span class="tag">${v.status==='finalizada'?'Finalizada':'Rascunho com autosave'}</span></h3>${v.avaliacoes.map(a=>`<div style="margin-top:18px"><h4 style="margin-bottom:8px">${a.nome}</h4>${CRITERIOS_ASSEIO.map(([k,nome])=>{const r=a.respostas[k]||{resultado:null,observacao:'',fotos:[]};return `<div class="checklist-item"><div class="checklist-item-topo"><div class="checklist-item-desc">${nome}</div><div class="checklist-opcoes"><button class="opcao-btn ${r.resultado==='conforme'?'sel-conforme':''}" onclick="marcarAsseio('${v.id}','${a.colaboradorId}','${k}','conforme')">Sim</button><button class="opcao-btn ${r.resultado==='nao_conforme'?'sel-nao_conforme':''}" onclick="marcarAsseio('${v.id}','${a.colaboradorId}','${k}','nao_conforme')">Não</button><button class="opcao-btn ${r.resultado==='na'?'sel-na':''}" onclick="marcarAsseio('${v.id}','${a.colaboradorId}','${k}','na')">N/A</button></div></div>${r.resultado?`<textarea class="checklist-obs" rows="2" placeholder="Observação (opcional)" oninput="observacaoAsseio('${v.id}','${a.colaboradorId}','${k}',this.value)">${r.observacao||''}</textarea><div class="checklist-fotos">${(r.fotos||[]).map((f,i)=>`<div class="foto-thumb"><img src="${f}"><div class="remover-foto" onclick="removerFotoAsseio('${v.id}','${a.colaboradorId}','${k}',${i})">✕</div></div>`).join('')}<label class="btn-add-foto" title="Tirar foto">📷<input type="file" accept="image/*" capture="environment" onchange="fotoAsseio('${v.id}','${a.colaboradorId}','${k}',this)"></label><label class="btn-add-foto" title="Galeria">🖼️<input type="file" accept="image/*" onchange="fotoAsseio('${v.id}','${a.colaboradorId}','${k}',this)"></label></div>`:''}</div>`}).join('')}</div>`).join('')}<div style="margin-top:16px"><button class="btn-primario" onclick="finalizarAsseio('${v.id}')">Finalizar verificação</button></div></div>`;}
+async function gerarRelatorioMensalAsseio(clienteId){
+  const ref=await selecionarDataVisual({titulo:'Escolha um dia do mês do relatório',valor:formatoISO(new Date()),opcional:false});if(!ref)return;const mes=ref.slice(0,7),lista=ASSEIO_VERIFICACOES.filter(v=>v.cliente_id===clienteId&&v.data.startsWith(mes));if(!lista.length){alert('Não há verificações neste mês.');return;}const ocultarNomes=confirm('Deseja ocultar os nomes dos colaboradores neste PDF?\n\nOK = usar Colaborador 01, 02...\nCancelar = manter os nomes.');const nomesUnicos=[...new Set(lista.flatMap(v=>v.avaliacoes.map(a=>a.nome)))],nomeRel=n=>ocultarNomes?`Colaborador ${String(nomesUnicos.indexOf(n)+1).padStart(2,'0')}`:n;
+  const c=CLIENTES.find(x=>x.id===clienteId),{jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});let y=14;const logo=pegarLogoBase64();if(logo)try{doc.addImage(logo,'JPEG',81,y,48,24)}catch(e){}y+=28;doc.setFillColor(79,165,121);doc.roundedRect(14,y,182,10,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(13);doc.text('CONTROLE MENSAL DE ASSEIO PESSOAL',105,y+6.7,{align:'center'});y+=15;doc.setTextColor(34,35,31);doc.setFontSize(10);doc.text(`${c.nome} · ${MESES_NOME[Number(mes.slice(5))-1]}/${mes.slice(0,4)} · ${lista.length} verificação(ões)`,14,y);y+=6;
+  const linhas=[];lista.sort((a,b)=>a.data.localeCompare(b.data)).forEach(v=>v.avaliacoes.forEach(a=>CRITERIOS_ASSEIO.forEach(([k,nome])=>{const r=a.respostas[k];if(r?.resultado)linhas.push([dataBR(v.data),nomeRel(a.nome),nome,r.resultado==='conforme'?'Conforme':r.resultado==='nao_conforme'?'Não conforme':'N/A',r.observacao||'']);})));
+  doc.autoTable({startY:y,head:[['Data','Colaborador','Critério','Resultado','Observação']],body:linhas,theme:'grid',headStyles:{fillColor:[79,165,121],fontSize:7},styles:{fontSize:6.8,cellPadding:2,lineColor:[226,224,214]},columnStyles:{0:{cellWidth:18},1:{cellWidth:30},2:{cellWidth:60},3:{cellWidth:25}}});
+  const validas=linhas.filter(l=>l[3]!=='N/A'),conformes=validas.filter(l=>l[3]==='Conforme').length,perc=validas.length?Math.round(conformes/validas.length*100):0;let fy=doc.lastAutoTable.finalY+8;if(fy>260){doc.addPage();fy=16;}doc.setFontSize(10);doc.setFont(undefined,'bold');doc.text(`Conformidade mensal: ${perc}%`,14,fy);fy+=7;doc.setFont(undefined,'normal');doc.setFontSize(8);doc.text(doc.splitTextToSize('Este relatório consolida as verificações de asseio pessoal realizadas no período e serve como evidência de acompanhamento e orientação da equipe.',182),14,fy);
+  const evidencias=[];lista.forEach(v=>v.avaliacoes.forEach(a=>CRITERIOS_ASSEIO.forEach(([k,nome])=>(a.respostas[k]?.fotos||[]).forEach(f=>evidencias.push({foto:f,data:v.data,nome:nomeRel(a.nome),criterio:nome})))));if(evidencias.length){doc.addPage();let ey=18;doc.setFont(undefined,'bold');doc.setFontSize(13);doc.setTextColor(34,35,31);doc.text('EVIDÊNCIAS FOTOGRÁFICAS',14,ey);ey+=9;evidencias.forEach(e=>{if(ey+61>282){doc.addPage();ey=18;}doc.setFontSize(8);doc.setFont(undefined,'bold');doc.text(`${dataBR(e.data)} · ${e.nome}`,14,ey);doc.setFont(undefined,'normal');doc.text(doc.splitTextToSize(e.criterio,86),14,ey+5);try{doc.addImage(e.foto,'JPEG',108,ey-4,84,56)}catch(err){}ey+=64;});}
+  ultimoPDFBlob=doc.output('blob');ultimoPDFNome=`Asseio_Pessoal_${c.nome.replace(/\s+/g,'_')}_${mes}.pdf`;RELATORIO_ASSEIO_PRONTO_CLIENTE=clienteId;dispararAutomacao('Relatório mensal de asseio gerado',`${c.nome} · ${lista.length} verificação(ões)`);renderTela();
+}
+function asseioClienteHTML(c){if(ASSEIO_VERIFICACAO_ATIVA){const v=ASSEIO_VERIFICACOES.find(x=>x.id===ASSEIO_VERIFICACAO_ATIVA);if(v?.cliente_id===c.id)return verificacaoAsseioHTML(v);}const cols=ASSEIO_COLABORADORES.filter(x=>x.cliente_id===c.id),vers=ASSEIO_VERIFICACOES.filter(x=>x.cliente_id===c.id);return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"><button class="btn-primario" onclick="novaVerificacaoAsseio('${c.id}')">+ Nova verificação</button><button class="btn-secundario" onclick="novoColaboradorAsseio('${c.id}')">+ Colaborador</button><button class="btn-secundario" onclick="gerarRelatorioMensalAsseio('${c.id}')">📄 Relatório mensal</button></div>${RELATORIO_ASSEIO_PRONTO_CLIENTE===c.id?`<div class="card" style="margin-bottom:14px"><h3>Relatório pronto</h3><div style="display:flex;gap:8px"><button class="btn-primario" onclick="visualizarPDF()">Visualizar</button><button class="btn-secundario" onclick="baixarPDF()">Baixar</button><button class="btn-secundario" onclick="compartilharPDF()">Compartilhar</button></div></div>`:''}<div class="grid"><div class="card"><h3>Colaboradores (${cols.filter(x=>x.ativo).length} ativos)</h3>${cols.map(x=>`<div class="item-lista-simples" style="opacity:${x.ativo?1:.55}"><span>${x.nome}</span><button class="tag" onclick="alternarColaboradorAsseio('${x.id}')">${x.ativo?'Ativo':'Inativo'}</button></div>`).join('')||semRegistro()}</div><div class="card"><h3>Histórico mensal</h3>${vers.map(v=>`<div class="item-lista-simples"><button onclick="ASSEIO_VERIFICACAO_ATIVA='${v.id}';renderTela()" style="text-align:left"><strong>${dataBR(v.data)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${v.avaliacoes.length} colaborador(es)</div></button><span class="tag">${v.status==='finalizada'?'Finalizada':'Rascunho'}</span></div>`).join('')||semRegistro()}</div></div>`;}
+
 /* ---------- LIDERANÇA (área privada da titular) ---------- */
 let LIDERANCA_RESPONSAVEIS=[];
 let LIDERANCA_DELEGACOES=[];
@@ -4582,6 +4637,7 @@ async function entrarNoApp(){
   await carregarPendenciasSupabase();
   await carregarLiderancaSupabase();
   await carregarCentralComandoSupabase();
+  await carregarAsseioSupabase();
   restaurarTelaAtualSessao();
   renderSidebar();
   renderTela();

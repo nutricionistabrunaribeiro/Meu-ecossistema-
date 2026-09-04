@@ -25,6 +25,15 @@ conectado ao Supabase e preparado para instalação como PWA.
 - salvamento automático no rascunho e persistência no Supabase;
 - validade exibida junto ao item nos novos PDFs, antes das fotos.
 
+## Rodada V15 — Galeria e Asseio Pessoal
+
+- câmera e galeria disponíveis separadamente nos itens do checklist;
+- Controle Mensal de Asseio Pessoal dentro de cada cliente;
+- cadastro nominal e ativação/inativação de colaboradores;
+- verificações por visita com 12 critérios, observações, fotos e autosave;
+- relatório mensal consolidado com percentual, histórico e evidências fotográficas;
+- opção de manter ou ocultar nomes no PDF destinado ao cliente.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
