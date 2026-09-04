@@ -34,6 +34,17 @@ conectado ao Supabase e preparado para instalação como PWA.
 - relatório mensal consolidado com percentual, histórico e evidências fotográficas;
 - opção de manter ou ocultar nomes no PDF destinado ao cliente.
 
+## Rodada V16 — Carteira Saber Nutrir e envios mensais
+
+- estabelecimentos vinculados organizados somente dentro da contratante;
+- vinculados preservados na Agenda, nas rotas e na contagem de visitas;
+- vinculados removidos da lista principal e do seletor de checklists operacionais;
+- controle mensal simples com os estados `Pendente` e `Enviado`;
+- resumo no Dashboard e matriz anual dentro da Saber Nutrir;
+- ativação individual para estabelecimentos que recebem checklist mensal, mesmo sem visita;
+- texto do asseio atualizado para “Barba e bigode totalmente aparados”;
+- identidade complementar no menu: Trabalho verde/laranja e Pessoal laranja/verde.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
