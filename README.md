@@ -80,6 +80,14 @@ conectado ao Supabase e preparado para instalação como PWA.
 - agrupamento dos avisos por dia, sem alterar nem duplicar os registros existentes;
 - layout vertical no celular e compacto com rolagem suave no desktop.
 
+## Rodada V21 — Correção do Dashboard no computador
+
+- formulário rápido da Lista de Mercado ajustado à largura do card;
+- campos de item e quantidade mantidos lado a lado;
+- botão “Adicionar” reposicionado inteiro em uma linha abaixo;
+- textos longos protegidos contra invasão dos cards vizinhos;
+- comportamento do celular e dados já cadastrados preservados.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
