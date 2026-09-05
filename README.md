@@ -72,6 +72,14 @@ conectado ao Supabase e preparado para instalação como PWA.
 - resumo e operação rápida da Lista de Mercado no Dashboard geral;
 - persistência privada no Supabase, vinculada ao usuário autenticado.
 
+## Rodada V20 — Faixa inteligente da Agenda
+
+- remoção da grade alta e vazia de “Dia inteiro” no celular;
+- novo painel compacto “Avisos do período” antes da agenda por horários;
+- exibição apenas dos dias que possuem prazos, vencimentos, treinamentos ou conteúdos;
+- agrupamento dos avisos por dia, sem alterar nem duplicar os registros existentes;
+- layout vertical no celular e compacto com rolagem suave no desktop.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
