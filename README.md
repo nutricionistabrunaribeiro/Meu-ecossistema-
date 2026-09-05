@@ -45,6 +45,17 @@ conectado ao Supabase e preparado para instalação como PWA.
 - texto do asseio atualizado para “Barba e bigode totalmente aparados”;
 - identidade complementar no menu: Trabalho verde/laranja e Pessoal laranja/verde.
 
+## Rodada V17 — Entregas multiclientes
+
+- novo módulo `Entregas` no menu Trabalho;
+- uma entrega pode ser vinculada a um ou vários clientes;
+- prazo escolhido no calendário visual;
+- baixa individual por cliente, com histórico de concluídas;
+- edição da entrega e da seleção de clientes, além de exclusão com confirmação;
+- sinalização de entregas atrasadas;
+- resumo das entregas abertas, clientes pendentes e próximos prazos no Dashboard;
+- apenas comandos e acompanhamento: nenhum arquivo é armazenado no aplicativo.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
