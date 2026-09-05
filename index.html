@@ -4351,7 +4351,28 @@ let ENTREGAS=[],ENTREGA_CLIENTES=[],filtroEntregas='abertas';
 async function carregarEntregasSupabase(){const [e,c]=await Promise.all([supa.from('entregas').select('*').order('prazo',{ascending:true}),supa.from('entrega_clientes').select('*')]);if(e.error||c.error){dispararAutomacao('Erro ao carregar Entregas',(e.error||c.error).message);return;}ENTREGAS=e.data||[];ENTREGA_CLIENTES=c.data||[];}
 function clientesSelecionaveisEntrega(){return CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo');}
 function rotuloClienteEntrega(c){const pai=CLIENTES.find(x=>x.id===c.contratanteId);return `${c.nome}${pai?' — '+pai.nome:''}`;}
-function selecionarClientesEntrega(atuais=[]){const lista=clientesSelecionaveisEntrega(),padrao=atuais.map(id=>lista.findIndex(c=>c.id===id)+1).filter(n=>n>0).join(', ');const resposta=prompt(`Selecione um ou vários clientes pelos números, separados por vírgula:\n\n${lista.map((c,i)=>`${i+1}. ${rotuloClienteEntrega(c)}`).join('\n')}`,padrao);if(resposta===null)return null;return [...new Set(resposta.split(',').map(n=>lista[parseInt(n.trim())-1]?.id).filter(Boolean))];}
+function numerosSelecaoClientes(texto,total){
+  const normalizado=String(texto||'').trim().toLowerCase(),todos=Array.from({length:total},(_,i)=>i+1);
+  if(!normalizado)return [];
+  const modoTodos=/^(todos|tudo|all)\b/.test(normalizado);
+  const parte=modoTodos?(normalizado.split(/\bmenos\b/)[1]||''):normalizado;
+  const numeros=[];
+  parte.split(',').map(x=>x.trim()).filter(Boolean).forEach(token=>{
+    const intervalo=token.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+    if(intervalo){let a=Number(intervalo[1]),b=Number(intervalo[2]);if(a>b)[a,b]=[b,a];for(let n=a;n<=b;n++)if(n>=1&&n<=total)numeros.push(n);}
+    else{const n=Number(token.replace(/^-/,''));if(Number.isInteger(n)&&n>=1&&n<=total)numeros.push(n);}
+  });
+  const unicos=[...new Set(numeros)];
+  return modoTodos?todos.filter(n=>!unicos.includes(n)):unicos;
+}
+function selecionarClientesEntrega(atuais=[]){
+  const lista=clientesSelecionaveisEntrega(),padrao=atuais.length===lista.length&&lista.length?'todos':atuais.map(id=>lista.findIndex(c=>c.id===id)+1).filter(n=>n>0).join(', ');
+  const resposta=prompt(`Selecione os clientes de uma destas formas:\n\n• todos\n• intervalo: 1-30\n• combinação: 1, 3, 5-12\n• todos menos 4, 7\n\n${lista.map((c,i)=>`${i+1}. ${rotuloClienteEntrega(c)}`).join('\n')}`,padrao);
+  if(resposta===null)return null;
+  const numeros=numerosSelecaoClientes(resposta,lista.length);
+  if(!numeros.length){alert('Nenhum cliente selecionado. Use “todos”, um intervalo como 1-30 ou números separados por vírgula.');return [];}
+  return numeros.map(n=>lista[n-1].id);
+}
 async function novaEntrega(){const titulo=prompt('Qual entrega precisa ser realizada?\nEx.: Revisão das FDS');if(!titulo?.trim())return;const clienteIds=selecionarClientesEntrega();if(!clienteIds?.length){alert('Selecione pelo menos um cliente.');return;}const prazo=await selecionarDataVisual({titulo:'Prazo da entrega',opcional:false});if(!prazo)return;const observacoes=prompt('Orientações ou observações (opcional):','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('entregas').insert({user_id:user.id,titulo:titulo.trim(),prazo,observacoes:observacoes.trim()||null}).select().single();if(error){dispararAutomacao('Erro ao criar entrega',error.message);return;}const {data:vinculos,error:erroVinculos}=await supa.from('entrega_clientes').insert(clienteIds.map(cliente_id=>({user_id:user.id,entrega_id:data.id,cliente_id}))).select();if(erroVinculos){await supa.from('entregas').delete().eq('id',data.id);dispararAutomacao('Erro ao vincular clientes',erroVinculos.message);return;}ENTREGAS.push(data);ENTREGA_CLIENTES.push(...(vinculos||[]));dispararAutomacao('Entrega criada',`${titulo.trim()} · ${clienteIds.length} cliente(s)`);renderTela();}
 async function editarEntrega(id){const e=ENTREGAS.find(x=>x.id===id);if(!e)return;const titulo=prompt('Nome da entrega:',e.titulo);if(!titulo?.trim())return;const prazo=await selecionarDataVisual({titulo:'Prazo da entrega',valor:e.prazo,opcional:false});if(!prazo)return;const observacoes=prompt('Orientações ou observações:',e.observacoes||'');if(observacoes===null)return;const {error}=await supa.from('entregas').update({titulo:titulo.trim(),prazo,observacoes:observacoes.trim()||null,atualizado_em:new Date().toISOString()}).eq('id',id);if(error){dispararAutomacao('Erro ao editar entrega',error.message);return;}Object.assign(e,{titulo:titulo.trim(),prazo,observacoes:observacoes.trim()||null});renderTela();}
 async function editarClientesEntrega(id){const atuais=ENTREGA_CLIENTES.filter(v=>v.entrega_id===id).map(v=>v.cliente_id),novos=selecionarClientesEntrega(atuais);if(novos===null||!novos.length)return;const {data:{user}}=await supa.auth.getUser(),antigosStatus=Object.fromEntries(ENTREGA_CLIENTES.filter(v=>v.entrega_id===id).map(v=>[v.cliente_id,v]));const {error:erroDelete}=await supa.from('entrega_clientes').delete().eq('entrega_id',id);if(erroDelete){dispararAutomacao('Erro ao editar clientes',erroDelete.message);return;}const payload=novos.map(cliente_id=>({user_id:user.id,entrega_id:id,cliente_id,status:antigosStatus[cliente_id]?.status||'pendente',concluido_em:antigosStatus[cliente_id]?.concluido_em||null}));const {data,error}=await supa.from('entrega_clientes').insert(payload).select();if(error){dispararAutomacao('Erro ao salvar clientes da entrega',error.message);await carregarEntregasSupabase();return;}ENTREGA_CLIENTES=ENTREGA_CLIENTES.filter(v=>v.entrega_id!==id);ENTREGA_CLIENTES.push(...(data||[]));renderTela();}

@@ -103,6 +103,15 @@ conectado ao Supabase e preparado para instalação como PWA.
 - respostas, observações, validades e fotos restauradas ao retomar o preenchimento;
 - fotos comprimidas antes do envio e protegidas por usuário no Supabase.
 
+## Rodada V23 — Seleção rápida de clientes nas Entregas
+
+- seleção de todos os clientes digitando `todos`;
+- seleção por intervalo, como `1-30`;
+- combinação de números e intervalos, como `1, 3, 5-12`;
+- exclusão rápida a partir do conjunto completo, como `todos menos 4, 7`;
+- funcionamento tanto na criação quanto na edição de uma entrega;
+- clientes e entregas já cadastrados permanecem inalterados.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
