@@ -88,6 +88,21 @@ conectado ao Supabase e preparado para instalação como PWA.
 - textos longos protegidos contra invasão dos cards vizinhos;
 - comportamento do celular e dados já cadastrados preservados.
 
+## Rodada V22 — Evolução visual e experiência do sistema
+
+- identidade visual refinada com hierarquia, sombras discretas, verde e laranja da marca;
+- menu com ícones, seleção visual e contadores de pendências, entregas, checklists e mercado;
+- nova Central de Comando “Hoje” no Dashboard, destacando a próxima ação;
+- cards prioritários diferenciados sem exagero de cores;
+- botão flutuante no celular para criar compromisso, checklist, pendência, entrega ou item de mercado;
+- nova visualização diária da Agenda, otimizada para celular;
+- cadastro de compromisso reorganizado: descrição, tipo, cliente, data e horário;
+- categoria e cor aplicadas automaticamente de acordo com o tipo e a carteira do cliente;
+- central de checklists em andamento com progresso, continuar e excluir;
+- indicador de autosave e botão “Salvar agora” dentro do checklist;
+- respostas, observações, validades e fotos restauradas ao retomar o preenchimento;
+- fotos comprimidas antes do envio e protegidas por usuário no Supabase.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
