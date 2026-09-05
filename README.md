@@ -112,6 +112,16 @@ conectado ao Supabase e preparado para instalação como PWA.
 - funcionamento tanto na criação quanto na edição de uma entrega;
 - clientes e entregas já cadastrados permanecem inalterados.
 
+## Rodada V24 — Cabeçalho limpo e sincronização transparente
+
+- remoção da busca global do cabeçalho;
+- remoção do sino e do painel interno de notificações;
+- avisos rápidos de sucesso e erro continuam aparecendo temporariamente na tela;
+- indicador renomeado para `Banco conectado` somente após resposta real do Supabase;
+- quando não há internet ou o banco não responde, exibe `Sem sincronização`;
+- textos incorretos sobre funcionamento e sincronização offline foram removidos;
+- o PWA ainda abre sua estrutura pelo cache, mas requer conexão para carregar e salvar dados.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;

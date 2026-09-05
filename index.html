@@ -728,15 +728,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <div class="status-conexao" id="statusConexao"><span class="bolinha"></span><span class="txt">Online</span></div>
-      <button class="search" onclick="abrirBusca()">🔍 Buscar em tudo…</button>
-      <div class="sino-wrap">
-        <button class="btn-sino" onclick="alternarPainelNotif()">🔔<span class="sino-badge" id="sinoBadge" style="display:none;">0</span></button>
-        <div class="painel-notif" id="painelNotif">
-          <div class="painel-notif-topo"><span>Automações e notificações</span><button onclick="limparNotificacoes()">Limpar</button></div>
-          <div class="painel-notif-lista" id="painelNotifLista"></div>
-        </div>
-      </div>
+      <div class="status-conexao" id="statusConexao" title="Indica se os dados podem ser sincronizados com o Supabase"><span class="bolinha"></span><span class="txt">Verificando banco…</span></div>
       <div class="avatar">BR</div>
     </div>
   </header>
@@ -744,13 +736,6 @@
   <div id="conteudoTela"></div>
 </main>
 
-
-<div class="overlay" id="overlayBusca">
-  <div class="modal-busca">
-    <input type="text" placeholder="Buscar clientes, documentos, tarefas..." autofocus>
-    <div class="dica">Pesquisa em todos os módulos ao mesmo tempo — protótipo, sem dados reais ainda.</div>
-  </div>
-</div>
 
 <div class="toast-container" id="toastContainer"></div>
 <div class="system-modal-bg" id="modalSistema" onclick="if(event.target===this)fecharModalSistema()"><div class="system-modal" id="modalSistemaConteudo"></div></div>
@@ -902,7 +887,6 @@ function salvarTelaAtualSessao(){
 
 function abrirMenuMobile(){ document.getElementById('sidebarMobileWrap').classList.add('aberto'); }
 function fecharMenuMobile(){ document.getElementById('sidebarMobileWrap').classList.remove('aberto'); }
-function abrirBusca(){ document.getElementById('overlayBusca').classList.add('aberto'); }
 function abrirModalSistema(html){const modal=document.getElementById('modalSistema');document.getElementById('modalSistemaConteudo').innerHTML=html;modal.classList.add('aberto');}
 function fecharModalSistema(){const modal=document.getElementById('modalSistema');modal.classList.remove('aberto');document.getElementById('modalSistemaConteudo').innerHTML='';celulaAtiva=null;}
 function acaoRapida(acao){
@@ -913,9 +897,6 @@ function acaoRapida(acao){
   if(acao==='entrega'){espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='entregas';renderSidebar();renderTela();setTimeout(novaEntrega,0);}
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
-document.getElementById('overlayBusca').addEventListener('click', (e)=>{
-  if(e.target.id==='overlayBusca') e.target.classList.remove('aberto');
-});
 
 const NOMES_TELA = {
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
@@ -3812,12 +3793,7 @@ function dispararAutomacao(titulo, detalhe){
   const agora = new Date();
   const hora = agora.getHours().toString().padStart(2,'0')+':'+agora.getMinutes().toString().padStart(2,'0');
   LOG_AUTOMACOES.unshift({titulo, detalhe, hora});
-  notifNaoLidas++;
   mostrarToast(titulo);
-  atualizarBadgeNotif();
-  if(document.getElementById('painelNotif').classList.contains('aberto')){
-    renderPainelNotif();
-  }
 }
 
 function mostrarToast(msg){
@@ -3828,45 +3804,6 @@ function mostrarToast(msg){
   container.appendChild(el);
   setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 4200);
 }
-
-function atualizarBadgeNotif(){
-  const badge = document.getElementById('sinoBadge');
-  if(notifNaoLidas > 0){ badge.style.display='flex'; badge.innerText = notifNaoLidas; }
-  else { badge.style.display='none'; }
-}
-
-function alternarPainelNotif(){
-  const painel = document.getElementById('painelNotif');
-  painel.classList.toggle('aberto');
-  if(painel.classList.contains('aberto')){
-    notifNaoLidas = 0;
-    atualizarBadgeNotif();
-    renderPainelNotif();
-  }
-}
-function limparNotificacoes(){
-  LOG_AUTOMACOES = [];
-  renderPainelNotif();
-}
-function renderPainelNotif(){
-  const lista = document.getElementById('painelNotifLista');
-  if(LOG_AUTOMACOES.length===0){
-    lista.innerHTML = `<div class="painel-notif-vazio">Nenhuma automação disparada ainda. Interaja com o sistema (feche uma visita, mova um lead, marque um item do checklist...) para ver aqui.</div>`;
-    return;
-  }
-  lista.innerHTML = LOG_AUTOMACOES.map(n=>`
-    <div class="notif-item">
-      <div class="notif-item-titulo">${n.titulo}</div>
-      ${n.detalhe ? `<div>${n.detalhe}</div>` : ''}
-      <div class="notif-item-hora">${n.hora}</div>
-    </div>
-  `).join('');
-}
-document.addEventListener('click', (e)=>{
-  const painel = document.getElementById('painelNotif');
-  const sino = e.target.closest('.sino-wrap');
-  if(!sino && painel.classList.contains('aberto')) painel.classList.remove('aberto');
-});
 
 /* ---------- CENTRAL DE PENDÊNCIAS (agrega dados reais dos outros módulos) ---------- */
 let PENDENCIAS_DB = [];
@@ -4659,38 +4596,31 @@ function avisoPersistencia(){
   }
 }
 
-/* ---------- MODO OFFLINE INTELIGENTE ---------- */
-let filaAcoesOffline = [];
-
-function atualizarStatusConexao(){
+/* ---------- STATUS REAL DE SINCRONIZAÇÃO ---------- */
+async function atualizarStatusConexao(){
   const el = document.getElementById('statusConexao');
   if(!el) return;
-  if(navigator.onLine){
-    el.classList.remove('offline');
-    el.querySelector('.txt').innerText = 'Online';
-  } else {
+  if(!navigator.onLine){
     el.classList.add('offline');
-    el.querySelector('.txt').innerText = 'Offline';
+    el.querySelector('.txt').innerText = 'Sem sincronização';
+    el.title='Sem internet: a interface pode abrir pelo cache, mas os dados não serão carregados ou salvos.';
+    return false;
   }
+  el.classList.remove('offline');
+  el.querySelector('.txt').innerText='Verificando banco…';
+  const {error}=await supa.from('perfil_usuario').select('user_id',{head:true,count:'exact'}).limit(1);
+  if(error){el.classList.add('offline');el.querySelector('.txt').innerText='Sem sincronização';el.title='A internet está disponível, mas o Supabase não respondeu. Evite alterações até a conexão voltar.';return false;}
+  el.classList.remove('offline');el.querySelector('.txt').innerText='Banco conectado';el.title='Conexão confirmada: os dados podem ser carregados e salvos no Supabase.';return true;
 }
-window.addEventListener('online', ()=>{
-  atualizarStatusConexao();
-  if(filaAcoesOffline.length>0){
-    dispararAutomacao('Conexão restabelecida', `${filaAcoesOffline.length} ação(ões) feita(s) offline foram sincronizadas agora.`);
-    filaAcoesOffline = [];
-  } else {
-    dispararAutomacao('Conexão restabelecida', 'Você está online novamente.');
-  }
-  salvarEstado();
+window.addEventListener('online', async ()=>{
+  if(await atualizarStatusConexao())dispararAutomacao('Banco conectado','A sincronização com o Supabase foi restabelecida.');
 });
 window.addEventListener('offline', ()=>{
   atualizarStatusConexao();
-  dispararAutomacao('Você está offline', 'Continue usando normalmente — o que você fizer aqui na visita fica guardado no aparelho e sincroniza sozinho assim que a internet voltar.');
+  dispararAutomacao('Sem sincronização', 'A interface pode continuar aberta, mas não faça alterações até a conexão com o banco voltar.');
 });
 function registrarAcaoOffline(descricao){
-  if(!navigator.onLine){
-    filaAcoesOffline.push({descricao, quando: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
-  }
+  return navigator.onLine;
 }
 
 /* ---------- PERFIL DO USUÁRIO ---------- */
