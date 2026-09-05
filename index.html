@@ -122,7 +122,17 @@
   .date-month-selects{display:grid;grid-template-columns:1.3fr .8fr;gap:7px}.date-month-selects select{width:100%;border:1px solid var(--cor-borda);border-radius:9px;padding:8px;background:var(--cor-superficie);color:var(--cor-texto);font:inherit}
   .date-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.date-week{font-size:10px;text-align:center;color:var(--cor-texto-suave);padding:4px}.date-day{aspect-ratio:1;border-radius:10px;font-size:12px}.date-day:hover{background:#E6EFE7}.date-day.today{border:1px solid var(--cor-acento);color:var(--cor-primaria);font-weight:700}.date-day.selected{background:var(--cor-primaria);color:#fff;font-weight:700}.date-day.out{opacity:.28}
   .date-modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:16px}.date-modal-actions .confirm{background:var(--cor-primaria);color:#fff;border-color:var(--cor-primaria)}
-  .agenda-filtros{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 16px}.agenda-filtro{border:1px solid var(--cor-borda);border-radius:20px;padding:6px 10px;font-size:11px;background:var(--cor-superficie)}.agenda-filtro.off{opacity:.42;text-decoration:line-through}
+  .agenda-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#315d45 0%,#437355 63%,#d77b35 160%);border-radius:20px;padding:20px;margin-bottom:18px;color:#fff;box-shadow:0 14px 34px rgba(44,91,66,.16)}
+  .agenda-hero:after{content:"";position:absolute;width:190px;height:190px;border:36px solid rgba(255,255,255,.07);border-radius:50%;right:-85px;top:-105px;pointer-events:none}
+  .agenda-hero-top{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;z-index:1}
+  .agenda-hero-title{display:flex;align-items:center;gap:12px}.agenda-icon{width:45px;height:45px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+  .agenda-hero-title strong{display:block;font-family:'Fraunces',serif;font-size:18px}.agenda-hero-title span{display:block;font-size:11.5px;opacity:.8;margin-top:2px}
+  .agenda-view-switch{display:flex;background:rgba(18,48,33,.3);padding:4px;border-radius:12px;gap:3px}.agenda-view-switch button{padding:8px 13px;border-radius:9px;color:rgba(255,255,255,.72);font-size:11.5px;font-weight:700}.agenda-view-switch button.active{background:#fff;color:#315d45;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+  .agenda-hero-details{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.35fr;gap:18px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
+  .agenda-hero-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.65;margin-bottom:8px}
+  .legenda{display:flex;gap:10px 14px;flex-wrap:wrap;margin:0}.legenda-item{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.88)}.legenda-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.16)}
+  .agenda-filtros{display:flex;gap:7px;flex-wrap:wrap;margin:0}.agenda-filtro{border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 10px;font-size:10.5px;background:rgba(255,255,255,.12);color:#fff}.agenda-filtro.off{opacity:.42;text-decoration:line-through}
+  .agenda-periodo{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:14px;padding:10px 12px;margin-bottom:12px}.agenda-periodo-label{text-align:center;font-family:'Fraunces',serif;font-size:15px;color:var(--cor-primaria)}.agenda-periodo-nav{display:flex;align-items:center;gap:6px}.agenda-periodo-nav:last-child{justify-content:flex-end}.agenda-nav-icon{width:34px;height:34px;border:1px solid var(--cor-borda);border-radius:9px;background:var(--cor-fundo);color:var(--cor-primaria);font-size:17px}.agenda-hoje{font-size:11px;padding:8px 11px;border-radius:9px;background:var(--cor-primaria);color:#fff;font-weight:700}
   .agenda-dia-inteiro{display:grid;grid-template-columns:70px repeat(7,minmax(90px,1fr));gap:5px;min-width:780px;margin-bottom:8px}.agenda-dia-inteiro>div{border:1px solid var(--cor-borda);border-radius:8px;padding:6px;min-height:42px;font-size:10px}.agenda-dia-inteiro .label{border:0;color:var(--cor-texto-suave);display:flex;align-items:center}.prazo-chip{display:block;border-left:3px solid var(--cor-acento);background:var(--cor-fundo);border-radius:5px;padding:4px;margin-bottom:4px;line-height:1.2}.prazo-chip.vencimento{border-color:#B0413E}.prazo-chip.treinamento{border-color:#7398B2}.prazo-chip.conteudo{border-color:#805A9B}
 
   .pend-num{font-family:'Fraunces',serif;font-size:38px;font-weight:600;color:var(--cor-primaria);}
@@ -160,9 +170,6 @@
   .btn-rapido:hover{background:var(--cor-fundo);}
 
   /* Planner Semanal (Agenda) */
-  .legenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
-  .legenda-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--cor-texto-suave);}
-  .legenda-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
   .dot-visita{background:#8E5FB0;}
   .dot-demanda{background:#D98B3F;}
   .dot-pessoal{background:#4F8A5E;}
@@ -467,6 +474,9 @@
   .add-compra{display:flex;gap:8px;margin-top:14px;}
   .add-compra input{flex:1;border:1px solid var(--cor-borda);border-radius:8px;padding:9px 12px;font-size:12.5px;font-family:inherit;}
   .add-compra button{background:var(--cor-primaria);color:#fff;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;}
+  .mercado-resumo{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.mercado-resumo span{font-size:11px;padding:5px 10px;border-radius:20px;background:var(--cor-fundo);color:var(--cor-texto-suave)}
+  .mercado-add{display:grid;grid-template-columns:minmax(160px,1fr) 110px auto;gap:8px;margin-bottom:14px}.mercado-add input{min-width:0;border:1px solid var(--cor-borda);border-radius:9px;padding:10px 12px;font:inherit;font-size:12.5px}.mercado-add button{background:var(--cor-primaria);color:#fff;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700}
+  .mercado-vazio{text-align:center;padding:22px 10px;color:var(--cor-texto-suave);font-size:12.5px}.mercado-item-qtd{font-size:10.5px;color:var(--cor-texto-suave);background:var(--cor-fundo);border-radius:14px;padding:2px 7px}.mercado-acoes{display:flex;justify-content:flex-end;margin-top:12px}.mercado-dashboard-lista{display:flex;flex-direction:column;margin-top:10px}.mercado-dashboard-lista .compra-item{padding:8px 0}
 
   .devocional-card{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:var(--radius);padding:22px;}
   .devocional-data{font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px;}
@@ -627,6 +637,7 @@
     .grid{grid-template-columns:1fr;}
     .conteudo-full,.rapidos{grid-column:1/-1;}
     .search{width:120px;}
+    .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto 1fr auto}.agenda-periodo-label{font-size:13px}.agenda-periodo .agenda-hoje{display:none}.mercado-add{grid-template-columns:1fr 88px}.mercado-add button{grid-column:1/-1}
   }
   /* Telas curtas (celular deitado) — reduz espaçamentos verticais pra caber tudo sem cortar */
   @media (max-height:480px) and (orientation:landscape){
@@ -774,6 +785,7 @@ const MODULOS = {
       {id:"metas", nome:"Metas"},
       {id:"contas", nome:"Financeiro"},
       {id:"compras", nome:"Compras"},
+      {id:"mercado", nome:"Lista de Mercado"},
       {id:"estudos", nome:"Estudos"},
     ]},
   ]
@@ -896,6 +908,7 @@ const NOMES_TELA = {
   contas:["Financeiro Pessoal","Separado da Consultoria"],
   menu_pessoal:["Vida Pessoal","Escolha uma área no menu"],
   compras:["Compras","Sua lista"],
+  mercado:["Lista de Mercado","Itens para comprar no mercado"],
   estudos:["Estudos","4 itens em andamento"],
 };
 
@@ -998,11 +1011,11 @@ function agendaHTML(){
     CATEGORIAS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot" style="background:${t.cor}"></span>${t.nome}</div>`).join('') +
     `</div>`;
   const filtros=`<div class="agenda-filtros"><strong style="font-size:11px;padding:6px 2px">Exibir:</strong>${Object.entries({prazo:'Prazos',vencimento:'Vencimentos',treinamento:'Treinamentos',conteudo:'Conteúdo'}).map(([id,nome])=>`<button class="agenda-filtro ${CAMADAS_AGENDA[id]?'':'off'}" onclick="alternarCamadaAgenda('${id}')"><span style="color:${CORES_CAMADAS[id]}">●</span> ${nome}</button>`).join('')}</div>`;
-  const abas = `<div class="etapa-tabs" style="margin:0 0 16px;">
+  const abas = `<div class="agenda-view-switch">
       <button class="${visaoAgenda==='semana'?'active':''}" onclick="mudarVisaoAgenda('semana')">Semana</button>
       <button class="${visaoAgenda==='mes'?'active':''}" onclick="mudarVisaoAgenda('mes')">Mês / Calendário</button>
     </div>`;
-  return legenda + filtros + abas + (visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
+  return `<section class="agenda-hero"><div class="agenda-hero-top"><div class="agenda-hero-title"><div class="agenda-icon">▦</div><div><strong>Minha agenda</strong><span>Compromissos, prazos e vencimentos em um só lugar</span></div></div>${abas}</div><div class="agenda-hero-details"><div><div class="agenda-hero-label">Categorias</div>${legenda}</div><div><div class="agenda-hero-label">Camadas inteligentes</div>${filtros}</div></div></section>` + (visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
 }
 
 function agendaSemanaHTML(){
@@ -1010,14 +1023,7 @@ function agendaSemanaHTML(){
   const diasDaSemana = Array.from({length:7}, (_,i)=> addDias(domingo, i));
   const rotulo = formatoBR(diasDaSemana[0]) + ' – ' + formatoBR(diasDaSemana[6]) + '/' + diasDaSemana[6].getFullYear();
 
-  let nav = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-      <div style="display:flex;gap:6px;align-items:center;">
-        <button class="btn-secundario" onclick="irSemana(-1)">← Semana anterior</button>
-        <button class="btn-secundario" onclick="irSemanaHoje()">Hoje</button>
-        <button class="btn-secundario" onclick="irSemana(1)">Próxima semana →</button>
-      </div>
-      <div style="font-weight:600;font-size:13px;">${rotulo}</div>
-    </div>`;
+  let nav = `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irSemana(-1)" title="Semana anterior">‹</button><button class="agenda-hoje" onclick="irSemanaHoje()">Hoje</button></div><div class="agenda-periodo-label">${rotulo}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irSemana(1)" title="Próxima semana">›</button></div></div>`;
 
   const inteligentes=itensCalendarioInteligente();
   const faixa=`<div class="planner-scroll"><div class="agenda-dia-inteiro"><div class="label">Dia inteiro</div>${diasDaSemana.map(d=>{const iso=formatoISO(d);return `<div>${inteligentes.filter(i=>i.dataISO===iso).map(i=>`<span class="prazo-chip ${i.tipo}" title="Registro original — não é uma cópia">${i.titulo}${i.clienteId?' · '+(CLIENTES.find(c=>c.id===i.clienteId)?.nome||''):''}</span>`).join('')}</div>`}).join('')}</div></div>`;
@@ -1068,11 +1074,7 @@ function agendaMesHTML(){
   const primeiroDiaSemana = baseMes.getDay();
   const diasNoMes = new Date(baseMes.getFullYear(), baseMes.getMonth()+1, 0).getDate();
 
-  let nav = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <button class="btn-secundario" onclick="irMes(-1)">← Mês anterior</button>
-      <div style="font-family:'Fraunces',serif;font-size:16px;">${nomeMes}</div>
-      <button class="btn-secundario" onclick="irMes(1)">Próximo mês →</button>
-    </div>`;
+  let nav = `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irMes(-1)" title="Mês anterior">‹</button></div><div class="agenda-periodo-label">${nomeMes}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irMes(1)" title="Próximo mês">›</button></div></div>`;
 
   let celulas = '';
   for(let i=0;i<primeiroDiaSemana;i++) celulas += `<div></div>`;
@@ -3415,6 +3417,43 @@ function comprasHTML(){
     </div>`;
 }
 
+let LISTA_MERCADO = [];
+function textoHTML(valor){return String(valor??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function carregarMercadoSupabase(){
+  const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lista_mercado').select('*').eq('user_id',user.id).order('comprado').order('criado_em');
+  if(error){dispararAutomacao('Erro ao carregar lista de mercado',error.message);return;}
+  LISTA_MERCADO=data||[];
+}
+async function adicionarItemMercado(){
+  const campo=document.getElementById('novoItemMercado'),campoQtd=document.getElementById('quantidadeMercado');
+  const item=campo?.value.trim(),quantidade=campoQtd?.value.trim();if(!item)return;
+  const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lista_mercado').insert({user_id:user.id,item,quantidade:quantidade||null}).select().single();
+  if(error){dispararAutomacao('Erro ao adicionar item',error.message);return;}
+  LISTA_MERCADO.push(data);dispararAutomacao('Item adicionado ao mercado',item);renderTela();
+}
+async function alternarItemMercado(id){
+  const item=LISTA_MERCADO.find(x=>x.id===id);if(!item)return;const comprado=!item.comprado;
+  const {error}=await supa.from('lista_mercado').update({comprado,atualizado_em:new Date().toISOString()}).eq('id',id);
+  if(error){dispararAutomacao('Erro ao atualizar item',error.message);return;}item.comprado=comprado;renderTela();
+}
+async function excluirItemMercado(id){
+  const item=LISTA_MERCADO.find(x=>x.id===id);if(!item||!confirm(`Excluir “${item.item}” da lista de mercado?`))return;
+  const {error}=await supa.from('lista_mercado').delete().eq('id',id);if(error){dispararAutomacao('Erro ao excluir item',error.message);return;}
+  LISTA_MERCADO=LISTA_MERCADO.filter(x=>x.id!==id);renderTela();
+}
+async function limparCompradosMercado(){
+  const ids=LISTA_MERCADO.filter(x=>x.comprado).map(x=>x.id);if(!ids.length||!confirm(`Excluir ${ids.length} item(ns) já comprado(s)?`))return;
+  const {error}=await supa.from('lista_mercado').delete().in('id',ids);if(error){dispararAutomacao('Erro ao limpar comprados',error.message);return;}
+  LISTA_MERCADO=LISTA_MERCADO.filter(x=>!x.comprado);renderTela();
+}
+function linhaMercadoHTML(item){return `<div class="compra-item ${item.comprado?'feito':''}" onclick="alternarItemMercado('${item.id}')"><input type="checkbox" ${item.comprado?'checked':''} onclick="event.stopPropagation();alternarItemMercado('${item.id}')"><span>${textoHTML(item.item)}</span>${item.quantidade?`<span class="mercado-item-qtd">${textoHTML(item.quantidade)}</span>`:''}<button onclick="event.stopPropagation();excluirItemMercado('${item.id}')" title="Excluir" style="margin-left:auto;color:#B0413E;font-size:15px">🗑</button></div>`;}
+function formularioMercadoHTML(){return `<div class="mercado-add"><input id="novoItemMercado" placeholder="O que precisa comprar?" onkeydown="if(event.key==='Enter')adicionarItemMercado()"><input id="quantidadeMercado" placeholder="Qtd. (opcional)" onkeydown="if(event.key==='Enter')adicionarItemMercado()"><button onclick="adicionarItemMercado()">+ Adicionar</button></div>`;}
+function mercadoHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado),comprados=LISTA_MERCADO.filter(x=>x.comprado);return `<div class="card"><div class="mercado-resumo"><span>${pendentes.length} para comprar</span><span>${comprados.length} comprado(s)</span></div>${formularioMercadoHTML()}${pendentes.map(linhaMercadoHTML).join('')}${comprados.map(linhaMercadoHTML).join('')||(!pendentes.length?'<div class="mercado-vazio">Sua lista está vazia. Adicione o primeiro item acima.</div>':'')}${comprados.length?`<div class="mercado-acoes"><button class="btn-secundario" style="color:#B0413E" onclick="limparCompradosMercado()">Limpar comprados</button></div>`:''}</div>`;}
+function abrirListaMercado(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='mercado';salvarTelaAtualSessao();renderSidebar();renderTela();}
+function mercadoDashboardHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado);return `<div class="card"><h3>Lista de mercado <button onclick="abrirListaMercado()">abrir lista</button></h3><div class="pend-num">${pendentes.length}</div><div class="pend-desc">item(ns) para comprar</div><div class="mercado-dashboard-lista">${pendentes.slice(0,5).map(linhaMercadoHTML).join('')||'<div class="mercado-vazio">Lista de mercado em dia.</div>'}</div>${formularioMercadoHTML()}</div>`;}
+
 function devocionalHTML(){
   return `
     <div class="devocional-card">
@@ -4338,6 +4377,8 @@ function renderTela(){
     document.getElementById('conteudoTela').innerHTML = contasHTML();
   } else if(telaAtual === 'compras'){
     document.getElementById('conteudoTela').innerHTML = comprasHTML();
+  } else if(telaAtual === 'mercado'){
+    document.getElementById('conteudoTela').innerHTML = mercadoHTML();
   } else if(telaAtual === 'configuracoes'){
     document.getElementById('conteudoTela').innerHTML = configuracoesHTML();
   } else {
@@ -4428,6 +4469,8 @@ function dashboardHTML(){
         ${listaPendenciasResumo.length===0 ? `<li style="color:var(--cor-texto-suave);">Tudo em dia 🎉</li>` : ''}
       </ul>
     </div>
+
+    ${mercadoDashboardHTML()}
 
     <div class="card">
       <h3>Entregas <button onclick="irPara('entregas')">ver tudo</button></h3>
@@ -4697,6 +4740,7 @@ async function entrarNoApp(){
   await carregarMetasPessoaisSupabase();
   await carregarContasPessoaisSupabase();
   await carregarComprasSupabase();
+  await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();
   await carregarCicloSupabase();
   await carregarPixelSupabase();

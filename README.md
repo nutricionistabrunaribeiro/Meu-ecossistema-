@@ -63,6 +63,15 @@ conectado ao Supabase e preparado para instalação como PWA.
 - o Dashboard considera a meta fixa da contratante: 12 visitas por semana e 48 por mês;
 - cada visita Saber Nutrir concluída na Agenda abate uma unidade dessa meta.
 
+## Rodada V19 — Agenda visual e Lista de Mercado
+
+- topo da Agenda redesenhado, responsivo e organizado em categorias, camadas e modos de visualização;
+- navegação semanal e mensal mais compacta, preservando todos os compromissos e controles existentes;
+- Lista de Mercado separada da lista de compras geral;
+- inclusão de item e quantidade opcional, marcação, desmarcação, exclusão e limpeza dos comprados;
+- resumo e operação rápida da Lista de Mercado no Dashboard geral;
+- persistência privada no Supabase, vinculada ao usuário autenticado.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
