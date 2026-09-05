@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-ecossistema-v17';
+const CACHE_NAME = 'meu-ecossistema-v18';
 const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', event => {

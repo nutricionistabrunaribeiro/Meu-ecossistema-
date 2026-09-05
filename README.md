@@ -56,6 +56,13 @@ conectado ao Supabase e preparado para instalação como PWA.
 - resumo das entregas abertas, clientes pendentes e próximos prazos no Dashboard;
 - apenas comandos e acompanhamento: nenhum arquivo é armazenado no aplicativo.
 
+## Rodada V18 — Meta fixa de visitas Saber Nutrir
+
+- a frequência individual dos estabelecimentos permanece apenas como referência operacional;
+- a meta pessoal da Saber Nutrir não é mais calculada pela soma dos 28 vinculados;
+- o Dashboard considera a meta fixa da contratante: 12 visitas por semana e 48 por mês;
+- cada visita Saber Nutrir concluída na Agenda abate uma unidade dessa meta.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
