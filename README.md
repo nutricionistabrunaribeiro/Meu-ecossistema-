@@ -3,6 +3,15 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V28 — Linha Editorial
+
+- biblioteca editorial dentro do Marketing com 24 pautas completas;
+- pilares de Segurança dos Alimentos, Higiene e BPF, Fiscalização, Bastidores, Gestão e Produtos/Rotulagem;
+- objetivo, formato, gancho, roteiro e CTA em cada pauta;
+- filtros por pilar, criação, edição e exclusão de pautas;
+- envio direto para o calendário editorial com escolha da data de publicação;
+- persistência real no Supabase pela tabela `linha_editorial`, protegida por RLS.
+
 ## Rodada V27 — Planejamento e Fechamento Mensal
 
 - Radar do mês no Dashboard e módulo Planejamento com navegação mensal;
