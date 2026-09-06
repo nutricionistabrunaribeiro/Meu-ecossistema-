@@ -3,6 +3,16 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V27 — Planejamento e Fechamento Mensal
+
+- Radar do mês no Dashboard e módulo Planejamento com navegação mensal;
+- calendário anual de datas relevantes para nutrição, segurança dos alimentos, higiene e saúde;
+- datas editáveis, ocultáveis e extensíveis, repetidas automaticamente nos próximos anos;
+- criação de pauta de Marketing a partir de uma data profissional;
+- rotinas semanais, mensais e anuais com baixa por ocorrência e histórico preservado;
+- fechamento mensal em tela e PDF, incluindo visitas, financeiro, checklists e todas as entregas Saber Nutrir, inclusive clientes sem visita.
+- três tabelas novas protegidas por RLS: `datas_profissionais`, `rotinas_recorrentes` e `rotina_execucoes`.
+
 ## Rodada V12 — Calendário Inteligente
 
 - seletor visual de datas com navegação por mês e ano;
