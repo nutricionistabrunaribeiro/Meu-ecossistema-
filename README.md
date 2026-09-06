@@ -3,6 +3,13 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V29 — Abertura do Planejamento
+
+- cálculo do Radar e do Fechamento tolerante a registros antigos ou campos vazios;
+- leitura independente dos checklists Saber Nutrir, sem bloquear a montagem da página;
+- tratamento visual de recuperação caso a conexão seja interrompida durante a abertura;
+- cache do PWA atualizado para distribuir a correção imediatamente.
+
 ## Rodada V28 — Linha Editorial
 
 - biblioteca editorial dentro do Marketing com 24 pautas completas;
