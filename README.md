@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V31 — Planejamento conectado aos dados reais
+
+- sincronização do Planejamento com Agenda, Clientes, Checklists, Entregas, Obrigações e Financeiro a cada abertura;
+- Radar e Fechamento usando as mesmas informações já cadastradas nos módulos originais;
+- Rotinas automáticas para visitas Saber Nutrir, envios mensais, entregas e obrigações recorrentes;
+- rotinas manuais preservadas separadamente, sem exigir recadastro das rotinas do sistema;
+- cache V31 para distribuição da integração corrigida.
+
 ## Correção V30 — Carregamento isolado do Planejamento
 
 - abertura da estrutura da página separada dos cálculos dos indicadores;
