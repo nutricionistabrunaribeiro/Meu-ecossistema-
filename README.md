@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V30 — Carregamento isolado do Planejamento
+
+- abertura da estrutura da página separada dos cálculos dos indicadores;
+- carregamento independente das abas Radar, Datas, Rotinas e Fechamento;
+- falha em um indicador não deixa mais a página inteira vazia;
+- alternativa visual para atualizar os dados ou acessar outra aba;
+- cache V30 para substituir a versão anterior no PWA.
+
 ## Correção V29 — Abertura do Planejamento
 
 - cálculo do Radar e do Fechamento tolerante a registros antigos ou campos vazios;
