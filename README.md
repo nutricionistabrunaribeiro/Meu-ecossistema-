@@ -3,6 +3,16 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V34 — Contas a pagar no Dashboard
+
+- card de Contas a pagar conectado às despesas do Financeiro Pessoal;
+- exibição de descrição, vencimento, valor e alerta por período;
+- destaque para contas atrasadas, vencendo hoje, em 7 dias e em 30 dias;
+- baixa rápida pelo Dashboard, preservando o lançamento no histórico;
+- atalhos para cadastrar uma conta e abrir a lista completa;
+- contas vencidas incluídas no aviso principal do Dashboard;
+- cache atualizado para V34.
+
 ## Correção V33 — Cálculo das ocorrências
 
 - corrigida a variável usada para gerar os dias das rotinas recorrentes;

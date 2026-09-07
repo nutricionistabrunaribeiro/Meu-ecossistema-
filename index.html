@@ -3458,6 +3458,14 @@ async function darBaixaContaPessoal(id){
   if(error){ l.status='aberto'; l.dataPagamentoISO=null; renderTela(); dispararAutomacao('Erro ao dar baixa', error.message); return; }
   dispararAutomacao('Lançamento pessoal efetivado', l.desc);
 }
+function diasParaVencimentoConta(iso){if(!iso)return null;const hoje=new Date();hoje.setHours(0,0,0,0);const venc=dataISOParaLocal(iso);return venc?Math.round((venc-hoje)/86400000):null;}
+function rotuloPrazoConta(l){const dias=diasParaVencimentoConta(l.vencimentoISO);if(dias===null)return {texto:'Sem data',cor:'var(--cor-texto-suave)'};if(dias<0)return {texto:`Atrasada há ${Math.abs(dias)} dia${Math.abs(dias)!==1?'s':''}`,cor:'#B0413E'};if(dias===0)return {texto:'Vence hoje',cor:'#E36216'};if(dias<=7)return {texto:`Vence em ${dias} dia${dias!==1?'s':''}`,cor:'#E36216'};if(dias<=30)return {texto:`Vence em ${dias} dias`,cor:'#9A7518'};return {texto:dataBR(l.vencimentoISO),cor:'var(--cor-texto-suave)'};}
+function abrirContasPagar(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='contas';filtroContasPessoais='contas_pagar';salvarTelaAtualSessao();renderSidebar();renderTela();}
+function contasPagarDashboardHTML(){
+  const abertas=(Array.isArray(CONTAS_PESSOAIS)?CONTAS_PESSOAIS:[]).filter(l=>l.tipo==='despesa'&&l.status!=='pago').sort((a,b)=>(a.vencimentoISO||'9999').localeCompare(b.vencimentoISO||'9999'));
+  const vencidas=abertas.filter(l=>(diasParaVencimentoConta(l.vencimentoISO)??9999)<0),proximas30=abertas.filter(l=>{const d=diasParaVencimentoConta(l.vencimentoISO);return d!==null&&d>=0&&d<=30}),total30=[...vencidas,...proximas30].reduce((s,l)=>s+Number(l.valor||0),0);
+  return `<div class="card" style="border-top:4px solid var(--cor-acento)"><h3>Contas a pagar <button onclick="abrirContasPagar()">ver todas</button></h3><div style="display:flex;gap:18px;align-items:end;margin-bottom:12px"><div><div class="pend-num">${abertas.length}</div><div class="pend-desc">contas em aberto</div></div><div><strong style="font-size:15px;color:var(--cor-acento)">${formatarMoeda(total30)}</strong><div class="pend-desc">vencidas ou nos próximos 30 dias</div></div></div>${abertas.slice(0,5).map(l=>{const p=rotuloPrazoConta(l);return `<div class="item-lista-simples"><button onclick="darBaixaContaPessoal('${l.id}')" title="Marcar como paga" style="width:25px;height:25px;border:1.5px solid var(--cor-primaria);border-radius:7px;color:var(--cor-primaria);flex-shrink:0">✓</button><div style="flex:1"><strong>${l.desc}</strong><div style="font-size:10.5px;color:${p.cor}">${p.texto} · ${dataBR(l.vencimentoISO)}</div></div><strong style="font-size:11px">${formatarMoeda(l.valor)}</strong></div>`}).join('')||'<div style="font-size:12px;color:var(--cor-texto-suave)">Nenhuma conta em aberto. Tudo pago ✓</div>'}<button class="btn-secundario" style="margin-top:12px" onclick="novaContaPessoal('despesa')">+ Adicionar conta</button></div>`;
+}
 
 let LISTA_COMPRAS = [];
 async function carregarComprasSupabase(){
@@ -4594,7 +4602,8 @@ function dashboardHTML(){
   const resumoChecklistsSN=saberNutrir?resumoEnviosContratante(saberNutrir.id,mesAtual+'-01'):{total:0,enviados:0,pendentes:0};
   const pendenciasVencidas=PENDENCIAS_DB.filter(p=>p.origem==='manual'&&p.status!=='concluida'&&p.prazo&&p.prazo<hoje).length;
   const checklistsRascunho=VISITAS.filter(v=>v.status!=='concluida').length;
-  const atencaoAgora=proximoEvento?proximoEvento.titulo:pendenciasVencidas?pendenciasVencidas+' pendência(s) vencida(s)':entregasAtrasadas?entregasAtrasadas+' entrega(s) atrasada(s)':'Seu dia está organizado';
+  const contasVencidas=CONTAS_PESSOAIS.filter(l=>l.tipo==='despesa'&&l.status!=='pago'&&(diasParaVencimentoConta(l.vencimentoISO)??0)<0).length;
+  const atencaoAgora=proximoEvento?proximoEvento.titulo:pendenciasVencidas?pendenciasVencidas+' pendência(s) vencida(s)':entregasAtrasadas?entregasAtrasadas+' entrega(s) atrasada(s)':contasVencidas?contasVencidas+' conta(s) vencida(s)':'Seu dia está organizado';
 
   return `
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${pendenciasVencidas}</strong><span>pendências vencidas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
@@ -4634,6 +4643,8 @@ function dashboardHTML(){
     </div>
 
     ${mercadoDashboardHTML()}
+
+    ${contasPagarDashboardHTML()}
 
     <div class="card">
       <h3>Entregas <button onclick="irPara('entregas')">ver tudo</button></h3>
