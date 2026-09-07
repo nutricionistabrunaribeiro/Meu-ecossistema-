@@ -7,9 +7,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
 <meta name="theme-color" content="#72BD88">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -682,10 +682,11 @@
   .login-aviso{font-size:10.5px;color:var(--cor-texto-suave);text-align:center;margin-top:18px;line-height:1.5;}
   #appRoot{display:none;width:100%;min-height:100vh;min-height:100dvh;}
   #appRoot.ativo{display:flex;}
+.btn-instalar-app{display:none;align-items:center;gap:6px;background:var(--cor-primaria);color:#fff;padding:9px 12px;border-radius:10px;font-size:11px;font-weight:700;box-shadow:0 5px 14px rgba(78,134,95,.18)}.btn-instalar-app.visivel{display:flex}
 .plan-mes{display:flex;align-items:center;justify-content:center;gap:18px;background:#fff;border:1px solid var(--cor-borda);border-radius:18px;padding:13px;margin-bottom:12px}.plan-mes button{width:38px;height:38px;border-radius:12px;background:#F4F7F2;color:var(--cor-primaria);font-size:20px}.plan-mes strong{min-width:190px;text-align:center;font-family:Georgia,serif;font-size:20px;color:var(--cor-primaria)}
 .plan-tabs{display:flex;gap:8px;overflow:auto;padding:3px 0 15px}.plan-tabs button{white-space:nowrap;padding:9px 14px;border:1px solid var(--cor-borda);background:#fff;border-radius:999px;font-size:12px}.plan-tabs button.active{background:var(--cor-primaria);color:#fff;border-color:var(--cor-primaria)}
 .plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.plan-hero{grid-column:1/-1;padding:22px;border-radius:22px;color:#fff;background:linear-gradient(135deg,var(--cor-primaria),#4A8D61 64%,var(--cor-acento))}.plan-hero small{letter-spacing:1.5px;opacity:.8}.plan-hero h2{font-family:Georgia,serif;font-size:25px;margin:7px 0}.plan-hero p{margin:0;max-width:620px;opacity:.85}.plan-card{background:#fff;border:1px solid var(--cor-borda);border-radius:18px;padding:17px;display:flex;flex-direction:column;min-height:118px}.plan-card span,.plan-card small{color:var(--cor-texto-suave);font-size:11px}.plan-card strong{font-family:Georgia,serif;font-size:27px;color:var(--cor-primaria);margin:auto 0 3px}.plan-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.plan-actions span{font-size:11px;color:var(--cor-texto-suave)}.plan-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fff;border:1px solid var(--cor-borda);border-radius:15px;padding:11px 13px;margin-bottom:8px}.plan-row small{display:block;margin-top:3px;color:var(--cor-texto-suave);font-size:10.5px}.plan-date{width:48px;height:48px;border-radius:13px;background:#EDF7F0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--cor-primaria)}.plan-date b{font-size:18px}.plan-date span{font-size:9px;text-transform:uppercase}.plan-row-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.plan-row-actions button{font-size:10px;padding:6px 8px;border-radius:8px;background:#F4F5F1}.plan-off{opacity:.48}.plan-check{width:34px;height:34px;border-radius:10px;border:2px solid var(--cor-primaria);color:#fff}.plan-check.ok{background:var(--cor-primaria)}
-@media(max-width:760px){.plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-row{grid-template-columns:auto 1fr}.plan-row-actions{grid-column:1/-1;justify-content:flex-start}.plan-hero h2{font-size:21px}}@media(max-width:430px){.plan-grid{grid-template-columns:1fr}.plan-mes strong{min-width:140px;font-size:17px}}
+@media(max-width:760px){.plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-row{grid-template-columns:auto 1fr}.plan-row-actions{grid-column:1/-1;justify-content:flex-start}.plan-hero h2{font-size:21px}.btn-instalar-app{padding:8px 10px;font-size:10px}}@media(max-width:430px){.plan-grid{grid-template-columns:1fr}.plan-mes strong{min-width:140px;font-size:17px}.status-conexao{display:none}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -733,6 +734,7 @@
       </div>
     </div>
     <div class="top-actions">
+      <button class="btn-instalar-app" id="btnInstalarApp" onclick="instalarMeuEcossistema()">▣ Instalar aplicativo</button>
       <div class="status-conexao" id="statusConexao" title="Indica se os dados podem ser sincronizados com o Supabase"><span class="bolinha"></span><span class="txt">Verificando banco…</span></div>
       <div class="avatar">BR</div>
     </div>
@@ -4950,6 +4952,15 @@ async function sairDaConta(){
   telaLoginNormal();
 }
 
+let eventoInstalacaoPWA=null;
+function appEstaInstalado(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+function atualizarBotaoInstalacao(){const b=document.getElementById('btnInstalarApp');if(!b)return;const celular=window.matchMedia('(max-width: 760px)').matches||/Android|iPhone|iPad/i.test(navigator.userAgent);b.classList.toggle('visivel',celular&&!appEstaInstalado());}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();eventoInstalacaoPWA=e;atualizarBotaoInstalacao();});
+window.addEventListener('appinstalled',()=>{eventoInstalacaoPWA=null;atualizarBotaoInstalacao();dispararAutomacao('Meu Ecossistema instalado','O ícone já está disponível na tela do celular.');});
+async function instalarMeuEcossistema(){
+  if(eventoInstalacaoPWA){eventoInstalacaoPWA.prompt();const escolha=await eventoInstalacaoPWA.userChoice;if(escolha.outcome==='accepted')eventoInstalacaoPWA=null;atualizarBotaoInstalacao();return;}
+  abrirModalSistema(`<div class="system-modal-top"><div><h3>Instalar Meu Ecossistema</h3><p>Coloque o ícone diretamente na tela do celular.</p></div><button onclick="fecharModalSistema()">✕</button></div><div style="font-size:13px;line-height:1.65"><p><strong>Se você abriu pelo WhatsApp:</strong></p><p>1. Toque nos três pontos do navegador.<br>2. Escolha <strong>Abrir no Chrome</strong>.<br>3. No Chrome, toque novamente nos três pontos.<br>4. Entre em <strong>Instalar e criar atalho</strong>.<br>5. Toque em <strong>Instalar</strong> ou <strong>Criar atalho</strong>.</p><p style="margin-top:12px;color:var(--cor-texto-suave)">O navegador interno do WhatsApp não oferece a instalação completa do aplicativo.</p></div>`);
+}
 async function iniciarApp(){
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
@@ -4958,6 +4969,7 @@ async function iniciarApp(){
   atualizarStatusConexao();
   renderSidebar();
   renderTela();
+  atualizarBotaoInstalacao();
   const { data: { session } } = await supa.auth.getSession();
   if(session){
     entrarNoApp();

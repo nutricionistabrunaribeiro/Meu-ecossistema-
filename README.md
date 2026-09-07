@@ -3,6 +3,15 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V35 — Instalação no celular
+
+- caminhos dos ícones 192×192 e 512×512 corrigidos no manifest, favicon e service worker;
+- ícones declarados também como `maskable` para launchers Android;
+- botão visual “Instalar aplicativo” exibido no celular quando ainda não estiver instalado;
+- acionamento do instalador nativo do Chrome quando disponível;
+- instruções específicas quando o link for aberto pelo navegador interno do WhatsApp;
+- cache atualizado para V35.
+
 ## Rodada V34 — Contas a pagar no Dashboard
 
 - card de Contas a pagar conectado às despesas do Financeiro Pessoal;
