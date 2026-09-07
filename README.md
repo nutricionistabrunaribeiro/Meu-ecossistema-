@@ -3,6 +3,20 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V37 — Chegar leve aos 38
+
+- projeto pessoal temporário criado dentro do módulo persistente de Projetos;
+- 57 missões iniciais divididas em Casa, Trabalho, Pessoal e Preparação da Folga;
+- datas editáveis, inclusão, edição, conclusão, reabertura e exclusão de missões;
+- progresso automático, próxima missão e contagem regressiva local até 07/10/2026;
+- card responsivo no Dashboard Pessoal durante a preparação;
+- Modo Folga automático entre 07/10 e 12/10, sem exibição de tarefas;
+- retirada automática do card em 13/10, mantendo o projeto no histórico;
+- missões de Trabalho podem ser vinculadas a Entregas existentes sem duplicação;
+- Projetos de clientes e projetos pessoais permanecem visualmente separados;
+- RLS do módulo de Projetos atualizado para isolamento por usuária;
+- cache atualizado para V37.
+
 ## Correção V36 — Lista completa de clientes
 
 - novo seletor visual de clientes com pesquisa e rolagem, sem o corte da caixa numerada do navegador;

@@ -423,6 +423,9 @@
   .etapa-check-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 0;cursor:pointer;}
   .etapa-check-item input{accent-color:var(--cor-primaria);}
   .etapa-check-item.done{color:var(--cor-texto-suave);text-decoration:line-through;}
+  .projeto-pessoal-hero{position:relative;overflow:hidden;background:linear-gradient(125deg,var(--cor-acento),#F08A46 62%,var(--cor-primaria) 145%);color:#fff;border-radius:22px;padding:23px;margin-bottom:18px;box-shadow:0 16px 36px rgba(227,98,22,.16)}
+  .projeto-pessoal-hero:after{content:"";position:absolute;width:200px;height:200px;border:38px solid rgba(255,255,255,.08);border-radius:50%;right:-92px;top:-112px}.projeto-pessoal-hero>*{position:relative;z-index:1}.projeto-pessoal-eyebrow{font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;opacity:.78}.projeto-pessoal-hero h2{font-family:'Fraunces',serif;font-size:25px;margin:5px 0}.projeto-pessoal-contagem{font-size:13px;opacity:.88}.projeto-pessoal-barra{height:9px;background:rgba(255,255,255,.25);border-radius:12px;overflow:hidden;margin:18px 0 10px}.projeto-pessoal-barra div{height:100%;background:#fff;border-radius:12px}.projeto-pessoal-resumo{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11.5px}.projeto-pessoal-missao{margin-top:16px;padding:13px 14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:13px}.projeto-pessoal-missao small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.08em;opacity:.72;margin-bottom:4px}.projeto-pessoal-missao strong{font-size:13px}.projeto-pessoal-abrir{margin-top:14px;background:#fff;color:var(--cor-acento);padding:9px 13px;border-radius:10px;font-size:11.5px;font-weight:800}
+  .projeto-meta-pessoal{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 18px}.projeto-meta-pessoal span{padding:6px 9px;background:var(--cor-fundo);border-radius:20px;font-size:10.5px;color:var(--cor-texto-suave)}.item-projeto-info{display:block;font-size:10px;color:var(--cor-texto-suave);margin-top:2px;text-decoration:none}.item-projeto-acoes{display:flex;align-items:center;gap:5px;flex-shrink:0}.item-projeto-acoes button{font-size:10px;color:var(--cor-primaria);padding:3px}.projeto-status-pill{display:inline-flex;padding:4px 9px;border-radius:20px;background:#E8F3EA;color:#356849;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 
   /* Modulo Marketing */
   .mkt-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
@@ -654,7 +657,7 @@
     .grid{grid-template-columns:1fr;}
     .conteudo-full,.rapidos{grid-column:1/-1;}
     .search{width:120px;}
-    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}
+    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}
     .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto 1fr auto}.agenda-periodo-label{font-size:13px}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:1fr 88px}.mercado-add button{grid-column:1/-1}
   }
   /* Telas curtas (celular deitado) — reduz espaçamentos verticais pra caber tudo sem cortar */
@@ -790,6 +793,7 @@ const MODULOS = {
   ],
   pessoal: [
     {grupo:"Vida Pessoal", itens:[
+      {id:"projetos", nome:"Projetos"},
       {id:"habitos", nome:"Hábitos"},
       {id:"ciclo", nome:"Ciclo Menstrual"},
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
@@ -2847,25 +2851,31 @@ async function carregarProjetosSupabase(){
   const { data: etapasRows } = await supa.from('etapas_projeto').select('*').order('ordem');
   const { data: checklistRows } = await supa.from('checklist_etapa_projeto').select('*');
   PROJETOS = (projetosRows||[]).map(p=>({
-    id: p.id, nome: p.nome, clienteId:p.cliente_id, cliente: p.clientes ? p.clientes.nome : "—",
+    id:p.id,nome:p.nome,clienteId:p.cliente_id,cliente:p.clientes?p.clientes.nome:null,categoria:p.categoria||'cliente',dataInicio:p.data_inicio||null,dataFim:p.data_fim||null,status:p.status||'ativo',
     etapas: (etapasRows||[]).filter(e=>e.projeto_id===p.id).map(e=>({
       id: e.id, nome: e.nome, ordem:e.ordem,
-      checklist: (checklistRows||[]).filter(c=>c.etapa_id===e.id).map(c=>({id:c.id, t:c.item, c:c.concluido}))
+      checklist: (checklistRows||[]).filter(c=>c.etapa_id===e.id).sort((a,b)=>(a.ordem||0)-(b.ordem||0)).map(c=>({id:c.id,t:c.item,c:c.concluido,dataInicio:c.data_inicio||null,dataFim:c.data_fim||null,ordem:c.ordem||0,entregaId:c.entrega_id||null,concluidoEm:c.concluido_em||null}))
     }))
   }));
+  await atualizarStatusProjetoTemporario();
 }
 async function novoProjeto(clienteId=null){
-  if(CLIENTES.length===0){ alert('Cadastre um cliente antes de criar um projeto.'); return; }
+  const pessoal=espacoAtual==='pessoal';
+  if(!pessoal&&CLIENTES.length===0){ alert('Cadastre um cliente antes de criar um projeto.'); return; }
   let clienteEscolhido = clienteId ? CLIENTES.find(c=>c.id===clienteId) : null;
-  if(!clienteEscolhido){
+  if(!pessoal&&!clienteEscolhido){
     clienteEscolhido=await selecionarClientesVisual({titulo:'Cliente do projeto'});
     if(!clienteEscolhido)return;
   }
   const nome = prompt("Nome do projeto:");
   if(!nome || !nome.trim()) return;
-  const { data, error } = await supa.from('projetos').insert({nome: nome.trim(), cliente_id: clienteEscolhido.id}).select().single();
+  let dataInicio=null,dataFim=null;
+  if(pessoal){dataInicio=await selecionarDataVisual({titulo:'Data inicial do projeto',opcional:true});if(dataInicio===null)return;dataFim=await selecionarDataVisual({titulo:'Data final do projeto',valor:dataInicio,opcional:true});if(dataFim===null)return;}
+  const {data:{user}}=await supa.auth.getUser();
+  const { data, error } = await supa.from('projetos').insert({user_id:user.id,nome:nome.trim(),cliente_id:clienteEscolhido?.id||null,categoria:pessoal?'pessoal':'cliente',data_inicio:dataInicio,data_fim:dataFim}).select().single();
   if(error){ dispararAutomacao('Erro ao criar projeto', error.message); return; }
-  const etapasPayload = ETAPAS_PADRAO_PROJETO.map((et,idx)=>({projeto_id:data.id, nome:et.nome, ordem:idx+1}));
+  const modeloEtapas=pessoal?[{nome:'Planejamento',itens:[]}]:ETAPAS_PADRAO_PROJETO;
+  const etapasPayload = modeloEtapas.map((et,idx)=>({user_id:user.id,projeto_id:data.id, nome:et.nome, ordem:idx+1}));
   const { data: etapasCriadas, error: erroEtapas } = await supa.from('etapas_projeto').insert(etapasPayload).select();
   if(erroEtapas){
     await supa.from('projetos').delete().eq('id', data.id);
@@ -2873,8 +2883,8 @@ async function novoProjeto(clienteId=null){
     return;
   }
   const itensPayload = etapasCriadas.flatMap(etapa=>{
-    const modelo = ETAPAS_PADRAO_PROJETO.find(x=>x.nome===etapa.nome);
-    return (modelo?.itens || []).map(item=>({etapa_id:etapa.id, item, concluido:false}));
+    const modelo = modeloEtapas.find(x=>x.nome===etapa.nome);
+    return (modelo?.itens || []).map((item,ordem)=>({user_id:user.id,etapa_id:etapa.id,item,concluido:false,ordem:ordem+1}));
   });
   const { data: itensCriados, error: erroItens } = await supa.from('checklist_etapa_projeto').insert(itensPayload).select();
   if(erroItens){
@@ -2886,7 +2896,7 @@ async function novoProjeto(clienteId=null){
     id:et.id, nome:et.nome,
     checklist:(itensCriados||[]).filter(i=>i.etapa_id===et.id).map(i=>({id:i.id,t:i.item,c:i.concluido}))
   }));
-  PROJETOS.push({id: data.id, nome: nome.trim(), clienteId:clienteEscolhido.id, cliente: clienteEscolhido.nome, etapas: etapasTela});
+  PROJETOS.push({id:data.id,nome:nome.trim(),clienteId:clienteEscolhido?.id||null,cliente:clienteEscolhido?.nome||null,categoria:pessoal?'pessoal':'cliente',dataInicio,dataFim,status:'ativo',etapas:etapasTela});
   dispararAutomacao('Projeto criado', nome.trim());
   renderTela();
 }
@@ -2904,12 +2914,14 @@ async function alternarChecklistProjeto(projId, etapaId, idx){
   const p = PROJETOS.find(x=>x.id===projId);
   const et = p.etapas.find(e=>e.id===etapaId);
   et.checklist[idx].c = !et.checklist[idx].c;
+  et.checklist[idx].concluidoEm=et.checklist[idx].c?new Date().toISOString():null;
   const todosFeitos = et.checklist.every(i=>i.c);
   if(todosFeitos && et.checklist.length>0){
     dispararAutomacao('Etapa de projeto concluída', `"${et.nome}" — ${p.nome}. Progresso do projeto atualizado.`);
   }
   renderTela();
-  await supa.from('checklist_etapa_projeto').update({concluido: et.checklist[idx].c}).eq('id', et.checklist[idx].id);
+  const {error}=await supa.from('checklist_etapa_projeto').update({concluido:et.checklist[idx].c,concluido_em:et.checklist[idx].concluidoEm,atualizado_em:new Date().toISOString()}).eq('id',et.checklist[idx].id);
+  if(error){et.checklist[idx].c=!et.checklist[idx].c;dispararAutomacao('Erro ao atualizar missão',error.message);renderTela();}
 }
 async function adicionarEtapaProjeto(projId){
   const p=PROJETOS.find(x=>x.id===projId);if(!p)return;
@@ -2919,12 +2931,32 @@ async function adicionarEtapaProjeto(projId){
   if(error){dispararAutomacao('Erro ao adicionar etapa',error.message);return;}
   p.etapas.push({id:data.id,nome:data.nome,ordem:data.ordem,checklist:[]});renderTela();
 }
+async function editarEtapaProjeto(projId,etapaId){const p=PROJETOS.find(x=>x.id===projId),et=p?.etapas.find(e=>e.id===etapaId);if(!et)return;const nome=prompt('Nome do grupo:',et.nome);if(!nome?.trim())return;const {error}=await supa.from('etapas_projeto').update({nome:nome.trim(),atualizado_em:new Date().toISOString()}).eq('id',etapaId);if(error){dispararAutomacao('Erro ao editar grupo',error.message);return;}et.nome=nome.trim();renderTela();}
 async function adicionarItemProjeto(projId,etapaId){
   const p=PROJETOS.find(x=>x.id===projId);const et=p?.etapas.find(e=>e.id===etapaId);if(!et)return;
   const item=prompt(`Novo item de "${et.nome}":`);if(!item?.trim())return;
-  const {data,error}=await supa.from('checklist_etapa_projeto').insert({etapa_id:etapaId,item:item.trim(),concluido:false}).select().single();
+  const dataInicio=await selecionarDataVisual({titulo:'Data inicial da missão',opcional:true});if(dataInicio===null)return;
+  const dataFim=dataInicio?await selecionarDataVisual({titulo:'Data final da missão',valor:dataInicio,opcional:true}):'';if(dataFim===null)return;
+  const {data:{user}}=await supa.auth.getUser();const ordem=Math.max(0,...et.checklist.map(i=>Number(i.ordem)||0))+1;
+  const {data,error}=await supa.from('checklist_etapa_projeto').insert({user_id:user.id,etapa_id:etapaId,item:item.trim(),concluido:false,data_inicio:dataInicio||null,data_fim:dataFim||dataInicio||null,ordem}).select().single();
   if(error){dispararAutomacao('Erro ao adicionar item',error.message);return;}
-  et.checklist.push({id:data.id,t:data.item,c:false});renderTela();
+  et.checklist.push({id:data.id,t:data.item,c:false,dataInicio:data.data_inicio,dataFim:data.data_fim,ordem:data.ordem,entregaId:null,concluidoEm:null});renderTela();
+}
+async function editarItemProjeto(projId,etapaId,itemId){
+  const p=PROJETOS.find(x=>x.id===projId),et=p?.etapas.find(e=>e.id===etapaId),item=et?.checklist.find(i=>i.id===itemId);if(!item)return;
+  const texto=prompt('Editar missão:',item.t);if(!texto?.trim())return;
+  const dataInicio=await selecionarDataVisual({titulo:'Data inicial da missão',valor:item.dataInicio,opcional:true});if(dataInicio===null)return;
+  const dataFim=dataInicio?await selecionarDataVisual({titulo:'Data final da missão',valor:item.dataFim||dataInicio,opcional:true}):'';if(dataFim===null)return;
+  const payload={item:texto.trim(),data_inicio:dataInicio||null,data_fim:dataFim||dataInicio||null,atualizado_em:new Date().toISOString()};
+  const {error}=await supa.from('checklist_etapa_projeto').update(payload).eq('id',itemId);if(error){dispararAutomacao('Erro ao editar missão',error.message);return;}
+  Object.assign(item,{t:payload.item,dataInicio:payload.data_inicio,dataFim:payload.data_fim});renderTela();
+}
+async function vincularEntregaItemProjeto(projId,etapaId,itemId){
+  const p=PROJETOS.find(x=>x.id===projId),et=p?.etapas.find(e=>e.id===etapaId),item=et?.checklist.find(i=>i.id===itemId);if(!item)return;
+  if(item.entregaId&&confirm('Remover o vínculo atual com a entrega?')){const {error}=await supa.from('checklist_etapa_projeto').update({entrega_id:null,atualizado_em:new Date().toISOString()}).eq('id',itemId);if(!error){item.entregaId=null;renderTela();}return;}
+  if(!ENTREGAS.length){alert('Ainda não há entregas cadastradas. Crie a entrega primeiro no módulo Entregas.');return;}
+  const escolha=prompt(`Vincular a qual entrega?\n${ENTREGAS.map((e,i)=>`${i+1}. ${e.titulo} · ${dataBR(e.prazo)}`).join('\n')}\n\nDigite o número:`);const entrega=ENTREGAS[parseInt(escolha)-1];if(!entrega)return;
+  const {error}=await supa.from('checklist_etapa_projeto').update({entrega_id:entrega.id,atualizado_em:new Date().toISOString()}).eq('id',itemId);if(error){dispararAutomacao('Erro ao vincular entrega',error.message);return;}item.entregaId=entrega.id;renderTela();
 }
 async function excluirItemProjeto(projId,etapaId,itemId){
   const p=PROJETOS.find(x=>x.id===projId);const et=p?.etapas.find(e=>e.id===etapaId);const item=et?.checklist.find(i=>i.id===itemId);
@@ -2956,41 +2988,61 @@ function progressoProjeto(projeto){
   const feitos = projeto.etapas.reduce((s,e)=>s+e.checklist.filter(i=>i.c).length,0);
   return totalItens===0 ? 0 : Math.round((feitos/totalItens)*100);
 }
+const PROJETO_CHEGAR_LEVE='Chegar leve aos 38';
+function projetoChegarLeve(){return PROJETOS.find(p=>p.categoria==='pessoal'&&p.nome.toLocaleLowerCase('pt-BR')===PROJETO_CHEGAR_LEVE.toLocaleLowerCase('pt-BR'));}
+function itensProjeto(p){return p?.etapas.flatMap(e=>e.checklist.map(i=>({...i,grupo:e.nome,grupoOrdem:e.ordem||0,etapaId:e.id})))||[];}
+function periodoItemProjeto(i){if(!i.dataInicio&&!i.dataFim)return 'Sem data';const ini=i.dataInicio||i.dataFim,fim=i.dataFim||i.dataInicio;return ini===fim?dataBR(ini):`${dataBR(ini)} a ${dataBR(fim)}`;}
+function missaoAtualProjeto(p,hoje=formatoISO(new Date())){const pendentes=itensProjeto(p).filter(i=>!i.c);const ordem=(a,b)=>(a.dataInicio||a.dataFim||'9999-12-31').localeCompare(b.dataInicio||b.dataFim||'9999-12-31')||(a.grupoOrdem||0)-(b.grupoOrdem||0)||(a.ordem||0)-(b.ordem||0);return pendentes.filter(i=>(i.dataInicio||'0000-01-01')<=hoje&&(i.dataFim||i.dataInicio||'9999-12-31')>=hoje).sort(ordem)[0]||pendentes.filter(i=>(i.dataFim||i.dataInicio||'9999-12-31')<hoje).sort(ordem)[0]||pendentes.filter(i=>(i.dataInicio||i.dataFim||'9999-12-31')>hoje).sort(ordem)[0]||pendentes.sort(ordem)[0]||null;}
+function diasCalendarioEntre(inicio,fim){const [ai,mi,di]=inicio.split('-').map(Number),[af,mf,df]=fim.split('-').map(Number);return Math.max(0,Math.ceil((Date.UTC(af,mf-1,df)-Date.UTC(ai,mi-1,di))/86400000));}
+function faseProjetoTemporario(p,hoje=formatoISO(new Date())){if(!p)return 'ausente';if(hoje>='2026-10-13')return 'historico';if(hoje>='2026-10-07')return 'folga';return 'preparacao';}
+async function atualizarStatusProjetoTemporario(){const p=projetoChegarLeve(),hoje=formatoISO(new Date());if(p&&hoje>='2026-10-13'&&p.status==='ativo'){const {error}=await supa.from('projetos').update({status:'finalizado',atualizado_em:new Date().toISOString()}).eq('id',p.id);if(!error)p.status='finalizado';}}
+function abrirProjetoPessoal(id){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');projetoSelecionadoId=id;telaAtual='projetos';salvarTelaAtualSessao();renderSidebar();renderTela();}
+function cardProjetoTemporarioHTML(dataReferencia=null){
+  const p=projetoChegarLeve();if(!p)return '';const hoje=dataReferencia||formatoISO(new Date()),fase=faseProjetoTemporario(p,hoje);if(fase==='historico')return '';
+  if(fase==='folga')return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Chegar leve aos 38</div><h2>Modo Folga</h2><div class="projeto-pessoal-contagem">Você se preparou para esses dias. Agora aproveite.</div><div style="font-size:11px;opacity:.72;margin-top:10px">07 a 12 de outubro</div></section>`;
+  const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length,total=itens.length,perc=total?Math.round(feitos/total*100):0,missao=missaoAtualProjeto(p,hoje),dias=diasCalendarioEntre(hoje,'2026-10-07');
+  return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Projeto pessoal temporário</div><h2>Chegar leve aos 38</h2><div class="projeto-pessoal-contagem">${dias} ${dias===1?'dia':'dias'} para a folga</div><div class="projeto-pessoal-barra"><div style="width:${perc}%"></div></div><div class="projeto-pessoal-resumo"><span>${feitos} de ${total} etapas concluídas</span><strong>${perc}% concluído</strong></div><div class="projeto-pessoal-missao"><small>Missão de hoje</small><strong>${missao?textoHTML(missao.t):'Tudo concluído. Agora é só manter leve!'}</strong>${missao?`<div style="font-size:10px;opacity:.75;margin-top:3px">${textoHTML(missao.grupo)} · ${periodoItemProjeto(missao)}</div>`:''}</div><button class="projeto-pessoal-abrir" onclick="abrirProjetoPessoal('${p.id}')">Abrir projeto →</button></section>`;
+}
+function dashboardPessoalHTML(){return `${cardProjetoTemporarioHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
 
 function projetosHTML(){
   if(projetoSelecionadoId){
     return fichaProjetoHTML(PROJETOS.find(p=>p.id===projetoSelecionadoId));
   }
+  const projetos=PROJETOS.filter(p=>espacoAtual==='pessoal'?p.categoria==='pessoal':p.categoria!=='pessoal');
   return `
     <div class="projetos-topo">
-      <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${PROJETOS.length} projetos ativos</div>
+      <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${projetos.length} projeto(s) ${espacoAtual==='pessoal'?'pessoal(is)':'de clientes'}</div>
       <button class="btn-novo-projeto" onclick="novoProjeto()">+ Novo projeto</button>
     </div>
     <div class="projetos-grid">
-      ${PROJETOS.map(p=>{
+      ${projetos.map(p=>{
         const perc = progressoProjeto(p);
         return `
         <div class="projeto-card" onclick="abrirProjeto('${p.id}')">
           <div class="projeto-card-nome">${p.nome}</div>
-          <div class="projeto-card-cliente">${p.cliente}</div>
+          <div class="projeto-card-cliente">${p.categoria==='pessoal'?'Pessoal'+(p.dataFim?' · até '+dataBR(p.dataFim):''):p.cliente}</div>
           <div class="proj-barra"><div style="width:${perc}%;"></div></div>
-          <div class="projeto-card-perc">${perc}% concluído</div>
+          <div class="projeto-card-perc">${perc}% concluído ${p.status!=='ativo'?'· '+p.status:''}</div>
         </div>`;
-      }).join('')}
+      }).join('')||semRegistro()}
     </div>`;
 }
 
 function fichaProjetoHTML(p){
+  if(!p)return semRegistro();
   const perc = progressoProjeto(p);
+  const total=itensProjeto(p).length,feitos=itensProjeto(p).filter(i=>i.c).length;
   return `
     <button class="ficha-voltar" onclick="voltarProjetos()">← Voltar para Projetos</button>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(p.nome)}</div>
       <div>
         <div class="ficha-nome">${p.nome}</div>
-        <div class="ficha-sub">${p.cliente} · ${perc}% concluído</div>
+        <div class="ficha-sub">${p.categoria==='pessoal'?'Projeto pessoal':p.cliente} · ${perc}% concluído</div>
       </div>
     </div>
+    ${p.categoria==='pessoal'?`<div class="projeto-meta-pessoal"><span>${dataBR(p.dataInicio)} a ${dataBR(p.dataFim)}</span><span>${feitos} de ${total} concluídas</span><span class="projeto-status-pill">${faseProjetoTemporario(p)==='historico'?'Finalizado':p.status}</span></div>`:''}
     <div class="proj-barra" style="margin-bottom:20px;"><div style="width:${perc}%;"></div></div>
     <div style="margin-bottom:16px;"><button class="btn-primario" onclick="adicionarEtapaProjeto('${p.id}')">+ Adicionar etapa</button></div>
     <div class="etapas-timeline">
@@ -3002,12 +3054,12 @@ function fichaProjetoHTML(p){
           <div class="etapa-linha"></div>
           <div class="etapa-marca ${st}">${iconeEt}</div>
           <div class="etapa-conteudo">
-            <div style="display:flex;justify-content:space-between;gap:10px;"><div class="etapa-titulo">${et.nome}</div><button onclick="excluirEtapaProjeto('${p.id}','${et.id}')" style="color:#B0413E;font-size:11px;">Excluir etapa</button></div>
+            <div style="display:flex;justify-content:space-between;gap:10px;"><div class="etapa-titulo">${et.nome}</div><div style="display:flex;gap:7px"><button onclick="editarEtapaProjeto('${p.id}','${et.id}')" style="color:var(--cor-primaria);font-size:11px;">Editar</button><button onclick="excluirEtapaProjeto('${p.id}','${et.id}')" style="color:#B0413E;font-size:11px;">Excluir grupo</button></div></div>
             <div class="etapa-status-txt">${st==='concluida'?'Concluída':st==='andamento'?'Em andamento':'Pendente'}</div>
             ${et.checklist.map((item,idx)=>`
               <div class="etapa-check-item ${item.c?'done':''}" onclick="alternarChecklistProjeto('${p.id}','${et.id}',${idx})">
                 <input type="checkbox" ${item.c?'checked':''} onclick="event.stopPropagation(); alternarChecklistProjeto('${p.id}','${et.id}',${idx})">
-                <span style="flex:1">${item.t}</span><button onclick="event.stopPropagation();excluirItemProjeto('${p.id}','${et.id}','${item.id}')" title="Excluir item" style="color:#B0413E">✕</button>
+                <span style="flex:1">${item.t}<small class="item-projeto-info">${periodoItemProjeto(item)}${item.entregaId?' · Entrega: '+textoHTML(ENTREGAS.find(e=>e.id===item.entregaId)?.titulo||'vínculo preservado'):''}</small></span><span class="item-projeto-acoes"><button onclick="event.stopPropagation();editarItemProjeto('${p.id}','${et.id}','${item.id}')" title="Editar missão">Editar</button>${p.categoria==='pessoal'&&et.nome.toUpperCase()==='TRABALHO'?`<button onclick="event.stopPropagation();vincularEntregaItemProjeto('${p.id}','${et.id}','${item.id}')" title="Vincular entrega">${item.entregaId?'Desvincular':'Entrega'}</button>`:''}<button onclick="event.stopPropagation();excluirItemProjeto('${p.id}','${et.id}','${item.id}')" title="Excluir item" style="color:#B0413E">✕</button></span>
               </div>
             `).join('')}
             <button class="btn-secundario" style="padding:7px 10px;font-size:11px;margin-top:8px;" onclick="adicionarItemProjeto('${p.id}','${et.id}')">+ Adicionar item</button>
@@ -4540,7 +4592,7 @@ function renderTela(){
   } else if(telaAtual === 'habitos'){
     document.getElementById('conteudoTela').innerHTML = habitosHTML();
   } else if(telaAtual === 'menu_pessoal'){
-    document.getElementById('conteudoTela').innerHTML = `<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0">${i.nome} →</h3></button>`).join('')}</div>`;
+    document.getElementById('conteudoTela').innerHTML = dashboardPessoalHTML();
   } else if(telaAtual === 'ciclo'){
     document.getElementById('conteudoTela').innerHTML = cicloHTML();
   } else if(telaAtual === 'ideias_pessoais'){
@@ -4592,7 +4644,7 @@ function dashboardHTML(){
   const entregasAtrasadas=entregasAbertas.filter(e=>e.prazo<hoje).length;
   const clientesEntregaPendentes=ENTREGA_CLIENTES.filter(v=>v.status!=='entregue'&&entregasAbertas.some(e=>e.id===v.entrega_id)).length;
 
-  const projetosAtivos = PROJETOS.slice(0,3);
+  const projetosAtivos = PROJETOS.filter(p=>p.categoria!=='pessoal'&&p.status!=='finalizado').slice(0,3);
 
   const conteudoHoje = CONTEUDOS_MKT.filter(c=>c.status!=='publicado').slice(0,3);
   const vencimentos30=[
