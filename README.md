@@ -3,6 +3,15 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V36 — Lista completa de clientes
+
+- novo seletor visual de clientes com pesquisa e rolagem, sem o corte da caixa numerada do navegador;
+- lista completa aplicada a Obrigações, Checklists, Projetos, Contratos, Rotas, Produtos/Rotulagem e Liderança;
+- Entregas agora usa seleção múltipla visual, com ações para selecionar todos e limpar a seleção;
+- identificação de clientes diretos, contratantes e estabelecimentos vinculados à Saber Nutrir;
+- funcionamento responsivo no celular, tablet e computador;
+- cache atualizado para V36.
+
 ## Correção V35 — Instalação no celular
 
 - caminhos dos ícones 192×192 e 512×512 corrigidos no manifest, favicon e service worker;
