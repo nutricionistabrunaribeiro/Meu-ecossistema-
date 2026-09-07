@@ -3,6 +3,21 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V33 — Cálculo das ocorrências
+
+- corrigida a variável usada para gerar os dias das rotinas recorrentes;
+- Radar volta a contabilizar as rotinas sem interromper a página;
+- rotina semanal real validada na competência de setembro de 2026;
+- cache atualizado para V33.
+
+## Correção V32 — Radar e Rotinas resilientes
+
+- tratamento individual de registros de datas, obrigações e rotinas;
+- campos antigos ou vazios deixam de interromper a aba inteira;
+- Radar e Rotinas usam listas seguras mesmo durante a sincronização;
+- mensagem técnica visível apenas se ainda houver uma exceção, facilitando diagnóstico definitivo;
+- cache atualizado para V32.
+
 ## Correção V31 — Planejamento conectado aos dados reais
 
 - sincronização do Planejamento com Agenda, Clientes, Checklists, Entregas, Obrigações e Financeiro a cada abertura;
