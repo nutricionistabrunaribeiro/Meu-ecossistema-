@@ -221,6 +221,15 @@ conectado ao Supabase e preparado para instalação como PWA.
 - textos incorretos sobre funcionamento e sincronização offline foram removidos;
 - o PWA ainda abre sua estrutura pelo cache, mas requer conexão para carregar e salvar dados.
 
+## Rodada V38 — Calendário documental e visitas por cliente
+
+- calendário visual de documentações no Dashboard, com navegação mensal e detalhes por dia;
+- resumo por status: vencidos, até 15 dias, entre 16 e 30 dias, regulares e sem validade;
+- explicações objetivas para diferenciar Documentações de Obrigações;
+- contador “Realizado no mês” passa a considerar as visitas concluídas vinculadas na Agenda;
+- compatibilidade com visitas antigas da Saber Nutrir cadastradas antes do seletor de clientes;
+- migração segura para vincular somente registros antigos com correspondência inequívoca, sem excluir compromissos.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;

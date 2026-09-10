@@ -106,6 +106,7 @@
   .card h3 button{font-size:11.5px;color:var(--cor-primaria);font-weight:600;}
   .dashboard-hoje{position:relative;overflow:hidden;background:linear-gradient(118deg,#4E865F,#72BD88 68%,#E36216 145%);border-radius:22px;color:#fff;padding:23px 25px;margin-bottom:18px;box-shadow:0 16px 36px rgba(78,134,95,.18);display:grid;grid-template-columns:1.4fr repeat(3,minmax(115px,.55fr));gap:18px;align-items:center}.dashboard-hoje:after{content:"";position:absolute;width:220px;height:220px;border:42px solid rgba(255,255,255,.06);border-radius:50%;right:-105px;top:-135px}.hoje-chamada{position:relative;z-index:1}.hoje-eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;opacity:.65;margin-bottom:7px}.hoje-titulo{font-family:'Fraunces',serif;font-size:21px;line-height:1.2}.hoje-sub{font-size:11.5px;opacity:.72;margin-top:5px}.hoje-metrica{position:relative;z-index:1;border-left:1px solid rgba(255,255,255,.22);padding-left:16px}.hoje-metrica strong{display:block;font-family:'Fraunces',serif;font-size:25px}.hoje-metrica span{font-size:10.5px;opacity:.73}
   .card-destaque{border-top:3px solid var(--cor-primaria)}.card-alerta{border-top:3px solid var(--cor-acento)}
+  .doc-calendar-card{grid-column:span 2;border-top:4px solid var(--cor-primaria);overflow:hidden}.doc-calendar-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:15px}.doc-calendar-sub{font-size:11px;color:var(--cor-texto-suave);margin-top:4px}.doc-calendar-summary{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.doc-summary-pill{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:750;background:#F3F0EA;color:var(--cor-texto-suave)}.doc-summary-pill.danger{background:#FAE7E5;color:#A33B38}.doc-summary-pill.warning{background:#FFF0DE;color:#B55A18}.doc-summary-pill.ok{background:#E5F3E9;color:#2F6B4A}.doc-calendar-layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,.78fr);gap:17px}.doc-month{border:1px solid var(--cor-borda);border-radius:16px;padding:12px;background:#FCFBF8}.doc-week,.doc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.doc-week span{text-align:center;font-size:9px;font-weight:800;color:var(--cor-texto-suave);padding:3px}.doc-day{min-height:48px;border:1px solid transparent;border-radius:10px;background:#F6F3ED;padding:6px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;color:var(--cor-texto);cursor:pointer}.doc-day:hover,.doc-day.selected{border-color:var(--cor-primaria);background:#EEF7F0}.doc-day.empty{background:transparent;cursor:default}.doc-day.today b{color:var(--cor-acento)}.doc-day b{font-size:11px}.doc-day-dots{display:flex;gap:3px;flex-wrap:wrap}.doc-dot{width:6px;height:6px;border-radius:50%}.doc-dot.vencido{background:#B0413E}.doc-dot.urgente{background:#E36216}.doc-dot.atencao{background:#D6A72A}.doc-dot.regular{background:#72BD88}.doc-calendar-list{min-height:180px;padding:4px 2px}.doc-calendar-list-title{font-family:'Fraunces',serif;font-size:16px;margin-bottom:8px}.doc-calendar-item{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--cor-borda);font-size:11px}.doc-calendar-item:last-child{border-bottom:none}.doc-calendar-item i{width:8px;height:8px;border-radius:50%;margin-top:4px;flex:0 0 auto}.doc-calendar-item strong{display:block;font-size:11.5px}.doc-calendar-item small{display:block;color:var(--cor-texto-suave);margin-top:2px}.module-explainer{padding:12px 14px;border-radius:13px;background:#F4F1EA;border-left:3px solid var(--cor-primaria);font-size:11.5px;color:var(--cor-texto-suave);margin-bottom:14px}.module-explainer strong{color:var(--cor-texto)}
 
   .arco-wrap{display:flex;align-items:center;gap:18px;}
   .arco{position:relative;width:104px;height:104px;flex-shrink:0;}
@@ -657,7 +658,7 @@
     .grid{grid-template-columns:1fr;}
     .conteudo-full,.rapidos{grid-column:1/-1;}
     .search{width:120px;}
-    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}
+    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}.doc-calendar-card{grid-column:1/-1}.doc-calendar-head{display:block}.doc-calendar-summary{justify-content:flex-start;margin-top:10px}.doc-calendar-layout{grid-template-columns:1fr}.doc-day{min-height:42px;padding:5px}.doc-calendar-list{min-height:0}
     .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto 1fr auto}.agenda-periodo-label{font-size:13px}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:1fr 88px}.mercado-add button{grid-column:1/-1}
   }
   /* Telas curtas (celular deitado) — reduz espaçamentos verticais pra caber tudo sem cortar */
@@ -1043,7 +1044,7 @@ function itensCalendarioInteligente(){
   (LIDERANCA_DELEGACOES||[]).filter(d=>d.status!=='concluida').forEach(d=>{add(d.prazo,'Delegação: '+d.titulo,'prazo',d.cliente_id);add(d.proximo_acompanhamento,'Acompanhar: '+d.titulo,'prazo',d.cliente_id)});
   (CONTEUDOS_MKT||[]).filter(c=>c.status!=='publicado').forEach(c=>add(c.dataISO,'Conteúdo: '+c.titulo,'conteudo'));
   if(CAMADAS_AGENDA.datas_profissionais){const anoBase=new Date().getFullYear(),anos=Array.from({length:31},(_,i)=>anoBase-10+i);(DATAS_PROFISSIONAIS||[]).filter(d=>d.ativo).forEach(d=>anos.forEach(a=>add(dataProfissionalISO(d,a),'Data da área: '+d.titulo,'datas_profissionais')));}
-  (CLIENTES||[]).forEach(c=>(c.documentacao||[]).forEach(d=>{if(statusAutomaticoDoc(d.validade)!=='Vigente')add(d.validade,'Documento: '+d.nome,'vencimento',c.id)}));
+  (CLIENTES||[]).forEach(c=>(c.documentacao||[]).forEach(d=>{if(dataLocalDocumento(d.validade)&&statusAutomaticoDoc(d.validade)!=='Vigente')add(d.validade,'Documento: '+d.nome,'vencimento',c.id)}));
   return itens;
 }
 
@@ -1404,7 +1405,16 @@ async function novoCliente(contratanteInicial=null){
   dispararAutomacao('Cliente cadastrado', `"${nome.trim()}" salvo no banco de dados.`);
   renderTela();
 }
-function visitasRealizadasMes(clienteId){const mes=new Date().toISOString().slice(0,7);return eventosSemana.filter(e=>e.clienteId===clienteId&&e.concluido&&e.tipo==='visita'&&e.dataISO?.startsWith(mes)).length;}
+function normalizarNomeAgenda(valor){return String(valor||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\b(by|da|de|do|dos|das)\b/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
+function clienteEventoResolvido(evento){
+  if(evento.clienteId)return CLIENTES.find(c=>String(c.id)===String(evento.clienteId))||null;
+  if(evento.tipo!=='visita')return null;
+  const titulo=normalizarNomeAgenda(evento.titulo);if(!titulo)return null;
+  const aliases={einstein:'koji einstein',central:'koji central',delivery:'koji delivery','primus vila':'primus vila dirce',bendita:'bendita mm','sao caetano':'la vieiras sao caetano',emporio:'emporio','las patas':'las patas','primus osasco':'primus osasco','primus carapicuiba':'primus carapicuiba','sushi kyio':'sushi kiyo','sushi kiyo':'sushi kiyo'};
+  const alvo=aliases[titulo]||titulo,candidatos=CLIENTES.filter(c=>{const nome=normalizarNomeAgenda(c.nome);return nome===alvo||nome.endsWith(' '+alvo)||alvo.endsWith(' '+nome)});
+  return candidatos.length===1?candidatos[0]:null;
+}
+function visitasRealizadasMes(clienteId){const mes=formatoISO(new Date()).slice(0,7);return eventosSemana.filter(e=>String(clienteEventoResolvido(e)?.id||'')===String(clienteId)&&e.concluido&&e.tipo==='visita'&&e.dataISO?.startsWith(mes)).length;}
 function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);return {prev:c.visitasPrevistasMes||((c.visitasPrevistasSemana||0)*4),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
 function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
 function carteiraContratanteHTML(c){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')" style="text-align:left"><strong>${f.nome}</strong></button><span style="display:flex;align-items:center;gap:8px"><button class="tag" onclick="alternarChecklistMensalCliente('${f.id}')">${f.recebeChecklistMensal?'Checklist mensal ✓':'Ativar checklist mensal'}</button>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>${controleChecklistsContratanteHTML(c)}`;}
@@ -1452,13 +1462,18 @@ function graficoEvolucaoChecklist(c){
     </div>`;
 }
 
+function dataLocalDocumento(validadeTxt){
+  if(!validadeTxt || validadeTxt==='—')return null;
+  const partes=String(validadeTxt).split('/').map(Number);
+  if(partes.length!==3||!partes.every(Number.isFinite))return null;
+  const data=new Date(partes[2],partes[1]-1,partes[0],12,0,0);
+  return isNaN(data.getTime())?null:data;
+}
 function statusAutomaticoDoc(validadeTxt){
-  if(!validadeTxt || validadeTxt==='—') return 'Vigente';
-  const partes = validadeTxt.split('/');
-  if(partes.length<3) return 'Vigente';
-  const dataVal = new Date(parseInt(partes[2]), parseInt(partes[1])-1, parseInt(partes[0]));
-  if(isNaN(dataVal.getTime())) return 'Vigente';
-  const diffDias = Math.round((dataVal - HOJE_REAL)/(1000*60*60*24));
+  const dataVal=dataLocalDocumento(validadeTxt);
+  if(!dataVal) return 'Sem validade';
+  const hojeLocal=new Date();hojeLocal.setHours(12,0,0,0);
+  const diffDias = Math.round((dataVal - hojeLocal)/(1000*60*60*24));
   if(diffDias < 0) return 'Vencido';
   if(diffDias <= 30) return 'Próximo do vencimento';
   return 'Vigente';
@@ -1468,6 +1483,30 @@ function classeStatusDoc(status){
   if(status==='Próximo do vencimento') return 'doc-status-vencendo';
   if(status==='Vencido') return 'doc-status-vencido';
   return 'doc-status-revisao';
+}
+let MES_DOCUMENTOS_OFFSET=0;
+let DIA_DOCUMENTOS_SELECIONADO=formatoISO(new Date());
+function documentosComContexto(){
+  return CLIENTES.flatMap(c=>(c.documentacao||[]).map(d=>({...d,clienteId:c.id,clienteNome:c.nome,dataValidade:dataLocalDocumento(d.validade)})));
+}
+function classePrazoDocumento(doc){
+  if(!doc.dataValidade)return 'sem-data';
+  const hoje=new Date();hoje.setHours(12,0,0,0);const dias=Math.round((doc.dataValidade-hoje)/86400000);
+  return dias<0?'vencido':dias<=15?'urgente':dias<=30?'atencao':'regular';
+}
+function selecionarDiaDocumentos(iso){DIA_DOCUMENTOS_SELECIONADO=iso;renderTela();}
+function mudarMesDocumentos(delta){MES_DOCUMENTOS_OFFSET+=delta;const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+MES_DOCUMENTOS_OFFSET);DIA_DOCUMENTOS_SELECIONADO=formatoISO(d);renderTela();}
+function calendarioDocumentacoesDashboardHTML(){
+  const hoje=new Date(),cursor=new Date(hoje.getFullYear(),hoje.getMonth()+MES_DOCUMENTOS_OFFSET,1,12),ano=cursor.getFullYear(),mes=cursor.getMonth(),prefixo=`${ano}-${String(mes+1).padStart(2,'0')}`;
+  const docs=documentosComContexto(),comData=docs.filter(d=>d.dataValidade),doMes=comData.filter(d=>formatoISO(d.dataValidade).startsWith(prefixo));
+  const resumo={vencido:docs.filter(d=>classePrazoDocumento(d)==='vencido').length,urgente:docs.filter(d=>classePrazoDocumento(d)==='urgente').length,atencao:docs.filter(d=>classePrazoDocumento(d)==='atencao').length,regular:docs.filter(d=>classePrazoDocumento(d)==='regular').length,semData:docs.filter(d=>!d.dataValidade).length};
+  const primeiro=(cursor.getDay()+6)%7,total=new Date(ano,mes+1,0).getDate(),celulas=Array.from({length:primeiro},()=>'<span class="doc-day empty"></span>');
+  for(let dia=1;dia<=total;dia++){
+    const iso=`${prefixo}-${String(dia).padStart(2,'0')}`,itens=doMes.filter(d=>formatoISO(d.dataValidade)===iso),classes=[iso===formatoISO(hoje)?'today':'',iso===DIA_DOCUMENTOS_SELECIONADO?'selected':''].join(' ');
+    celulas.push(`<button class="doc-day ${classes}" onclick="selecionarDiaDocumentos('${iso}')"><b>${dia}</b><span class="doc-day-dots">${itens.slice(0,5).map(d=>`<i class="doc-dot ${classePrazoDocumento(d)}"></i>`).join('')}</span></button>`);
+  }
+  const selecionados=docs.filter(d=>d.dataValidade&&formatoISO(d.dataValidade)===DIA_DOCUMENTOS_SELECIONADO),dataSelecionada=new Date(DIA_DOCUMENTOS_SELECIONADO+'T12:00:00');
+  return `<div class="card doc-calendar-card"><div class="doc-calendar-head"><div><h3>Calendário de documentações <button onclick="irPara('clientes')">ver clientes</button></h3><div class="doc-calendar-sub">Validades documentais de toda a carteira em uma visão rápida.</div></div><div class="doc-calendar-summary"><span class="doc-summary-pill danger">${resumo.vencido} vencido(s)</span><span class="doc-summary-pill warning">${resumo.urgente} em até 15 dias</span><span class="doc-summary-pill">${resumo.atencao} entre 16 e 30 dias</span><span class="doc-summary-pill ok">${resumo.regular} regular(es)</span>${resumo.semData?`<span class="doc-summary-pill">${resumo.semData} sem validade</span>`:''}</div></div><div class="doc-calendar-layout"><div class="doc-month"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><button class="agenda-nav-icon" onclick="mudarMesDocumentos(-1)">‹</button><strong class="serif">${MESES_NOME[mes]} ${ano}</strong><button class="agenda-nav-icon" onclick="mudarMesDocumentos(1)">›</button></div><div class="doc-week">${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d=>`<span>${d}</span>`).join('')}</div><div class="doc-days">${celulas.join('')}</div><div style="display:flex;gap:11px;flex-wrap:wrap;margin-top:10px;font-size:9.5px;color:var(--cor-texto-suave)"><span><i class="doc-dot vencido" style="display:inline-block"></i> vencido</span><span><i class="doc-dot urgente" style="display:inline-block"></i> até 15 dias</span><span><i class="doc-dot atencao" style="display:inline-block"></i> 16–30 dias</span><span><i class="doc-dot regular" style="display:inline-block"></i> regular</span></div></div><div class="doc-calendar-list"><div class="doc-calendar-list-title">${dataSelecionada.toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div>${selecionados.length?selecionados.map(d=>`<div class="doc-calendar-item"><i class="doc-dot ${classePrazoDocumento(d)}"></i><div><strong>${textoHTML(d.nome)}</strong><small>${textoHTML(d.clienteNome)} · ${textoHTML(d.tipo||'Documento')}</small></div></div>`).join(''):'<div class="placeholder" style="min-height:120px">Nenhum documento vence neste dia.</div>'}</div></div></div>`;
 }
 async function novoDocumentoCliente(clienteId){
   const nome = prompt("Nome do documento (ex: Manual de Boas Práticas, Contrato, Licença...):");
@@ -1502,9 +1541,7 @@ async function removerDocumentoCliente(clienteId, docId){
 function checklistDocumentacaoHTML(c){
   const docs = c.documentacao || [];
   return `
-    <div style="margin-bottom:14px;font-size:11.5px;color:var(--cor-texto-suave);">
-      Os arquivos ficam guardados no seu computador — aqui é só o controle de emissão, validade e status de cada documento. Status calculado automaticamente.
-    </div>
+    <div class="module-explainer"><strong>Documentação é o registro ou comprovante.</strong> Use esta área para controlar o que existe, sua emissão e validade. Os arquivos continuam guardados no seu computador; o sistema apenas acompanha o status.</div>
     <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div>
     ${docs.length===0 ? semRegistro() : `
     <div class="docrow docrow-head">
@@ -4284,8 +4321,8 @@ async function statusObrigacao(id){
 }
 async function excluirObrigacao(id){if(!confirm('Excluir esta obrigação?'))return;const {error}=await supa.from('obrigacoes_cliente').delete().eq('id',id);if(!error){OBRIGACOES=OBRIGACOES.filter(x=>x.id!==id);renderTela();}}
 function cardObrigacao(o){const c=CLIENTES.find(x=>x.id===o.cliente_id);const dias=diasAte(o.vencimento);const alerta=o.status!=='realizada'&&dias<=30;return `<div class="item-lista-simples" style="${alerta?'border-left:4px solid '+(dias<=15?'#B0413E':'#E36216')+';padding-left:10px':''}"><div><strong>${o.titulo}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${c?.nome||'Cliente'} · ${o.categoria||'Geral'} · ${dataBR(o.vencimento)}${alerta?` · ${dias<0?'Vencida há '+Math.abs(dias)+' dias':'vence em '+dias+' dias'}`:''}</div></div><div style="display:flex;gap:6px"><button class="tag" onclick="statusObrigacao('${o.id}')">${o.status.replace('_',' ')}</button><button onclick="excluirObrigacao('${o.id}')" style="color:#B0413E">✕</button></div></div>`;}
-function obrigacoesClienteHTML(c){const itens=OBRIGACOES.filter(o=>o.cliente_id===c.id);return `<button class="btn-primario" onclick="novaObrigacao('${c.id}')">+ Nova obrigação</button><div style="margin-top:12px">${itens.length?itens.map(cardObrigacao).join(''):semRegistro()}</div>`;}
-function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizada');return `<div style="margin-bottom:14px"><button class="btn-primario" onclick="novaObrigacao()">+ Nova obrigação</button></div><div class="card"><h3>Programação geral</h3>${ativas.length?ativas.map(cardObrigacao).join(''):semRegistro()}</div>`;}
+function obrigacoesClienteHTML(c){const itens=OBRIGACOES.filter(o=>o.cliente_id===c.id);return `<div class="module-explainer"><strong>Obrigação é aquilo que precisa acontecer ou ser renovado.</strong> Use esta área para programar ações recorrentes, prazos e o próximo vencimento do cliente.</div><button class="btn-primario" onclick="novaObrigacao('${c.id}')">+ Nova obrigação</button><div style="margin-top:12px">${itens.length?itens.map(cardObrigacao).join(''):semRegistro()}</div>`;}
+function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizada');return `<div class="module-explainer"><strong>Obrigação é aquilo que precisa acontecer ou ser renovado.</strong> Exemplos: realizar controle de pragas, renovar licença ou programar treinamento. O comprovante gerado pertence ao Controle de Documentação.</div><div style="margin-bottom:14px"><button class="btn-primario" onclick="novaObrigacao()">+ Nova obrigação</button></div><div class="card"><h3>Programação geral</h3>${ativas.length?ativas.map(cardObrigacao).join(''):semRegistro()}</div>`;}
 async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===clienteId);const tema=prompt('Tema do treinamento:');if(!tema?.trim())return;const dataT=await selecionarDataVisual({titulo:'Data prevista ou realizada',opcional:true});if(dataT===null)return;const validade=await selecionarDataVisual({titulo:'Validade ou reciclagem',opcional:true});if(validade===null)return;const participantes=parseInt(prompt('Quantidade de participantes:',''))||null;const obs=prompt('Observações:','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('treinamentos_cliente').insert({user_id:user.id,cliente_id:c.id,tema:tema.trim(),data:dataT||null,validade:validade||null,participantes,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar treinamento',error.message);return;}TREINAMENTOS.unshift(data);renderTela();}
 async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);const ordem=['planejado','realizado','cancelado'];const status=ordem[(ordem.indexOf(t.status)+1)%3];const {error}=await supa.from('treinamentos_cliente').update({status}).eq('id',id);if(!error){t.status=status;renderTela();}}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
@@ -4719,6 +4756,8 @@ function dashboardHTML(){
       <div class="pend-num">${vencimentos30.length}</div><div class="pend-desc">alertas para os próximos 30 dias</div>
       <ul class="pend-list">${vencimentos30.slice(0,4).map(v=>`<li>${v.titulo} <span class="tag" style="color:${v.dias<=15?'#B0413E':'#E36216'}">${v.dias<0?'vencido':v.dias+' dias'} · ${v.cliente||''}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhum vencimento próximo.</li>'}</ul>
     </div>
+
+    ${calendarioDocumentacoesDashboardHTML()}
 
     <div class="card" style="border-top:4px solid var(--cor-acento)">
       <h3>Radar do mês <button onclick="irPara('planejamento')">abrir planejamento</button></h3>
