@@ -100,6 +100,19 @@
   .menu-toggle{display:none;}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:18px;align-items:start}
+  @media (min-width:1101px){
+    .dashboard-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:stretch}
+    .dashboard-grid>.card{height:100%}
+    .dash-arco{grid-column:span 5}.dash-agenda{grid-column:span 7}
+    .dash-mercado,.dash-contas{grid-column:span 6}
+    .dash-entregas,.dash-vencimentos{grid-column:span 6}
+    .dashboard-grid>.doc-calendar-card{grid-column:1/-1}
+    .dash-radar,.dash-visitas-mes,.dash-checklists{grid-column:span 4}
+    .dash-visitas-ano{grid-column:span 8}.dash-projetos{grid-column:span 4}
+    .dash-conteudo{grid-column:span 8}.dash-lideranca{grid-column:span 4}
+    .dashboard-grid>.rapidos{grid-column:1/-1}
+    .dash-agenda,.dash-mercado,.dash-contas{max-height:370px;overflow:auto}
+  }
   .card{background:var(--cor-superficie);border:1px solid rgba(210,208,198,.82);border-radius:18px;padding:20px;box-shadow:var(--sombra-card);transition:transform .18s,box-shadow .18s,border-color .18s;min-width:0}
   .card:hover{transform:translateY(-1px);box-shadow:var(--sombra-hover);border-color:rgba(114,189,136,.34)}
   .card h3{font-size:13.5px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
@@ -3567,7 +3580,7 @@ function abrirContasPagar(){espacoAtual='pessoal';document.body.setAttribute('da
 function contasPagarDashboardHTML(){
   const abertas=(Array.isArray(CONTAS_PESSOAIS)?CONTAS_PESSOAIS:[]).filter(l=>l.tipo==='despesa'&&l.status!=='pago').sort((a,b)=>(a.vencimentoISO||'9999').localeCompare(b.vencimentoISO||'9999'));
   const vencidas=abertas.filter(l=>(diasParaVencimentoConta(l.vencimentoISO)??9999)<0),proximas30=abertas.filter(l=>{const d=diasParaVencimentoConta(l.vencimentoISO);return d!==null&&d>=0&&d<=30}),total30=[...vencidas,...proximas30].reduce((s,l)=>s+Number(l.valor||0),0);
-  return `<div class="card" style="border-top:4px solid var(--cor-acento)"><h3>Contas a pagar <button onclick="abrirContasPagar()">ver todas</button></h3><div style="display:flex;gap:18px;align-items:end;margin-bottom:12px"><div><div class="pend-num">${abertas.length}</div><div class="pend-desc">contas em aberto</div></div><div><strong style="font-size:15px;color:var(--cor-acento)">${formatarMoeda(total30)}</strong><div class="pend-desc">vencidas ou nos próximos 30 dias</div></div></div>${abertas.slice(0,5).map(l=>{const p=rotuloPrazoConta(l);return `<div class="item-lista-simples"><button onclick="darBaixaContaPessoal('${l.id}')" title="Marcar como paga" style="width:25px;height:25px;border:1.5px solid var(--cor-primaria);border-radius:7px;color:var(--cor-primaria);flex-shrink:0">✓</button><div style="flex:1"><strong>${l.desc}</strong><div style="font-size:10.5px;color:${p.cor}">${p.texto} · ${dataBR(l.vencimentoISO)}</div></div><strong style="font-size:11px">${formatarMoeda(l.valor)}</strong></div>`}).join('')||'<div style="font-size:12px;color:var(--cor-texto-suave)">Nenhuma conta em aberto. Tudo pago ✓</div>'}<button class="btn-secundario" style="margin-top:12px" onclick="novaContaPessoal('despesa')">+ Adicionar conta</button></div>`;
+  return `<div class="card dash-contas" style="border-top:4px solid var(--cor-acento)"><h3>Contas a pagar <button onclick="abrirContasPagar()">ver todas</button></h3><div style="display:flex;gap:18px;align-items:end;margin-bottom:12px"><div><div class="pend-num">${abertas.length}</div><div class="pend-desc">contas em aberto</div></div><div><strong style="font-size:15px;color:var(--cor-acento)">${formatarMoeda(total30)}</strong><div class="pend-desc">vencidas ou nos próximos 30 dias</div></div></div>${abertas.slice(0,5).map(l=>{const p=rotuloPrazoConta(l);return `<div class="item-lista-simples"><button onclick="darBaixaContaPessoal('${l.id}')" title="Marcar como paga" style="width:25px;height:25px;border:1.5px solid var(--cor-primaria);border-radius:7px;color:var(--cor-primaria);flex-shrink:0">✓</button><div style="flex:1"><strong>${l.desc}</strong><div style="font-size:10.5px;color:${p.cor}">${p.texto} · ${dataBR(l.vencimentoISO)}</div></div><strong style="font-size:11px">${formatarMoeda(l.valor)}</strong></div>`}).join('')||'<div style="font-size:12px;color:var(--cor-texto-suave)">Nenhuma conta em aberto. Tudo pago ✓</div>'}<button class="btn-secundario" style="margin-top:12px" onclick="novaContaPessoal('despesa')">+ Adicionar conta</button></div>`;
 }
 
 let LISTA_COMPRAS = [];
@@ -3650,7 +3663,7 @@ function linhaMercadoHTML(item){return `<div class="compra-item ${item.comprado?
 function formularioMercadoHTML(){return `<div class="mercado-add"><input id="novoItemMercado" placeholder="O que precisa comprar?" onkeydown="if(event.key==='Enter')adicionarItemMercado()"><input id="quantidadeMercado" placeholder="Qtd. (opcional)" onkeydown="if(event.key==='Enter')adicionarItemMercado()"><button onclick="adicionarItemMercado()">+ Adicionar</button></div>`;}
 function mercadoHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado),comprados=LISTA_MERCADO.filter(x=>x.comprado);return `<div class="card"><div class="mercado-resumo"><span>${pendentes.length} para comprar</span><span>${comprados.length} comprado(s)</span></div>${formularioMercadoHTML()}${pendentes.map(linhaMercadoHTML).join('')}${comprados.map(linhaMercadoHTML).join('')||(!pendentes.length?'<div class="mercado-vazio">Sua lista está vazia. Adicione o primeiro item acima.</div>':'')}${comprados.length?`<div class="mercado-acoes"><button class="btn-secundario" style="color:#B0413E" onclick="limparCompradosMercado()">Limpar comprados</button></div>`:''}</div>`;}
 function abrirListaMercado(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='mercado';salvarTelaAtualSessao();renderSidebar();renderTela();}
-function mercadoDashboardHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado);return `<div class="card mercado-card-dashboard"><h3>Lista de mercado <button onclick="abrirListaMercado()">abrir lista</button></h3><div class="pend-num">${pendentes.length}</div><div class="pend-desc">item(ns) para comprar</div><div class="mercado-dashboard-lista">${pendentes.slice(0,5).map(linhaMercadoHTML).join('')||'<div class="mercado-vazio">Lista de mercado em dia.</div>'}</div>${formularioMercadoHTML()}</div>`;}
+function mercadoDashboardHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado);return `<div class="card mercado-card-dashboard dash-mercado"><h3>Lista de mercado <button onclick="abrirListaMercado()">abrir lista</button></h3><div class="pend-num">${pendentes.length}</div><div class="pend-desc">item(ns) para comprar</div><div class="mercado-dashboard-lista">${pendentes.slice(0,5).map(linhaMercadoHTML).join('')||'<div class="mercado-vazio">Lista de mercado em dia.</div>'}</div>${formularioMercadoHTML()}</div>`;}
 
 function devocionalHTML(){
   return `
@@ -4671,12 +4684,6 @@ function dashboardHTML(){
   const offset = totalHoje>0 ? Math.round(circunf * (1 - percArco/100)) : circunf;
   const proximoEvento = eventosHoje.find(e=>!e.concluido);
 
-  const pendenciasCount =
-    PENDENCIAS_DB.filter(p=>p.origem==='manual' && p.status!=='concluida').length +
-    LEADS.filter(l=>l.etapa==='followup').length;
-
-  const listaPendenciasResumo = [];
-  PENDENCIAS_DB.filter(p=>p.origem==='manual' && p.status!=='concluida').forEach(p=> listaPendenciasResumo.push({texto:p.titulo, tag:p.cliente||rotuloStatusPendencia(p.status)}));
   const entregasAbertas=ENTREGAS.filter(e=>!entregaConcluida(e)).sort((a,b)=>a.prazo.localeCompare(b.prazo));
   const entregasAtrasadas=entregasAbertas.filter(e=>e.prazo<hoje).length;
   const clientesEntregaPendentes=ENTREGA_CLIENTES.filter(v=>v.status!=='entregue'&&entregasAbertas.some(e=>e.id===v.entrega_id)).length;
@@ -4705,8 +4712,8 @@ function dashboardHTML(){
 
   return `
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${pendenciasVencidas}</strong><span>pendências vencidas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
-  <div class="grid">
-    <div class="card card-destaque">
+  <div class="grid dashboard-grid">
+    <div class="card card-destaque dash-arco">
       <h3>Arco do dia</h3>
       <div class="arco-wrap">
         <div class="arco">
@@ -4724,34 +4731,24 @@ function dashboardHTML(){
       </div>
     </div>
 
-    <div class="card card-destaque">
+    <div class="card card-destaque dash-agenda">
       <h3>Agenda de hoje <button onclick="irPara('agenda')">ver tudo</button></h3>
       ${eventosHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nada agendado para hoje.</div>` :
         eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${e.titulo}${e.concluido?' ✓':''}<div class="agenda-tipo">${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria)?.nome||e.categoria}</div></div></div>`).join('')}
-    </div>
-
-    <div class="card card-alerta">
-      <h3>Pendências <button onclick="irPara('pendencias')">ver tudo</button></h3>
-      <div class="pend-num">${pendenciasCount}</div>
-      <div class="pend-desc">itens aguardando ação</div>
-      <ul class="pend-list">
-        ${listaPendenciasResumo.slice(0,3).map(p=>`<li>${p.texto} <span class="tag">${p.tag}</span></li>`).join('')}
-        ${listaPendenciasResumo.length===0 ? `<li style="color:var(--cor-texto-suave);">Tudo em dia 🎉</li>` : ''}
-      </ul>
     </div>
 
     ${mercadoDashboardHTML()}
 
     ${contasPagarDashboardHTML()}
 
-    <div class="card">
+    <div class="card dash-entregas">
       <h3>Entregas <button onclick="irPara('entregas')">ver tudo</button></h3>
       <div class="pend-num">${entregasAbertas.length}</div>
       <div class="pend-desc">tipos de entrega em aberto · ${clientesEntregaPendentes} cliente(s) pendente(s)${entregasAtrasadas?' · '+entregasAtrasadas+' atrasada(s)':''}</div>
       <ul class="pend-list">${entregasAbertas.slice(0,3).map(e=>`<li>${e.titulo} <span class="tag" style="color:${e.prazo<hoje?'#B0413E':'var(--cor-texto-suave)'}">${dataBR(e.prazo)}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhuma entrega pendente.</li>'}</ul>
     </div>
 
-    <div class="card">
+    <div class="card dash-vencimentos">
       <h3>Próximos vencimentos <button onclick="irPara('obrigacoes')">programar</button></h3>
       <div class="pend-num">${vencimentos30.length}</div><div class="pend-desc">alertas para os próximos 30 dias</div>
       <ul class="pend-list">${vencimentos30.slice(0,4).map(v=>`<li>${v.titulo} <span class="tag" style="color:${v.dias<=15?'#B0413E':'#E36216'}">${v.dias<0?'vencido':v.dias+' dias'} · ${v.cliente||''}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhum vencimento próximo.</li>'}</ul>
@@ -4759,31 +4756,31 @@ function dashboardHTML(){
 
     ${calendarioDocumentacoesDashboardHTML()}
 
-    <div class="card" style="border-top:4px solid var(--cor-acento)">
+    <div class="card dash-radar" style="border-top:4px solid var(--cor-acento)">
       <h3>Radar do mês <button onclick="irPara('planejamento')">abrir planejamento</button></h3>
       <div class="pend-num">${(()=>{const anterior=planejamentoMesOffset;planejamentoMesOffset=0;const m=metricasFechamento();planejamentoMesOffset=anterior;return m.check.pendentes+m.vinc.filter(v=>v.status!=='entregue').length+OBRIGACOES.filter(o=>o.status!=='realizada'&&o.vencimento?.startsWith(m.pref)).length})()}</div>
       <div class="pend-desc">pontos pedem atenção entre checklists, entregas e obrigações</div>
     </div>
 
-    <div class="card">
+    <div class="card dash-visitas-mes">
       <h3>Visitas do mês <button onclick="irPara('clientes')">ver clientes</button></h3>
       <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px"><strong>Bruna Ribeiro</strong><span>${realizadasBRC}/${metaBRC} · faltam ${Math.max(0,metaBRC-realizadasBRC)}</span></div><div class="proj-barra" style="margin-top:6px"><div style="width:${metaBRC?Math.min(100,realizadasBRC/metaBRC*100):0}%"></div></div></div>
       <div><div style="display:flex;justify-content:space-between;font-size:12px"><strong>Saber Nutrir</strong><span>${realizadasSN}/${metaSN} · faltam ${Math.max(0,metaSN-realizadasSN)}</span></div><div class="proj-barra" style="margin-top:6px"><div style="width:${metaSN?Math.min(100,realizadasSN/metaSN*100):0}%"></div></div></div>
     </div>
 
-    <div class="card">
+    <div class="card dash-checklists">
       <h3>Checklists Saber Nutrir <button onclick="${saberNutrir?`abrirCliente('${saberNutrir.id}')`:`irPara('clientes')`}">abrir controle</button></h3>
       <div class="pend-num">${resumoChecklistsSN.enviados}/${resumoChecklistsSN.total}</div>
       <div class="pend-desc">enviados em ${MESES_NOME[Number(mesAtual.slice(5))-1]} · ${resumoChecklistsSN.pendentes} pendente(s)</div>
       <div class="proj-barra" style="margin-top:12px"><div style="width:${resumoChecklistsSN.total?Math.round(resumoChecklistsSN.enviados/resumoChecklistsSN.total*100):0}%"></div></div>
     </div>
 
-    <div class="card conteudo-full">
+    <div class="card conteudo-full dash-visitas-ano">
       <h3>Visitas realizadas em ${anoAtual}</h3><div class="pend-num">${visitasAno.length}</div><div class="pend-desc">${visitasAno.filter(e=>e.categoria==='brc').length} Bruna Ribeiro · ${visitasAno.filter(e=>e.categoria==='saber_nutrir').length} Saber Nutrir</div>
       <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end;height:90px;margin-top:14px">${mesesVisitas.map(m=>`<div style="text-align:center;font-size:9px;color:var(--cor-texto-suave)"><div style="font-weight:700;color:var(--cor-primaria);margin-bottom:3px">${m.qtd}</div><div style="height:${Math.max(3,m.qtd*3)}px;max-height:55px;background:var(--cor-primaria);border-radius:4px 4px 0 0"></div><div style="margin-top:3px">${m.nome}</div></div>`).join('')}</div>
     </div>
 
-    <div class="card">
+    <div class="card dash-projetos">
       <h3>Projetos ativos <button onclick="irPara('projetos')">ver tudo</button></h3>
       ${projetosAtivos.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum projeto cadastrado ainda.</div>` :
         projetosAtivos.map(p=>{
@@ -4794,7 +4791,7 @@ function dashboardHTML(){
         }).join('')}
     </div>
 
-    <div class="card conteudo-full">
+    <div class="card conteudo-full dash-conteudo">
       <h3>Conteúdo do dia <button onclick="irPara('marketing')">calendário editorial</button></h3>
       <div class="conteudo-cards">
         ${conteudoHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum conteúdo no calendário ainda.</div>` :
@@ -4802,7 +4799,7 @@ function dashboardHTML(){
       </div>
     </div>
 
-    <div class="card">
+    <div class="card dash-lideranca">
       <h3>Liderança <button onclick="irPara('lideranca')">acompanhar</button></h3>
       <div class="pend-num">${LIDERANCA_DELEGACOES.filter(d=>d.status!=='concluida').length}</div>
       <div class="pend-desc">delegações ativas · ${LIDERANCA_DELEGACOES.filter(d=>d.status==='aguardando_validacao').length} aguardando sua validação</div>

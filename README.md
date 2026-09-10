@@ -230,6 +230,23 @@ conectado ao Supabase e preparado para instalação como PWA.
 - compatibilidade com visitas antigas da Saber Nutrir cadastradas antes do seletor de clientes;
 - migração segura para vincular somente registros antigos com correspondência inequívoca, sem excluir compromissos.
 
+## Rodada V39 — Dashboard bento no computador
+
+- reorganização exclusiva do Dashboard em telas grandes, sem alterar celular e tablet;
+- grade de 12 colunas com cards proporcionais e linhas visualmente equilibradas;
+- calendário documental ocupando toda a largura útil, sem coluna vazia ao lado;
+- agrupamento de indicadores relacionados em blocos de três;
+- limite de altura e rolagem interna para Agenda, Mercado e Contas quando houver muitos registros;
+- atalhos rápidos preservados ao final do painel.
+
+## Rodada V40 — Dashboard mais limpo
+
+- retirada somente do card de Pendências do Dashboard;
+- módulo de Pendências e registros dos clientes integralmente preservados;
+- Mercado e Contas a Pagar passam a dividir toda a largura da faixa no computador;
+- distribuição de tablet e celular mantida;
+- cache do aplicativo atualizado para carregar o novo layout.
+
 ## Conteúdo do pacote
 
 - `index.html`: aplicação completa;
