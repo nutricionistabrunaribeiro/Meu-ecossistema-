@@ -3,6 +3,18 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V41 — Painel documental e Agenda em sequência
+
+- Documentação dos clientes reorganizada em painel por frentes, sem apagar os registros existentes;
+- itens-base preenchíveis, editáveis, excluíveis e marcáveis como não aplicáveis;
+- emissão/elaboração, validade, observações e status reunidos por documento;
+- contrato, empresa responsável e regularidade integrados ao próprio serviço terceirizado;
+- documentos antigos sem correspondência permanecem em Documentos personalizados;
+- calendário documental do Dashboard continua alimentado pelas validades;
+- Agenda cadastrada e exibida na sequência Cliente → Tipo → Detalhe opcional;
+- cor dos compromissos continua automática conforme tipo e carteira do cliente;
+- cache do PWA atualizado para V41.
+
 ## Rodada V37 — Chegar leve aos 38
 
 - projeto pessoal temporário criado dentro do módulo persistente de Projetos;

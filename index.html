@@ -611,6 +611,9 @@
   .docrow:last-child{border-bottom:none;}
   .docrow-head{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--cor-texto-suave);font-weight:700;padding-bottom:6px;border-bottom:1px solid var(--cor-borda);}
   @media (max-width:640px){ .docrow, .docrow-head{grid-template-columns:1fr;} }
+  .doc-panel-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.doc-panel-resumo>div{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:13px;padding:12px}.doc-panel-resumo strong{display:block;font-family:'Fraunces',serif;font-size:22px;color:var(--cor-primaria)}.doc-panel-resumo span{font-size:10.5px;color:var(--cor-texto-suave)}
+  .doc-grupo{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:15px;margin-bottom:10px;overflow:hidden}.doc-grupo summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px}.doc-grupo summary::-webkit-details-marker{display:none}.doc-grupo-titulo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:13px}.doc-grupo-icone{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#E5F1E8,#FFF0E6);display:flex;align-items:center;justify-content:center}.doc-grupo-contagem{font-size:10.5px;color:var(--cor-texto-suave);white-space:nowrap}.doc-grupo-corpo{border-top:1px solid var(--cor-borda);padding:5px 14px 10px}.doc-check-item{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(90px,.7fr) minmax(90px,.7fr) auto;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--cor-borda)}.doc-check-item:last-child{border-bottom:none}.doc-check-item.pendente{opacity:.78}.doc-check-nome{font-size:12.5px;font-weight:600}.doc-check-meta{font-size:10px;color:var(--cor-texto-suave);margin-top:3px}.doc-check-data{font-size:10.5px;color:var(--cor-texto-suave)}.doc-check-acoes{display:flex;gap:5px}.doc-check-acoes button{border:1px solid var(--cor-borda);border-radius:8px;padding:7px 9px;font-size:10.5px}.doc-modelo-nota{font-size:11px;color:var(--cor-texto-suave);margin:8px 0 15px}.doc-toggle-row{display:flex;gap:8px;flex-wrap:wrap}.doc-toggle-row label{display:flex;align-items:center;gap:6px;border:1px solid var(--cor-borda);border-radius:9px;padding:8px 10px;font-size:11px}.doc-toggle-row input{accent-color:var(--cor-primaria)}
+  @media(max-width:720px){.doc-panel-resumo{grid-template-columns:1fr 1fr}.doc-check-item{grid-template-columns:1fr auto}.doc-check-item .doc-check-data{grid-column:1}.doc-check-acoes{grid-column:2;grid-row:1/3}.doc-grupo summary{padding:12px}.doc-grupo-corpo{padding:4px 11px 8px}}
 
   /* Meu Ano em Pixels */
   .pixel-legenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
@@ -1094,7 +1097,7 @@ function agendaDiaHTML(){
   return `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(-1)">‹</button><button class="agenda-hoje" onclick="irDiaHoje()">Hoje</button></div><div class="agenda-periodo-label">${DIAS_SEMANA[d.getDay()]}, ${isoParaBRCompleto(dataAgendaDiaria)}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(1)">›</button></div></div>
   ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${i.titulo}</span>`).join('')}</section>`:''}
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-primario" onclick="abrirFormularioAgenda('${dataAgendaDiaria}',${Math.min(19,Math.max(7,new Date().getHours()))})">+ Novo compromisso</button></div>
-  <div class="agenda-dia-cards">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="agenda-dia-card ${e.concluido?'concluido':''}"><div class="agenda-dia-hora">${String(e.hora).padStart(2,'0')}:00</div><div class="agenda-dia-cor" style="background:${cat.cor}"></div><div><strong style="font-size:13px">${e.titulo}</strong><div class="agenda-tipo">${rotuloTipoEvento(e.tipo)}${e.clienteNomeVinculado?' · '+e.clienteNomeVinculado:''}${e.clienteExterno?' · '+e.clienteExterno:''}</div></div><button class="btn-secundario" onclick="alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
+  <div class="agenda-dia-cards">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="agenda-dia-card ${e.concluido?'concluido':''}"><div class="agenda-dia-hora">${String(e.hora).padStart(2,'0')}:00</div><div class="agenda-dia-cor" style="background:${cat.cor}"></div><div>${eventoResumoHTML(e)}</div><button class="btn-secundario" onclick="alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
 }
 
 function agendaSemanaHTML(){
@@ -1122,7 +1125,7 @@ function agendaSemanaHTML(){
       const idCel = `cel-${dataISO}-${hora}`;
       const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora);
       let chips = eventos.map(e=>
-        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${e.tipo||'Tipo não definido'} · toque para marcar como feito">${e.titulo}${e.clienteNomeVinculado?' — '+e.clienteNomeVinculado:''}${e.clienteExterno?' — '+e.clienteExterno:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
+        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
       ).join('');
       grid += `<div class="planner-cell" id="${idCel}" onclick="abrirQuickAdd('${dataISO}', ${hora})">${chips}</div>`;
     });
@@ -1180,6 +1183,9 @@ function selecionarCategoriaEvento(cat){
 }
 const TIPOS_EVENTO_UI=[['visita','Visita'],['reuniao','Reunião'],['treinamento','Treinamento'],['demanda','Demanda administrativa'],['pessoal','Compromisso pessoal'],['financeiro','Financeiro'],['outro','Outro']];
 function rotuloTipoEvento(tipo){return TIPOS_EVENTO_UI.find(t=>t[0]===tipo)?.[1]||'Compromisso';}
+function nomeClienteEvento(e){return e.clienteNomeVinculado||e.clienteExterno||'';}
+function eventoResumoHTML(e,compacto=false){const cliente=nomeClienteEvento(e),tipo=rotuloTipoEvento(e.tipo),detalhe=e.titulo&&e.titulo!==tipo?e.titulo:'';return `${cliente?`<strong${compacto?' style="font-size:inherit"':''}>${textoHTML(cliente)}</strong>`:''}<div class="agenda-tipo">${textoHTML(tipo)}</div>${detalhe?`<div${compacto?' class="agenda-detalhe"':''}>${textoHTML(detalhe)}</div>`:''}`;}
+function eventoResumoTexto(e){return [nomeClienteEvento(e),rotuloTipoEvento(e.tipo),e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?e.titulo:''].filter(Boolean).join(' · ');}
 function categoriaPorTipo(tipo,clienteId){
   if(tipo==='visita'){const c=CLIENTES.find(x=>x.id===clienteId);return c?.tipoCliente==='vinculado'?'saber_nutrir':'brc';}
   return ({reuniao:'reuniao',treinamento:'treinamento',pessoal:'pessoal'})[tipo]||'outro';
@@ -1187,14 +1193,14 @@ function categoriaPorTipo(tipo,clienteId){
 function abrirFormularioAgenda(dataISO,hora){
   const clientes=CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo');
   abrirModalSistema(`<div class="system-modal-head"><div><h2>Novo compromisso</h2><p>Preencha na ordem da sua rotina. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
-    <div class="form-field full"><label>1. Qual é o compromisso?</label><input id="agendaTitulo" placeholder="Ex.: Reunião de alinhamento, visita mensal..." autofocus></div>
-    <div class="form-field"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
-    <div class="form-field"><label>3. Cliente ou local</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()"><option value="">Selecione...</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
+    <div class="form-field full"><label>1. Cliente</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()" autofocus><option value="">Sem cliente / compromisso pessoal</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
+    <div class="form-field full"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
+    <div class="form-field full"><label>3. Qual é o compromisso? <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><input id="agendaTitulo" placeholder="Ex.: Revisar FDS e EPIs"></div>
     <div class="form-field"><label>Data</label><input type="date" id="agendaData" value="${dataISO}"></div>
     <div class="form-field"><label>Horário</label><select id="agendaHora">${HORAS_PLANNER.map(h=>`<option value="${h}" ${h===hora?'selected':''}>${String(h).padStart(2,'0')}:00</option>`).join('')}</select></div>
     <div class="form-field full"><label>Identificação visual automática</label><div class="form-color-preview"><i id="agendaCorPreview"></i><span id="agendaCorTexto"></span></div></div>
   </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="confirmarNovoEvento()">Salvar compromisso</button></div>`);
-  atualizarFormularioAgenda();setTimeout(()=>document.getElementById('agendaTitulo')?.focus(),0);
+  atualizarFormularioAgenda();setTimeout(()=>document.getElementById('agendaCliente')?.focus(),0);
 }
 function atualizarFormularioAgenda(){
   const tipo=document.getElementById('agendaTipo')?.value||'visita',clienteId=document.getElementById('agendaCliente')?.value||null,cat=categoriaPorTipo(tipo,clienteId),def=CATEGORIAS_EVENTO.find(c=>c.id===cat)||CATEGORIAS_EVENTO.at(-1),select=document.getElementById('agendaCliente'),hint=document.getElementById('agendaClienteHint');
@@ -1204,9 +1210,8 @@ function atualizarFormularioAgenda(){
 }
 async function confirmarNovoEvento(){
   const input = document.getElementById('agendaTitulo');
-  const titulo = input ? input.value.trim() : '';
-  if(!titulo){ input && input.focus(); return; }
   const tipoEvento=document.getElementById('agendaTipo').value,clienteId=document.getElementById('agendaCliente').value||null,dataISO=document.getElementById('agendaData').value,hora=Number(document.getElementById('agendaHora').value),categoria=categoriaPorTipo(tipoEvento,clienteId),clienteExterno=null;
+  const titulo = input?.value.trim() || rotuloTipoEvento(tipoEvento);
   if(tipoEvento==='visita'&&!clienteId){document.getElementById('agendaCliente').focus();dispararAutomacao('Selecione o cliente','Toda visita precisa estar vinculada para entrar nos indicadores.');return;}
   if(!dataISO)return;
   const { data, error } = await supa.from('eventos').insert({
@@ -1220,7 +1225,7 @@ async function confirmarNovoEvento(){
   });
   const d = new Date(dataISO+'T00:00:00');
   fecharModalSistema();
-  dispararAutomacao('Compromisso criado', `"${titulo}" — ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h.`);
+  dispararAutomacao('Compromisso criado', `${[data.clientes?.nome,rotuloTipoEvento(tipoEvento),input?.value.trim()].filter(Boolean).join(' · ')} — ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h.`);
   renderTela();
 }
 async function alternarConcluidoEvento(id){
@@ -1377,7 +1382,10 @@ async function carregarClientesSupabase(){
     if(cliente){
       cliente.documentacao.push({
         id:doc.id, nome:doc.nome, tipo:doc.tipo || 'Documento', emissao:doc.emissao || '—',
-        validade:doc.validade || '—', revisao:doc.revisao || '—', status:doc.status || 'Válido'
+        validade:doc.validade || '—', revisao:doc.revisao || '—', status:doc.status || 'Válido',
+        categoria:doc.categoria||'personalizados', modeloChave:doc.modelo_chave||null, observacoes:doc.observacoes||'',
+        empresaResponsavel:doc.empresa_responsavel||'', possuiContrato:doc.possui_contrato, documentacaoCompleta:doc.documentacao_completa,
+        aplicavel:doc.aplicavel!==false
       });
     }
   });
@@ -1500,7 +1508,7 @@ function classeStatusDoc(status){
 let MES_DOCUMENTOS_OFFSET=0;
 let DIA_DOCUMENTOS_SELECIONADO=formatoISO(new Date());
 function documentosComContexto(){
-  return CLIENTES.flatMap(c=>(c.documentacao||[]).map(d=>({...d,clienteId:c.id,clienteNome:c.nome,dataValidade:dataLocalDocumento(d.validade)})));
+  return CLIENTES.flatMap(c=>(c.documentacao||[]).filter(d=>d.aplicavel!==false).map(d=>({...d,clienteId:c.id,clienteNome:c.nome,dataValidade:dataLocalDocumento(d.validade)})));
 }
 function classePrazoDocumento(doc){
   if(!doc.dataValidade)return 'sem-data';
@@ -1521,26 +1529,47 @@ function calendarioDocumentacoesDashboardHTML(){
   const selecionados=docs.filter(d=>d.dataValidade&&formatoISO(d.dataValidade)===DIA_DOCUMENTOS_SELECIONADO),dataSelecionada=new Date(DIA_DOCUMENTOS_SELECIONADO+'T12:00:00');
   return `<div class="card doc-calendar-card"><div class="doc-calendar-head"><div><h3>Calendário de documentações <button onclick="irPara('clientes')">ver clientes</button></h3><div class="doc-calendar-sub">Validades documentais de toda a carteira em uma visão rápida.</div></div><div class="doc-calendar-summary"><span class="doc-summary-pill danger">${resumo.vencido} vencido(s)</span><span class="doc-summary-pill warning">${resumo.urgente} em até 15 dias</span><span class="doc-summary-pill">${resumo.atencao} entre 16 e 30 dias</span><span class="doc-summary-pill ok">${resumo.regular} regular(es)</span>${resumo.semData?`<span class="doc-summary-pill">${resumo.semData} sem validade</span>`:''}</div></div><div class="doc-calendar-layout"><div class="doc-month"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><button class="agenda-nav-icon" onclick="mudarMesDocumentos(-1)">‹</button><strong class="serif">${MESES_NOME[mes]} ${ano}</strong><button class="agenda-nav-icon" onclick="mudarMesDocumentos(1)">›</button></div><div class="doc-week">${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d=>`<span>${d}</span>`).join('')}</div><div class="doc-days">${celulas.join('')}</div><div style="display:flex;gap:11px;flex-wrap:wrap;margin-top:10px;font-size:9.5px;color:var(--cor-texto-suave)"><span><i class="doc-dot vencido" style="display:inline-block"></i> vencido</span><span><i class="doc-dot urgente" style="display:inline-block"></i> até 15 dias</span><span><i class="doc-dot atencao" style="display:inline-block"></i> 16–30 dias</span><span><i class="doc-dot regular" style="display:inline-block"></i> regular</span></div></div><div class="doc-calendar-list"><div class="doc-calendar-list-title">${dataSelecionada.toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div>${selecionados.length?selecionados.map(d=>`<div class="doc-calendar-item"><i class="doc-dot ${classePrazoDocumento(d)}"></i><div><strong>${textoHTML(d.nome)}</strong><small>${textoHTML(d.clienteNome)} · ${textoHTML(d.tipo||'Documento')}</small></div></div>`).join(''):'<div class="placeholder" style="min-height:120px">Nenhum documento vence neste dia.</div>'}</div></div></div>`;
 }
-async function novoDocumentoCliente(clienteId){
-  const nome = prompt("Nome do documento (ex: Manual de Boas Práticas, Contrato, Licença...):");
-  if(!nome || !nome.trim()) return;
-  const tipo = prompt("Tipo (Manual, POP, MBP, Contrato, Licença, Certificado...):", "Documento") || "Documento";
-  const emissaoISO = await selecionarDataVisual({titulo:'Data de emissão',opcional:true});if(emissaoISO===null)return;
-  const validadeISO = await selecionarDataVisual({titulo:'Data de validade',opcional:true});if(validadeISO===null)return;
-  const emissao = emissaoISO ? isoParaBRCompleto(emissaoISO) : "—";
-  const validade = validadeISO ? isoParaBRCompleto(validadeISO) : "—";
-  const c = CLIENTES.find(x=>x.id===clienteId);
-  const statusTela = statusAutomaticoDoc(validade);
-  const statusBanco = statusTela==='Vigente' ? 'Válido' : statusTela==='Próximo do vencimento' ? 'Vencendo' : statusTela;
-  const { data, error } = await supa.from('documentacao_cliente').insert({
-    cliente_id:clienteId, nome:nome.trim(), tipo, emissao, validade, status:statusBanco
-  }).select().single();
-  if(error){ dispararAutomacao('Erro ao adicionar documento', error.message); return; }
-  if(!c.documentacao) c.documentacao = [];
-  c.documentacao.push({id:data.id, nome:nome.trim(), tipo, emissao, validade, status:statusBanco});
-  dispararAutomacao('Documento adicionado ao Controle de Documentação', `"${nome.trim()}" — ${c.nome}`);
-  renderTela();
+const MODELO_DOCUMENTACAO=[
+  {id:'regularizacao',nome:'Licenças e regularização',icone:'▣',itens:[['cnpj','CNPJ'],['contrato_social','Contrato social / requerimento empresarial'],['inscricao_municipal','Inscrição municipal'],['licenca_sanitaria','Licença ou alvará sanitário'],['alvara_funcionamento','Alvará de funcionamento'],['avcb_clcb','AVCB ou CLCB'],['responsabilidade_tecnica','Responsabilidade técnica e regularidade no conselho']]},
+  {id:'boas_praticas',nome:'Manual, POPs e segurança dos alimentos',icone:'✓',itens:[['manual_boas_praticas','Manual de Boas Práticas'],['pops','Procedimentos Operacionais Padronizados (POPs)'],['plano_alergenicos','Plano de controle de alergênicos'],['rastreabilidade','Procedimento de rastreabilidade'],['plano_acao','Plano de ação das não conformidades']]},
+  {id:'colaboradores',nome:'Colaboradores e segurança do trabalho',icone:'♙',itens:[['pgr','PGR'],['pcmso','PCMSO'],['asos','ASOs dos colaboradores'],['treinamento_bpf','Treinamento em Boas Práticas'],['fichas_epi','Fichas de entrega de EPI']]},
+  {id:'pragas',nome:'Controle de pragas',icone:'◉',servico:true,itens:[['controle_pragas','Gestão do controle de pragas']]},
+  {id:'agua',nome:'Água e caixa-d’água',icone:'◇',servico:true,itens:[['caixa_agua','Higienização da caixa-d’água'],['potabilidade','Laudo de potabilidade da água'],['filtro','Troca da vela do filtro']]},
+  {id:'residuos',nome:'Resíduos e coleta de óleo',icone:'♻',servico:true,itens:[['coleta_residuos','Gestão da coleta de resíduos'],['coleta_oleo','Gestão da coleta de óleo'],['pgrs','PGRS, quando aplicável']]},
+  {id:'equipamentos',nome:'Equipamentos, calibração e manutenção',icone:'⚙',servico:true,itens:[['calibracao_termometros','Calibração de termômetros'],['calibracao_balancas','Calibração de balanças'],['manutencao_equipamentos','Manutenção preventiva de equipamentos']]},
+  {id:'estrutura',nome:'Coifas, dutos e climatização',icone:'⌂',servico:true,itens:[['coifas_dutos','Limpeza e manutenção de coifas e dutos'],['pmoc','PMOC, quando aplicável'],['instalacao_gas','Inspeção da instalação de gás']]},
+  {id:'fornecedores',nome:'Fornecedores, produtos e rotulagem',icone:'▤',itens:[['fornecedores_aprovados','Relação de fornecedores aprovados'],['licencas_fornecedores','Regularidade dos fornecedores'],['fichas_tecnicas','Fichas técnicas dos produtos'],['fds_produtos','FDS dos produtos químicos'],['rotulagem','Documentação de rotulagem e alergênicos']]},
+  {id:'transporte',nome:'Transporte',icone:'⌁',servico:true,itens:[['documentacao_veiculo','Documentação do veículo e motorista'],['contrato_transportadora','Regularidade da transportadora'],['higienizacao_veiculo','Higienização do veículo'],['temperatura_transporte','Controle de temperatura no transporte']]},
+  {id:'registros',nome:'Registros operacionais',icone:'▦',itens:[['controle_temperatura','Controle de temperatura'],['controle_recebimento','Controle de recebimento'],['registros_higienizacao','Registros de higienização'],['controle_oleo','Controle de qualidade e troca do óleo'],['coleta_amostras','Controle de coleta de amostras'],['asseio_pessoal','Registros de asseio pessoal']]}
+];
+function normalizarDocumento(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
+const ALIASES_DOCUMENTOS={licenca_sanitaria:['licenca sanitaria'],alvara_funcionamento:['licenca de funcionamento','alvara de funcionamento'],avcb_clcb:['avcb','clcb'],manual_boas_praticas:['manual de boas praticas'],pops:['pops'],asos:['asos','aso nutri'],treinamento_bpf:['treinamento'],controle_pragas:['dedetizacao','documentacao da trully nollen'],caixa_agua:["higienizacao caixa d agua","higienizacao de caixa d agua"],potabilidade:['potabilidade agua','analise de potabilidade','potabilidade responsabilidade do einstein'],filtro:['troca da vela do filtro'],coleta_oleo:['certificado de troca de oleo'],calibracao_termometros:['calibracao termometro','termometro'],coifas_dutos:['manutencao coifa','manutencao da coifa','manutencao coifa fritadeiras'],documentacao_veiculo:['dedetizacao carro de transporte']};
+function documentoModelo(c,chave){const porChave=(c.documentacao||[]).find(d=>d.modeloChave===chave);if(porChave)return porChave;const nomes=ALIASES_DOCUMENTOS[chave]||[];return (c.documentacao||[]).find(d=>!d.modeloChave&&nomes.includes(normalizarDocumento(d.nome)))||null;}
+function categoriaDocumento(chave){return MODELO_DOCUMENTACAO.find(g=>g.itens.some(i=>i[0]===chave))?.id||'personalizados';}
+function documentoStatusPainel(d){if(!d)return 'Pendente';if(d.aplicavel===false)return 'Não se aplica';if(!d.emissao&&!d.validade)return 'Pendente';return statusAutomaticoDoc(d.validade);}
+function abrirDocumentoModelo(clienteId,chave,nome=null,docId=null){
+  const c=CLIENTES.find(x=>x.id===clienteId),d=docId?(c.documentacao||[]).find(x=>x.id===docId):(chave?documentoModelo(c,chave):null),grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||categoriaDocumento(chave)));
+  abrirModalSistema(`<div class="system-modal-head"><div><h2>${d?'Atualizar':'Preencher'} documentação</h2><p>O sistema acompanha os dados; o arquivo permanece no seu computador.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+    <div class="form-field full"><label>Documento</label><input id="docNome" value="${textoHTML(d?.nome||nome||'')}" ${chave?'readonly':''}></div>
+    <div class="form-field"><label>Data de emissão/elaboração</label><input type="date" id="docEmissao" value="${normalizarDataISO(d?.emissao)||''}"></div>
+    <div class="form-field"><label>Data de validade/próxima execução</label><input type="date" id="docValidade" value="${normalizarDataISO(d?.validade)||''}"></div>
+    ${grupo?.servico?`<div class="form-field"><label>Empresa responsável</label><input id="docEmpresa" value="${textoHTML(d?.empresaResponsavel||'')}" placeholder="Nome da empresa ou prestador"></div><div class="form-field full"><div class="doc-toggle-row"><label><input type="checkbox" id="docContrato" ${d?.possuiContrato===true?'checked':''}> Possui contrato vigente</label><label><input type="checkbox" id="docCompleta" ${d?.documentacaoCompleta===true?'checked':''}> Documentação da empresa completa</label></div></div>`:''}
+    <div class="form-field full"><label>Observações</label><textarea id="docObservacoes" rows="3" placeholder="Responsável, particularidades, pendências...">${textoHTML(d?.observacoes||'')}</textarea></div>
+    <div class="form-field full"><label><input type="checkbox" id="docAplicavel" ${d?.aplicavel===false?'':'checked'} style="accent-color:var(--cor-primaria)"> Este item se aplica ao cliente</label></div>
+  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarDocumentoPainel('${clienteId}','${chave||''}','${d?.id||''}')">Salvar</button></div>`);
 }
+async function salvarDocumentoPainel(clienteId,chave,docId){
+  const c=CLIENTES.find(x=>x.id===clienteId),nome=document.getElementById('docNome').value.trim();if(!nome){document.getElementById('docNome').focus();return;}
+  const emissaoISO=document.getElementById('docEmissao').value,validadeISO=document.getElementById('docValidade').value,aplicavel=document.getElementById('docAplicavel').checked;
+  const emissao=emissaoISO?isoParaBRCompleto(emissaoISO):'—',validade=validadeISO?isoParaBRCompleto(validadeISO):'—',statusTela=aplicavel?statusAutomaticoDoc(validade):'Sem validade',status=statusTela==='Vigente'?'Válido':statusTela==='Próximo do vencimento'?'Vencendo':statusTela==='Vencido'?'Vencido':'Em revisão';
+  const payload={cliente_id:clienteId,nome,tipo:'Documento',emissao,validade,status,categoria:chave?categoriaDocumento(chave):'personalizados',modelo_chave:chave||null,observacoes:document.getElementById('docObservacoes').value.trim(),empresa_responsavel:document.getElementById('docEmpresa')?.value.trim()||null,possui_contrato:document.getElementById('docContrato')?.checked??null,documentacao_completa:document.getElementById('docCompleta')?.checked??null,aplicavel};
+  const existente=docId||(chave?documentoModelo(c,chave)?.id:null);let resposta;
+  if(existente)resposta=await supa.from('documentacao_cliente').update(payload).eq('id',existente).select().single();else resposta=await supa.from('documentacao_cliente').insert(payload).select().single();
+  if(resposta.error){dispararAutomacao('Erro ao salvar documentação',resposta.error.message);return;}
+  const salvo={id:resposta.data.id,nome,tipo:'Documento',emissao,validade,status,categoria:payload.categoria,modeloChave:payload.modelo_chave,observacoes:payload.observacoes,empresaResponsavel:payload.empresa_responsavel||'',possuiContrato:payload.possui_contrato,documentacaoCompleta:payload.documentacao_completa,aplicavel};
+  const idx=c.documentacao.findIndex(x=>x.id===salvo.id);if(idx>=0)c.documentacao[idx]=salvo;else c.documentacao.push(salvo);fecharModalSistema();dispararAutomacao('Documentação atualizada',`${nome} — ${c.nome}`);renderTela();
+}
+function novoDocumentoCliente(clienteId){abrirDocumentoModelo(clienteId,'','');}
 async function removerDocumentoCliente(clienteId, docId){
   const c = CLIENTES.find(x=>x.id===clienteId);
   const doc = c.documentacao.find(d=>d.id===docId);
@@ -1553,24 +1582,11 @@ async function removerDocumentoCliente(clienteId, docId){
 }
 function checklistDocumentacaoHTML(c){
   const docs = c.documentacao || [];
-  return `
-    <div class="module-explainer"><strong>Documentação é o registro ou comprovante.</strong> Use esta área para controlar o que existe, sua emissão e validade. Os arquivos continuam guardados no seu computador; o sistema apenas acompanha o status.</div>
-    <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div>
-    ${docs.length===0 ? semRegistro() : `
-    <div class="docrow docrow-head">
-      <div>Documento</div><div>Tipo</div><div>Validade</div><div>Status</div><div></div>
-    </div>
-    ${docs.map(d=>{
-      const status = statusAutomaticoDoc(d.validade);
-      return `
-      <div class="docrow">
-        <div>${d.nome}</div>
-        <div>${d.tipo}</div>
-        <div>${d.validade}</div>
-        <div><span class="doc-status-pill ${classeStatusDoc(status)}">${status}</span></div>
-        <div><button onclick="removerDocumentoCliente('${c.id}','${d.id}')" style="color:var(--cor-texto-suave);font-size:13px;">✕</button></div>
-      </div>`;
-    }).join('')}`}`;
+  const preenchidos=docs.filter(d=>d.aplicavel!==false).length,vencidos=docs.filter(d=>documentoStatusPainel(d)==='Vencido').length,vencendo=docs.filter(d=>documentoStatusPainel(d)==='Próximo do vencimento').length,totalModelo=MODELO_DOCUMENTACAO.reduce((s,g)=>s+g.itens.length,0);
+  const usados=new Set();
+  const grupos=MODELO_DOCUMENTACAO.map((g,gi)=>{const itens=g.itens.map(([chave,nome])=>{const d=documentoModelo(c,chave);if(d)usados.add(d.id);const status=documentoStatusPainel(d),meta=[d?.empresaResponsavel,d?.possuiContrato===true?'Contrato vigente':d?.possuiContrato===false?'Sem contrato':'',d?.documentacaoCompleta===true?'Documentação completa':d?.documentacaoCompleta===false?'Documentação incompleta':''].filter(Boolean).join(' · ');return `<div class="doc-check-item ${d?'':'pendente'}"><div><div class="doc-check-nome">${textoHTML(nome)}</div>${meta?`<div class="doc-check-meta">${textoHTML(meta)}</div>`:''}</div><div class="doc-check-data">${d?.emissao&&d.emissao!=='—'?'Emissão: '+textoHTML(d.emissao):'Sem emissão'}</div><div><span class="doc-status-pill ${classeStatusDoc(status)}">${status}</span>${d?.validade&&d.validade!=='—'?`<div class="doc-check-data">até ${textoHTML(d.validade)}</div>`:''}</div><div class="doc-check-acoes"><button onclick="abrirDocumentoModelo('${c.id}','${chave}','${textoHTML(nome)}')">${d?'Editar':'Preencher'}</button>${d?`<button onclick="removerDocumentoCliente('${c.id}','${d.id}')" title="Excluir">✕</button>`:''}</div></div>`}).join('');const qtd=g.itens.filter(([ch])=>documentoModelo(c,ch)).length;return `<details class="doc-grupo" ${gi===0?'open':''}><summary><div class="doc-grupo-titulo"><span class="doc-grupo-icone">${g.icone}</span>${g.nome}</div><span class="doc-grupo-contagem">${qtd}/${g.itens.length} preenchido(s) ▾</span></summary><div class="doc-grupo-corpo">${itens}</div></details>`}).join('');
+  const personalizados=docs.filter(d=>!usados.has(d.id));
+  return `<div class="module-explainer"><strong>Painel documental do cliente.</strong> Preencha emissão, validade e observações. Nos serviços terceirizados, contrato, empresa e regularidade ficam juntos no mesmo item. Os arquivos continuam no seu computador.</div><div class="doc-panel-resumo"><div><strong>${preenchidos}</strong><span>registros preenchidos</span></div><div><strong>${totalModelo}</strong><span>itens no modelo</span></div><div><strong>${vencendo}</strong><span>próximos do vencimento</span></div><div><strong>${vencidos}</strong><span>vencidos</span></div></div><div class="doc-modelo-nota">Use “Não se aplica” quando a exigência não fizer parte da realidade deste cliente.</div>${grupos}<details class="doc-grupo" ${personalizados.length?'open':''}><summary><div class="doc-grupo-titulo"><span class="doc-grupo-icone">＋</span>Documentos personalizados</div><span class="doc-grupo-contagem">${personalizados.length} registro(s) ▾</span></summary><div class="doc-grupo-corpo"><div style="padding:10px 0"><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Adicionar documento</button></div>${personalizados.map(d=>{const status=documentoStatusPainel(d);return `<div class="doc-check-item"><div><div class="doc-check-nome">${textoHTML(d.nome)}</div>${d.observacoes?`<div class="doc-check-meta">${textoHTML(d.observacoes)}</div>`:''}</div><div class="doc-check-data">${d.emissao&&d.emissao!=='—'?'Emissão: '+textoHTML(d.emissao):'Sem emissão'}</div><div><span class="doc-status-pill ${classeStatusDoc(status)}">${status}</span>${d.validade&&d.validade!=='—'?`<div class="doc-check-data">até ${textoHTML(d.validade)}</div>`:''}</div><div class="doc-check-acoes"><button onclick="abrirDocumentoModelo('${c.id}','','${textoHTML(d.nome)}','${d.id}')">Editar</button><button onclick="removerDocumentoCliente('${c.id}','${d.id}')">✕</button></div></div>`}).join('')}</div></details>`;
 }
 
 async function editarCampoCliente(clienteId, campoDb, rotulo){
@@ -4734,7 +4750,7 @@ function dashboardHTML(){
     <div class="card card-destaque dash-agenda">
       <h3>Agenda de hoje <button onclick="irPara('agenda')">ver tudo</button></h3>
       ${eventosHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nada agendado para hoje.</div>` :
-        eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${e.titulo}${e.concluido?' ✓':''}<div class="agenda-tipo">${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria)?.nome||e.categoria}</div></div></div>`).join('')}
+        eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${eventoResumoHTML(e,true)}${e.concluido?' <span title="Concluído">✓</span>':''}</div></div>`).join('')}
     </div>
 
     ${mercadoDashboardHTML()}
