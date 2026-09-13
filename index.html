@@ -1855,6 +1855,20 @@ function gerarChecklistOficial(modeloId=MODELO_CHECKLIST_ID){
   // clona o modelo carregado do banco, pronto pra uma nova visita responder do zero
   return TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===modeloId).map(i => ({...i, resultado:null, obs:"", validade:null, fotos:[]}));
 }
+function modelosChecklistOrdenados(){
+  return MODELOS_CHECKLIST
+    .filter(m=>m.ativo && TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo))
+    .sort((a,b)=>Number(!/principal/i.test(a.nome))-Number(!/principal/i.test(b.nome))||a.nome.localeCompare(b.nome,'pt-BR'));
+}
+function resumoModeloChecklist(modelo){
+  const itens=TODOS_ITENS_CHECKLIST.filter(i=>i.modeloId===modelo.id&&i.ativo);
+  const categorias=[...new Set(itens.map(i=>i.categoria))];
+  const destaques=[];
+  if(categorias.some(c=>/DML|Material de Limpeza/i.test(c)))destaques.push('DML');
+  if(categorias.some(c=>/Vesti/i.test(c)))destaques.push('Vestiários');
+  if(categorias.some(c=>/Transporte/i.test(c)))destaques.push('Transporte');
+  return `${itens.length} itens${destaques.length?' · inclui '+destaques.join(', '):' · auditoria RDC'}`;
+}
 
 let VISITAS = [];
 
@@ -1948,9 +1962,9 @@ async function novaVisita(clienteId=null){
     clienteEscolhido=await selecionarClientesVisual({titulo:'Cliente do checklist',clientes:clientesChecklist});
     if(!clienteEscolhido)return;
   }
-  const modelosAtivos=MODELOS_CHECKLIST.filter(m=>m.ativo && TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo));
+  const modelosAtivos=modelosChecklistOrdenados();
   if(!modelosAtivos.length){ alert('Crie e ative um modelo com pelo menos um item em Configurações.'); return; }
-  const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome}`).join('\n')}\n\nDigite o número:`);
+  const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome} — ${resumoModeloChecklist(m)}`).join('\n')}\n\nChecklist Principal é o modelo completo. Digite o número:`, '1');
   const modelo=modelosAtivos[parseInt(escolhaModelo)-1]; if(!modelo)return;
   const dataISO=await selecionarDataVisual({titulo:'Data de aplicação do checklist',valor:formatoISO(new Date()),opcional:false});
   if(!dataISO)return;const dataTxt=isoParaBRCompleto(dataISO);
@@ -2163,8 +2177,10 @@ function fichaVisitaHTML(v){
         <div style="margin-top:18px;"><button class="btn-primario" onclick="irParaEtapaVisita('durante')">Iniciar visita →</button></div>
       </div>`;
   } else if(etapaVisitaAtual === 'durante'){
+    const modeloCompleto=/principal/i.test(v.modeloNome||'');
     corpoEtapa = `
       <div class="autosave-bar"><span><span class="autosave-dot"></span>Salvamento automático ativo${ultimoSalvamentoChecklist?' · salvo às '+ultimoSalvamentoChecklist.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''}</span><button class="btn-secundario" onclick="salvarChecklistAgora('${v.id}')">Salvar agora</button></div>
+      ${modeloCompleto?'':`<div class="module-explainer" style="border-left:4px solid var(--cor-acento)"><strong>Modelo aberto: ${textoHTML(v.modeloNome||'Checklist de Auditoria - RDC')}.</strong> DML, Vestiários e Transporte fazem parte do <strong>Checklist Principal</strong>. Para utilizá-los, inicie um novo checklist e escolha a opção 1.</div>`}
       <div class="score-box">
         <div class="score-num ${pontuacao>=80?'score-boa':'score-baixa'}">${pontuacao}%</div>
         <div style="flex:1;">

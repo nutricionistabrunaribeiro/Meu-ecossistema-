@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V44 — seleção clara do Checklist Principal
+
+- Checklist Principal agora aparece sempre como opção 1 e pré-selecionada ao iniciar;
+- seletor informa a quantidade de itens e destaca DML, Vestiários e Transporte;
+- checklists abertos no modelo de Auditoria RDC exibem uma orientação clara;
+- checklists em andamento e históricos continuam preservados no modelo em que foram criados;
+- cache atualizado para V44.
+
 ## Rodada V43 — Checklist Principal e Auditoria RDC
 
 - Checklist Principal atualizado com os 70 itens do modelo operacional validado;
