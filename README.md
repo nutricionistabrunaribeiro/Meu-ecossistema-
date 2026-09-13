@@ -3,6 +3,15 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Correção V42 — Documentação simplificada
+
+- linhas documentais simplificadas para Documento, Data de emissão, Data de validade e Status;
+- status operacional limitado a Arquivado ou Pendente;
+- avisos de validade continuam calculados separadamente no calendário do Dashboard;
+- após salvar ou editar, o sistema mantém aberta a mesma categoria documental;
+- dados documentais já cadastrados continuam preservados;
+- cache atualizado para V42.
+
 ## Rodada V41 — Painel documental e Agenda em sequência
 
 - Documentação dos clientes reorganizada em painel por frentes, sem apagar os registros existentes;
