@@ -1847,7 +1847,7 @@ async function carregarModeloChecklistSupabase(){
   TODOS_ITENS_CHECKLIST = (data || []).map(row=>({
     id: row.id, modeloId:row.modelo_id, categoria: row.categoria, desc: row.descricao, ordem:row.ordem, ativo:row.ativo!==false, resultado: null, obs: "", fotos: []
   }));
-  MODELO_CHECKLIST_ID = MODELOS_CHECKLIST.find(m=>m.ativo)?.id || MODELOS_CHECKLIST[0]?.id || TODOS_ITENS_CHECKLIST[0]?.modeloId || null;
+  MODELO_CHECKLIST_ID = MODELOS_CHECKLIST.find(m=>m.ativo&&/principal/i.test(m.nome)&&TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo))?.id || MODELOS_CHECKLIST.find(m=>m.ativo&&TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo))?.id || MODELOS_CHECKLIST[0]?.id || TODOS_ITENS_CHECKLIST[0]?.modeloId || null;
   MODELO_CHECKLIST_ADMIN_ID = MODELO_CHECKLIST_ADMIN_ID || MODELO_CHECKLIST_ID;
   ITENS_CHECKLIST_BPF = TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===MODELO_CHECKLIST_ID);
 }

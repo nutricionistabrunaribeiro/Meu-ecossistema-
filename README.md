@@ -3,6 +3,16 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V43 — Checklist Principal e Auditoria RDC
+
+- Checklist Principal atualizado com os 70 itens do modelo operacional validado;
+- documentação ampliada com contratos e regularidade dentro do serviço correspondente;
+- seções específicas para asseio, resíduos, DML, vestiários e transporte;
+- antigo modelo de Boas Práticas preservado e identificado como Checklist de Auditoria - RDC;
+- Checklist Principal priorizado automaticamente ao iniciar um novo preenchimento;
+- históricos, respostas e PDFs antigos permanecem inalterados;
+- cache atualizado para V43.
+
 ## Correção V42 — Documentação simplificada
 
 - linhas documentais simplificadas para Documento, Data de emissão, Data de validade e Status;
