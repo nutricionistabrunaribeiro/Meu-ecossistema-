@@ -1,39 +1,15 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V45 — Próximos passos por cliente
+
+- Geração assistida a partir do checklist mais recente e do controle de documentação.
+- Revisão antes de salvar: responsável, prioridade e prazo.
+- Visões para ações da Bruna, do cliente, de terceiros e concluídas.
+- Inclusão manual, edição, conclusão, reabertura e histórico persistente.
+- Envio opcional das ações da Bruna para Entregas, sem duplicação automática.
+
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
-
-## Rodada V48 — relatório de checklist profissional
-
-- resultado ganhou uma faixa própria, sem disputar espaço com a descrição;
-- descrição agora usa toda a largura útil abaixo do número e do resultado;
-- medição e impressão usam a mesma fonte, eliminando quebras inconsistentes;
-- títulos de categoria não ficam mais sozinhos no final da página;
-- paginação e rodapé profissional adicionados em todas as páginas;
-- ordem oficial da V47 permanece preservada e cache atualizado para V48.
-
-## Rodada V47 — ordem oficial no PDF do checklist
-
-- relatórios voltam a seguir rigorosamente a ordem oficial do modelo;
-- categorias e itens não dependem mais da ordem em que foram preenchidos ou atualizados;
-- checklists concluídos também são reorganizados ao serem carregados para consulta;
-- correção de sobreposição das descrições longas preservada;
-- cache atualizado para V47.
-
-## Rodada V46 — correção do PDF do Checklist Principal
-
-- descrições longas e o selo de resultado agora ocupam colunas independentes;
-- quebra de linha e altura de cada item calculadas dinamicamente;
-- selo `Conforme`, `Não conforme` ou `N/A` não sobrepõe mais o texto;
-- observações, validades e fotografias continuam acompanhando a altura real do item;
-- cache atualizado para V46.
-
-## Rodada V45 — status Implantado na documentação
-
-- nova situação `Implantado` no checklist de controle de documentação;
-- contadores separados para Implantados, Arquivados e Pendentes;
-- registros com validade continuam aparecendo no respectivo dia; registros sem validade permanecem no resumo `sem validade`;
-- cache atualizado para V45.
 
 ## Rodada V44 — seleção clara do Checklist Principal
 
