@@ -3,6 +3,13 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V45 — status Implantado na documentação
+
+- nova situação `Implantado` no checklist de controle de documentação;
+- contadores separados para Implantados, Arquivados e Pendentes;
+- registros com validade continuam aparecendo no respectivo dia; registros sem validade permanecem no resumo `sem validade`;
+- cache atualizado para V45.
+
 ## Rodada V44 — seleção clara do Checklist Principal
 
 - Checklist Principal agora aparece sempre como opção 1 e pré-selecionada ao iniciar;
