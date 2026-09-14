@@ -2398,32 +2398,45 @@ async function gerarPDFVisita(v){
   const itensRespondidos=ordenarItensChecklist(v.checklist.filter(i=>i.resultado));
   const novaPagina=()=>{doc.addPage();y=16;categoriaAtual=null;};
   itensRespondidos.forEach((item,idx)=>{
+    // Define a fonte antes de medir o texto. Assim a quebra calculada e a
+    // impressão usam exatamente o mesmo tamanho, inclusive após observações.
+    doc.setFont(undefined,'bold');doc.setFontSize(8.8);
+    const desc=doc.splitTextToSize(item.desc,largura-12);
+    doc.setFont(undefined,'normal');doc.setFontSize(7.7);
+    const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-12):[];
+    const validade=item.validade?`Validade: ${isoParaBRCompleto(item.validade)}`:'';
+    const fotos=item.fotos||[];
+    const linhasFotos=Math.ceil(fotos.length/3);
+    const alturaDescricao=Math.max(4.2,desc.length*4.2);
+    const alturaObs=obs.length?obs.length*3.6+3:0;
+    const altura=Math.max(23,16+alturaDescricao+alturaObs+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
+
+    // Reserva o cabeçalho da categoria junto com o primeiro item e repete o
+    // título quando a categoria continua em uma nova página.
+    const precisaCabecalho=item.categoria!==categoriaAtual;
+    if(y+(precisaCabecalho?11:0)+altura>278)novaPagina();
     if(item.categoria!==categoriaAtual){
-      if(y>270)novaPagina();
       doc.setFillColor(114,189,136);doc.roundedRect(margem,y,largura,8,1,1,'F');
       doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
       doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;
     }
-    // A descrição e o resultado ocupam colunas independentes para textos longos
-    // nunca passarem por baixo do selo Conforme/Não conforme.
-    const larguraDescricao=128;
+
     const xStatus=margem+largura-38;
     const larguraStatus=34;
-    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,larguraDescricao);
-    const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-10):[];
-    const validade=item.validade?`Validade: ${isoParaBRCompleto(item.validade)}`:'';
-    const fotos=item.fotos||[];
-    const linhasFotos=Math.ceil(fotos.length/3);
-    const alturaDescricao=Math.max(8,desc.length*4.2);
-    const altura=Math.max(18,7+alturaDescricao+obs.length*3.6+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
-    if(y+altura>278){novaPagina();doc.setFillColor(114,189,136);doc.roundedRect(margem,y,largura,8,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;}
     const cor=item.resultado==='conforme'?[114,189,136]:item.resultado==='nao_conforme'?[176,65,62]:[108,107,98];
     doc.setFillColor(252,251,249);doc.setDrawColor(226,224,214);doc.roundedRect(margem,y,largura,altura,2,2,'FD');
     doc.setFillColor(...cor);doc.roundedRect(margem,y,2.2,altura,1,1,'F');
-    doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);doc.text(desc,margem+6,y+6,{lineHeightFactor:1.18});
+
+    // Linha superior exclusiva: número do item à esquerda e resultado à direita.
+    doc.setFont(undefined,'bold');doc.setFontSize(6.7);doc.setTextColor(108,107,98);
+    doc.text(`ITEM ${String(idx+1).padStart(2,'0')}`,margem+6,y+7);
     const status=item.resultado==='conforme'?'CONFORME':item.resultado==='nao_conforme'?'NÃO CONFORME':'N/A';
     doc.setFillColor(...cor);doc.roundedRect(xStatus,y+3,larguraStatus,7,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.4);doc.text(status,xStatus+larguraStatus/2,y+7.6,{align:'center'});
-    let yi=y+7+alturaDescricao;
+
+    doc.setDrawColor(235,232,224);doc.line(margem+6,y+12,margem+largura-6,y+12);
+    doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);
+    doc.text(desc,margem+6,y+17,{lineHeightFactor:1.18});
+    let yi=y+18+alturaDescricao;
     if(obs.length){doc.setFont(undefined,'normal');doc.setFontSize(7.7);doc.setTextColor(item.resultado==='nao_conforme'?142:108,item.resultado==='nao_conforme'?58:107,item.resultado==='nao_conforme'?74:98);doc.text(obs,margem+6,yi);yi+=obs.length*3.6+3;}
     if(validade){doc.setFont(undefined,'bold');doc.setFontSize(7.7);doc.setTextColor(217,130,43);doc.text(validade,margem+6,yi);yi+=5;}
     fotos.forEach((foto,i)=>{const col=i%3;if(i>0&&col===0)yi+=37;const x=margem+6+col*56;const origem=urlFoto(foto);try{doc.addImage(origem,'JPEG',x,yi,52,33);}catch(e){try{doc.addImage(origem,'PNG',x,yi,52,33);}catch(e2){}}});
@@ -2469,14 +2482,19 @@ async function gerarPDFVisita(v){
   doc.setDrawColor(34,35,31);
   doc.line(margem, y, margem+70, y);
   doc.line(120, y, 190, y);
-  doc.setFontSize(8.5);
-  doc.setTextColor(34,35,31);
-  doc.text(`${v.nutricionista} — Nutricionista Responsável`, margem, y+4);
-  doc.text(`${v.clienteNome} — Responsável pelo Estabelecimento`, 120, y+4);
-
   doc.setFontSize(7.5);
-  doc.setTextColor(108,107,98);
-  doc.text('Bruna Ribeiro Consultoria · Gerado automaticamente pelo Meu Ecossistema', 105, 290, {align:'center'});
+  doc.setTextColor(34,35,31);
+  doc.text(doc.splitTextToSize(`${v.nutricionista} — Nutricionista Responsável`,70), margem, y+4);
+  doc.text(doc.splitTextToSize(`${v.clienteNome} — Responsável pelo Estabelecimento`,70), 120, y+4);
+
+  // Rodapé profissional e paginação em todas as páginas.
+  const totalPaginas=doc.getNumberOfPages();
+  for(let pagina=1;pagina<=totalPaginas;pagina++){
+    doc.setPage(pagina);doc.setDrawColor(226,224,214);doc.line(margem,286,210-margem,286);
+    doc.setFont(undefined,'normal');doc.setFontSize(7);doc.setTextColor(108,107,98);
+    doc.text('Bruna Ribeiro Consultoria · Meu Ecossistema',margem,291);
+    doc.text(`Página ${pagina} de ${totalPaginas}`,210-margem,291,{align:'right'});
+  }
 
   const nomeArquivo = `Checklist_${v.clienteNome.replace(/\s+/g,'_')}_${v.mesAno.replace('/','_')}.pdf`;
   ultimoPDFBlob = doc.output('blob');

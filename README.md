@@ -3,6 +3,15 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V48 — relatório de checklist profissional
+
+- resultado ganhou uma faixa própria, sem disputar espaço com a descrição;
+- descrição agora usa toda a largura útil abaixo do número e do resultado;
+- medição e impressão usam a mesma fonte, eliminando quebras inconsistentes;
+- títulos de categoria não ficam mais sozinhos no final da página;
+- paginação e rodapé profissional adicionados em todas as páginas;
+- ordem oficial da V47 permanece preservada e cache atualizado para V48.
+
 ## Rodada V47 — ordem oficial no PDF do checklist
 
 - relatórios voltam a seguir rigorosamente a ordem oficial do modelo;
