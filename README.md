@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V47 — ordem oficial no PDF do checklist
+
+- relatórios voltam a seguir rigorosamente a ordem oficial do modelo;
+- categorias e itens não dependem mais da ordem em que foram preenchidos ou atualizados;
+- checklists concluídos também são reorganizados ao serem carregados para consulta;
+- correção de sobreposição das descrições longas preservada;
+- cache atualizado para V47.
+
 ## Rodada V46 — correção do PDF do Checklist Principal
 
 - descrições longas e o selo de resultado agora ocupam colunas independentes;

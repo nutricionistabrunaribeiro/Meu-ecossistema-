@@ -1856,6 +1856,15 @@ function gerarChecklistOficial(modeloId=MODELO_CHECKLIST_ID){
   // clona o modelo carregado do banco, pronto pra uma nova visita responder do zero
   return TODOS_ITENS_CHECKLIST.filter(i=>i.ativo && i.modeloId===modeloId).map(i => ({...i, resultado:null, obs:"", validade:null, fotos:[]}));
 }
+function ordemItemChecklist(item){
+  const ordemSalva=Number(item?.ordem);
+  if(Number.isFinite(ordemSalva))return ordemSalva;
+  const itemModelo=TODOS_ITENS_CHECKLIST.find(i=>i.id===item?.id);
+  return Number.isFinite(Number(itemModelo?.ordem))?Number(itemModelo.ordem):999999;
+}
+function ordenarItensChecklist(itens){
+  return [...(itens||[])].sort((a,b)=>ordemItemChecklist(a)-ordemItemChecklist(b));
+}
 function modelosChecklistOrdenados(){
   return MODELOS_CHECKLIST
     .filter(m=>m.ativo && TODOS_ITENS_CHECKLIST.some(i=>i.modeloId===m.id&&i.ativo))
@@ -1934,11 +1943,12 @@ async function carregarVisitasSupabase(){
         let item=v.checklist.find(i=>i.id===r.item_modelo_id);
         if(!item && v.status==='concluida'){
           const modelo=TODOS_ITENS_CHECKLIST.find(i=>i.id===r.item_modelo_id);
-          item={id:r.item_modelo_id,categoria:r.categoria_snapshot||modelo?.categoria||'Histórico',desc:r.descricao_snapshot||modelo?.desc||'Item histórico',fotos:[]};
+          item={id:r.item_modelo_id,categoria:r.categoria_snapshot||modelo?.categoria||'Histórico',desc:r.descricao_snapshot||modelo?.desc||'Item histórico',ordem:modelo?.ordem,fotos:[]};
           v.checklist.push(item);
         }
         if(item) Object.assign(item,{respostaId:r.id,resultado:r.resultado,obs:r.observacao||'',validade:r.validade||null,categoria:r.categoria_snapshot||item.categoria,desc:r.descricao_snapshot||item.desc});
       });
+      VISITAS.forEach(v=>{v.checklist=ordenarItensChecklist(v.checklist);});
     }
     const idsRespostas=VISITAS.flatMap(v=>v.checklist.map(i=>i.respostaId).filter(Boolean));
     if(idsRespostas.length){
@@ -2383,7 +2393,9 @@ async function gerarPDFVisita(v){
   y = doc.lastAutoTable.finalY + 8;
 
   let categoriaAtual = null;
-  const itensRespondidos=v.checklist.filter(i=>i.resultado);
+  // O PDF segue a ordem oficial do modelo, independentemente da ordem em que
+  // cada resposta foi preenchida ou atualizada no Supabase.
+  const itensRespondidos=ordenarItensChecklist(v.checklist.filter(i=>i.resultado));
   const novaPagina=()=>{doc.addPage();y=16;categoriaAtual=null;};
   itensRespondidos.forEach((item,idx)=>{
     if(item.categoria!==categoriaAtual){
