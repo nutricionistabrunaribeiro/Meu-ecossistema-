@@ -3,6 +3,14 @@
 Aplicativo web estático (HTML + CSS + JavaScript puro, sem etapa de build),
 conectado ao Supabase e preparado para instalação como PWA.
 
+## Rodada V46 — correção do PDF do Checklist Principal
+
+- descrições longas e o selo de resultado agora ocupam colunas independentes;
+- quebra de linha e altura de cada item calculadas dinamicamente;
+- selo `Conforme`, `Não conforme` ou `N/A` não sobrepõe mais o texto;
+- observações, validades e fotografias continuam acompanhando a altura real do item;
+- cache atualizado para V46.
+
 ## Rodada V45 — status Implantado na documentação
 
 - nova situação `Implantado` no checklist de controle de documentação;

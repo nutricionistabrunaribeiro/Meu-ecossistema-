@@ -2392,20 +2392,26 @@ async function gerarPDFVisita(v){
       doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
       doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;
     }
-    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,138);
+    // A descrição e o resultado ocupam colunas independentes para textos longos
+    // nunca passarem por baixo do selo Conforme/Não conforme.
+    const larguraDescricao=128;
+    const xStatus=margem+largura-38;
+    const larguraStatus=34;
+    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,larguraDescricao);
     const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-10):[];
     const validade=item.validade?`Validade: ${isoParaBRCompleto(item.validade)}`:'';
     const fotos=item.fotos||[];
     const linhasFotos=Math.ceil(fotos.length/3);
-    const altura=Math.max(17,8+desc.length*4+obs.length*3.6+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
+    const alturaDescricao=Math.max(8,desc.length*4.2);
+    const altura=Math.max(18,7+alturaDescricao+obs.length*3.6+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
     if(y+altura>278){novaPagina();doc.setFillColor(114,189,136);doc.roundedRect(margem,y,largura,8,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;}
     const cor=item.resultado==='conforme'?[114,189,136]:item.resultado==='nao_conforme'?[176,65,62]:[108,107,98];
     doc.setFillColor(252,251,249);doc.setDrawColor(226,224,214);doc.roundedRect(margem,y,largura,altura,2,2,'FD');
     doc.setFillColor(...cor);doc.roundedRect(margem,y,2.2,altura,1,1,'F');
-    doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);doc.text(desc,margem+6,y+6);
+    doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);doc.text(desc,margem+6,y+6,{lineHeightFactor:1.18});
     const status=item.resultado==='conforme'?'CONFORME':item.resultado==='nao_conforme'?'NÃO CONFORME':'N/A';
-    doc.setFillColor(...cor);doc.roundedRect(165,y+3,27,6,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.7);doc.text(status,178.5,y+7,{align:'center'});
-    let yi=y+7+desc.length*4;
+    doc.setFillColor(...cor);doc.roundedRect(xStatus,y+3,larguraStatus,7,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.4);doc.text(status,xStatus+larguraStatus/2,y+7.6,{align:'center'});
+    let yi=y+7+alturaDescricao;
     if(obs.length){doc.setFont(undefined,'normal');doc.setFontSize(7.7);doc.setTextColor(item.resultado==='nao_conforme'?142:108,item.resultado==='nao_conforme'?58:107,item.resultado==='nao_conforme'?74:98);doc.text(obs,margem+6,yi);yi+=obs.length*3.6+3;}
     if(validade){doc.setFont(undefined,'bold');doc.setFontSize(7.7);doc.setTextColor(217,130,43);doc.text(validade,margem+6,yi);yi+=5;}
     fotos.forEach((foto,i)=>{const col=i%3;if(i>0&&col===0)yi+=37;const x=margem+6+col*56;const origem=urlFoto(foto);try{doc.addImage(origem,'JPEG',x,yi,52,33);}catch(e){try{doc.addImage(origem,'PNG',x,yi,52,33);}catch(e2){}}});
