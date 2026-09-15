@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-ecossistema-v46';
+const CACHE_NAME = 'meu-ecossistema-v47';
 const APP_SHELL = ['/', '/index.html', '/proximos-passos.js', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', event => {

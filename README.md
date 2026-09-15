@@ -1,5 +1,13 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V47 — Operação mais limpa
+
+- Obrigações e Pendências foram retiradas da navegação e das fichas dos clientes.
+- Os registros antigos continuam preservados no Supabase.
+- Dashboard sem cards ou atalhos redundantes; Entregas ganhou mais destaque.
+- Radar mensal passou a considerar Checklists, Próximos passos, Entregas e Rotinas.
+- Sessões antigas abertas em módulos ocultados retornam com segurança ao Dashboard.
+
 ## Rodada V46 — Entrega agrupada por cliente
 
 - Seleção de várias ações da Bruna para criar um único card em Entregas.

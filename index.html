@@ -105,7 +105,7 @@
     .dashboard-grid>.card{height:100%}
     .dash-arco{grid-column:span 5}.dash-agenda{grid-column:span 7}
     .dash-mercado,.dash-contas{grid-column:span 6}
-    .dash-entregas,.dash-vencimentos{grid-column:span 6}
+    .dash-entregas{grid-column:1/-1}
     .dashboard-grid>.doc-calendar-card{grid-column:1/-1}
     .dash-radar,.dash-visitas-mes,.dash-checklists{grid-column:span 4}
     .dash-visitas-ano{grid-column:span 8}.dash-projetos{grid-column:span 4}
@@ -774,7 +774,7 @@
 
 <div class="toast-container" id="toastContainer"></div>
 <div class="system-modal-bg" id="modalSistema" onclick="if(event.target===this)fecharModalSistema()"><div class="system-modal" id="modalSistemaConteudo"></div></div>
-<div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('pendencia')">⚑ Nova pendência</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
+<div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
 </div>
 
 <script src="/proximos-passos.js"></script>
@@ -791,9 +791,7 @@ const MODULOS = {
       {id:"agenda", nome:"Agenda"},
       {id:"clientes", nome:"Clientes"},
       {id:"visitas", nome:"Checklists"},
-      {id:"pendencias", nome:"Pendências"},
       {id:"entregas", nome:"Entregas"},
-      {id:"obrigacoes", nome:"Obrigações"},
       {id:"planejamento", nome:"Planejamento"},
       {id:"lideranca", nome:"Liderança"},
     ]},
@@ -945,7 +943,6 @@ function acaoRapida(acao){
   document.getElementById('fabWrap').classList.remove('aberto');
   if(acao==='agenda'){espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='agenda';renderSidebar();renderTela();setTimeout(()=>abrirFormularioAgenda(formatoISO(new Date()),Math.min(19,Math.max(7,new Date().getHours()))),0);}
   if(acao==='checklist'){espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='visitas';renderSidebar();renderTela();novaVisita();}
-  if(acao==='pendencia'){espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='pendencias';renderSidebar();renderTela();setTimeout(novaPendenciaManual,0);}
   if(acao==='entrega'){espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='entregas';renderSidebar();renderTela();setTimeout(novaEntrega,0);}
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
@@ -956,9 +953,7 @@ const NOMES_TELA = {
   clientes:["Clientes","3 clientes cadastrados"],
   visitas:["Checklists","Inicie um checklist e arquive no cliente"],
   biblioteca:["Biblioteca","8 documentos"],
-  pendencias:["Pendências","Central combinada"],
   entregas:["Entregas","Prazos e clientes envolvidos"],
-  obrigacoes:["Obrigações","Vencimentos e programação"],
   planejamento:["Planejamento","Radar, datas, rotinas e fechamento mensal"],
   lideranca:["Liderança","Delegações e acompanhamento"],
   marketing:["Marketing","Calendário editorial"],
@@ -1249,11 +1244,9 @@ const ABAS_CLIENTE = [
   {id:"documentacao", nome:"Controle de documentação"},
   {id:"proximos_passos", nome:"Próximos passos"},
   {id:"visitas", nome:"Checklists"},
-  {id:"obrigacoes", nome:"Obrigações"},
   {id:"treinamentos", nome:"Treinamentos"},
   {id:"asseio", nome:"Asseio Pessoal"},
   {id:"projetos", nome:"Projetos"},
-  {id:"pendencias", nome:"Pendências"},
   {id:"financeiro", nome:"Financeiro"},
 ];
 
@@ -1731,10 +1724,6 @@ function abaConteudoClienteHTML(c){
           </span>
         </div>
       `).join('') : semRegistro())+`<h4 style="margin:22px 0 10px;font-size:12px;text-transform:uppercase;color:var(--cor-texto-suave)">Evolução dos resultados</h4>`+graficoEvolucaoChecklist(c);
-    case "pendencias":
-      return pendenciasDoClienteHTML(c);
-    case "obrigacoes":
-      return obrigacoesClienteHTML(c);
     case "treinamentos":
       return treinamentosClienteHTML(c);
     case "asseio":
@@ -4602,19 +4591,19 @@ function metricasFechamento(){
 function cabecalhoMesPlanejamento(){const d=referenciaPlanejamento();return `<div class="plan-mes"><button onclick="planejamentoMesOffset--;renderTela()">←</button><strong>${MESES_NOME[d.getMonth()]} ${d.getFullYear()}</strong><button onclick="planejamentoMesOffset++;renderTela()">→</button></div>`;}
 function radarPlanejamentoHTML(){
   const m=metricasFechamento(),pref=m.pref,pendEnt=m.vinc.filter(v=>v.status!=='entregue').length;
-  const venc=(Array.isArray(OBRIGACOES)?OBRIGACOES:[]).filter(o=>String(o.vencimento||'').startsWith(pref)&&o.status!=='realizada');
+  const passosMes=(Array.isArray(PROXIMOS_PASSOS_CLIENTE)?PROXIMOS_PASSOS_CLIENTE:[]).filter(p=>p.status!=='concluido'&&String(p.prazo||'').startsWith(pref));
   const datas=(Array.isArray(DATAS_PROFISSIONAIS)?DATAS_PROFISSIONAIS:[]).filter(d=>d.ativo&&Number(d.mes)===referenciaPlanejamento().getMonth()+1),oc=[];
   (Array.isArray(ROTINAS_RECORRENTES)?ROTINAS_RECORRENTES:[]).filter(r=>r&&r.ativo).forEach(r=>{try{oc.push(...ocorrenciasRotina(r).map(data=>({r,data,ok:!!execucaoRotina(r.id,data)?.concluida})))}catch(e){console.warn('Rotina ignorada no Radar',r.id,e)}});
-  return `<div class="plan-grid"><div class="plan-hero"><small>VISÃO DO MÊS</small><h2>${m.check.pendentes+pendEnt+venc.length} pontos pedem atenção</h2><p>Checklists, entregas, obrigações e rotinas reunidos sem misturar os históricos.</p></div>${[['Checklists Saber Nutrir',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas Saber Nutrir',m.feitos.length+'/'+m.vinc.length,pendEnt+' pendentes'],['Visitas realizadas',m.eventosMes.length,m.brc+' BRC · '+m.snVisitas+' Saber Nutrir'],['Obrigações',venc.length,venc.length?'previstas no mês':'tudo em dia'],['Rotinas',oc.filter(x=>x.ok).length+'/'+oc.length,oc.filter(x=>!x.ok).length+' a cumprir'],['Datas da área',datas.length,datas.slice(0,2).map(d=>String(d.dia).padStart(2,'0')+'/'+String(d.mes).padStart(2,'0')).join(' · ')||'nenhuma']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div>`;
+  return `<div class="plan-grid"><div class="plan-hero"><small>VISÃO DO MÊS</small><h2>${m.check.pendentes+pendEnt+passosMes.length} pontos pedem atenção</h2><p>Checklists, próximos passos, entregas e rotinas reunidos sem duplicar informações.</p></div>${[['Checklists Saber Nutrir',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas Saber Nutrir',m.feitos.length+'/'+m.vinc.length,pendEnt+' pendentes'],['Visitas realizadas',m.eventosMes.length,m.brc+' BRC · '+m.snVisitas+' Saber Nutrir'],['Próximos passos',passosMes.length,passosMes.length?'com prazo neste mês':'tudo em dia'],['Rotinas',oc.filter(x=>x.ok).length+'/'+oc.length,oc.filter(x=>!x.ok).length+' a cumprir'],['Datas da área',datas.length,datas.slice(0,2).map(d=>String(d.dia).padStart(2,'0')+'/'+String(d.mes).padStart(2,'0')).join(' · ')||'nenhuma']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div>`;
 }
 function datasPlanejamentoHTML(){const ano=referenciaPlanejamento().getFullYear();return `<div class="plan-actions"><button class="btn-primario" onclick="novaDataProfissional()">+ Nova data</button><span>As datas se repetem automaticamente todos os anos.</span></div>${DATAS_PROFISSIONAIS.sort((a,b)=>a.mes-b.mes||a.dia-b.dia).map(d=>`<div class="plan-row ${d.ativo?'':'plan-off'}"><div class="plan-date"><b>${String(d.dia).padStart(2,'0')}</b><span>${MESES_NOME[d.mes-1].slice(0,3)}</span></div><div><strong>${d.titulo}</strong><small>${d.categoria} · alerta ${d.antecedencia_dias} dias antes · ${ano}</small></div><div class="plan-row-actions"><button onclick="criarConteudoDaData('${d.id}')">Criar conteúdo</button><button onclick="editarDataProfissional('${d.id}')">Editar</button><button onclick="alternarDataProfissional('${d.id}')">${d.ativo?'Ocultar':'Exibir'}</button><button onclick="excluirDataProfissional('${d.id}')">✕</button></div></div>`).join('')}`;}
 function rotinasPlanejamentoHTML(){
   const linhas=[];(Array.isArray(ROTINAS_RECORRENTES)?ROTINAS_RECORRENTES:[]).filter(r=>r&&r.ativo).forEach(r=>{try{ocorrenciasRotina(r).forEach(data=>linhas.push({r,data,ok:!!execucaoRotina(r.id,data)?.concluida}))}catch(e){console.warn('Rotina inválida ignorada',r.id,e)}});
-  const m=metricasFechamento(),clientes=Array.isArray(CLIENTES)?CLIENTES:[],sn=clientes.find(c=>c.tipoCliente==='contratante'&&String(c.nome||'').toLowerCase().includes('saber')),metaSN=sn?(sn.visitasPrevistasMes||Number(sn.visitasPrevistasSemana||0)*4):0,entregasMes=(Array.isArray(ENTREGAS)?ENTREGAS:[]).filter(e=>String(e.prazo||'').startsWith(m.pref)),entregasFeitas=entregasMes.filter(e=>entregaConcluida(e)).length,obrigacoesRecorrentes=(Array.isArray(OBRIGACOES)?OBRIGACOES:[]).filter(o=>o&&o.recorrencia_meses&&o.status!=='realizada');
+  const m=metricasFechamento(),clientes=Array.isArray(CLIENTES)?CLIENTES:[],sn=clientes.find(c=>c.tipoCliente==='contratante'&&String(c.nome||'').toLowerCase().includes('saber')),metaSN=sn?(sn.visitasPrevistasMes||Number(sn.visitasPrevistasSemana||0)*4):0,entregasMes=(Array.isArray(ENTREGAS)?ENTREGAS:[]).filter(e=>String(e.prazo||'').startsWith(m.pref)),entregasFeitas=entregasMes.filter(e=>entregaConcluida(e)).length;
   const automaticas=[['Visitas Saber Nutrir',`${m.snVisitas}/${metaSN}`,'meta mensal alimentada pela Agenda',m.snVisitas>=metaSN&&metaSN>0],['Envio de checklists Saber Nutrir',`${m.check.enviados}/${m.check.total}`,`${m.check.pendentes} pendente(s) no mês`,m.check.total>0&&m.check.pendentes===0],['Entregas com prazo no mês',`${entregasFeitas}/${entregasMes.length}`,`${Math.max(0,entregasMes.length-entregasFeitas)} pendente(s)`,entregasMes.length>0&&entregasFeitas===entregasMes.length]];
-  return `<div class="plan-actions"><button class="btn-primario" onclick="novaRotina()">+ Nova rotina</button><span>As rotinas automáticas aproveitam o que já está alimentado no sistema.</span></div><div class="card" style="margin-bottom:14px"><h3>Rotinas automáticas do sistema</h3>${automaticas.map(x=>`<div class="item-lista-simples"><div><strong>${x[0]}</strong><div style="font-size:10.5px;color:var(--cor-texto-suave)">${x[2]}</div></div><span class="tag" style="color:${x[3]?'#2F6B4A':'var(--cor-acento)'}">${x[1]} ${x[3]?'✓':''}</span></div>`).join('')}${obrigacoesRecorrentes.map(o=>`<div class="item-lista-simples"><div><strong>${o.titulo}</strong><div style="font-size:10.5px;color:var(--cor-texto-suave)">Obrigação recorrente a cada ${o.recorrencia_meses} mês(es)</div></div><span class="tag">${dataBR(o.vencimento)}</span></div>`).join('')}</div><h3 style="margin:18px 0 10px">Rotinas criadas por você</h3>${linhas.sort((a,b)=>a.data.localeCompare(b.data)).map(x=>`<div class="plan-row"><button class="plan-check ${x.ok?'ok':''}" onclick="alternarExecucaoRotina('${x.r.id}','${x.data}')">${x.ok?'✓':''}</button><div><strong>${x.r.titulo}</strong><small>${dataBR(x.data)} · ${x.r.categoria} · ${x.r.frequencia}</small></div><div class="plan-row-actions"><button onclick="excluirRotina('${x.r.id}')">Excluir rotina</button></div></div>`).join('')||'<div class="placeholder">Nenhuma rotina manual prevista neste mês.</div>'}`;
+  return `<div class="plan-actions"><button class="btn-primario" onclick="novaRotina()">+ Nova rotina</button><span>As rotinas automáticas aproveitam o que já está alimentado no sistema.</span></div><div class="card" style="margin-bottom:14px"><h3>Rotinas automáticas do sistema</h3>${automaticas.map(x=>`<div class="item-lista-simples"><div><strong>${x[0]}</strong><div style="font-size:10.5px;color:var(--cor-texto-suave)">${x[2]}</div></div><span class="tag" style="color:${x[3]?'#2F6B4A':'var(--cor-acento)'}">${x[1]} ${x[3]?'✓':''}</span></div>`).join('')}</div><h3 style="margin:18px 0 10px">Rotinas criadas por você</h3>${linhas.sort((a,b)=>a.data.localeCompare(b.data)).map(x=>`<div class="plan-row"><button class="plan-check ${x.ok?'ok':''}" onclick="alternarExecucaoRotina('${x.r.id}','${x.data}')">${x.ok?'✓':''}</button><div><strong>${x.r.titulo}</strong><small>${dataBR(x.data)} · ${x.r.categoria} · ${x.r.frequencia}</small></div><div class="plan-row-actions"><button onclick="excluirRotina('${x.r.id}')">Excluir rotina</button></div></div>`).join('')||'<div class="placeholder">Nenhuma rotina manual prevista neste mês.</div>'}`;
 }
-function fechamentoPlanejamentoHTML(){const m=metricasFechamento(),pct=m.feitos.length?Math.round(m.noPrazo/m.feitos.length*100):0,pend=m.vinc.filter(v=>v.status!=='entregue');return `<div class="plan-actions"><button class="btn-primario" onclick="gerarPDFFechamentoMensal()">Baixar PDF do fechamento</button><span>Inclui todas as entregas Saber Nutrir, mesmo sem visita.</span></div><div class="plan-grid">${[['Visitas BRC',m.brc,'realizadas'],['Visitas Saber Nutrir',m.snVisitas,'realizadas'],['Checklists enviados',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas concluídas',m.feitos.length+'/'+m.vinc.length,pct+'% no prazo'],['Receita prevista',moeda(m.prev),'competência do mês'],['Receita efetivada',moeda(m.efet),'recebida no mês']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div><div class="card" style="margin-top:16px"><h3>Pendências Saber Nutrir</h3>${pend.slice(0,20).map(v=>{const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${e?.titulo||'Entrega'} · ${c?.nome||'Cliente'}</span><span class="tag">${dataBR(e?.prazo)}</span></div>`}).join('')||semRegistro()}</div>`;}
+function fechamentoPlanejamentoHTML(){const m=metricasFechamento(),pct=m.feitos.length?Math.round(m.noPrazo/m.feitos.length*100):0,pend=m.vinc.filter(v=>v.status!=='entregue');return `<div class="plan-actions"><button class="btn-primario" onclick="gerarPDFFechamentoMensal()">Baixar PDF do fechamento</button><span>Inclui todas as entregas Saber Nutrir, mesmo sem visita.</span></div><div class="plan-grid">${[['Visitas BRC',m.brc,'realizadas'],['Visitas Saber Nutrir',m.snVisitas,'realizadas'],['Checklists enviados',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas concluídas',m.feitos.length+'/'+m.vinc.length,pct+'% no prazo'],['Receita prevista',moeda(m.prev),'competência do mês'],['Receita efetivada',moeda(m.efet),'recebida no mês']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div><div class="card" style="margin-top:16px"><h3>Entregas em aberto — Saber Nutrir</h3>${pend.slice(0,20).map(v=>{const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${e?.titulo||'Entrega'} · ${c?.nome||'Cliente'}</span><span class="tag">${dataBR(e?.prazo)}</span></div>`}).join('')||semRegistro()}</div>`;}
 function planejamentoHTML(){
   const d=referenciaPlanejamento();
   return `<div class="plan-mes"><button onclick="planejamentoMesOffset--;abrirConteudoPlanejamento()">←</button><strong>${MESES_NOME[d.getMonth()]} ${d.getFullYear()}</strong><button onclick="planejamentoMesOffset++;abrirConteudoPlanejamento()">→</button></div>
@@ -4627,7 +4616,7 @@ async function abrirConteudoPlanejamento(dadosAtualizados=false){
   const raiz=document.getElementById('conteudoPlanejamento');
   if(!raiz){telaAtual='planejamento';renderTela();return;}
   if(!dadosAtualizados&&!sincronizandoPlanejamento){
-    sincronizandoPlanejamento=true;raiz.innerHTML='<div class="card"><h3>Sincronizando com o sistema…</h3><p style="font-size:12px;color:var(--cor-texto-suave)">Lendo Agenda, Clientes, Checklists, Entregas, Obrigações e Financeiro.</p></div>';
+    sincronizandoPlanejamento=true;raiz.innerHTML='<div class="card"><h3>Sincronizando com o sistema…</h3><p style="font-size:12px;color:var(--cor-texto-suave)">Lendo Agenda, Clientes, Checklists, Próximos passos, Entregas e Financeiro.</p></div>';
     await Promise.allSettled([carregarClientesSupabase(),carregarEnviosMensaisSupabase(),carregarEntregasSupabase(),carregarEventosSupabase(),carregarLancamentosSupabase(),carregarCentralComandoSupabase(),carregarPlanejamentoSupabase()]);
     sincronizandoPlanejamento=false;return abrirConteudoPlanejamento(true);
   }
@@ -4636,7 +4625,7 @@ async function abrirConteudoPlanejamento(dadosAtualizados=false){
   try{raiz.innerHTML=abaPlanejamento==='radar'?radarPlanejamentoHTML():abaPlanejamento==='datas'?datasPlanejamentoHTML():abaPlanejamento==='rotinas'?rotinasPlanejamentoHTML():fechamentoPlanejamentoHTML();}
   catch(e){console.error('Erro na aba do Planejamento',e);raiz.innerHTML=`<div class="card" style="border-top:4px solid var(--cor-acento)"><h3>Não consegui carregar esta parte</h3><p style="font-size:12px;color:var(--cor-texto-suave);line-height:1.5">As outras áreas continuam disponíveis. Atualize os dados ou escolha outra aba.</p><div class="tag" style="margin-top:8px">Código: ${String(e?.message||'erro desconhecido').replace(/[<>]/g,'')}</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn-primario" onclick="abrirConteudoPlanejamento(false)">Atualizar dados</button><button class="btn-secundario" onclick="selecionarAbaPlanejamento('datas')">Abrir Datas da área</button></div></div>`;}
 }
-function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(14);doc.text('Pendências de entrega — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,18,y);y+=7;});doc.save(`fechamento-${m.pref}.pdf`);}
+function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(14);doc.text('Entregas em aberto — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,18,y);y+=7;});doc.save(`fechamento-${m.pref}.pdf`);}
 
 function renderTela(){
   const [titulo, sub] = NOMES_TELA[telaAtual] || ["", ""];
@@ -4668,8 +4657,6 @@ function renderTela(){
     }
   } else if(telaAtual === 'biblioteca'){
     document.getElementById('conteudoTela').innerHTML = bibliotecaHTML();
-  } else if(telaAtual === 'pendencias'){
-    document.getElementById('conteudoTela').innerHTML = pendenciasHTML();
   } else if(telaAtual === 'entregas'){
     document.getElementById('conteudoTela').innerHTML = entregasHTML();
   } else if(telaAtual === 'planejamento'){
@@ -4677,8 +4664,6 @@ function renderTela(){
     setTimeout(abrirConteudoPlanejamento,0);
   } else if(telaAtual === 'lideranca'){
     document.getElementById('conteudoTela').innerHTML = liderancaHTML();
-  } else if(telaAtual === 'obrigacoes'){
-    document.getElementById('conteudoTela').innerHTML = obrigacoesHTML();
   } else if(telaAtual === 'rotas_custos'){
     document.getElementById('conteudoTela').innerHTML = rotasCustosHTML();
   } else if(telaAtual === 'produtos_rotulagem'){
@@ -4747,10 +4732,6 @@ function dashboardHTML(){
   const projetosAtivos = PROJETOS.filter(p=>p.categoria!=='pessoal'&&p.status!=='finalizado').slice(0,3);
 
   const conteudoHoje = CONTEUDOS_MKT.filter(c=>c.status!=='publicado').slice(0,3);
-  const vencimentos30=[
-    ...OBRIGACOES.filter(o=>o.status!=='realizada'&&diasAte(o.vencimento)<=30).map(o=>({titulo:o.titulo,cliente:CLIENTES.find(c=>c.id===o.cliente_id)?.nome,dias:diasAte(o.vencimento)})),
-    ...TREINAMENTOS.filter(t=>t.status==='realizado'&&diasAte(t.validade)<=30).map(t=>({titulo:'Reciclagem: '+t.tema,cliente:CLIENTES.find(c=>c.id===t.cliente_id)?.nome,dias:diasAte(t.validade)}))
-  ].sort((a,b)=>a.dias-b.dias);
   const mesAtual=hoje.slice(0,7),anoAtual=hoje.slice(0,4);
   const visitasConcluidas=eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido);
   const realizadasBRC=visitasConcluidas.filter(e=>e.categoria==='brc'&&e.dataISO?.startsWith(mesAtual)).length;
@@ -4761,13 +4742,12 @@ function dashboardHTML(){
   const visitasAno=visitasConcluidas.filter(e=>e.dataISO?.startsWith(anoAtual));
   const mesesVisitas=Array.from({length:12},(_,i)=>{const chave=`${anoAtual}-${String(i+1).padStart(2,'0')}`;return {nome:MESES_NOME[i].slice(0,3),qtd:visitasAno.filter(e=>e.dataISO?.startsWith(chave)).length};});
   const resumoChecklistsSN=saberNutrir?resumoEnviosContratante(saberNutrir.id,mesAtual+'-01'):{total:0,enviados:0,pendentes:0};
-  const pendenciasVencidas=PENDENCIAS_DB.filter(p=>p.origem==='manual'&&p.status!=='concluida'&&p.prazo&&p.prazo<hoje).length;
   const checklistsRascunho=VISITAS.filter(v=>v.status!=='concluida').length;
   const contasVencidas=CONTAS_PESSOAIS.filter(l=>l.tipo==='despesa'&&l.status!=='pago'&&(diasParaVencimentoConta(l.vencimentoISO)??0)<0).length;
-  const atencaoAgora=proximoEvento?proximoEvento.titulo:pendenciasVencidas?pendenciasVencidas+' pendência(s) vencida(s)':entregasAtrasadas?entregasAtrasadas+' entrega(s) atrasada(s)':contasVencidas?contasVencidas+' conta(s) vencida(s)':'Seu dia está organizado';
+  const atencaoAgora=proximoEvento?proximoEvento.titulo:entregasAtrasadas?entregasAtrasadas+' entrega(s) atrasada(s)':contasVencidas?contasVencidas+' conta(s) vencida(s)':'Seu dia está organizado';
 
   return `
-  <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${pendenciasVencidas}</strong><span>pendências vencidas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
+  <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${entregasAtrasadas}</strong><span>entregas atrasadas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
   <div class="grid dashboard-grid">
     <div class="card card-destaque dash-arco">
       <h3>Arco do dia</h3>
@@ -4804,18 +4784,12 @@ function dashboardHTML(){
       <ul class="pend-list">${entregasAbertas.slice(0,3).map(e=>`<li>${e.titulo} <span class="tag" style="color:${e.prazo<hoje?'#B0413E':'var(--cor-texto-suave)'}">${dataBR(e.prazo)}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhuma entrega pendente.</li>'}</ul>
     </div>
 
-    <div class="card dash-vencimentos">
-      <h3>Próximos vencimentos <button onclick="irPara('obrigacoes')">programar</button></h3>
-      <div class="pend-num">${vencimentos30.length}</div><div class="pend-desc">alertas para os próximos 30 dias</div>
-      <ul class="pend-list">${vencimentos30.slice(0,4).map(v=>`<li>${v.titulo} <span class="tag" style="color:${v.dias<=15?'#B0413E':'#E36216'}">${v.dias<0?'vencido':v.dias+' dias'} · ${v.cliente||''}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhum vencimento próximo.</li>'}</ul>
-    </div>
-
     ${calendarioDocumentacoesDashboardHTML()}
 
     <div class="card dash-radar" style="border-top:4px solid var(--cor-acento)">
       <h3>Radar do mês <button onclick="irPara('planejamento')">abrir planejamento</button></h3>
-      <div class="pend-num">${(()=>{const anterior=planejamentoMesOffset;planejamentoMesOffset=0;const m=metricasFechamento();planejamentoMesOffset=anterior;return m.check.pendentes+m.vinc.filter(v=>v.status!=='entregue').length+OBRIGACOES.filter(o=>o.status!=='realizada'&&o.vencimento?.startsWith(m.pref)).length})()}</div>
-      <div class="pend-desc">pontos pedem atenção entre checklists, entregas e obrigações</div>
+      <div class="pend-num">${(()=>{const anterior=planejamentoMesOffset;planejamentoMesOffset=0;const m=metricasFechamento();planejamentoMesOffset=anterior;return m.check.pendentes+m.vinc.filter(v=>v.status!=='entregue').length+PROXIMOS_PASSOS_CLIENTE.filter(p=>p.status!=='concluido'&&p.prazo?.startsWith(m.pref)).length})()}</div>
+      <div class="pend-desc">pontos pedem atenção entre checklists, próximos passos e entregas</div>
     </div>
 
     <div class="card dash-visitas-mes">
@@ -4864,7 +4838,7 @@ function dashboardHTML(){
     <div class="rapidos">
       <button class="btn-rapido" onclick="novoCliente()">+ Novo cliente</button>
       <button class="btn-rapido" onclick="irPara('agenda')">+ Agendar visita</button>
-      <button class="btn-rapido" onclick="irPara('pendencias');setTimeout(novaPendenciaManual,0)">+ Nova pendência</button>
+      <button class="btn-rapido" onclick="irPara('entregas');setTimeout(novaEntrega,0)">+ Nova entrega</button>
     </div>
   </div>`;
 }
@@ -5091,7 +5065,7 @@ function restaurarTelaAtualSessao(){
     const cliente = sessionStorage.getItem('me_cliente_selecionado');
     const etapa = sessionStorage.getItem('me_etapa_visita');
     if(espaco){ espacoAtual = espaco; document.body.setAttribute('data-espaco', espaco); }
-    if(tela){ telaAtual = tela; }
+    if(tela){ telaAtual = ['pendencias','obrigacoes'].includes(tela) ? 'dashboard' : tela; }
     if(visita){ visitaSelecionadaId = visita; const v = VISITAS.find(x=>x.id===visita); if(v) etapaVisitaAtual = v.status==='concluida'?'apos':etapaVisitaAtual; }
     if(cliente){ clienteSelecionadoId = cliente; }
     if(etapa && ['durante','apos'].includes(etapa)) etapaVisitaAtual = etapa;
@@ -5132,7 +5106,7 @@ async function iniciarApp(){
 function verificarPendenciasAtrasadas(){
   const atrasados = LANCAMENTOS.filter(l=>statusRealLancamento(l)==='atrasado').length;
   if(atrasados>0){
-    dispararAutomacao('Verificação automática de pendências', `${atrasados} lançamento(s) financeiro(s) atrasado(s) — veja em Pendências.`);
+    dispararAutomacao('Verificação financeira', `${atrasados} lançamento(s) financeiro(s) atrasado(s) — veja em Financeiro.`);
   }
 }
 iniciarApp();
