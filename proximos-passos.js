@@ -37,15 +37,16 @@ function proximosPassosClienteHTML(c){
   const todos=PROXIMOS_PASSOS_CLIENTE.filter(p=>p.cliente_id===c.id),abertos=todos.filter(p=>p.status!=='concluido');
   const grupos={bruna:abertos.filter(p=>p.responsavel==='bruna'),cliente:abertos.filter(p=>p.responsavel==='cliente'),terceiro:abertos.filter(p=>p.responsavel==='terceiro'),concluidas:todos.filter(p=>p.status==='concluido')};
   const lista=grupos[filtroProximosPassos]||grupos.bruna;
+  const minhasParaEntrega=grupos.bruna.filter(p=>!p.entrega_id);
   return `<div class="module-explainer"><strong>Seu plano de ação real.</strong> Gere sugestões com base no último checklist concluído e no controle de documentação. Nada vira entrega sem sua confirmação.</div>
-  <div class="passos-toolbar"><div class="passos-actions"><button class="btn-primario" onclick="ppRevisar('${c.id}')">✦ Gerar próximos passos</button><button class="btn-secundario" onclick="ppNovo('${c.id}')">+ Incluir manualmente</button></div></div>
+  <div class="passos-toolbar"><div class="passos-actions"><button class="btn-primario" onclick="ppRevisar('${c.id}')">✦ Gerar próximos passos</button><button class="btn-secundario" onclick="ppNovo('${c.id}')">+ Incluir manualmente</button>${minhasParaEntrega.length?`<button class="btn-secundario" onclick="ppAbrirLoteEntregas('${c.id}')">Adicionar ações às Entregas (${minhasParaEntrega.length})</button>`:''}</div></div>
   <div class="passos-resumo"><div class="passos-metrica"><strong>${grupos.bruna.length}</strong><span>minhas ações</span></div><div class="passos-metrica"><strong>${grupos.cliente.length}</strong><span>ações do cliente</span></div><div class="passos-metrica"><strong>${grupos.terceiro.length}</strong><span>ações de terceiros</span></div><div class="passos-metrica"><strong>${grupos.concluidas.length}</strong><span>concluídas</span></div></div>
   <div class="passos-filtros">${[['bruna','Minhas ações'],['cliente','Ações do cliente'],['terceiro','Terceiros'],['concluidas','Concluídas']].map(([id,n])=>`<button class="passos-filtro ${filtroProximosPassos===id?'active':''}" onclick="filtroProximosPassos='${id}';renderTela()">${n}</button>`).join('')}</div>
   <div style="margin-top:14px">${lista.length?lista.map(ppCard).join(''):'<div class="placeholder">Nenhuma ação nesta lista.</div>'}</div>`;
 }
 function ppCard(p){
   const prazo=p.prazo?p.prazo.split('-').reverse().join('/'):'Sem prazo';
-  return `<div class="passo-card ${p.prioridade} ${p.status==='concluido'?'concluido':''}"><div class="passo-titulo">${textoHTML(p.titulo)}</div><div class="passo-meta"><span class="passo-origem">${ppOrigem(p.origem)}</span><span>${ppResp(p.responsavel)}</span><span>${p.prioridade==='alta'?'Alta':p.prioridade==='baixa'?'Baixa':'Média'} prioridade</span><span>Prazo: ${prazo}</span><span>${ppStatus(p.status)}</span>${p.entrega_id?'<span>✓ Nas Entregas</span>':''}</div>${p.observacoes?`<div style="font-size:11.5px;color:var(--cor-texto-suave);margin-top:8px">${textoHTML(p.observacoes)}</div>`:''}<div class="passo-botoes"><button onclick="ppEditar('${p.id}')">Editar</button>${p.status!=='concluido'?`<button onclick="ppMudarStatus('${p.id}','${p.status==='andamento'?'pendente':'andamento'}')">${p.status==='andamento'?'Voltar a pendente':'Iniciar'}</button><button onclick="ppMudarStatus('${p.id}','concluido')">✓ Concluir</button>`:`<button onclick="ppMudarStatus('${p.id}','pendente')">Reabrir</button>`}${p.responsavel==='bruna'&&!p.entrega_id&&p.status!=='concluido'?`<button onclick="ppParaEntregas('${p.id}')">Adicionar às Entregas</button>`:''}</div></div>`;
+  return `<div class="passo-card ${p.prioridade} ${p.status==='concluido'?'concluido':''}"><div class="passo-titulo">${textoHTML(p.titulo)}</div><div class="passo-meta"><span class="passo-origem">${ppOrigem(p.origem)}</span><span>${ppResp(p.responsavel)}</span><span>${p.prioridade==='alta'?'Alta':p.prioridade==='baixa'?'Baixa':'Média'} prioridade</span><span>Prazo: ${prazo}</span><span>${ppStatus(p.status)}</span>${p.entrega_id?'<span>✓ Nas Entregas</span>':''}</div>${p.observacoes?`<div style="font-size:11.5px;color:var(--cor-texto-suave);margin-top:8px">${textoHTML(p.observacoes)}</div>`:''}<div class="passo-botoes"><button onclick="ppEditar('${p.id}')">Editar</button>${p.status!=='concluido'?`<button onclick="ppMudarStatus('${p.id}','${p.status==='andamento'?'pendente':'andamento'}')">${p.status==='andamento'?'Voltar a pendente':'Iniciar'}</button><button onclick="ppMudarStatus('${p.id}','concluido')">✓ Concluir</button>`:`<button onclick="ppMudarStatus('${p.id}','pendente')">Reabrir</button>`}</div></div>`;
 }
 function ppRevisar(clienteId){
   const c=CLIENTES.find(x=>x.id===clienteId),sugestoes=ppSugestoes(c);
@@ -83,15 +84,34 @@ async function ppMudarStatus(id,status){
   const {error}=await supa.from('proximos_passos_cliente').update(valores).eq('id',id);
   if(error){dispararAutomacao('Erro ao atualizar ação',error.message);return;}Object.assign(p,valores);renderTela();
 }
-async function ppParaEntregas(id){
-  const p=PROXIMOS_PASSOS_CLIENTE.find(x=>x.id===id);if(!p||p.entrega_id)return;
-  let prazo=p.prazo;if(!prazo)prazo=await selecionarDataVisual({titulo:'Prazo da entrega',opcional:false});if(!prazo)return;
+function ppAbrirLoteEntregas(clienteId){
+  const c=CLIENTES.find(x=>x.id===clienteId);
+  const acoes=PROXIMOS_PASSOS_CLIENTE.filter(p=>p.cliente_id===clienteId&&p.responsavel==='bruna'&&p.status!=='concluido'&&!p.entrega_id);
+  if(!acoes.length){dispararAutomacao('Entregas atualizadas','Todas as suas ações deste cliente já estão vinculadas.');return;}
+  const prazos=acoes.map(p=>p.prazo).filter(Boolean).sort();
+  window.__ppLoteEntregas=acoes;
+  abrirModalSistema(`<div class="system-modal-head"><div><h2>Uma entrega, várias ações</h2><p>Selecione as ações de ${textoHTML(c?.nome||'cliente')} que devem ficar juntas no mesmo card.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>
+  <div class="form-grid"><div class="form-field full"><label>Nome do card em Entregas</label><input id="ppLoteTitulo" value="Plano de ação — ${textoHTML(c?.nome||'Cliente')}"></div><div class="form-field"><label>Prazo do conjunto</label><input type="date" id="ppLotePrazo" value="${prazos[0]||''}"></div></div>
+  <div style="max-height:42vh;overflow:auto;margin-top:12px">${acoes.map((p,i)=>`<label class="passo-preview" style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="ppLoteSel${i}" checked style="margin-top:2px;accent-color:var(--cor-primaria)"><span><strong style="font-size:12px">${textoHTML(p.titulo)}</strong><small style="display:block;color:var(--cor-texto-suave);margin-top:3px">${p.prazo?'Prazo individual: '+p.prazo.split('-').reverse().join('/'):'Sem prazo individual'}</small></span></label>`).join('')}</div>
+  <div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="ppSalvarLoteEntregas('${clienteId}')">Criar um único card</button></div>`);
+}
+async function ppSalvarLoteEntregas(clienteId){
+  const acoes=window.__ppLoteEntregas||[];
+  const selecionadas=acoes.filter((p,i)=>document.getElementById('ppLoteSel'+i)?.checked);
+  if(!selecionadas.length){alert('Selecione pelo menos uma ação.');return;}
+  const titulo=document.getElementById('ppLoteTitulo').value.trim();
+  const prazo=document.getElementById('ppLotePrazo').value;
+  if(!titulo){alert('Informe o nome do card.');return;}
+  if(!prazo){alert('Informe o prazo do conjunto.');return;}
+  const observacoes='Ações deste plano de trabalho:\n'+selecionadas.map((p,i)=>`${i+1}. ${p.titulo}${p.observacoes?' — '+p.observacoes:''}`).join('\n');
   const {data:{user}}=await supa.auth.getUser();
-  const {data:entrega,error}=await supa.from('entregas').insert({user_id:user.id,titulo:p.titulo,prazo,observacoes:p.observacoes||null}).select().single();
+  const {data:entrega,error}=await supa.from('entregas').insert({user_id:user.id,titulo,prazo,observacoes}).select().single();
   if(error){dispararAutomacao('Erro ao criar entrega',error.message);return;}
-  const {data:vinculo,error:erroVinculo}=await supa.from('entrega_clientes').insert({user_id:user.id,entrega_id:entrega.id,cliente_id:p.cliente_id}).select().single();
+  const {data:vinculo,error:erroVinculo}=await supa.from('entrega_clientes').insert({user_id:user.id,entrega_id:entrega.id,cliente_id:clienteId}).select().single();
   if(erroVinculo){await supa.from('entregas').delete().eq('id',entrega.id);dispararAutomacao('Erro ao vincular entrega',erroVinculo.message);return;}
-  const {error:erroPasso}=await supa.from('proximos_passos_cliente').update({entrega_id:entrega.id,prazo}).eq('id',id);
-  if(erroPasso){dispararAutomacao('Entrega criada, vínculo pendente',erroPasso.message);return;}
-  ENTREGAS.push(entrega);ENTREGA_CLIENTES.push(vinculo);p.entrega_id=entrega.id;p.prazo=prazo;dispararAutomacao('Adicionado às Entregas',p.titulo);renderTela();
+  const ids=selecionadas.map(p=>p.id);
+  const {error:erroPasso}=await supa.from('proximos_passos_cliente').update({entrega_id:entrega.id,atualizado_em:new Date().toISOString()}).in('id',ids);
+  if(erroPasso){await supa.from('entrega_clientes').delete().eq('id',vinculo.id);await supa.from('entregas').delete().eq('id',entrega.id);dispararAutomacao('Erro ao agrupar ações',erroPasso.message);return;}
+  ENTREGAS.push(entrega);ENTREGA_CLIENTES.push(vinculo);selecionadas.forEach(p=>p.entrega_id=entrega.id);
+  fecharModalSistema();dispararAutomacao('Entrega agrupada criada',`${selecionadas.length} ações reunidas em um único card.`);renderTela();
 }

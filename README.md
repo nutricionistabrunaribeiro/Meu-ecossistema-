@@ -1,5 +1,12 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V46 — Entrega agrupada por cliente
+
+- Seleção de várias ações da Bruna para criar um único card em Entregas.
+- Título e prazo do conjunto podem ser revisados antes da criação.
+- As ações escolhidas aparecem numeradas dentro das observações da entrega.
+- Ações já vinculadas permanecem preservadas e não entram novamente na seleção.
+
 ## Rodada V45 — Próximos passos por cliente
 
 - Geração assistida a partir do checklist mais recente e do controle de documentação.
