@@ -76,13 +76,14 @@ async function ppSalvarManual(clienteId,id=''){
   else{const {data:{user}}=await supa.auth.getUser();resultado=await supa.from('proximos_passos_cliente').insert({...valores,user_id:user.id,origem:'manual'}).select().single();}
   if(resultado.error){dispararAutomacao('Erro ao salvar ação',resultado.error.message);return;}
   const pos=PROXIMOS_PASSOS_CLIENTE.findIndex(x=>x.id===resultado.data.id);if(pos>=0)PROXIMOS_PASSOS_CLIENTE[pos]=resultado.data;else PROXIMOS_PASSOS_CLIENTE.unshift(resultado.data);
+  await ppSincronizarEntrega(resultado.data);
   fecharModalSistema();renderTela();
 }
 async function ppMudarStatus(id,status){
   const p=PROXIMOS_PASSOS_CLIENTE.find(x=>x.id===id);if(!p)return;
   const valores={status,concluido_em:status==='concluido'?new Date().toISOString():null,atualizado_em:new Date().toISOString()};
   const {error}=await supa.from('proximos_passos_cliente').update(valores).eq('id',id);
-  if(error){dispararAutomacao('Erro ao atualizar ação',error.message);return;}Object.assign(p,valores);renderTela();
+  if(error){dispararAutomacao('Erro ao atualizar ação',error.message);renderTela();return;}Object.assign(p,valores);await ppSincronizarEntrega(p);renderTela();
 }
 function ppAbrirLoteEntregas(clienteId){
   const c=CLIENTES.find(x=>x.id===clienteId);
@@ -95,7 +96,14 @@ function ppAbrirLoteEntregas(clienteId){
   <div style="max-height:42vh;overflow:auto;margin-top:12px">${acoes.map((p,i)=>`<label class="passo-preview" style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="ppLoteSel${i}" checked style="margin-top:2px;accent-color:var(--cor-primaria)"><span><strong style="font-size:12px">${textoHTML(p.titulo)}</strong><small style="display:block;color:var(--cor-texto-suave);margin-top:3px">${p.prazo?'Prazo individual: '+p.prazo.split('-').reverse().join('/'):'Sem prazo individual'}</small></span></label>`).join('')}</div>
   <div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="ppSalvarLoteEntregas('${clienteId}')">Criar um único card</button></div>`);
 }
+let ppLoteSalvando=false;
 async function ppSalvarLoteEntregas(clienteId){
+  if(ppLoteSalvando)return;
+  ppLoteSalvando=true;
+  try{return await ppPersistirLoteEntregas(clienteId);}
+  finally{ppLoteSalvando=false;}
+}
+async function ppPersistirLoteEntregas(clienteId){
   const acoes=window.__ppLoteEntregas||[];
   const selecionadas=acoes.filter((p,i)=>document.getElementById('ppLoteSel'+i)?.checked);
   if(!selecionadas.length){alert('Selecione pelo menos uma ação.');return;}
@@ -114,4 +122,23 @@ async function ppSalvarLoteEntregas(clienteId){
   if(erroPasso){await supa.from('entrega_clientes').delete().eq('id',vinculo.id);await supa.from('entregas').delete().eq('id',entrega.id);dispararAutomacao('Erro ao agrupar ações',erroPasso.message);return;}
   ENTREGAS.push(entrega);ENTREGA_CLIENTES.push(vinculo);selecionadas.forEach(p=>p.entrega_id=entrega.id);
   fecharModalSistema();dispararAutomacao('Entrega agrupada criada',`${selecionadas.length} ações reunidas em um único card.`);renderTela();
+}
+
+function ppTopicosEntregaHTML(e){
+  const passos=PROXIMOS_PASSOS_CLIENTE.filter(p=>p.entrega_id===e.id);
+  const obs=e.observacoes&&!e.observacoes.startsWith('Ações deste plano de trabalho:')?`<p style="white-space:pre-wrap;font-size:12px">${textoHTML(e.observacoes)}</p>`:'';
+  if(!passos.length)return e.observacoes?`<p style="white-space:pre-wrap;font-size:12px">${textoHTML(e.observacoes)}</p>`:'';
+  return obs+`<div style="margin:12px 0"><small>${passos.filter(p=>p.status==='concluido').length} de ${passos.length} tópicos concluídos</small>${passos.map(p=>`<div class="item-lista-simples" style="gap:12px;align-items:flex-start"><label style="display:flex;gap:10px;flex:1;min-width:0"><input type="checkbox" ${p.status==='concluido'?'checked':''} onchange="this.disabled=true;ppMudarStatus('${p.id}',this.checked?'concluido':'pendente')"><span style="overflow-wrap:anywhere;${p.status==='concluido'?'text-decoration:line-through;opacity:.65':''}">${textoHTML(p.titulo)}${p.prazo?`<small style="display:block">Prazo: ${dataBR(p.prazo)}</small>`:''}${p.observacoes?`<small style="display:block;white-space:pre-wrap">${textoHTML(p.observacoes)}</small>`:''}</span></label><button class="btn-secundario" onclick="ppEditar('${p.id}')">Editar</button></div>`).join('')}</div>`;
+}
+async function ppSincronizarEntrega(p){
+  if(!p.entrega_id)return;
+  const vinculo=ENTREGA_CLIENTES.find(v=>v.entrega_id===p.entrega_id&&v.cliente_id===p.cliente_id);
+  if(!vinculo)return;
+  const passos=PROXIMOS_PASSOS_CLIENTE.filter(x=>x.entrega_id===p.entrega_id&&x.cliente_id===p.cliente_id);
+  const status=passos.every(x=>x.status==='concluido')?'entregue':'pendente';
+  if(vinculo.status===status)return;
+  const valores={status,concluido_em:status==='entregue'?new Date().toISOString():null};
+  const {error}=await supa.from('entrega_clientes').update(valores).eq('id',vinculo.id);
+  if(error){dispararAutomacao('Ação salva; entrega não sincronizada',error.message+' Abra Entregas para conferir o status do cliente.');return;}
+  Object.assign(vinculo,valores);
 }

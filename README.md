@@ -336,3 +336,7 @@ detecta a mudança e republica automaticamente.
 ## Domínio próprio (opcional)
 
 Vercel → Project → Settings → Domains → adicionar o domínio.
+
+## Rodada V48 — Avisos e tópicos de Entregas
+
+Avisos ligados às Entregas reais, tópicos individuais reutilizando Próximos passos, restauração de Implantado e correções de salvamento/navegação. Sem migration nova. Consulte REVISAO-V48.md para testes e limitações, especialmente a revisão pendente das policies do banco e o funcionamento offline.

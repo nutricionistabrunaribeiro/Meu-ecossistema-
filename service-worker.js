@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-ecossistema-v47';
+const CACHE_NAME = 'meu-ecossistema-v48';
 const APP_SHELL = ['/', '/index.html', '/proximos-passos.js', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', event => {
@@ -25,6 +25,6 @@ self.addEventListener('fetch', event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached => cached || caches.match('/index.html')))
+      .catch(() => caches.match(event.request).then(cached => cached || (event.request.mode === 'navigate' ? caches.match('/index.html') : Response.error())))
   );
 });
