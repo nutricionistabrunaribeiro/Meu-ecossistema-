@@ -1,5 +1,14 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Correção V50 — Enquadramento no iPhone
+
+- campos com tamanho mínimo compatível com o Safari, evitando o zoom automático ao receber foco;
+- modais, calendários e seletores limitados à largura e à altura útil da tela;
+- grades, cards e textos longos podem encolher ou quebrar linha sem ampliar a página;
+- agenda e formulários corrigidos para não criarem largura maior que a tela;
+- ajustes restritos ao celular, preservando tablet e computador;
+- cache do PWA atualizado para V50.
+
 ## Rodada V49 — Segurança exclusiva e rascunho offline
 
 - acesso do banco e dos arquivos limitado à conta proprietária por políticas RLS restritivas;
