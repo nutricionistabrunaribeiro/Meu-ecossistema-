@@ -1,5 +1,18 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V49 — Segurança exclusiva e rascunho offline
+
+- acesso do banco e dos arquivos limitado à conta proprietária por políticas RLS restritivas;
+- nenhuma tabela, registro, histórico ou arquivo existente foi apagado;
+- checklists já preparados podem ser consultados e preenchidos sem conexão;
+- respostas, observações e validades são gravadas primeiro no aparelho e sincronizadas ao reconectar;
+- conflitos entre uma versão local e uma versão mais nova do banco exigem confirmação manual;
+- um checklist só pode ser finalizado e gerar PDF depois que as respostas estiverem sincronizadas;
+- fotos, criação de novos checklists, PDFs e os demais módulos continuam exigindo internet;
+- cache do PWA atualizado para V49.
+
+Consulte `REVISAO-V49.md` para os testes, limites e procedimento de publicação.
+
 ## Rodada V47 — Operação mais limpa
 
 - Obrigações e Pendências foram retiradas da navegação e das fichas dos clientes.

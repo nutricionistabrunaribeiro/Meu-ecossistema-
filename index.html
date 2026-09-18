@@ -778,6 +778,7 @@
 </div>
 
 <script src="/proximos-passos.js"></script>
+<script src="/offline-drafts.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -904,6 +905,7 @@ function trocarEspaco(esp){
 
 function irPara(id){
   if(['pendencias','obrigacoes'].includes(id)) id='dashboard';
+  if(modoConsultaOffline&&id!=='visitas'){alert('Sem conexão, continue os checklists já preparados neste aparelho. As outras áreas precisam de internet.');return;}
   telaAtual = id;
   if(id==='agenda'&&window.innerWidth<=640&&visaoAgenda==='semana')visaoAgenda='dia';
   if(id === 'visitas'){ visitaSelecionadaId = null; telaPosPdfVisitaId = null; }
@@ -1933,7 +1935,7 @@ async function carregarVisitasSupabase(){
           item={id:r.item_modelo_id,categoria:r.categoria_snapshot||modelo?.categoria||'Histórico',desc:r.descricao_snapshot||modelo?.desc||'Item histórico',fotos:[]};
           v.checklist.push(item);
         }
-        if(item) Object.assign(item,{respostaId:r.id,resultado:r.resultado,obs:r.observacao||'',validade:r.validade||null,categoria:r.categoria_snapshot||item.categoria,desc:r.descricao_snapshot||item.desc});
+        if(item) Object.assign(item,{respostaId:r.id,_serverUpdatedAt:r.atualizado_em,resultado:r.resultado,obs:r.observacao||'',validade:r.validade||null,categoria:r.categoria_snapshot||item.categoria,desc:r.descricao_snapshot||item.desc});
       });
     }
     const idsRespostas=VISITAS.flatMap(v=>v.checklist.map(i=>i.respostaId).filter(Boolean));
@@ -1951,6 +1953,7 @@ function mesAnoPorData(dataISO){
 }
 
 async function novaVisita(clienteId=null){
+  if(!navigator.onLine||modoConsultaOffline){alert('Inicie o checklist com conexão. Depois você poderá continuar o preenchimento sem internet.');return;}
   const clientesChecklist=CLIENTES.filter(c=>c.tipoCliente!=='vinculado');
   if(clientesChecklist.length===0){ alert('Cadastre um cliente direto antes de iniciar um checklist.'); return; }
   let clienteEscolhido=CLIENTES.find(c=>c.id===clienteId);
@@ -2010,6 +2013,8 @@ let visitaSelecionadaId = null;
 let etapaVisitaAtual = "durante";
 
 async function excluirVisita(id){
+  if(Object.values(lerRascunhos()).some(r=>r.visita.id===id)){alert('Sincronize as respostas deste checklist antes de excluir.');return;}
+  if(!navigator.onLine){alert('Conecte-se para excluir o checklist.');return;}
   const v = VISITAS.find(x=>x.id===id);
   if(!v)return;
   if(!confirm(`Excluir a visita de ${v.clienteNome} em ${v.data}? Essa ação não pode ser desfeita.`)) return;
@@ -2086,6 +2091,7 @@ function comprimirImagemChecklist(arquivo){
   return new Promise((resolve,reject)=>{const leitor=new FileReader();leitor.onerror=reject;leitor.onload=e=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1280,escala=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*escala);canvas.height=Math.round(img.height*escala);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.78));};img.src=e.target.result;};leitor.readAsDataURL(arquivo);});
 }
 async function adicionarFotoItem(visitaId, itemId, inputEl){
+  if(!navigator.onLine){alert('Guarde a foto na galeria e anexe quando a conexão voltar. As respostas em texto podem continuar offline.');return;}
   const arquivo = inputEl.files[0];
   if(!arquivo) return;
   const v=VISITAS.find(x=>x.id===visitaId),item=v?.checklist.find(i=>i.id===itemId);if(!item)return;
@@ -2123,26 +2129,24 @@ const timersObsChecklist = {};
 let ultimoSalvamentoChecklist=null;
 const filasSalvamentoChecklist=new WeakMap();
 function salvarRascunhoItem(v,item){
+  if(!guardarRascunhoLocal(v,item))return Promise.resolve(false);
   const anterior=filasSalvamentoChecklist.get(item)||Promise.resolve();
   const atual=anterior.catch(()=>false).then(()=>persistirRascunhoItem(v,item));
   filasSalvamentoChecklist.set(item,atual);
   return atual;
 }
 async function persistirRascunhoItem(v,item){
-  const valores={resultado:item.resultado||null,observacao:item.obs||null,validade:item.validade||null,categoria_snapshot:item.categoria,descricao_snapshot:item.desc,atualizado_em:new Date().toISOString()};
-  let resultado;
-  if(item.respostaId) resultado=await supa.from('checklist_respostas_itens').update(valores).eq('id',item.respostaId);
-  else resultado=await supa.from('checklist_respostas_itens').insert({...valores,visita_id:v.id,item_modelo_id:item.id}).select('id').single();
-  if(resultado.error){ dispararAutomacao('Erro no salvamento automático', resultado.error.message); return false; }
-  if(resultado.data?.id) item.respostaId=resultado.data.id;
-  ultimoSalvamentoChecklist=new Date();
-  return true;
+  const r=lerRascunhos()[v.id+':'+item.id];
+  if(!r)return true;
+  if(!navigator.onLine)return false;
+  return enviarRascunho(r);
 }
 async function salvarChecklistAgora(visitaId){
   const v=VISITAS.find(x=>x.id===visitaId);if(!v)return;
   Object.keys(timersObsChecklist).filter(k=>k.startsWith(visitaId+':')).forEach(k=>{clearTimeout(timersObsChecklist[k]);delete timersObsChecklist[k];});
   const resultados=await Promise.all(v.checklist.map(i=>salvarRascunhoItem(v,i)));
-  if(resultados.every(Boolean)){dispararAutomacao('Checklist salvo','Você pode sair e continuar depois sem perder o preenchimento.');renderTela();}
+  await salvarCopiaChecklist();
+  dispararAutomacao(resultados.every(Boolean)?'Checklist sincronizado':'Rascunho neste aparelho',statusRascunhoTexto());renderTela();
 }
 async function atualizarValidadeItem(visitaId,itemId){
   const v=VISITAS.find(x=>x.id===visitaId);const item=v?.checklist.find(i=>i.id===itemId);if(!v||!item)return;
@@ -2156,6 +2160,7 @@ function atualizarObsItem(visitaId, itemId, texto){
   const v = VISITAS.find(x=>x.id===visitaId);
   const item=v.checklist.find(i=>i.id===itemId);
   item.obs = texto;
+  guardarRascunhoLocal(v,item);
   const chave=`${visitaId}:${itemId}`;
   clearTimeout(timersObsChecklist[chave]);
   timersObsChecklist[chave]=setTimeout(()=>salvarRascunhoItem(v,item),600);
@@ -2183,7 +2188,7 @@ function fichaVisitaHTML(v){
   } else if(etapaVisitaAtual === 'durante'){
     const modeloCompleto=/principal/i.test(v.modeloNome||'');
     corpoEtapa = `
-      <div class="autosave-bar"><span><span class="autosave-dot"></span>Salvamento automático ativo${ultimoSalvamentoChecklist?' · salvo às '+ultimoSalvamentoChecklist.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''}</span><button class="btn-secundario" onclick="salvarChecklistAgora('${v.id}')">Salvar agora</button></div>
+      <div class="autosave-bar"><span><span class="autosave-dot"></span>${statusRascunhoTexto()}</span><button class="btn-secundario" onclick="salvarChecklistAgora('${v.id}')">Salvar agora</button><button class="btn-secundario" onclick="abrirRevisaoRascunhos()">Ver sincronização</button></div>
       ${modeloCompleto?'':`<div class="module-explainer" style="border-left:4px solid var(--cor-acento)"><strong>Modelo aberto: ${textoHTML(v.modeloNome||'Checklist de Auditoria - RDC')}.</strong> DML, Vestiários e Transporte fazem parte do <strong>Checklist Principal</strong>. Para utilizá-los, inicie um novo checklist e escolha a opção 1.</div>`}
       <div class="score-box">
         <div class="score-num ${pontuacao>=80?'score-boa':'score-baixa'}">${pontuacao}%</div>
@@ -2298,11 +2303,11 @@ function canvasVazio(canvas){
 }
 
 async function concluirVisita(id){
+  if(!navigator.onLine){alert('O rascunho está no aparelho. Conecte-se para sincronizar e finalizar o relatório.');return;}
   const v = VISITAS.find(x=>x.id===id);
   const dataElaboracaoISO=await selecionarDataVisual({titulo:'Data de elaboração/finalização',valor:v.dataElaboracaoISO||formatoISO(new Date()),opcional:false});
   if(!dataElaboracaoISO)return;
   if(v.dataAplicacaoISO&&dataElaboracaoISO<v.dataAplicacaoISO&&!confirm('A data de elaboração é anterior à data de aplicação. Deseja manter assim mesmo?'))return;
-  v.status = 'concluida';
   v.pontuacao = calcularPontuacao(v.checklist);
   v.dataElaboracaoISO=dataElaboracaoISO;
   v.dataElaboracao=isoParaBRCompleto(dataElaboracaoISO);
@@ -2314,17 +2319,14 @@ async function concluirVisita(id){
   v.assinaturaCliente = (canvasCliente && !canvasVazio(canvasCliente)) ? canvasCliente.toDataURL('image/png') : null;
   v.assinaturaTecnico = (canvasTecnico && !canvasVazio(canvasTecnico)) ? canvasTecnico.toDataURL('image/png') : null;
 
-  const { error: erroUpdate } = await supa.from('visitas').update({
-    status: 'concluida', pontuacao: v.pontuacao,
-    data_aplicacao: v.dataAplicacaoISO, data_elaboracao: dataElaboracaoISO
-  }).eq('id', v.id);
-
   const resultadosSalvos = await Promise.all(v.checklist.filter(i=>i.resultado).map(i=>salvarRascunhoItem(v,i)));
-  const erroRespostas = resultadosSalvos.some(x=>!x) ? {message:'Uma ou mais respostas não puderam ser salvas.'} : null;
-
-  if(erroUpdate || erroRespostas){
-    dispararAutomacao('Erro ao salvar visita', (erroUpdate||erroRespostas).message);
+  if(resultadosSalvos.some(x=>!x)||Object.values(lerRascunhos()).some(r=>r.visita.id===v.id)){
+    dispararAutomacao('Checklist ainda em rascunho','Há respostas aguardando sincronização. Revise antes de finalizar.');renderTela();return;
   }
+  const {error:erroUpdate}=await supa.from('visitas').update({status:'concluida',pontuacao:v.pontuacao,data_aplicacao:v.dataAplicacaoISO,data_elaboracao:dataElaboracaoISO}).eq('id',v.id).select('id').single();
+  if(erroUpdate){dispararAutomacao('Checklist ainda em rascunho',erroUpdate.message);return;}
+  v.status='concluida';
+  await salvarCopiaChecklist();
 
   const cliente = CLIENTES.find(c=>c.id===v.clienteId);
   if(cliente) recalcularHistoricoCliente(cliente);
@@ -4913,7 +4915,7 @@ async function salvarEstado(){
 
 function avisoPersistencia(){
   if(!armazenamentoDisponivel){
-    dispararAutomacao('Modo demonstração', 'Abra este app pelo link do Claude (não pelo arquivo baixado) para os dados de Clientes, Agenda e Financeiro serem salvos de verdade entre uma sessão e outra.');
+    dispararAutomacao('Confira a sincronização', 'Use o indicador de conexão para confirmar o envio ao banco.');
   }
 }
 
@@ -4923,8 +4925,8 @@ async function atualizarStatusConexao(){
   if(!el) return;
   if(!navigator.onLine){
     el.classList.add('offline');
-    el.querySelector('.txt').innerText = 'Sem sincronização';
-    el.title='Sem internet: a interface pode abrir pelo cache, mas os dados não serão carregados ou salvos.';
+    el.querySelector('.txt').innerText = 'Offline · rascunhos locais';
+    el.title='Sem internet: continue respostas dos checklists preparados neste aparelho. Fotos, novos registros e finalização precisam de conexão.';
     return false;
   }
   el.classList.remove('offline');
@@ -4938,7 +4940,7 @@ window.addEventListener('online', async ()=>{
 });
 window.addEventListener('offline', ()=>{
   atualizarStatusConexao();
-  dispararAutomacao('Sem sincronização', 'A interface pode continuar aberta, mas não faça alterações até a conexão com o banco voltar.');
+  dispararAutomacao('Sem conexão', 'Respostas dos checklists ficam neste aparelho. Aguarde a sincronização antes de finalizar. Outras alterações precisam de conexão.');
 });
 function registrarAcaoOffline(descricao){
   return navigator.onLine;
@@ -4988,10 +4990,7 @@ function telaLoginNormal(){
     <div class="login-campo"><label>Senha</label><input type="password" id="loginSenha" placeholder="Sua senha"></div>
     <button class="login-btn" id="loginBtnEntrar" onclick="tentarLogin()">Entrar</button>
     <div id="loginErro" class="login-erro"></div>
-    <div style="text-align:center;margin-top:14px;">
-      <button onclick="telaCriarConta()" style="font-size:12px;color:var(--cor-primaria);font-weight:600;">Primeiro acesso? Criar minha conta</button>
-    </div>
-    <div class="login-aviso">Login real, protegido pelo Supabase — os dados agora ficam salvos na nuvem e sincronizam entre seus aparelhos.</div>`;
+    <div class="login-aviso">Acesso exclusivo de Bruna Ribeiro. Os dados ficam protegidos na nuvem e sincronizam entre seus aparelhos.</div>`;
   setTimeout(()=>{
     const campoSenha = document.getElementById('loginSenha');
     if(campoSenha) campoSenha.addEventListener('keydown', e=>{ if(e.key==='Enter') tentarLogin(); });
@@ -5052,6 +5051,21 @@ async function tentarLogin(){
   entrarNoApp();
 }
 async function entrarNoApp(){
+  const {data:{session}}=await supa.auth.getSession();
+  if(!session)return;
+  rascunhoUsuario=session.user.id;
+  let bancoConectado=navigator.onLine;
+  if(bancoConectado){
+    const teste=await supa.from('perfil_usuario').select('user_id').eq('user_id',session.user.id).maybeSingle();
+    bancoConectado=!teste.error&&!!teste.data;
+  }
+  modoConsultaOffline=!bancoConectado;
+  if(modoConsultaOffline){
+    if(!await restaurarCopiaChecklist()){alert('Abra o sistema uma vez com internet para preparar os checklists neste aparelho.');return;}
+    document.getElementById('telaLogin').style.display='none';document.getElementById('appRoot').classList.add('ativo');
+    restaurarTelaAtualSessao();telaAtual='visitas';renderSidebar();renderTela();atualizarStatusConexao();return;
+  }
+
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').classList.add('ativo');
   await carregarPerfilSupabase();
@@ -5081,6 +5095,9 @@ async function entrarNoApp(){
   await carregarCentralComandoSupabase();
   await carregarPlanejamentoSupabase();
   await carregarAsseioSupabase();
+  aplicarRascunhosLocais();
+  await sincronizarRascunhos();
+  await salvarCopiaChecklist();
   restaurarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -5101,6 +5118,8 @@ function restaurarTelaAtualSessao(){
   } catch(e){}
 }
 async function sairDaConta(){
+  if(Object.keys(lerRascunhos()).length){alert('Existem respostas aguardando sincronização neste aparelho. Sincronize antes de sair da conta.');return;}
+  rascunhoUsuario=null;
   await supa.auth.signOut();
   document.getElementById('appRoot').classList.remove('ativo');
   document.getElementById('telaLogin').style.display = 'flex';
