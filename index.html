@@ -615,6 +615,9 @@
   @media (max-width:640px){ .docrow, .docrow-head{grid-template-columns:1fr;} }
   .doc-panel-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.doc-panel-resumo>div{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:13px;padding:12px}.doc-panel-resumo strong{display:block;font-family:'Fraunces',serif;font-size:22px;color:var(--cor-primaria)}.doc-panel-resumo span{font-size:10.5px;color:var(--cor-texto-suave)}
   .doc-grupo{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:15px;margin-bottom:10px;overflow:hidden}.doc-grupo summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px}.doc-grupo summary::-webkit-details-marker{display:none}.doc-grupo-titulo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:13px}.doc-grupo-icone{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#E5F1E8,#FFF0E6);display:flex;align-items:center;justify-content:center}.doc-grupo-contagem{font-size:10.5px;color:var(--cor-texto-suave);white-space:nowrap}.doc-grupo-corpo{border-top:1px solid var(--cor-borda);padding:5px 14px 10px}.doc-check-head,.doc-check-item{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(105px,.7fr) minmax(105px,.7fr) minmax(90px,.55fr) auto;gap:10px;align-items:center}.doc-check-head{padding:9px 2px 5px;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--cor-texto-suave);font-weight:700}.doc-check-item{padding:11px 2px;border-bottom:1px solid var(--cor-borda)}.doc-check-item:last-child{border-bottom:none}.doc-check-item.pendente{opacity:.78}.doc-check-nome{font-size:12.5px;font-weight:600}.doc-check-meta{font-size:10px;color:var(--cor-texto-suave);margin-top:3px}.doc-check-data{font-size:10.5px;color:var(--cor-texto-suave)}.doc-check-acoes{display:flex;gap:5px}.doc-check-acoes button{border:1px solid var(--cor-borda);border-radius:8px;padding:7px 9px;font-size:10.5px}.doc-modelo-nota{font-size:11px;color:var(--cor-texto-suave);margin:8px 0 15px}.doc-toggle-row{display:flex;gap:8px;flex-wrap:wrap}.doc-toggle-row label{display:flex;align-items:center;gap:6px;border:1px solid var(--cor-borda);border-radius:9px;padding:8px 10px;font-size:11px}.doc-toggle-row input{accent-color:var(--cor-primaria)}
+  .doc-form-modal{width:100%;min-width:0}.doc-form-modal .form-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.doc-form-modal .form-field,.doc-form-modal input,.doc-form-modal select,.doc-form-modal textarea{min-width:0}.doc-form-modal input[type="date"]{-webkit-appearance:none;appearance:none;display:block}.doc-aplicavel{display:flex!important;align-items:center;gap:9px;text-transform:none!important;letter-spacing:0!important;font-size:12.5px!important;color:var(--cor-texto)!important}.doc-aplicavel input{flex:0 0 auto;width:18px!important;height:18px!important;margin:0}.doc-form-modal .system-modal-actions{width:100%}
+  .doc-date-control{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:stretch}.doc-date-value{min-width:0;border:1px solid var(--cor-borda);border-radius:10px;background:var(--cor-superficie);padding:10px 12px;text-align:left;color:var(--cor-texto)}.doc-date-value span{display:block;font-size:13px;font-weight:600}.doc-date-value small{display:block;color:var(--cor-texto-suave);font-size:9.5px;margin-top:2px}.doc-date-clear{border:1px solid #F0D5D2;border-radius:10px;padding:8px 10px;color:#A33B38;background:#FFF8F7;font-size:11px;font-weight:700}.doc-date-clear[hidden]{display:none}.checklist-date-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.checklist-date-remove{color:#A33B38!important;border-color:#F0D5D2!important;background:#FFF8F7!important}
+  @media(max-width:800px){.doc-form-modal .form-grid{grid-template-columns:minmax(0,1fr)!important}.doc-form-modal .form-field.full{grid-column:1}.doc-form-modal .doc-toggle-row{display:grid;grid-template-columns:minmax(0,1fr);width:100%}.doc-form-modal .doc-toggle-row label{width:100%;min-width:0;text-transform:none;letter-spacing:0;font-size:12px;line-height:1.35}.doc-form-modal .system-modal-head{align-items:flex-start}.doc-form-modal .system-modal-head>div{min-width:0}.doc-form-modal .system-modal-head h2,.doc-form-modal .system-modal-head p{overflow-wrap:anywhere}.doc-form-modal .system-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.doc-form-modal .system-modal-actions button{width:100%;padding:12px 10px}.doc-form-modal input[type="date"]{width:100%;min-height:46px}}
   @media(max-width:720px){.doc-panel-resumo{grid-template-columns:1fr 1fr}.doc-check-head{display:none}.doc-check-item{grid-template-columns:1fr auto}.doc-check-item .doc-check-data,.doc-check-item .doc-check-status{grid-column:1}.doc-check-acoes{grid-column:2;grid-row:1/5}.doc-grupo summary{padding:12px}.doc-grupo-corpo{padding:4px 11px 8px}}
 
   /* Meu Ano em Pixels */
@@ -1560,22 +1563,38 @@ let CATEGORIA_DOCUMENTO_ABERTA='regularizacao';
 function documentoStatusPainel(d){if(!d)return 'Pendente';if(d.aplicavel===false)return 'Não se aplica';return d.statusOperacional==='pendente'?'Pendente':d.statusOperacional==='implantado'?'Implantado':'Arquivado';}
 function classeStatusOperacional(status){return ['Arquivado','Implantado'].includes(status)?'doc-status-valido':status==='Pendente'?'doc-status-vencendo':'doc-status-revisao';}
 function manterCategoriaDocumento(id,aberto){if(aberto)CATEGORIA_DOCUMENTO_ABERTA=id;}
+function campoDataDocumentoHTML(id,rotulo,valor){
+  const iso=normalizarDataISO(valor)||'';
+  return `<div class="form-field"><label>${rotulo}</label><input type="hidden" id="${id}" value="${iso}"><div class="doc-date-control"><button type="button" class="doc-date-value" onclick="editarCampoDataDocumento('${id}','${rotulo}')"><span id="${id}Texto">${iso?isoParaBRCompleto(iso):'Sem data'}</span><small>${iso?'Toque para alterar':'Toque para selecionar'}</small></button><button type="button" class="doc-date-clear" id="${id}Limpar" ${iso?'':'hidden'} onclick="limparCampoDataDocumento('${id}')">Limpar</button></div></div>`;
+}
+function atualizarVisualCampoDataDocumento(id){
+  const input=document.getElementById(id),texto=document.getElementById(id+'Texto'),limpar=document.getElementById(id+'Limpar');if(!input||!texto||!limpar)return;
+  texto.textContent=input.value?isoParaBRCompleto(input.value):'Sem data';
+  const dica=texto.nextElementSibling;if(dica)dica.textContent=input.value?'Toque para alterar':'Toque para selecionar';
+  limpar.hidden=!input.value;
+}
+async function editarCampoDataDocumento(id,titulo){
+  const input=document.getElementById(id);if(!input)return;
+  const data=await selecionarDataVisual({titulo,valor:input.value||null,opcional:true});if(data===null)return;
+  input.value=data||'';atualizarVisualCampoDataDocumento(id);
+}
+function limparCampoDataDocumento(id){const input=document.getElementById(id);if(!input)return;input.value='';atualizarVisualCampoDataDocumento(id);}
 function abrirDocumentoModelo(clienteId,chave,nome=null,docId=null){
   const c=CLIENTES.find(x=>x.id===clienteId),d=docId?(c.documentacao||[]).find(x=>x.id===docId):(chave?documentoModelo(c,chave):null),grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||categoriaDocumento(chave)));
-  abrirModalSistema(`<div class="system-modal-head"><div><h2>${d?'Atualizar':'Preencher'} documentação</h2><p>O sistema acompanha os dados; o arquivo permanece no seu computador.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+  abrirModalSistema(`<div class="doc-form-modal"><div class="system-modal-head"><div><h2>${d?'Atualizar':'Preencher'} documentação</h2><p>O sistema acompanha os dados; o arquivo permanece no seu computador.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
     <div class="form-field full"><label>Documento</label><input id="docNome" value="${textoHTML(d?.nome||nome||'')}" ${chave?'readonly':''}></div>
-    <div class="form-field"><label>Data de emissão/elaboração</label><input type="date" id="docEmissao" value="${normalizarDataISO(d?.emissao)||''}"></div>
-    <div class="form-field"><label>Data de validade/próxima execução</label><input type="date" id="docValidade" value="${normalizarDataISO(d?.validade)||''}"></div>
+    ${campoDataDocumentoHTML('docEmissao','Data de emissão/elaboração',d?.emissao)}
+    ${campoDataDocumentoHTML('docValidade','Data de validade/próxima execução',d?.validade)}
     <div class="form-field"><label>Status</label><select id="docStatusOperacional"><option value="pendente" ${d?.statusOperacional==='pendente'||!d?'selected':''}>Pendente</option><option value="arquivado" ${d?.statusOperacional==='arquivado'?'selected':''}>Arquivado</option><option value="implantado" ${d?.statusOperacional==='implantado'?'selected':''}>Implantado</option></select></div>
     ${grupo?.servico?`<div class="form-field"><label>Empresa responsável</label><input id="docEmpresa" value="${textoHTML(d?.empresaResponsavel||'')}" placeholder="Nome da empresa ou prestador"></div><div class="form-field full"><div class="doc-toggle-row"><label><input type="checkbox" id="docContrato" ${d?.possuiContrato===true?'checked':''}> Possui contrato vigente</label><label><input type="checkbox" id="docCompleta" ${d?.documentacaoCompleta===true?'checked':''}> Documentação da empresa completa</label></div></div>`:''}
     <div class="form-field full"><label>Observações</label><textarea id="docObservacoes" rows="3" placeholder="Responsável, particularidades, pendências...">${textoHTML(d?.observacoes||'')}</textarea></div>
-    <div class="form-field full"><label><input type="checkbox" id="docAplicavel" ${d?.aplicavel===false?'':'checked'} style="accent-color:var(--cor-primaria)"> Este item se aplica ao cliente</label></div>
-  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarDocumentoPainel('${clienteId}','${chave||''}','${d?.id||''}')">Salvar</button></div>`);
+    <div class="form-field full"><label class="doc-aplicavel"><input type="checkbox" id="docAplicavel" ${d?.aplicavel===false?'':'checked'} style="accent-color:var(--cor-primaria)"> <span>Este item se aplica ao cliente</span></label></div>
+  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarDocumentoPainel('${clienteId}','${chave||''}','${d?.id||''}')">Salvar</button></div></div>`);
 }
 async function salvarDocumentoPainel(clienteId,chave,docId){
   const c=CLIENTES.find(x=>x.id===clienteId),nome=document.getElementById('docNome').value.trim();if(!nome){document.getElementById('docNome').focus();return;}
   const emissaoISO=document.getElementById('docEmissao').value,validadeISO=document.getElementById('docValidade').value,aplicavel=document.getElementById('docAplicavel').checked;
-  const emissao=emissaoISO?isoParaBRCompleto(emissaoISO):'—',validade=validadeISO?isoParaBRCompleto(validadeISO):'—',statusTela=aplicavel?statusAutomaticoDoc(validade):'Sem validade',status=statusTela==='Vigente'?'Válido':statusTela==='Próximo do vencimento'?'Vencendo':statusTela==='Vencido'?'Vencido':'Em revisão';
+  const emissao=emissaoISO?isoParaBRCompleto(emissaoISO):null,validade=validadeISO?isoParaBRCompleto(validadeISO):null,statusTela=aplicavel?statusAutomaticoDoc(validade):'Sem validade',status=statusTela==='Vigente'?'Válido':statusTela==='Próximo do vencimento'?'Vencendo':statusTela==='Vencido'?'Vencido':'Em revisão';
   const statusOperacional=document.getElementById('docStatusOperacional').value;
   const payload={cliente_id:clienteId,nome,tipo:'Documento',emissao,validade,status,status_operacional:statusOperacional,categoria:chave?categoriaDocumento(chave):'personalizados',modelo_chave:chave||null,observacoes:document.getElementById('docObservacoes').value.trim(),empresa_responsavel:document.getElementById('docEmpresa')?.value.trim()||null,possui_contrato:document.getElementById('docContrato')?.checked??null,documentacao_completa:document.getElementById('docCompleta')?.checked??null,aplicavel};
   const existente=docId||(chave?documentoModelo(c,chave)?.id:null);let resposta;
@@ -2165,6 +2184,13 @@ async function atualizarValidadeItem(visitaId,itemId){
   if(salvo)dispararAutomacao(validade?'Validade salva':'Validade removida',item.desc);
   renderTela();
 }
+async function removerValidadeItem(visitaId,itemId){
+  const v=VISITAS.find(x=>x.id===visitaId),item=v?.checklist.find(i=>i.id===itemId);if(!v||!item)return;
+  item.validade=null;
+  const salvo=await salvarRascunhoItem(v,item);
+  dispararAutomacao(salvo?'Validade removida':'Validade removida do rascunho',salvo?'A alteração foi sincronizada.':'A alteração será sincronizada quando a conexão voltar.');
+  renderTela();
+}
 function atualizarObsItem(visitaId, itemId, texto){
   const v = VISITAS.find(x=>x.id===visitaId);
   const item=v.checklist.find(i=>i.id===itemId);
@@ -2222,7 +2248,7 @@ function fichaVisitaHTML(v){
               ${item.resultado ? `<textarea class="checklist-obs" rows="2" placeholder="${item.resultado==='nao_conforme' ? 'Descreva a não conformidade encontrada...' : 'Observação (opcional)...'}" oninput="atualizarObsItem('${v.id}','${item.id}', this.value)">${item.obs||''}</textarea>` : ''}
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;padding:9px 11px;background:var(--cor-fundo);border-radius:9px;">
                 <div><strong style="font-size:11px;">Validade</strong><div style="font-size:10.5px;color:var(--cor-texto-suave);">${item.validade?isoParaBRCompleto(item.validade):'Sem validade informada'}</div></div>
-                <button class="btn-secundario" style="padding:7px 10px;font-size:11px;" onclick="atualizarValidadeItem('${v.id}','${item.id}')">📅 ${item.validade?'Alterar':'Selecionar'}</button>
+                <div class="checklist-date-actions"><button class="btn-secundario" style="padding:7px 10px;font-size:11px;" onclick="atualizarValidadeItem('${v.id}','${item.id}')">📅 ${item.validade?'Alterar':'Selecionar'}</button>${item.validade?`<button class="btn-secundario checklist-date-remove" style="padding:7px 10px;font-size:11px;" onclick="removerValidadeItem('${v.id}','${item.id}')">Limpar</button>`:''}</div>
               </div>
               ${item.resultado ? `
               <div class="checklist-fotos">

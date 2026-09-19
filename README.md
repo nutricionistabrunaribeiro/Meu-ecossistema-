@@ -1,5 +1,23 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Correção V52 — Limpeza de datas opcionais
+
+- emissão e validade da documentação agora têm ações visíveis para selecionar e limpar;
+- limpar uma data salva `null` no banco, removendo de verdade o valor anterior;
+- validade dos itens do checklist ganhou botão direto `Limpar`;
+- remoções feitas no checklist também respeitam o rascunho offline e a sincronização;
+- ajustes da V51 para documentação no iPhone foram preservados;
+- cache do PWA atualizado para V52.
+
+## Correção V51 — Cadastro de documentações no celular
+
+- formulário documental reorganizado em uma única coluna no iPhone;
+- campos de emissão, validade, status, empresa e observações alinhados à largura útil;
+- datas corrigidas para não ultrapassarem o modal no Safari;
+- caixas de seleção e textos longos passam a quebrar linha corretamente;
+- botões Cancelar e Salvar alinhados e com a mesma largura;
+- cache do PWA atualizado para V51.
+
 ## Correção V50 — Enquadramento no iPhone
 
 - campos com tamanho mínimo compatível com o Safari, evitando o zoom automático ao receber foco;
