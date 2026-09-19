@@ -1,5 +1,14 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V54 — Modo escuro
+
+- opções Claro, Escuro e Automático em Configurações > Tema / Marca;
+- modo Automático acompanha a aparência do iPhone, tablet ou computador;
+- botão de troca rápida no cabeçalho;
+- preferência salva separadamente em cada aparelho;
+- paleta escura preserva o verde e o laranja da identidade visual;
+- cache do PWA atualizado para V54.
+
 ## Correção V53 — Legenda do Meu Ano em Pixels
 
 - texto da legenda alterado para a cor escura padrão do sistema;

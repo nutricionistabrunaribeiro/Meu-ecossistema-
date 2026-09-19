@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Ecossistema — Bruna Ribeiro Consultoria</title>
+<script>
+  (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
@@ -36,6 +39,7 @@
     --cor-primaria-clara:#EC8C54;
     --cor-acento:#72BD88;
   }
+  html[data-tema-interface="escuro"]{color-scheme:dark;--cor-fundo:#111713;--cor-texto:#F2F4EF;--cor-texto-suave:#AEB8AF;--cor-superficie:#1B231D;--cor-borda:#344139;--sombra-card:0 6px 20px rgba(0,0,0,.22);--sombra-hover:0 14px 32px rgba(0,0,0,.32)}
   *{box-sizing:border-box;margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%;overflow-x:hidden;}
   body{
@@ -51,6 +55,12 @@
   }
   h1,h2,h3,.serif{font-family:'Fraunces',serif;}
   button{font-family:inherit;border:none;background:none;cursor:pointer;}
+  .theme-toggle{width:36px;height:36px;border-radius:11px;border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}.theme-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:13px}.theme-option{border:1px solid var(--cor-borda);border-radius:13px;padding:13px 9px;background:var(--cor-fundo);color:var(--cor-texto);text-align:center}.theme-option span{display:block;font-size:19px;margin-bottom:5px}.theme-option strong{display:block;font-size:11px}.theme-option.active{border-color:var(--cor-primaria);box-shadow:0 0 0 2px color-mix(in srgb,var(--cor-primaria) 22%,transparent);background:color-mix(in srgb,var(--cor-primaria) 13%,var(--cor-superficie))}
+  html[data-tema-interface="escuro"] .form-field input,html[data-tema-interface="escuro"] .form-field select,html[data-tema-interface="escuro"] .form-field textarea,html[data-tema-interface="escuro"] .passo-preview-grid input,html[data-tema-interface="escuro"] .passo-preview-grid select{background:var(--cor-superficie);color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] .passos-metrica{background:linear-gradient(145deg,var(--cor-superficie),var(--cor-fundo))}
+  html[data-tema-interface="escuro"] :is(.fab-menu,.rascunho-card,.agenda-dia-card,.agenda-dia-vazio,.assinatura-box,.modal-busca,.painel-notif,.login-card,.plan-mes,.plan-tabs button,.plan-card,.plan-row){background:var(--cor-superficie);color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] :is(.doc-grupo-icone,.plan-date){background:color-mix(in srgb,var(--cor-primaria) 16%,var(--cor-superficie))}
+  html[data-tema-interface="escuro"] :is(input,select,textarea){color-scheme:dark}
 
   /* SIDEBAR */
   .sidebar{
@@ -690,6 +700,7 @@
     .search{width:120px;}
     .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}.doc-calendar-card{grid-column:1/-1}.doc-calendar-head{display:block}.doc-calendar-summary{justify-content:flex-start;margin-top:10px}.doc-calendar-layout{grid-template-columns:1fr}.doc-day{min-height:42px;padding:5px}.doc-calendar-list{min-height:0}
     .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto minmax(0,1fr) auto}.agenda-periodo-label{font-size:13px;min-width:0;overflow-wrap:anywhere}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) 88px}.mercado-add button{grid-column:1/-1}
+    .theme-options{grid-template-columns:1fr}.theme-option{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 13px}.theme-option span{margin:0}
   }
   /* Telas curtas (celular deitado) — reduz espaçamentos verticais pra caber tudo sem cortar */
   @media (max-height:480px) and (orientation:landscape){
@@ -777,6 +788,7 @@
     <div class="top-actions">
       <button class="btn-instalar-app" id="btnInstalarApp" onclick="instalarMeuEcossistema()">▣ Instalar aplicativo</button>
       <div class="status-conexao" id="statusConexao" title="Indica se os dados podem ser sincronizados com o Supabase"><span class="bolinha"></span><span class="txt">Verificando banco…</span></div>
+      <button class="theme-toggle" id="themeToggle" onclick="alternarTemaRapido()" aria-label="Alternar modo claro e escuro">☾</button>
       <div class="avatar">BR</div>
     </div>
   </header>
@@ -3819,6 +3831,17 @@ function mudarCorTema(variavel, valor){
   const span = document.getElementById('hex-'+variavel);
   if(span) span.innerText = valor;
 }
+const consultaTemaSistema=window.matchMedia('(prefers-color-scheme: dark)');
+function preferenciaTemaInterface(){return localStorage.getItem('me-tema-interface')||'automatico';}
+function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
+  const escuro=escolha==='escuro'||(escolha==='automatico'&&consultaTemaSistema.matches);
+  document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;
+  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#111713':'#72BD88';
+  const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
+}
+function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
+function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
+consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
 
 function configuracoesHTML(){
   const abas = [
@@ -3901,7 +3924,9 @@ function configChecklistsHTML(){
 }
 
 function configTemaHTML(){
+  const temaEscolhido=preferenciaTemaInterface();
   return `
+    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
@@ -5172,6 +5197,7 @@ async function instalarMeuEcossistema(){
   abrirModalSistema(`<div class="system-modal-top"><div><h3>Instalar Meu Ecossistema</h3><p>Coloque o ícone diretamente na tela do celular.</p></div><button onclick="fecharModalSistema()">✕</button></div><div style="font-size:13px;line-height:1.65"><p><strong>Se você abriu pelo WhatsApp:</strong></p><p>1. Toque nos três pontos do navegador.<br>2. Escolha <strong>Abrir no Chrome</strong>.<br>3. No Chrome, toque novamente nos três pontos.<br>4. Entre em <strong>Instalar e criar atalho</strong>.<br>5. Toque em <strong>Instalar</strong> ou <strong>Criar atalho</strong>.</p><p style="margin-top:12px;color:var(--cor-texto-suave)">O navegador interno do WhatsApp não oferece a instalação completa do aplicativo.</p></div>`);
 }
 async function iniciarApp(){
+  aplicarTemaInterface();
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
   }
