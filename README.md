@@ -1,5 +1,11 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Correção V53 — Legenda do Meu Ano em Pixels
+
+- texto da legenda alterado para a cor escura padrão do sistema;
+- contraste reforçado sem mudar as cores dos registros já preenchidos;
+- cache do PWA atualizado para V53.
+
 ## Correção V52 — Limpeza de datas opcionais
 
 - emissão e validade da documentação agora têm ações visíveis para selecionar e limpar;
