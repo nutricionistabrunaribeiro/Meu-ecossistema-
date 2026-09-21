@@ -1,5 +1,17 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V57 — Jornada Bíblica e Controle de Horas
+
+- Jornada Bíblica visual com os 66 livros e marcação capítulo por capítulo;
+- progresso geral, livros concluídos e sugestão automática da próxima leitura;
+- card da Jornada no Dashboard Pessoal;
+- Controle de Horas para visitas, administrativo, treinamentos, auditorias e deslocamentos;
+- cronômetro persistente mesmo ao bloquear o celular, atualizar a página ou trocar de aparelho;
+- histórico mensal, totais semanais/mensais e correção de horários;
+- card de atividade em andamento no Dashboard geral;
+- dados protegidos no Supabase e isolados pela conta proprietária;
+- cache do PWA atualizado para V57.
+
 ## Rodada V56 — Lista do Dia
 
 - nova Lista do Dia dentro de Vida Pessoal;

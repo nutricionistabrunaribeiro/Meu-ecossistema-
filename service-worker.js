@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-ecossistema-v56';
+const CACHE_NAME = 'meu-ecossistema-v57';
 const APP_SHELL = [
   '/', '/index.html', '/proximos-passos.js', '/offline-drafts.js',
   '/manifest.json', '/icon-192.png', '/icon-512.png',

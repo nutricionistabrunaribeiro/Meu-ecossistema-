@@ -1,0 +1,24 @@
+const fs=require('fs'),assert=require('assert');
+const html=fs.readFileSync('index.html','utf8');
+const sql=fs.readFileSync('20260921_jornada_biblica_controle_horas.sql','utf8');
+const sw=fs.readFileSync('service-worker.js','utf8');
+
+assert.match(html,/Jornada Bíblica/);
+assert.match(html,/const LIVROS_BIBLIA=/);
+assert.match(html,/\['Antigo Testamento','Salmos',150\]/);
+assert.match(html,/\['Novo Testamento','Apocalipse',22\]/);
+assert.match(html,/alternarCapituloBiblia/);
+assert.match(html,/cardJornadaBiblicaHTML\(true\)/);
+assert.match(html,/Controle de Horas/);
+assert.match(html,/atividadeHorasAtiva/);
+assert.match(html,/data-cronometro/);
+assert.match(html,/setInterval\(atualizarCronometros,1000\)/);
+assert.match(html,/carregarBibliaSupabase/);
+assert.match(html,/carregarControleHorasSupabase/);
+assert.match(sql,/create table if not exists public\.biblia_capitulos_lidos/);
+assert.match(sql,/create table if not exists public\.controle_horas/);
+assert.match(sql,/enable row level security/g);
+assert.match(sql,/controle_horas_uma_ativa_por_usuario_idx/);
+assert.match(sql,/ecossistema_acesso_exclusivo/g);
+assert.match(sw,/meu-ecossistema-v57/);
+console.log('V57 Jornada Bíblica e Controle de Horas: estrutura validada.');
