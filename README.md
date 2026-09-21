@@ -1,5 +1,21 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V56 — Lista do Dia
+
+- nova Lista do Dia dentro de Vida Pessoal;
+- inclusão, conclusão, reabertura e exclusão de itens;
+- limpeza coletiva dos itens concluídos;
+- card sincronizado no Dashboard geral com inclusão rápida;
+- dados persistidos no Supabase e isolados por usuário;
+- cache do PWA atualizado para V56.
+
+## Rodada V55 — Contraste do modo escuro
+
+- contraste corrigido no painel de documentação do cliente;
+- calendário de documentações com mês, dias, legendas e indicadores legíveis no tema escuro;
+- notificações flutuantes com fundo e texto contrastantes;
+- ocultação segura do texto de peso quando o modelo de checklist não define esse valor.
+
 ## Rodada V54 — Modo escuro
 
 - opções Claro, Escuro e Automático em Configurações > Tema / Marca;

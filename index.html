@@ -61,6 +61,18 @@
   html[data-tema-interface="escuro"] :is(.fab-menu,.rascunho-card,.agenda-dia-card,.agenda-dia-vazio,.assinatura-box,.modal-busca,.painel-notif,.login-card,.plan-mes,.plan-tabs button,.plan-card,.plan-row){background:var(--cor-superficie);color:var(--cor-texto)}
   html[data-tema-interface="escuro"] :is(.doc-grupo-icone,.plan-date){background:color-mix(in srgb,var(--cor-primaria) 16%,var(--cor-superficie))}
   html[data-tema-interface="escuro"] :is(input,select,textarea){color-scheme:dark}
+  html[data-tema-interface="escuro"] .module-explainer{background:color-mix(in srgb,var(--cor-primaria) 10%,var(--cor-superficie));color:var(--cor-texto-suave)}
+  html[data-tema-interface="escuro"] .module-explainer strong{color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] .doc-month{background:var(--cor-fundo);color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] .doc-month>.serif,html[data-tema-interface="escuro"] .doc-day b{color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] .doc-day{background:color-mix(in srgb,var(--cor-superficie) 82%,#000);color:var(--cor-texto)}
+  html[data-tema-interface="escuro"] .doc-day:hover,html[data-tema-interface="escuro"] .doc-day.selected{background:color-mix(in srgb,var(--cor-primaria) 18%,var(--cor-superficie));border-color:var(--cor-primaria)}
+  html[data-tema-interface="escuro"] .doc-day.empty{background:transparent}
+  html[data-tema-interface="escuro"] .doc-summary-pill{background:#303A33;color:#D6DDD7}
+  html[data-tema-interface="escuro"] .doc-summary-pill.danger{background:#482A2A;color:#FFB9B5}
+  html[data-tema-interface="escuro"] .doc-summary-pill.warning{background:#493221;color:#FFC58E}
+  html[data-tema-interface="escuro"] .doc-summary-pill.ok{background:#203B2A;color:#A8DFB8}
+  html[data-tema-interface="escuro"] .toast{background:#263229;color:#F7F8F5;border:1px solid #435248}
 
   /* SIDEBAR */
   .sidebar{
@@ -115,14 +127,14 @@
     .dashboard-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:stretch}
     .dashboard-grid>.card{height:100%}
     .dash-arco{grid-column:span 5}.dash-agenda{grid-column:span 7}
-    .dash-mercado,.dash-contas{grid-column:span 6}
+    .dash-lista-dia,.dash-mercado,.dash-contas{grid-column:span 4}
     .dash-entregas{grid-column:1/-1}
     .dashboard-grid>.doc-calendar-card{grid-column:1/-1}
     .dash-radar,.dash-visitas-mes,.dash-checklists{grid-column:span 4}
     .dash-visitas-ano{grid-column:span 8}.dash-projetos{grid-column:span 4}
     .dash-conteudo{grid-column:span 8}.dash-lideranca{grid-column:span 4}
     .dashboard-grid>.rapidos{grid-column:1/-1}
-    .dash-agenda,.dash-mercado,.dash-contas{max-height:370px;overflow:auto}
+    .dash-agenda,.dash-lista-dia,.dash-mercado,.dash-contas{max-height:370px;overflow:auto}
   }
   .card{background:var(--cor-superficie);border:1px solid rgba(210,208,198,.82);border-radius:18px;padding:20px;box-shadow:var(--sombra-card);transition:transform .18s,box-shadow .18s,border-color .18s;min-width:0}
   .card:hover{transform:translateY(-1px);box-shadow:var(--sombra-hover);border-color:rgba(114,189,136,.34)}
@@ -516,6 +528,7 @@
   .mercado-add{display:grid;grid-template-columns:minmax(160px,1fr) 110px auto;gap:8px;margin-bottom:14px}.mercado-add input{min-width:0;border:1px solid var(--cor-borda);border-radius:9px;padding:10px 12px;font:inherit;font-size:12.5px}.mercado-add button{background:var(--cor-primaria);color:#fff;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700}
   .mercado-vazio{text-align:center;padding:22px 10px;color:var(--cor-texto-suave);font-size:12.5px}.mercado-item-qtd{font-size:10.5px;color:var(--cor-texto-suave);background:var(--cor-fundo);border-radius:14px;padding:2px 7px}.mercado-acoes{display:flex;justify-content:flex-end;margin-top:12px}.mercado-dashboard-lista{display:flex;flex-direction:column;margin-top:10px}.mercado-dashboard-lista .compra-item{padding:8px 0}
   .mercado-card-dashboard{min-width:0;overflow:hidden}.mercado-card-dashboard .mercado-add{grid-template-columns:minmax(0,1fr) minmax(82px,105px);margin-top:14px;margin-bottom:0}.mercado-card-dashboard .mercado-add button{grid-column:1/-1;width:100%}.mercado-card-dashboard .compra-item span:not(.mercado-item-qtd){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lista-dia-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:14px}.lista-dia-add input{min-width:0;border:1px solid var(--cor-borda);border-radius:9px;padding:10px 12px;background:var(--cor-superficie);color:var(--cor-texto);font:inherit;font-size:12.5px}.lista-dia-add button{background:var(--cor-primaria);color:#fff;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700}.lista-dia-dashboard-lista{display:flex;flex-direction:column;margin-top:10px}.lista-dia-card-dashboard{min-width:0;overflow:hidden}.lista-dia-card-dashboard .lista-dia-add{grid-template-columns:minmax(0,1fr);margin-top:14px;margin-bottom:0}.lista-dia-card-dashboard .lista-dia-add button{width:100%}.lista-dia-card-dashboard .compra-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
   .devocional-card{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:var(--radius);padding:22px;}
   .devocional-data{font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px;}
@@ -699,7 +712,7 @@
     .conteudo-full,.rapidos{grid-column:1/-1;}
     .search{width:120px;}
     .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}.doc-calendar-card{grid-column:1/-1}.doc-calendar-head{display:block}.doc-calendar-summary{justify-content:flex-start;margin-top:10px}.doc-calendar-layout{grid-template-columns:1fr}.doc-day{min-height:42px;padding:5px}.doc-calendar-list{min-height:0}
-    .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto minmax(0,1fr) auto}.agenda-periodo-label{font-size:13px;min-width:0;overflow-wrap:anywhere}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) 88px}.mercado-add button{grid-column:1/-1}
+    .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto minmax(0,1fr) auto}.agenda-periodo-label{font-size:13px;min-width:0;overflow-wrap:anywhere}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) 88px}.mercado-add button{grid-column:1/-1}.lista-dia-add{grid-template-columns:minmax(0,1fr)}
     .theme-options{grid-template-columns:1fr}.theme-option{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 13px}.theme-option span{margin:0}
   }
   /* Telas curtas (celular deitado) — reduz espaçamentos verticais pra caber tudo sem cortar */
@@ -844,6 +857,7 @@ const MODULOS = {
       {id:"metas", nome:"Metas"},
       {id:"contas", nome:"Financeiro"},
       {id:"compras", nome:"Compras"},
+      {id:"lista_dia", nome:"Lista do Dia"},
       {id:"mercado", nome:"Lista de Mercado"},
       {id:"estudos", nome:"Estudos"},
     ]},
@@ -857,7 +871,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "trabalho";
 let telaAtual = "dashboard";
-const ICONES_MODULO={dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -865,6 +879,7 @@ function contadoresMenu(){
     obrigacoes:(OBRIGACOES||[]).filter(o=>o.status!=='realizada'&&diasAte(o.vencimento)<=30).length,
     visitas:(VISITAS||[]).filter(v=>v.status!=='concluida').length,
     mercado:(LISTA_MERCADO||[]).filter(i=>!i.comprado).length,
+    lista_dia:(LISTA_DIA||[]).filter(i=>!i.concluido).length,
     lideranca:(LIDERANCA_DELEGACOES||[]).filter(d=>d.status!=='concluida').length
   };
 }
@@ -1000,6 +1015,7 @@ const NOMES_TELA = {
   contas:["Financeiro Pessoal","Separado da Consultoria"],
   menu_pessoal:["Vida Pessoal","Escolha uma área no menu"],
   compras:["Compras","Sua lista"],
+  lista_dia:["Lista do Dia","O que você quer concluir agora"],
   mercado:["Lista de Mercado","Itens para comprar no mercado"],
   estudos:["Estudos","4 itens em andamento"],
 };
@@ -2251,7 +2267,7 @@ function fichaVisitaHTML(v){
           ${v.checklist.filter(i=>i.categoria===cat).map(item=>`
             <div class="checklist-item" style="${itensPendentesDestacar.includes(item.id) ? 'border-color:#B0413E;background:#FBF3F4;' : ''}">
               <div class="checklist-item-topo">
-                <div class="checklist-item-desc">${item.desc}<div class="checklist-item-peso">peso ${item.peso}</div></div>
+                <div class="checklist-item-desc">${item.desc}${item.peso!==undefined&&item.peso!==null&&item.peso!==''?`<div class="checklist-item-peso">peso ${item.peso}</div>`:''}</div>
                 <div class="checklist-opcoes">
                   <button class="opcao-btn ${item.resultado==='conforme'?'sel-conforme':''}" onclick="marcarResultadoItem('${v.id}','${item.id}','conforme')">Sim</button>
                   <button class="opcao-btn ${item.resultado==='nao_conforme'?'sel-nao_conforme':''}" onclick="marcarResultadoItem('${v.id}','${item.id}','nao_conforme')">Não</button>
@@ -3770,6 +3786,42 @@ function mercadoHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado),comp
 function abrirListaMercado(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='mercado';salvarTelaAtualSessao();renderSidebar();renderTela();}
 function mercadoDashboardHTML(){const pendentes=LISTA_MERCADO.filter(x=>!x.comprado);return `<div class="card mercado-card-dashboard dash-mercado"><h3>Lista de mercado <button onclick="abrirListaMercado()">abrir lista</button></h3><div class="pend-num">${pendentes.length}</div><div class="pend-desc">item(ns) para comprar</div><div class="mercado-dashboard-lista">${pendentes.slice(0,5).map(linhaMercadoHTML).join('')||'<div class="mercado-vazio">Lista de mercado em dia.</div>'}</div>${formularioMercadoHTML()}</div>`;}
 
+let LISTA_DIA = [];
+async function carregarListaDiaSupabase(){
+  const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lista_dia').select('*').eq('user_id',user.id).order('concluido').order('criado_em');
+  if(error){dispararAutomacao('Erro ao carregar Lista do Dia',error.message);return;}
+  LISTA_DIA=data||[];
+}
+async function adicionarItemListaDia(){
+  const campo=document.getElementById('novoItemListaDia'),item=campo?.value.trim();if(!item)return;
+  const {data:{user}}=await supa.auth.getUser();
+  const {data,error}=await supa.from('lista_dia').insert({user_id:user.id,item}).select().single();
+  if(error){dispararAutomacao('Erro ao adicionar item',error.message);return;}
+  LISTA_DIA.push(data);dispararAutomacao('Item adicionado à Lista do Dia',item);renderSidebar();renderTela();
+}
+async function alternarItemListaDia(id){
+  const item=LISTA_DIA.find(x=>x.id===id);if(!item)return;const concluido=!item.concluido;
+  const agora=new Date().toISOString();
+  const {error}=await supa.from('lista_dia').update({concluido,concluido_em:concluido?agora:null,atualizado_em:agora}).eq('id',id);
+  if(error){dispararAutomacao('Erro ao atualizar item',error.message);return;}Object.assign(item,{concluido,concluido_em:concluido?agora:null});renderSidebar();renderTela();
+}
+async function excluirItemListaDia(id){
+  const item=LISTA_DIA.find(x=>x.id===id);if(!item||!confirm(`Excluir “${item.item}” da Lista do Dia?`))return;
+  const {error}=await supa.from('lista_dia').delete().eq('id',id);if(error){dispararAutomacao('Erro ao excluir item',error.message);return;}
+  LISTA_DIA=LISTA_DIA.filter(x=>x.id!==id);renderSidebar();renderTela();
+}
+async function limparConcluidosListaDia(){
+  const ids=LISTA_DIA.filter(x=>x.concluido).map(x=>x.id);if(!ids.length||!confirm(`Limpar ${ids.length} item(ns) concluído(s)?`))return;
+  const {error}=await supa.from('lista_dia').delete().in('id',ids);if(error){dispararAutomacao('Erro ao limpar concluídos',error.message);return;}
+  LISTA_DIA=LISTA_DIA.filter(x=>!x.concluido);renderSidebar();renderTela();
+}
+function linhaListaDiaHTML(item){return `<div class="compra-item ${item.concluido?'feito':''}" onclick="alternarItemListaDia('${item.id}')"><input type="checkbox" ${item.concluido?'checked':''} onclick="event.stopPropagation();alternarItemListaDia('${item.id}')"><span>${textoHTML(item.item)}</span><button onclick="event.stopPropagation();excluirItemListaDia('${item.id}')" title="Excluir" style="margin-left:auto;color:#B0413E;font-size:15px">🗑</button></div>`;}
+function formularioListaDiaHTML(){return `<div class="lista-dia-add"><input id="novoItemListaDia" placeholder="O que precisa fazer?" onkeydown="if(event.key==='Enter')adicionarItemListaDia()"><button onclick="adicionarItemListaDia()">+ Adicionar</button></div>`;}
+function listaDiaHTML(){const abertos=LISTA_DIA.filter(x=>!x.concluido),concluidos=LISTA_DIA.filter(x=>x.concluido);return `<div class="card"><div class="mercado-resumo"><span>${abertos.length} para fazer</span><span>${concluidos.length} concluído(s)</span></div>${formularioListaDiaHTML()}${abertos.map(linhaListaDiaHTML).join('')}${concluidos.map(linhaListaDiaHTML).join('')||(!abertos.length?'<div class="mercado-vazio">Sua Lista do Dia está vazia. Adicione o primeiro item acima.</div>':'')}${concluidos.length?`<div class="mercado-acoes"><button class="btn-secundario" style="color:#B0413E" onclick="limparConcluidosListaDia()">Limpar concluídos</button></div>`:''}</div>`;}
+function abrirListaDia(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='lista_dia';salvarTelaAtualSessao();renderSidebar();renderTela();}
+function listaDiaDashboardHTML(){const abertos=LISTA_DIA.filter(x=>!x.concluido);return `<div class="card lista-dia-card-dashboard dash-lista-dia" style="border-top:4px solid var(--cor-primaria)"><h3>Lista do dia <button onclick="abrirListaDia()">abrir lista</button></h3><div class="pend-num">${abertos.length}</div><div class="pend-desc">item(ns) para concluir</div><div class="lista-dia-dashboard-lista">${abertos.slice(0,5).map(linhaListaDiaHTML).join('')||'<div class="mercado-vazio">Tudo concluído por aqui ✓</div>'}</div>${formularioListaDiaHTML()}</div>`;}
+
 function devocionalHTML(){
   return `
     <div class="devocional-card">
@@ -4788,6 +4840,8 @@ function renderTela(){
     document.getElementById('conteudoTela').innerHTML = contasHTML();
   } else if(telaAtual === 'compras'){
     document.getElementById('conteudoTela').innerHTML = comprasHTML();
+  } else if(telaAtual === 'lista_dia'){
+    document.getElementById('conteudoTela').innerHTML = listaDiaHTML();
   } else if(telaAtual === 'mercado'){
     document.getElementById('conteudoTela').innerHTML = mercadoHTML();
   } else if(telaAtual === 'configuracoes'){
@@ -4864,6 +4918,8 @@ function dashboardHTML(){
       ${eventosHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nada agendado para hoje.</div>` :
         eventosHoje.map(e=>`<div class="agenda-item"><div class="agenda-hora">${e.hora}:00</div><div>${eventoResumoHTML(e,true)}${e.concluido?' <span title="Concluído">✓</span>':''}</div></div>`).join('')}
     </div>
+
+    ${listaDiaDashboardHTML()}
 
     ${mercadoDashboardHTML()}
 
@@ -5145,6 +5201,7 @@ async function entrarNoApp(){
   await carregarMetasPessoaisSupabase();
   await carregarContasPessoaisSupabase();
   await carregarComprasSupabase();
+  await carregarListaDiaSupabase();
   await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();
   await carregarCicloSupabase();
