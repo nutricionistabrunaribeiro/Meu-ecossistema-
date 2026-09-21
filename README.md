@@ -1,5 +1,14 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V58 — Filtros do calendário de documentações
+
+- indicadores de vencidas, próximas, regulares e sem validade agora são clicáveis;
+- cada filtro abre a relação completa com documento, cliente, validade e prazo;
+- itens vencidos e próximos aparecem ordenados por data;
+- botão “Abrir controle” leva diretamente à documentação do cliente;
+- apresentação responsiva no celular e no computador;
+- cache do PWA atualizado para V58.
+
 ## Rodada V57 — Jornada Bíblica e Controle de Horas
 
 - Jornada Bíblica visual com os 66 livros e marcação capítulo por capítulo;
