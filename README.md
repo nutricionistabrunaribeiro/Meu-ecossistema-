@@ -1,18 +1,5 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
-## Rodada V59 — Rotina da Casa
-
-- novo módulo `Vida Pessoal > Rotina da Casa` com visão semanal de segunda a domingo;
-- card no Dashboard Pessoal com tarefas de hoje, progresso e acesso à semana;
-- rotinas semanais em um ou vários dias, responsável opcional e histórico persistente;
-- conclusão e reabertura das tarefas, além da opção de adiar para o dia seguinte;
-- inclusão, edição, pausa, reativação e exclusão lógica sem apagar o histórico;
-- três rotinas iniciais: retirar os lixos, trocar roupa de cama e lavar o banheiro;
-- rotinas domésticas separadas do Radar e do Planejamento profissional;
-- migração incremental no Supabase, RLS preservada e privilégios reduzidos ao necessário;
-- layout responsivo, compatível com modo claro e escuro;
-- cache do PWA atualizado para V59.
-
 ## Rodada V58 — Filtros do calendário de documentações
 
 - indicadores de vencidas, próximas, regulares e sem validade agora são clicáveis;
