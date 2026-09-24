@@ -1,5 +1,18 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
+## Rodada V60 — Recorrências Financeiras e da Agenda
+
+- entradas e contas a pagar podem ser únicas, parceladas ou recorrentes por período;
+- parcelas mensais são criadas de uma vez e identificadas visualmente como 1/12, 2/12 etc.;
+- recorrências financeiras aceitam frequência semanal, mensal ou anual, com primeira e última data;
+- cada ocorrência mantém baixa e status independentes;
+- edição e exclusão permitem atuar somente no item escolhido ou nele e nos próximos da série;
+- Agenda ganhou compromissos diários, semanais, mensais e anuais, inclusive em vários dias da semana;
+- compromissos recorrentes podem ser concluídos individualmente e permanecem vinculados em uma série;
+- migração incremental preserva lançamentos, contas e compromissos já existentes;
+- colunas novas mantêm as políticas RLS atuais e o acesso exclusivo da conta autenticada;
+- cache do PWA atualizado para V60.
+
 ## Rodada V59 — Rotina da Casa
 
 - novo módulo `Vida Pessoal > Rotina da Casa` com visão semanal de segunda a domingo;

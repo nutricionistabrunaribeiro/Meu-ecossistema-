@@ -413,6 +413,13 @@
   .fin-lanc-desc{font-weight:600;}
   .fin-lanc-meta{font-size:11px;color:var(--cor-texto-suave);}
   .fin-lanc-valor{font-family:'Fraunces',serif;font-size:15px;}
+  .serie-badge{display:inline-flex;align-items:center;gap:4px;margin-top:5px;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--cor-primaria) 12%,transparent);color:var(--cor-primaria);font-size:9.5px;font-weight:700;letter-spacing:.01em;}
+  .recorrencia-box{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:13px;border:1px solid var(--cor-borda);border-radius:12px;background:var(--cor-fundo);}
+  .recorrencia-box[hidden]{display:none;}
+  .recorrencia-dias{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;}
+  .recorrencia-dias label{display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid var(--cor-borda);border-radius:9px;background:var(--cor-superficie);font-size:11px;font-weight:650;cursor:pointer;}
+  .recorrencia-dias input{width:15px;height:15px;min-width:15px;}
+  .agenda-recorrente{font-size:9px;font-weight:700;color:var(--cor-primaria);margin-top:3px;}
   .status-pago{color:#3F6B4A;}
   .status-aberto{color:var(--cor-acento);}
   .status-atrasado{color:#B0413E;}
@@ -718,7 +725,7 @@
     .grid{grid-template-columns:1fr;}
     .conteudo-full,.rapidos{grid-column:1/-1;}
     .search{width:120px;}
-    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}.doc-calendar-card{grid-column:1/-1}.doc-calendar-head{display:block}.doc-calendar-summary{justify-content:flex-start;margin-top:10px}.doc-calendar-layout{grid-template-columns:1fr}.doc-day{min-height:42px;padding:5px}.doc-calendar-list{min-height:0}.doc-filter-item{grid-template-columns:9px minmax(0,1fr)}.doc-filter-open{grid-column:2;width:100%;padding:10px}
+    .dashboard-hoje{grid-template-columns:1fr 1fr;padding:19px}.hoje-chamada{grid-column:1/-1}.hoje-metrica{padding-left:10px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.recorrencia-box{grid-template-columns:1fr}.fab-wrap{display:block}.system-modal{padding:19px}.autosave-bar{top:4px}.agenda-dia-card{grid-template-columns:48px 6px 1fr;padding:10px}.agenda-dia-card>button{grid-column:3}.projeto-pessoal-hero{padding:19px}.projeto-pessoal-hero h2{font-size:22px}.etapa-check-item{align-items:flex-start;flex-wrap:wrap}.item-projeto-acoes{width:100%;padding-left:25px}.doc-calendar-card{grid-column:1/-1}.doc-calendar-head{display:block}.doc-calendar-summary{justify-content:flex-start;margin-top:10px}.doc-calendar-layout{grid-template-columns:1fr}.doc-day{min-height:42px;padding:5px}.doc-calendar-list{min-height:0}.doc-filter-item{grid-template-columns:9px minmax(0,1fr)}.doc-filter-open{grid-column:2;width:100%;padding:10px}
     .agenda-hero{padding:16px;border-radius:16px}.agenda-hero-top{align-items:flex-start;flex-direction:column}.agenda-view-switch{width:100%}.agenda-view-switch button{flex:1}.agenda-hero-details{grid-template-columns:1fr;gap:14px}.agenda-periodo{grid-template-columns:auto minmax(0,1fr) auto}.agenda-periodo-label{font-size:13px;min-width:0;overflow-wrap:anywhere}.agenda-periodo .agenda-hoje{display:none}.agenda-faixa{padding:12px}.agenda-faixa-lista{display:flex;flex-direction:column;overflow:visible}.agenda-faixa-dia{min-width:0;max-width:none;width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) 88px}.mercado-add button{grid-column:1/-1}.lista-dia-add{grid-template-columns:minmax(0,1fr)}
     .theme-options{grid-template-columns:1fr}.theme-option{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 13px}.theme-option span{margin:0}.biblia-hero{padding:19px}.biblia-hero h2{font-size:21px}.biblia-percent{font-size:29px}.biblia-livros{grid-template-columns:1fr 1fr}.biblia-livro{padding:12px}.horas-resumo{grid-template-columns:1fr 1fr}.horas-ativo-top{display:block}.horas-cronometro{margin-top:13px}.horas-lista-item{grid-template-columns:45px minmax(0,1fr)}.horas-data{width:45px;height:45px}.horas-item-acoes{grid-column:2;justify-content:flex-start}.casa-dashboard,.casa-hero{padding:17px}.casa-dashboard-top,.casa-hero-top{display:block}.casa-dashboard-top>button,.casa-hero-top>button{margin-top:10px}.casa-semana{grid-template-columns:repeat(7,minmax(82vw,1fr));scroll-snap-type:x mandatory}.casa-dia{scroll-snap-align:center;min-height:0}.casa-dias-form{grid-template-columns:repeat(4,1fr)}.casa-gerenciar-item{grid-template-columns:1fr}.casa-acoes{justify-content:flex-start}
   }
@@ -1065,6 +1072,29 @@ function normalizarDataISO(valor){
   return null;
 }
 function isoParaBRCompleto(iso){if(!iso)return '';const [a,m,d]=iso.split('-');return `${d}/${m}/${a}`;}
+function uuidSerie(){return globalThis.crypto?.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});}
+function somarDiasISO(iso,dias){const d=dataISOParaLocal(iso);d.setDate(d.getDate()+dias);return formatoISO(d);}
+function somarMesesISO(iso,meses){const [a,m,d]=iso.split('-').map(Number),ultimo=new Date(a,m+meses,0).getDate();return formatoISO(new Date(a,m-1+meses,Math.min(d,ultimo)));}
+function somarAnosISO(iso,anos){const [a,m,d]=iso.split('-').map(Number),ultimo=new Date(a+anos,m,0).getDate();return formatoISO(new Date(a+anos,m-1,Math.min(d,ultimo)));}
+function gerarDatasPorQuantidade(inicio,quantidade,frequencia='mensal'){
+  const total=Math.max(1,Math.min(120,Number(quantidade)||1)),datas=[];
+  for(let i=0;i<total;i++)datas.push(frequencia==='diaria'?somarDiasISO(inicio,i):frequencia==='semanal'?somarDiasISO(inicio,i*7):frequencia==='anual'?somarAnosISO(inicio,i):somarMesesISO(inicio,i));
+  return datas;
+}
+function gerarDatasAte(inicio,fim,frequencia='mensal',diasSemana=[]){
+  if(!inicio||!fim||fim<inicio)return [];
+  const datas=[],limite=730;
+  if(frequencia==='semanal'&&diasSemana.length){
+    let cursor=inicio;
+    while(cursor<=fim&&datas.length<limite){const d=dataISOParaLocal(cursor);if(diasSemana.includes(d.getDay()))datas.push(cursor);cursor=somarDiasISO(cursor,1);}
+    return datas;
+  }
+  let cursor=inicio;
+  while(cursor<=fim&&datas.length<limite){datas.push(cursor);cursor=frequencia==='diaria'?somarDiasISO(cursor,1):frequencia==='semanal'?somarDiasISO(cursor,7):frequencia==='anual'?somarAnosISO(cursor,1):somarMesesISO(cursor,1);}
+  return datas;
+}
+function rotuloFrequencia(f){return ({diaria:'Diário',semanal:'Semanal',mensal:'Mensal',anual:'Anual'})[f]||'Recorrente';}
+function serieMetaHTML(item){if(!item.serieId)return '';const texto=item.serieTipo==='parcelado'?`${item.serieOrdem||1}/${item.serieTotal||1} parcelas`:`↻ ${rotuloFrequencia(item.serieFrequencia)}`;return `<span class="serie-badge">${texto}</span>`;}
 function selecionarDataVisual({titulo='Selecionar data',valor=null,opcional=true}={}){
   return new Promise(resolve=>{
     const inicialISO=normalizarDataISO(valor)||formatoISO(new Date());let cursor=new Date(inicialISO+'T12:00:00');let selecionada=normalizarDataISO(valor);
@@ -1096,6 +1126,9 @@ async function carregarEventosSupabase(){
     clienteId: row.cliente_id || null,
     clienteNomeVinculado: row.clientes ? row.clientes.nome : null,
     clienteExterno: row.cliente_externo || null,
+    serieId:row.serie_id||null, serieTipo:row.serie_tipo||null,
+    serieOrdem:row.serie_ordem||null, serieTotal:row.serie_total||null,
+    serieFrequencia:row.serie_frequencia||null,
   }));
 }
 let celulaAtiva = null; // {dataISO, hora}
@@ -1155,7 +1188,7 @@ function agendaDiaHTML(){
   return `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(-1)">‹</button><button class="agenda-hoje" onclick="irDiaHoje()">Hoje</button></div><div class="agenda-periodo-label">${DIAS_SEMANA[d.getDay()]}, ${isoParaBRCompleto(dataAgendaDiaria)}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(1)">›</button></div></div>
   ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${i.titulo}</span>`).join('')}</section>`:''}
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-primario" onclick="abrirFormularioAgenda('${dataAgendaDiaria}',${Math.min(19,Math.max(7,new Date().getHours()))})">+ Novo compromisso</button></div>
-  <div class="agenda-dia-cards">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="agenda-dia-card ${e.concluido?'concluido':''}"><div class="agenda-dia-hora">${String(e.hora).padStart(2,'0')}:00</div><div class="agenda-dia-cor" style="background:${cat.cor}"></div><div>${eventoResumoHTML(e)}</div><button class="btn-secundario" onclick="alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
+  <div class="agenda-dia-cards">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="agenda-dia-card ${e.concluido?'concluido':''}"><div class="agenda-dia-hora">${String(e.hora).padStart(2,'0')}:00</div><div class="agenda-dia-cor" style="background:${cat.cor}"></div><div>${eventoResumoHTML(e)}</div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn-secundario" onclick="alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="editarEvento('${e.id}')" title="Editar">✎</button><button class="btn-secundario" onclick="removerEvento('${e.id}')" title="Excluir">✕</button></div></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
 }
 
 function agendaSemanaHTML(){
@@ -1183,7 +1216,7 @@ function agendaSemanaHTML(){
       const idCel = `cel-${dataISO}-${hora}`;
       const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora);
       let chips = eventos.map(e=>
-        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
+        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${(CATEGORIAS_EVENTO.find(t=>t.id===e.categoria)||CATEGORIAS_EVENTO.at(-1)).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}${e.serieId?' · ↻':''}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); editarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Editar">✎</span></div>`
       ).join('');
       grid += `<div class="planner-cell" id="${idCel}" onclick="abrirQuickAdd('${dataISO}', ${hora})">${chips}</div>`;
     });
@@ -1242,23 +1275,33 @@ function selecionarCategoriaEvento(cat){
 const TIPOS_EVENTO_UI=[['visita','Visita'],['reuniao','Reunião'],['treinamento','Treinamento'],['demanda','Demanda administrativa'],['pessoal','Compromisso pessoal'],['financeiro','Financeiro'],['outro','Outro']];
 function rotuloTipoEvento(tipo){return TIPOS_EVENTO_UI.find(t=>t[0]===tipo)?.[1]||'Compromisso';}
 function nomeClienteEvento(e){return e.clienteNomeVinculado||e.clienteExterno||'';}
-function eventoResumoHTML(e,compacto=false){const cliente=nomeClienteEvento(e),tipo=rotuloTipoEvento(e.tipo),detalhe=e.titulo&&e.titulo!==tipo?e.titulo:'';return `${cliente?`<strong${compacto?' style="font-size:inherit"':''}>${textoHTML(cliente)}</strong>`:''}<div class="agenda-tipo">${textoHTML(tipo)}</div>${detalhe?`<div${compacto?' class="agenda-detalhe"':''}>${textoHTML(detalhe)}</div>`:''}`;}
+function eventoResumoHTML(e,compacto=false){const cliente=nomeClienteEvento(e),tipo=rotuloTipoEvento(e.tipo),detalhe=e.titulo&&e.titulo!==tipo?e.titulo:'';return `${cliente?`<strong${compacto?' style="font-size:inherit"':''}>${textoHTML(cliente)}</strong>`:''}<div class="agenda-tipo">${textoHTML(tipo)}</div>${detalhe?`<div${compacto?' class="agenda-detalhe"':''}>${textoHTML(detalhe)}</div>`:''}${e.serieId?`<div class="agenda-recorrente">↻ ${rotuloFrequencia(e.serieFrequencia)} · ${e.serieOrdem}/${e.serieTotal}</div>`:''}`;}
 function eventoResumoTexto(e){return [nomeClienteEvento(e),rotuloTipoEvento(e.tipo),e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?e.titulo:''].filter(Boolean).join(' · ');}
 function categoriaPorTipo(tipo,clienteId){
   if(tipo==='visita'){const c=CLIENTES.find(x=>x.id===clienteId);return c?.tipoCliente==='vinculado'?'saber_nutrir':'brc';}
   return ({reuniao:'reuniao',treinamento:'treinamento',pessoal:'pessoal'})[tipo]||'outro';
 }
-function abrirFormularioAgenda(dataISO,hora){
-  const clientes=CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo');
-  abrirModalSistema(`<div class="system-modal-head"><div><h2>Novo compromisso</h2><p>Preencha na ordem da sua rotina. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
-    <div class="form-field full"><label>1. Cliente</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()" autofocus><option value="">Sem cliente / compromisso pessoal</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
-    <div class="form-field full"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
-    <div class="form-field full"><label>3. Qual é o compromisso? <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><input id="agendaTitulo" placeholder="Ex.: Revisar FDS e EPIs"></div>
-    <div class="form-field"><label>Data</label><input type="date" id="agendaData" value="${dataISO}"></div>
+let eventoAgendaEditandoId=null;
+function abrirFormularioAgenda(dataISO,hora,eventoId=null){
+  const clientes=CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo'),ev=eventoId?eventosSemana.find(e=>e.id===eventoId):null;
+  eventoAgendaEditandoId=eventoId;dataISO=ev?.dataISO||dataISO;hora=ev?.hora??hora;
+  const freq=ev?.serieFrequencia||'nenhuma',fimSerie=ev?.serieId?[...eventosSemana.filter(e=>e.serieId===ev.serieId).map(e=>e.dataISO)].sort().at(-1):dataISO;
+  abrirModalSistema(`<div class="system-modal-head"><div><h2>${ev?'Editar':'Novo'} compromisso</h2><p>Cliente, tipo e detalhe. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+    <div class="form-field full"><label>1. Cliente</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()" autofocus><option value="">Sem cliente / compromisso pessoal</option>${clientes.map(c=>`<option value="${c.id}" ${String(c.id)===String(ev?.clienteId||'')?'selected':''}>${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
+    <div class="form-field full"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}" ${id===(ev?.tipo||'visita')?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="form-field full"><label>3. Qual é o compromisso? <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><input id="agendaTitulo" value="${textoHTML(ev?.titulo||'')}" placeholder="Ex.: Revisar FDS e EPIs"></div>
+    <div class="form-field"><label>Data${ev?.serieId?' desta ocorrência':''}</label><input type="date" id="agendaData" value="${dataISO}"></div>
     <div class="form-field"><label>Horário</label><select id="agendaHora">${HORAS_PLANNER.map(h=>`<option value="${h}" ${h===hora?'selected':''}>${String(h).padStart(2,'0')}:00</option>`).join('')}</select></div>
+    <div class="form-field full"><label>Repetição</label><select id="agendaRecorrencia" onchange="atualizarCamposRecorrenciaAgenda()" ${ev?'disabled':''}><option value="nenhuma">Não repetir</option>${[['diaria','Todos os dias'],['semanal','Semanal'],['mensal','Mensal'],['anual','Anual']].map(([id,n])=>`<option value="${id}" ${id===freq?'selected':''}>${n}</option>`).join('')}</select>${ev?.serieId?'<div class="form-hint">Ao salvar, você escolherá entre alterar somente esta ocorrência ou esta e as próximas.</div>':''}</div>
+    <div class="recorrencia-box" id="agendaRecorrenciaBox" ${freq==='nenhuma'?'hidden':''}>
+      <div class="form-field" style="grid-column:1/-1"><label>Repetir até</label><input type="date" id="agendaRecorrenciaFim" value="${fimSerie}"></div>
+      <div class="recorrencia-dias" id="agendaDiasSemana" hidden>${[['1','Seg'],['2','Ter'],['3','Qua'],['4','Qui'],['5','Sex'],['6','Sáb'],['0','Dom']].map(([v,n])=>`<label><input type="checkbox" value="${v}">${n}</label>`).join('')}</div>
+    </div>
     <div class="form-field full"><label>Identificação visual automática</label><div class="form-color-preview"><i id="agendaCorPreview"></i><span id="agendaCorTexto"></span></div></div>
-  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="confirmarNovoEvento()">Salvar compromisso</button></div>`);
-  atualizarFormularioAgenda();setTimeout(()=>document.getElementById('agendaCliente')?.focus(),0);
+  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="confirmarEventoAgenda()">Salvar compromisso</button></div>`);
+  atualizarFormularioAgenda();atualizarCamposRecorrenciaAgenda();
+  if(freq==='semanal'){const dia=dataISOParaLocal(dataISO).getDay(),cb=[...document.querySelectorAll('#agendaDiasSemana input')].find(x=>Number(x.value)===dia);if(cb)cb.checked=true;}
+  setTimeout(()=>document.getElementById('agendaCliente')?.focus(),0);
 }
 function atualizarFormularioAgenda(){
   const tipo=document.getElementById('agendaTipo')?.value||'visita',clienteId=document.getElementById('agendaCliente')?.value||null,cat=categoriaPorTipo(tipo,clienteId),def=CATEGORIAS_EVENTO.find(c=>c.id===cat)||CATEGORIAS_EVENTO.at(-1),select=document.getElementById('agendaCliente'),hint=document.getElementById('agendaClienteHint');
@@ -1266,25 +1309,36 @@ function atualizarFormularioAgenda(){
   if(hint)hint.textContent=tipo==='visita'?'Obrigatório para visitas.':'Opcional para este tipo de compromisso.';
   const bolinha=document.getElementById('agendaCorPreview'),texto=document.getElementById('agendaCorTexto');if(bolinha)bolinha.style.background=def.cor;if(texto)texto.textContent=def.nome+' · cor aplicada pelo sistema';
 }
-async function confirmarNovoEvento(){
+function atualizarCamposRecorrenciaAgenda(){const freq=document.getElementById('agendaRecorrencia')?.value||'nenhuma',box=document.getElementById('agendaRecorrenciaBox'),dias=document.getElementById('agendaDiasSemana');if(box)box.hidden=freq==='nenhuma';if(dias)dias.hidden=freq!=='semanal';}
+async function confirmarEventoAgenda(){
   const input = document.getElementById('agendaTitulo');
   const tipoEvento=document.getElementById('agendaTipo').value,clienteId=document.getElementById('agendaCliente').value||null,dataISO=document.getElementById('agendaData').value,hora=Number(document.getElementById('agendaHora').value),categoria=categoriaPorTipo(tipoEvento,clienteId),clienteExterno=null;
   const titulo = input?.value.trim() || rotuloTipoEvento(tipoEvento);
   if(tipoEvento==='visita'&&!clienteId){document.getElementById('agendaCliente').focus();dispararAutomacao('Selecione o cliente','Toda visita precisa estar vinculada para entrar nos indicadores.');return;}
   if(!dataISO)return;
-  const { data, error } = await supa.from('eventos').insert({
-    titulo, categoria, tipo:tipoEvento, data: dataISO, hora,
-    cliente_id: clienteId, cliente_externo: clienteExterno
-  }).select('*, clientes(nome)').single();
+  if(eventoAgendaEditandoId){await salvarEdicaoEventoAgenda({titulo,categoria,tipoEvento,clienteId,clienteExterno,dataISO,hora});return;}
+  const frequencia=document.getElementById('agendaRecorrencia')?.value||'nenhuma',fim=document.getElementById('agendaRecorrenciaFim')?.value||dataISO,diasSemana=[...document.querySelectorAll('#agendaDiasSemana input:checked')].map(x=>Number(x.value));
+  const datas=frequencia==='nenhuma'?[dataISO]:gerarDatasAte(dataISO,fim,frequencia,diasSemana);
+  if(!datas.length){dispararAutomacao('Confira o período','A data final precisa ser igual ou posterior à data inicial.');return;}
+  const serieId=datas.length>1?uuidSerie():null,payloads=datas.map((data,i)=>({titulo,categoria,tipo:tipoEvento,data,hora,cliente_id:clienteId,cliente_externo:clienteExterno,serie_id:serieId,serie_tipo:serieId?'recorrente':null,serie_ordem:serieId?i+1:null,serie_total:serieId?datas.length:null,serie_frequencia:serieId?frequencia:null}));
+  const { data, error } = await supa.from('eventos').insert(payloads).select('*, clientes(nome)');
   if(error){ dispararAutomacao('Erro ao criar evento', error.message); return; }
-  eventosSemana.push({
-    id: data.id, dataISO, hora, titulo, categoria, tipo:tipoEvento, concluido:false,
-    clienteId, clienteNomeVinculado: data.clientes ? data.clientes.nome : null, clienteExterno
-  });
+  (data||[]).forEach(row=>eventosSemana.push({id:row.id,dataISO:row.data,hora:row.hora,titulo:row.titulo,categoria:row.categoria,tipo:row.tipo,concluido:false,clienteId:row.cliente_id,clienteNomeVinculado:row.clientes?.nome||null,clienteExterno:row.cliente_externo||null,serieId:row.serie_id||null,serieTipo:row.serie_tipo||null,serieOrdem:row.serie_ordem||null,serieTotal:row.serie_total||null,serieFrequencia:row.serie_frequencia||null}));
   const d = new Date(dataISO+'T00:00:00');
   fecharModalSistema();
-  dispararAutomacao('Compromisso criado', `${[data.clientes?.nome,rotuloTipoEvento(tipoEvento),input?.value.trim()].filter(Boolean).join(' · ')} — ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h.`);
+  dispararAutomacao(datas.length>1?'Compromissos recorrentes criados':'Compromisso criado', `${datas.length>1?datas.length+' ocorrências · ':''}${[CLIENTES.find(c=>String(c.id)===String(clienteId))?.nome,rotuloTipoEvento(tipoEvento),input?.value.trim()].filter(Boolean).join(' · ')} — início ${DIAS_SEMANA[d.getDay()]} ${formatoBR(d)}, ${hora}h.`);
   renderTela();
+}
+function confirmarNovoEvento(){return confirmarEventoAgenda();}
+function editarEvento(id){const e=eventosSemana.find(x=>x.id===id);if(e)abrirFormularioAgenda(e.dataISO,e.hora,id);}
+async function salvarEdicaoEventoAgenda(novo){
+  const atual=eventosSemana.find(e=>e.id===eventoAgendaEditandoId);if(!atual)return;
+  let escopo='1';if(atual.serieId){escopo=prompt('O que deseja alterar?\n1. Somente este compromisso\n2. Este e todos os próximos\n3. Cancelar','1');if(escopo!=='1'&&escopo!=='2')return;}
+  const alvos=escopo==='2'?eventosSemana.filter(e=>e.serieId===atual.serieId&&e.dataISO>=atual.dataISO):[atual],delta=Math.round((dataISOParaLocal(novo.dataISO)-dataISOParaLocal(atual.dataISO))/86400000),cliente=CLIENTES.find(c=>String(c.id)===String(novo.clienteId));
+  const resultados=await Promise.all(alvos.map(e=>{const novaData=escopo==='2'?somarDiasISO(e.dataISO,delta):novo.dataISO;return supa.from('eventos').update({titulo:novo.titulo,categoria:novo.categoria,tipo:novo.tipoEvento,data:novaData,hora:novo.hora,cliente_id:novo.clienteId,cliente_externo:novo.clienteExterno}).eq('id',e.id).then(r=>({r,e,novaData}));}));
+  const falha=resultados.find(x=>x.r.error);if(falha){dispararAutomacao('Erro ao editar compromisso',falha.r.error.message);return;}
+  resultados.forEach(({e,novaData})=>Object.assign(e,{titulo:novo.titulo,categoria:novo.categoria,tipo:novo.tipoEvento,dataISO:novaData,hora:novo.hora,clienteId:novo.clienteId,clienteNomeVinculado:cliente?.nome||null,clienteExterno:novo.clienteExterno}));
+  fecharModalSistema();eventoAgendaEditandoId=null;dispararAutomacao('Agenda atualizada',alvos.length>1?`${alvos.length} compromissos futuros foram atualizados.`:'Compromisso atualizado.');renderTela();
 }
 async function alternarConcluidoEvento(id){
   const ev = eventosSemana.find(e=>e.id===id);
@@ -1294,9 +1348,10 @@ async function alternarConcluidoEvento(id){
 }
 async function classificarEvento(id){const e=eventosSemana.find(x=>x.id===id);const n=prompt('Tipo:\n1. Visita\n2. Reunião\n3. Treinamento\n4. Demanda administrativa\n5. Pessoal\n6. Financeiro\n7. Outro',String(Math.max(1,['visita','reuniao','treinamento','demanda','pessoal','financeiro','outro'].indexOf(e.tipo)+1)));const tipos=['visita','reuniao','treinamento','demanda','pessoal','financeiro','outro'];const tipo=tipos[parseInt(n)-1];if(!tipo)return;const categoria=categoriaPorTipo(tipo,e.clienteId);const {error}=await supa.from('eventos').update({tipo,categoria}).eq('id',id);if(error){dispararAutomacao('Erro ao classificar compromisso',error.message);return;}Object.assign(e,{tipo,categoria});renderTela();}
 async function removerEvento(id){
-  eventosSemana = eventosSemana.filter(e=>e.id!==id);
-  renderTela();
-  await supa.from('eventos').delete().eq('id', id);
+  const e=eventosSemana.find(x=>x.id===id);if(!e)return;let alvos=[e];
+  if(e.serieId){const escopo=prompt('O que deseja excluir?\n1. Somente este compromisso\n2. Este e todos os próximos\n3. Cancelar','1');if(escopo==='2')alvos=eventosSemana.filter(x=>x.serieId===e.serieId&&x.dataISO>=e.dataISO);else if(escopo!=='1')return;}else if(!confirm(`Excluir “${e.titulo}”?`))return;
+  const ids=new Set(alvos.map(x=>x.id)),{error}=await supa.from('eventos').delete().in('id',[...ids]);if(error){dispararAutomacao('Erro ao excluir compromisso',error.message);return;}
+  eventosSemana=eventosSemana.filter(x=>!ids.has(x.id));renderTela();dispararAutomacao('Compromisso excluído',alvos.length>1?`${alvos.length} ocorrências futuras foram removidas.`:e.titulo);
 }
 
 /* ---------- MÓDULO CLIENTES ---------- */
@@ -2739,6 +2794,9 @@ async function carregarLancamentosSupabase(){
     vencimento: row.vencimento ? row.vencimento.split('-').reverse().slice(0,2).join('/') : "—",
     vencimentoISO: row.vencimento,
     dataPagamentoISO: row.data_pagamento || null,
+    serieId:row.serie_id||null, serieTipo:row.serie_tipo||null,
+    serieOrdem:row.serie_ordem||null, serieTotal:row.serie_total||null,
+    serieFrequencia:row.serie_frequencia||null,
   }));
 }
 
@@ -2791,20 +2849,34 @@ async function transferirParaPessoal(){
 }
 
 async function novoLancamento(tipo){
-  const desc = prompt(tipo==='receita' ? "Descrição da receita:" : "Descrição da despesa:");
-  if(!desc || !desc.trim()) return;
-  const valorTxt = prompt("Valor (só números, ex: 350):");
-  const valor = parseFloat((valorTxt||'').replace(',','.'));
-  if(!valor || valor<=0) return;
-  const vencimentoISO=await selecionarDataVisual({titulo:'Data de vencimento',opcional:true});if(vencimentoISO===null)return;
-  const vencimento=vencimentoISO?isoParaBRCompleto(vencimentoISO).slice(0,5):"";
-  const { data, error } = await supa.from('lancamentos_financeiros').insert({
-    tipo, descricao: desc.trim(), valor, vencimento: vencimentoISO||null, status: 'aberto'
-  }).select().single();
-  if(error){ dispararAutomacao('Erro ao lançar', error.message); return; }
-  LANCAMENTOS.push({id: data.id, tipo, desc: desc.trim(), cliente:null, valor, vencimento: vencimento||"—", vencimentoISO: data.vencimento, status:"aberto"});
-  dispararAutomacao('Lançamento adicionado', `${tipo==='receita'?'Receita':'Despesa'}: ${desc.trim()} — ${formatarMoeda(valor)}`);
-  renderTela();
+  abrirFormularioFinanceiro('trabalho',tipo);
+}
+function atualizarCamposSerieFinanceira(){const modo=document.getElementById('finModo')?.value||'unico',parcelas=document.getElementById('finParcelasBox'),rec=document.getElementById('finRecorrenteBox');if(parcelas)parcelas.hidden=modo!=='parcelado';if(rec)rec.hidden=modo!=='recorrente';}
+function abrirFormularioFinanceiro(modulo,tipo){
+  const trabalho=modulo==='trabalho',clientes=CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo'),hoje=formatoISO(new Date());
+  abrirModalSistema(`<div class="system-modal-head"><div><h2>${tipo==='receita'?'Nova entrada':'Nova conta a pagar'}</h2><p>Cadastre uma vez: única, parcelada ou recorrente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+    <div class="form-field full"><label>Descrição</label><input id="finDescricao" placeholder="Ex.: Escola, internet ou contrato mensal" autofocus></div>
+    ${trabalho?`<div class="form-field full"><label>Cliente <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><select id="finCliente"><option value="">Sem cliente</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div>`:''}
+    <div class="form-field"><label>Valor de cada lançamento</label><input id="finValor" inputmode="decimal" placeholder="Ex.: 350,00"></div>
+    <div class="form-field"><label>Forma de lançamento</label><select id="finModo" onchange="atualizarCamposSerieFinanceira()"><option value="unico">Pagamento único</option><option value="parcelado">Parcelado</option><option value="recorrente">Recorrente por período</option></select></div>
+    <div class="form-field full"><label>Primeiro vencimento</label><input type="date" id="finInicio" value="${hoje}"></div>
+    <div class="recorrencia-box" id="finParcelasBox" hidden><div class="form-field" style="grid-column:1/-1"><label>Quantidade de parcelas</label><input type="number" id="finQuantidade" min="2" max="120" value="12"></div><div class="form-hint" style="grid-column:1/-1">O sistema criará as parcelas mensais e mostrará 1/12, 2/12 e assim por diante.</div></div>
+    <div class="recorrencia-box" id="finRecorrenteBox" hidden><div class="form-field"><label>Frequência</label><select id="finFrequencia"><option value="semanal">Semanal</option><option value="mensal" selected>Mensal</option><option value="anual">Anual</option></select></div><div class="form-field"><label>Repetir até</label><input type="date" id="finFim"></div><div class="form-hint" style="grid-column:1/-1">A primeira e a última ocorrência ficam incluídas no período.</div></div>
+  </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarSerieFinanceira('${modulo}','${tipo}')">Salvar</button></div>`);
+}
+async function salvarSerieFinanceira(modulo,tipo){
+  const descricao=document.getElementById('finDescricao')?.value.trim(),valorTxt=document.getElementById('finValor')?.value||'',valor=parseFloat(valorTxt.includes(',')?valorTxt.replace(/\./g,'').replace(',','.'):valorTxt),modo=document.getElementById('finModo')?.value||'unico',inicio=document.getElementById('finInicio')?.value;
+  if(!descricao){dispararAutomacao('Informe a descrição','Dê um nome para identificar o lançamento.');return;}if(!valor||valor<=0){dispararAutomacao('Informe o valor','Use um valor maior que zero.');return;}if(!inicio){dispararAutomacao('Informe a primeira data','Selecione o primeiro vencimento.');return;}
+  let frequencia=null,datas=[inicio];
+  if(modo==='parcelado'){frequencia='mensal';datas=gerarDatasPorQuantidade(inicio,document.getElementById('finQuantidade')?.value,'mensal');if(datas.length<2){dispararAutomacao('Confira as parcelas','Informe pelo menos duas parcelas.');return;}}
+  if(modo==='recorrente'){frequencia=document.getElementById('finFrequencia')?.value||'mensal';const fim=document.getElementById('finFim')?.value;datas=gerarDatasAte(inicio,fim,frequencia);if(!datas.length){dispararAutomacao('Confira o período','Informe uma data final igual ou posterior ao primeiro vencimento.');return;}}
+  const serieId=datas.length>1?uuidSerie():null,clienteId=modulo==='trabalho'?(document.getElementById('finCliente')?.value||null):null;
+  const base={tipo,descricao,valor,status:'aberto'},payloads=datas.map((vencimento,i)=>({...base,vencimento,serie_id:serieId,serie_tipo:serieId?modo:null,serie_ordem:serieId?i+1:null,serie_total:serieId?datas.length:null,serie_frequencia:serieId?frequencia:null,...(modulo==='trabalho'?{cliente_id:clienteId}:{})}));
+  if(modulo==='pessoal'){const {data:{user}}=await supa.auth.getUser();payloads.forEach(p=>p.user_id=user.id);}
+  const tabela=modulo==='trabalho'?'lancamentos_financeiros':'contas_pessoais',selecao=modulo==='trabalho'?'*, clientes(nome)':'*',{data,error}=await supa.from(tabela).insert(payloads).select(selecao);
+  if(error){dispararAutomacao('Erro ao criar lançamentos',error.message);return;}
+  (data||[]).forEach(row=>{const item={id:row.id,tipo:row.tipo,desc:row.descricao,cliente:row.clientes?.nome||null,valor:Number(row.valor),status:row.status,vencimento:row.vencimento?row.vencimento.split('-').reverse().slice(0,2).join('/'):'—',vencimentoISO:row.vencimento,dataPagamentoISO:row.data_pagamento||null,serieId:row.serie_id||null,serieTipo:row.serie_tipo||null,serieOrdem:row.serie_ordem||null,serieTotal:row.serie_total||null,serieFrequencia:row.serie_frequencia||null};if(modulo==='trabalho')LANCAMENTOS.push(item);else CONTAS_PESSOAIS.push(item);});
+  fecharModalSistema();dispararAutomacao(datas.length>1?'Lançamentos programados':'Lançamento adicionado',datas.length>1?`${datas.length} ocorrências de ${formatarMoeda(valor)} foram criadas.`:`${descricao} · ${formatarMoeda(valor)}`);renderTela();
 }
 
 function statusRealLancamento(l){
@@ -2845,18 +2917,15 @@ async function editarLancamento(id){
   const novoValorTxt = prompt("Valor:", l.valor);
   const novoValor = parseFloat((novoValorTxt||'').replace(',','.'));
   if(!novoValor || novoValor<=0) return;
-  l.desc = novaDesc.trim(); l.valor = novoValor;
-  renderTela();
-  await supa.from('lancamentos_financeiros').update({descricao:novaDesc.trim(), valor:novoValor}).eq('id', id);
-  dispararAutomacao('Lançamento editado', novaDesc.trim());
+  let alvos=[l];if(l.serieId){const escopo=prompt('Aplicar a alteração em:\n1. Somente este lançamento\n2. Este e os próximos\n3. Cancelar','1');if(escopo==='2')alvos=LANCAMENTOS.filter(x=>x.serieId===l.serieId&&x.vencimentoISO>=l.vencimentoISO);else if(escopo!=='1')return;}
+  const ids=alvos.map(x=>x.id),{error}=await supa.from('lancamentos_financeiros').update({descricao:novaDesc.trim(),valor:novoValor}).in('id',ids);if(error){dispararAutomacao('Erro ao editar lançamento',error.message);return;}
+  alvos.forEach(x=>{x.desc=novaDesc.trim();x.valor=novoValor});renderTela();dispararAutomacao('Lançamento editado',alvos.length>1?`${alvos.length} lançamentos futuros atualizados.`:novaDesc.trim());
 }
 async function excluirLancamento(id){
   const l = LANCAMENTOS.find(x=>x.id===id);
-  if(!confirm(`Excluir "${l.desc}"? Essa ação não pode ser desfeita.`)) return;
-  LANCAMENTOS = LANCAMENTOS.filter(x=>x.id!==id);
-  renderTela();
-  await supa.from('lancamentos_financeiros').delete().eq('id', id);
-  dispararAutomacao('Lançamento excluído', l.desc);
+  let alvos=[l];if(l.serieId){const escopo=prompt('O que deseja excluir?\n1. Somente este lançamento\n2. Este e os próximos\n3. Cancelar','1');if(escopo==='2')alvos=LANCAMENTOS.filter(x=>x.serieId===l.serieId&&x.vencimentoISO>=l.vencimentoISO);else if(escopo!=='1')return;}else if(!confirm(`Excluir "${l.desc}"? Essa ação não pode ser desfeita.`))return;
+  const ids=alvos.map(x=>x.id),{error}=await supa.from('lancamentos_financeiros').delete().in('id',ids);if(error){dispararAutomacao('Erro ao excluir lançamento',error.message);return;}
+  const removidos=new Set(ids);LANCAMENTOS=LANCAMENTOS.filter(x=>!removidos.has(x.id));renderTela();dispararAutomacao('Lançamento excluído',alvos.length>1?`${alvos.length} lançamentos futuros removidos.`:l.desc);
 }
 async function cancelarLancamento(id){
   const l = LANCAMENTOS.find(x=>x.id===id);
@@ -2882,13 +2951,14 @@ async function novoContratoParcelado(){
   const mesInicialTxt = prompt("Mês/ano da 1ª parcela (MM/AAAA):", "08/2026");
   const [mesIni, anoIni] = (mesInicialTxt||'08/2026').split('/').map(Number);
 
-  const novasParcelas = [];
+  const novasParcelas = [],serieId=uuidSerie();
   for(let i=0;i<qtd;i++){
     const dataP = new Date(anoIni, (mesIni-1)+i, diaVenc);
     const vencISO = dataP.toISOString().slice(0,10);
     novasParcelas.push({
       tipo:"receita", descricao:`Contrato — ${clienteEscolhido.nome} (${i+1}/${qtd})`,
-      cliente_id: clienteEscolhido.id, valor, vencimento: vencISO, status:"aberto"
+      cliente_id: clienteEscolhido.id, valor, vencimento: vencISO, status:"aberto",
+      serie_id:serieId,serie_tipo:'parcelado',serie_ordem:i+1,serie_total:qtd,serie_frequencia:'mensal'
     });
   }
   const { data, error } = await supa.from('lancamentos_financeiros').insert(novasParcelas).select();
@@ -2896,7 +2966,8 @@ async function novoContratoParcelado(){
   data.forEach(row=>{
     LANCAMENTOS.push({
       id: row.id, tipo:"receita", desc: row.descricao, cliente: clienteEscolhido.nome,
-      valor, vencimento: row.vencimento.split('-').reverse().slice(0,2).join('/'), vencimentoISO: row.vencimento, status:"aberto"
+      valor, vencimento: row.vencimento.split('-').reverse().slice(0,2).join('/'), vencimentoISO: row.vencimento, status:"aberto",
+      serieId:row.serie_id,serieTipo:row.serie_tipo,serieOrdem:row.serie_ordem,serieTotal:row.serie_total,serieFrequencia:row.serie_frequencia
     });
   });
   dispararAutomacao('Contrato parcelado gerado', `${qtd}x ${formatarMoeda(valor)} — ${clienteEscolhido.nome}, vencendo todo dia ${diaVenc}.`);
@@ -2937,7 +3008,7 @@ function financeiroHTML(){
         <div class="fin-lancamento">
           <div>
             <div class="fin-lanc-desc">${l.desc}</div>
-            <div class="fin-lanc-meta">${l.cliente ? l.cliente + ' · ' : ''}Competência/vencimento ${l.vencimento}${l.dataPagamentoISO?' · Recebido em '+isoParaBRCompleto(l.dataPagamentoISO):''}</div>
+            <div class="fin-lanc-meta">${l.cliente ? l.cliente + ' · ' : ''}Competência/vencimento ${l.vencimento}${l.dataPagamentoISO?' · Recebido em '+isoParaBRCompleto(l.dataPagamentoISO):''}</div>${serieMetaHTML(l)}
           </div>
           <div style="text-align:right;display:flex;align-items:center;gap:10px;">
             <div>
@@ -3631,24 +3702,13 @@ async function carregarContasPessoaisSupabase(){
     vencimento: row.vencimento ? row.vencimento.split('-').reverse().slice(0,2).join('/') : "—",
     vencimentoISO: row.vencimento,
     dataPagamentoISO: row.data_pagamento || null,
+    serieId:row.serie_id||null, serieTipo:row.serie_tipo||null,
+    serieOrdem:row.serie_ordem||null, serieTotal:row.serie_total||null,
+    serieFrequencia:row.serie_frequencia||null,
   }));
 }
 async function novaContaPessoal(tipo){
-  const desc = prompt(tipo==='receita' ? "Descrição da receita:" : "Descrição da despesa:");
-  if(!desc || !desc.trim()) return;
-  const valorTxt = prompt("Valor (ex: 350):");
-  const valor = parseFloat((valorTxt||'').replace(',','.'));
-  if(!valor || valor<=0) return;
-  const vencimentoISO=await selecionarDataVisual({titulo:'Data de vencimento',opcional:true});if(vencimentoISO===null)return;
-  const vencimento=vencimentoISO?isoParaBRCompleto(vencimentoISO).slice(0,5):"";
-  const { data: { user } } = await supa.auth.getUser();
-  const { data, error } = await supa.from('contas_pessoais').insert({
-    user_id: user.id, tipo, descricao: desc.trim(), valor, vencimento:vencimentoISO||null, status:'aberto'
-  }).select().single();
-  if(error){ dispararAutomacao('Erro ao lançar', error.message); return; }
-  CONTAS_PESSOAIS.push({id:data.id, tipo, desc:desc.trim(), valor, vencimento: vencimento||"—", vencimentoISO:data.vencimento, dataPagamentoISO:null, status:"aberto"});
-  dispararAutomacao('Lançamento pessoal adicionado', desc.trim());
-  renderTela();
+  abrirFormularioFinanceiro('pessoal',tipo);
 }
 async function editarContaPessoal(id){
   const l = CONTAS_PESSOAIS.find(x=>x.id===id);
@@ -3657,21 +3717,15 @@ async function editarContaPessoal(id){
   const novoValorTxt = prompt("Valor:", l.valor);
   const novoValor = parseFloat((novoValorTxt||'').replace(',','.'));
   if(!novoValor || novoValor<=0) return;
-  l.desc = novaDesc.trim(); l.valor = novoValor;
-  renderTela();
-  const { error } = await supa.from('contas_pessoais').update({descricao:novaDesc.trim(), valor:novoValor}).eq('id', id);
-  if(error){ dispararAutomacao('Erro ao editar lançamento', error.message); return; }
-  dispararAutomacao('Lançamento pessoal editado', novaDesc.trim());
+  let alvos=[l];if(l.serieId){const escopo=prompt('Aplicar a alteração em:\n1. Somente este lançamento\n2. Este e os próximos\n3. Cancelar','1');if(escopo==='2')alvos=CONTAS_PESSOAIS.filter(x=>x.serieId===l.serieId&&x.vencimentoISO>=l.vencimentoISO);else if(escopo!=='1')return;}
+  const {error}=await supa.from('contas_pessoais').update({descricao:novaDesc.trim(),valor:novoValor}).in('id',alvos.map(x=>x.id));if(error){dispararAutomacao('Erro ao editar lançamento',error.message);return;}
+  alvos.forEach(x=>{x.desc=novaDesc.trim();x.valor=novoValor});renderTela();dispararAutomacao('Lançamento pessoal editado',alvos.length>1?`${alvos.length} lançamentos futuros atualizados.`:novaDesc.trim());
 }
 async function excluirContaPessoal(id){
   const l = CONTAS_PESSOAIS.find(x=>x.id===id);
-  if(!confirm(`Excluir "${l.desc}"? Essa ação não pode ser desfeita.`)) return;
-  const idx = CONTAS_PESSOAIS.findIndex(x=>x.id===id);
-  if(idx>-1) CONTAS_PESSOAIS.splice(idx,1);
-  renderTela();
-  const { error } = await supa.from('contas_pessoais').delete().eq('id', id);
-  if(error){ dispararAutomacao('Erro ao excluir lançamento', error.message); return; }
-  dispararAutomacao('Lançamento pessoal excluído', l.desc);
+  let alvos=[l];if(l.serieId){const escopo=prompt('O que deseja excluir?\n1. Somente este lançamento\n2. Este e os próximos\n3. Cancelar','1');if(escopo==='2')alvos=CONTAS_PESSOAIS.filter(x=>x.serieId===l.serieId&&x.vencimentoISO>=l.vencimentoISO);else if(escopo!=='1')return;}else if(!confirm(`Excluir "${l.desc}"? Essa ação não pode ser desfeita.`))return;
+  const ids=alvos.map(x=>x.id),{error}=await supa.from('contas_pessoais').delete().in('id',ids);if(error){dispararAutomacao('Erro ao excluir lançamento',error.message);return;}
+  const removidos=new Set(ids);CONTAS_PESSOAIS=CONTAS_PESSOAIS.filter(x=>!removidos.has(x.id));renderTela();dispararAutomacao('Lançamento pessoal excluído',alvos.length>1?`${alvos.length} lançamentos futuros removidos.`:l.desc);
 }
 let filtroContasPessoais = "todos";
 function selecionarFiltroContasPessoais(f){ filtroContasPessoais = f; renderTela(); }
@@ -3716,7 +3770,7 @@ function contasHTML(){
     <div class="fin-lista">
       ${lista.map(l=>{ const statusReal = statusRealContaPessoal(l); return `
         <div class="fin-lancamento">
-          <div><div class="fin-lanc-desc">${l.desc}</div><div class="fin-lanc-meta">Vencimento ${l.vencimento}</div></div>
+          <div><div class="fin-lanc-desc">${l.desc}</div><div class="fin-lanc-meta">Vencimento ${l.vencimento}</div>${serieMetaHTML(l)}</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="text-align:right;">
               <div class="fin-lanc-valor ${l.tipo==='receita'?'fin-pos':'fin-neg'}">${l.tipo==='despesa'?'-':''}${formatarMoeda(l.valor)}</div>
