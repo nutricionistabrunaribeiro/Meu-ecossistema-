@@ -458,3 +458,13 @@ Vercel → Project → Settings → Domains → adicionar o domínio.
 ## Rodada V48 — Avisos e tópicos de Entregas
 
 Avisos ligados às Entregas reais, tópicos individuais reutilizando Próximos passos, restauração de Implantado e correções de salvamento/navegação. Sem migration nova. Consulte REVISAO-V48.md para testes e limitações, especialmente a revisão pendente das policies do banco e o funcionamento offline.
+
+## Rodada V61 — Trajetos no Controle de Horas
+
+- origem e destino aparecem somente quando a atividade é Deslocamento;
+- atalhos para Casa → Cliente, Cliente → Casa, Cliente → Cliente e Outro;
+- Casa permanece um local, sem ser cadastrada como cliente;
+- carteira/vínculo profissional e cliente principal permanecem separados do trajeto;
+- cronômetro ativo e histórico mostram a rota de forma visual;
+- trajeto pode ser corrigido junto com o registro de horas;
+- registros anteriores continuam compatíveis, sem conversão ou exclusão.
