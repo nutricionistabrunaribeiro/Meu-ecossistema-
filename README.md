@@ -1,18 +1,5 @@
 # Meu Ecossistema — Bruna Ribeiro Consultoria
 
-## Rodada V60 — Recorrências Financeiras e da Agenda
-
-- entradas e contas a pagar podem ser únicas, parceladas ou recorrentes por período;
-- parcelas mensais são criadas de uma vez e identificadas visualmente como 1/12, 2/12 etc.;
-- recorrências financeiras aceitam frequência semanal, mensal ou anual, com primeira e última data;
-- cada ocorrência mantém baixa e status independentes;
-- edição e exclusão permitem atuar somente no item escolhido ou nele e nos próximos da série;
-- Agenda ganhou compromissos diários, semanais, mensais e anuais, inclusive em vários dias da semana;
-- compromissos recorrentes podem ser concluídos individualmente e permanecem vinculados em uma série;
-- migração incremental preserva lançamentos, contas e compromissos já existentes;
-- colunas novas mantêm as políticas RLS atuais e o acesso exclusivo da conta autenticada;
-- cache do PWA atualizado para V60.
-
 ## Rodada V59 — Rotina da Casa
 
 - novo módulo `Vida Pessoal > Rotina da Casa` com visão semanal de segunda a domingo;
@@ -459,12 +446,10 @@ Vercel → Project → Settings → Domains → adicionar o domínio.
 
 Avisos ligados às Entregas reais, tópicos individuais reutilizando Próximos passos, restauração de Implantado e correções de salvamento/navegação. Sem migration nova. Consulte REVISAO-V48.md para testes e limitações, especialmente a revisão pendente das policies do banco e o funcionamento offline.
 
-## Rodada V61 — Trajetos no Controle de Horas
 
-- origem e destino aparecem somente quando a atividade é Deslocamento;
-- atalhos para Casa → Cliente, Cliente → Casa, Cliente → Cliente e Outro;
-- Casa permanece um local, sem ser cadastrada como cliente;
-- carteira/vínculo profissional e cliente principal permanecem separados do trajeto;
-- cronômetro ativo e histórico mostram a rota de forma visual;
-- trajeto pode ser corrigido junto com o registro de horas;
-- registros anteriores continuam compatíveis, sem conversão ou exclusão.
+## V64 — organização visual do Dashboard (11/10/2026)
+- Mantém a Central de comando no topo.
+- Reordena os cards principais para Entregas, Agenda e Projetos.
+- Atualiza o identificador de cache do Service Worker para evitar servir o layout anterior.
+- Base de origem: pacote MEU-ECOSSISTEMA-ATUALIZADO (setembro/2026).
+- Esta edição não inclui ainda o agrupamento recolhível dos módulos de apoio nem incorpora alterações V60–V63 que não estavam disponíveis no pacote-base.
