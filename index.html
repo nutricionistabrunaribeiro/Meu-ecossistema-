@@ -891,9 +891,9 @@ const TAB_PRINCIPAL = {
   pessoal: ["habitos","metas","contas","ideias_pessoais"]
 };
 
-let espacoAtual = "trabalho";
-let telaAtual = "dashboard";
-const ICONES_MODULO={dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+let espacoAtual = "geral";
+let telaAtual = "visao_geral";
+const ICONES_MODULO={visao_geral:'◈',sono:'☾',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -932,12 +932,13 @@ function renderSidebar(){
         <div class="brand-sub">BRUNA RIBEIRO CONSULTORIA</div>
       </div>
     </div>
+    <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
     <div class="space-switch">
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
       <button class="${espacoAtual==='pessoal'?'active':''}" onclick="trocarEspaco('pessoal')">Pessoal</button>
     </div>
     <nav>`;
-  grupos.forEach(g=>{
+  (grupos||[]).forEach(g=>{
     html += `<div class="nav-label">${g.grupo}</div>`;
     g.itens.forEach(it=>{
       html += `<button class="${telaAtual===it.id?'active':''}" onclick="irPara('${it.id}')"><span class="nav-icon">${ICONES_MODULO[it.id]||'•'}</span><span class="nav-text">${it.nome}</span>${contadores[it.id]?'<span class="nav-badge">'+contadores[it.id]+'</span>':''}</button>`;
@@ -955,6 +956,7 @@ function renderSidebar(){
   mobileWrap.appendChild(aside);
 }
 
+function abrirVisaoGeral(){espacoAtual="geral";telaAtual="visao_geral";renderSidebar();renderTela();fecharMenuMobile();}
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
@@ -2516,19 +2518,19 @@ async function gerarPDFVisita(v){
       doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
       doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;
     }
-    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,138);
+    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc}`,largura-48);
     const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,largura-10):[];
     const validade=item.validade?`Validade: ${isoParaBRCompleto(item.validade)}`:'';
     const fotos=item.fotos||[];
     const linhasFotos=Math.ceil(fotos.length/3);
-    const altura=Math.max(17,8+desc.length*4+obs.length*3.6+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
+    const altura=Math.max(19,10+desc.length*4+obs.length*3.6+(obs.length?3:0)+(validade?5:0))+(linhasFotos?linhasFotos*37+4:0);
     if(y+altura>278){novaPagina();doc.setFillColor(114,189,136);doc.roundedRect(margem,y,largura,8,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(item.categoria,margem+4,y+5.4);y+=11;categoriaAtual=item.categoria;}
     const cor=item.resultado==='conforme'?[114,189,136]:item.resultado==='nao_conforme'?[176,65,62]:[108,107,98];
     doc.setFillColor(252,251,249);doc.setDrawColor(226,224,214);doc.roundedRect(margem,y,largura,altura,2,2,'FD');
     doc.setFillColor(...cor);doc.roundedRect(margem,y,2.2,altura,1,1,'F');
     doc.setFont(undefined,'bold');doc.setFontSize(8.8);doc.setTextColor(34,35,31);doc.text(desc,margem+6,y+6);
     const status=item.resultado==='conforme'?'CONFORME':item.resultado==='nao_conforme'?'NÃO CONFORME':'N/A';
-    doc.setFillColor(...cor);doc.roundedRect(165,y+3,27,6,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.7);doc.text(status,178.5,y+7,{align:'center'});
+    doc.setFillColor(...cor);doc.roundedRect(margem+largura-34,y+3,30,7,1.4,1.4,'F');doc.setTextColor(255,255,255);doc.setFontSize(6.7);doc.text(status,margem+largura-19,y+7.5,{align:'center'});
     let yi=y+7+desc.length*4;
     if(obs.length){doc.setFont(undefined,'normal');doc.setFontSize(7.7);doc.setTextColor(item.resultado==='nao_conforme'?142:108,item.resultado==='nao_conforme'?58:107,item.resultado==='nao_conforme'?74:98);doc.text(obs,margem+6,yi);yi+=obs.length*3.6+3;}
     if(validade){doc.setFont(undefined,'bold');doc.setFontSize(7.7);doc.setTextColor(217,130,43);doc.text(validade,margem+6,yi);yi+=5;}
@@ -3136,6 +3138,15 @@ function projetosDoClienteHTML(c){
 
 function abrirProjeto(id){ projetoSelecionadoId = id; renderTela(); }
 function voltarProjetos(){ projetoSelecionadoId = null; renderTela(); }
+async function excluirProjetoSeguro(id){
+ const p=PROJETOS.find(x=>x.id===id);if(!p)return;
+ if(!confirm(`Excluir definitivamente o projeto "${p.nome}"? A exclusão pode afetar etapas e checklists associados.`))return;
+ if(prompt('Digite EXCLUIR para confirmar:')!=='EXCLUIR')return;
+ const {data:excluidos,error}=await supa.from('projetos').delete().eq('id',id).select('id');
+ if(error||!excluidos?.length){dispararAutomacao('Não foi possível excluir projeto',error?.message||'O banco não confirmou a exclusão. Verifique permissões e vínculos.');return;}
+ PROJETOS=PROJETOS.filter(x=>x.id!==id);projetoSelecionadoId=null;renderSidebar();renderTela();
+}
+
 async function alternarChecklistProjeto(projId, etapaId, idx){
   const p = PROJETOS.find(x=>x.id===projId);
   const et = p.etapas.find(e=>e.id===etapaId);
@@ -3260,7 +3271,7 @@ function fichaProjetoHTML(p){
   const perc = progressoProjeto(p);
   const total=itensProjeto(p).length,feitos=itensProjeto(p).filter(i=>i.c).length;
   return `
-    <button class="ficha-voltar" onclick="voltarProjetos()">← Voltar para Projetos</button>
+    <button class="ficha-voltar" onclick="voltarProjetos()">← Voltar para Projetos</button><button class="btn-secundario" style="float:right;color:#B0413E" onclick="excluirProjetoSeguro('${p.id}')">Excluir projeto</button>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(p.nome)}</div>
       <div>
@@ -3917,14 +3928,14 @@ function formatarDuracao(ms,comSegundos=false){const total=Math.floor(ms/1000),h
 function clienteRegistroHoras(r){return CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'';}
 function atualizarCronometros(){const ativo=atividadeHorasAtiva();if(!ativo)return;document.querySelectorAll('[data-cronometro]').forEach(el=>el.textContent=formatarDuracao(duracaoHorasMs(ativo),true));}
 function controleAtivoHTML({dashboard=false}={}){const a=atividadeHorasAtiva();if(!a)return `<div class="card ${dashboard?'horas-dashboard':''}" style="border-top:4px solid var(--cor-primaria)"><h3>Controle de horas <button onclick="irPara('controle_horas')">ver histórico</button></h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="pend-desc">Nenhuma atividade em andamento.</div></div><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div></div>`;const cliente=clienteRegistroHoras(a);return `<section class="horas-ativo ${dashboard?'horas-dashboard':''}"><div class="horas-ativo-top"><div><small>${dashboard?'Atividade em andamento':'Cronômetro ativo'}</small><h2>${textoHTML(ROTULOS_HORAS[a.tipo]||a.tipo)}</h2><div class="horas-ativo-meta">${cliente?textoHTML(cliente)+' · ':''}${textoHTML(ROTULOS_CARTEIRA[a.carteira]||a.carteira)} · iniciada às ${new Date(a.inicio).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="horas-cronometro" data-cronometro>${formatarDuracao(duracaoHorasMs(a),true)}</div></div><div class="horas-ativo-acoes"><button class="horas-finalizar" onclick="finalizarControleHoras('${a.id}')">■ Finalizar</button>${dashboard?`<button class="horas-abrir" onclick="irPara('controle_horas')">Abrir controle</button>`:''}</div></section>`;}
-function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${CLIENTES.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
-async function iniciarControleHoras(){const tipo=document.getElementById('horaTipo')?.value,carteira=document.getElementById('horaCarteira')?.value,cliente_id=document.getElementById('horaCliente')?.value||null,observacao=document.getElementById('horaObservacao')?.value.trim()||null;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').insert({user_id:user.id,tipo,carteira,cliente_id,observacao,inicio:new Date().toISOString()}).select().single();if(error){dispararAutomacao('Erro ao iniciar atividade',error.message);return;}CONTROLE_HORAS.unshift(data);fecharModalSistema();dispararAutomacao('Cronômetro iniciado',ROTULOS_HORAS[tipo]);renderSidebar();renderTela();}
+function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${CLIENTES.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
+async function iniciarControleHoras(){const tipo=document.getElementById('horaTipo')?.value,carteira=document.getElementById('horaCarteira')?.value,cliente_id=document.getElementById('horaCliente')?.value||null,observacao=document.getElementById('horaObservacao')?.value.trim()||null;if(tipo==='deslocamento'&&(!document.getElementById('horaOrigem')?.value.trim()||!document.getElementById('horaDestino')?.value.trim())){alert('Informe origem e destino.');return;}const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').insert({user_id:user.id,tipo,carteira,cliente_id,observacao,...(tipo==='deslocamento'?{origem_tipo:'outro',origem_texto:document.getElementById('horaOrigem').value.trim(),destino_tipo:'outro',destino_texto:document.getElementById('horaDestino').value.trim()}:{}),inicio:new Date().toISOString()}).select().single();if(error){dispararAutomacao('Erro ao iniciar atividade',error.message);return;}CONTROLE_HORAS.unshift(data);fecharModalSistema();dispararAutomacao('Cronômetro iniciado',ROTULOS_HORAS[tipo]);renderSidebar();renderTela();}
 async function finalizarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||r.fim)return;if(!confirm(`Finalizar ${ROTULOS_HORAS[r.tipo]||'atividade'} agora?`))return;const fim=new Date().toISOString();const {error}=await supa.from('controle_horas').update({fim,atualizado_em:fim}).eq('id',id);if(error){dispararAutomacao('Erro ao finalizar atividade',error.message);return;}r.fim=fim;r.atualizado_em=fim;dispararAutomacao('Atividade finalizada',`Duração: ${formatarDuracao(duracaoHorasMs(r))}`);renderSidebar();renderTela();}
 function dataHoraLocalInput(iso){if(!iso)return '';const d=new Date(iso),off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
 function editarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r)return;abrirModalSistema(`<div class="system-modal-top"><div><h3>Corrigir registro</h3><p>${textoHTML(ROTULOS_HORAS[r.tipo]||r.tipo)}</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Início</label><input id="horaEditInicio" type="datetime-local" value="${dataHoraLocalInput(r.inicio)}"></div><div class="form-field"><label>Término</label><input id="horaEditFim" type="datetime-local" value="${dataHoraLocalInput(r.fim)}"></div><div class="form-field full"><label>Observação</label><textarea id="horaEditObs" rows="3">${textoHTML(r.observacao||'')}</textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarEdicaoControleHoras('${id}')">Salvar correção</button></div>`);}
 async function salvarEdicaoControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id),inicioCampo=document.getElementById('horaEditInicio')?.value,fimCampo=document.getElementById('horaEditFim')?.value;if(!r||!inicioCampo||!fimCampo){alert('Informe início e término.');return;}const inicio=new Date(inicioCampo).toISOString(),fim=new Date(fimCampo).toISOString();if(new Date(fim)<new Date(inicio)){alert('O término não pode ser anterior ao início.');return;}const observacao=document.getElementById('horaEditObs')?.value.trim()||null;const {error}=await supa.from('controle_horas').update({inicio,fim,observacao,atualizado_em:new Date().toISOString()}).eq('id',id);if(error){dispararAutomacao('Erro ao corrigir registro',error.message);return;}Object.assign(r,{inicio,fim,observacao});fecharModalSistema();renderTela();}
 async function excluirControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||!confirm('Excluir definitivamente este registro de horas?'))return;const {error}=await supa.from('controle_horas').delete().eq('id',id);if(error){dispararAutomacao('Erro ao excluir registro',error.message);return;}CONTROLE_HORAS=CONTROLE_HORAS.filter(x=>x.id!==id);renderTela();}
-function registroHorasHTML(r){const d=new Date(r.inicio),cliente=clienteRegistroHoras(r);return `<div class="horas-lista-item"><div class="horas-data"><strong>${d.getDate()}</strong><span>${MESES_NOME[d.getMonth()].slice(0,3)}</span></div><div><div class="horas-item-titulo">${textoHTML(ROTULOS_HORAS[r.tipo]||r.tipo)}${cliente?' · '+textoHTML(cliente):''}</div><div class="horas-item-meta">${textoHTML(ROTULOS_CARTEIRA[r.carteira]||r.carteira)} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}–${r.fim?new Date(r.fim).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'em andamento'} · ${formatarDuracao(duracaoHorasMs(r))}${r.observacao?' · '+textoHTML(r.observacao):''}</div></div><div class="horas-item-acoes">${r.fim?`<button onclick="editarControleHoras('${r.id}')">Editar</button>`:''}<button onclick="excluirControleHoras('${r.id}')" style="color:#B0413E">Excluir</button></div></div>`;}
+function registroHorasHTML(r){const d=new Date(r.inicio),cliente=clienteRegistroHoras(r);return `<div class="horas-lista-item"><div class="horas-data"><strong>${d.getDate()}</strong><span>${MESES_NOME[d.getMonth()].slice(0,3)}</span></div><div><div class="horas-item-titulo">${textoHTML(ROTULOS_HORAS[r.tipo]||r.tipo)}${cliente?' · '+textoHTML(cliente):''}</div><div class="horas-item-meta">${textoHTML(ROTULOS_CARTEIRA[r.carteira]||r.carteira)} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}–${r.fim?new Date(r.fim).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'em andamento'} · ${formatarDuracao(duracaoHorasMs(r))}${r.tipo==='deslocamento'?' · '+textoHTML(r.origem_texto||'Origem não informada')+' → '+textoHTML(r.destino_texto||'Destino não informado'):''}${r.observacao?' · '+textoHTML(r.observacao):''}</div></div><div class="horas-item-acoes">${r.fim?`<button onclick="editarControleHoras('${r.id}')">Editar</button>`:''}<button onclick="excluirControleHoras('${r.id}')" style="color:#B0413E">Excluir</button></div></div>`;}
 function controleHorasHTML(){const finalizados=CONTROLE_HORAS.filter(r=>r.fim&&dataHoraLocalInput(r.inicio).startsWith(mesControleHoras)),agora=new Date(),inicioSemana=new Date(agora);inicioSemana.setHours(0,0,0,0);inicioSemana.setDate(inicioSemana.getDate()-((inicioSemana.getDay()+6)%7));const semana=CONTROLE_HORAS.filter(r=>r.fim&&new Date(r.inicio)>=inicioSemana),soma=lista=>lista.reduce((s,r)=>s+duracaoHorasMs(r),0),visitas=finalizados.filter(r=>r.tipo==='visita'),admin=finalizados.filter(r=>r.tipo==='administrativo');return `${controleAtivoHTML()}${!atividadeHorasAtiva()?'<div style="margin-bottom:14px"><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div>':''}<div class="horas-resumo"><div class="horas-metrica"><strong>${formatarDuracao(soma(semana))}</strong><span>trabalhadas nesta semana</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(finalizados))}</strong><span>trabalhadas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(visitas))}</strong><span>em visitas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(admin))}</strong><span>administrativas no mês</span></div></div><div class="card"><div class="horas-filtros"><h3>Histórico mensal</h3><input type="month" value="${mesControleHoras}" onchange="mesControleHoras=this.value;renderTela()"></div>${finalizados.map(registroHorasHTML).join('')||'<div class="horas-vazio">Nenhuma atividade finalizada neste mês.</div>'}</div>`;}
 function controleHorasDashboardHTML(){return controleAtivoHTML({dashboard:true});}
 
@@ -4907,9 +4918,37 @@ async function abrirConteudoPlanejamento(dadosAtualizados=false){
 }
 function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(14);doc.text('Entregas em aberto — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,18,y);y+=7;});doc.save(`fechamento-${m.pref}.pdf`);}
 
+
+// Visão geral: indicadores reutilizam os registros já carregados pelos módulos existentes.
+function visaoGeralHTML(){
+ const hoje=new Date().toISOString().slice(0,10);
+ const tarefas=(typeof LISTA_DIA!=='undefined'?LISTA_DIA:[])||[];
+ const pend=(typeof PENDENCIAS_DB!=='undefined'?PENDENCIAS_DB:[])||[];
+ const projetos=(typeof PROJETOS!=='undefined'?PROJETOS:[])||[];
+ const sono=lerSono();const mes=hoje.slice(0,7);const registros=sono.filter(x=>x.data.startsWith(mes));
+ const media=registros.length?(registros.reduce((a,b)=>a+Number(b.horas||0),0)/registros.length).toFixed(1)+' h':'Sem registros';
+ return `<div class="grid" style="margin-bottom:18px">
+ <div class="card"><h3>Projetos cadastrados</h3><div style="font-size:28px;font-weight:700">${projetos.length}</div><button class="btn-secundario" onclick="trocarEspaco('trabalho');irPara('projetos')">Ver projetos →</button></div>
+ <div class="card"><h3>Tarefas de hoje</h3><div style="font-size:28px;font-weight:700">${tarefas.filter(t=>!t.concluido).length}</div><button class="btn-secundario" onclick="trocarEspaco('pessoal');irPara('lista_dia')">Ver tarefas →</button></div>
+ <div class="card"><h3>Pendências profissionais</h3><div style="font-size:28px;font-weight:700">${pend.filter(t=>t.status!=='concluida').length}</div><button class="btn-secundario" onclick="trocarEspaco('trabalho');irPara('dashboard')">Ver trabalho →</button></div>
+ <div class="card"><h3>Média de sono no mês</h3><div style="font-size:28px;font-weight:700">${media}</div><button class="btn-secundario" onclick="irPara('sono')">Registrar sono →</button></div>
+ </div><div class="grid"><button class="card" style="text-align:left" onclick="trocarEspaco('trabalho')"><h3>▣ Trabalho →</h3><p>Dashboard, clientes, visitas e controle de horas</p></button><button class="card" style="text-align:left" onclick="trocarEspaco('pessoal')"><h3>♡ Pessoal →</h3><p>Rotina, hábitos, metas e planejamento</p></button></div>`;
+}
+function lerSono(){try{return JSON.parse(localStorage.getItem('me_sono_v1')||'[]')}catch(e){return []}}
+function salvarSono(){
+ const data=document.getElementById('sonoData').value,entrada=document.getElementById('sonoDormir').value,saida=document.getElementById('sonoAcordar').value,qualidade=document.getElementById('sonoQualidade').value;
+ if(!data||!entrada||!saida){alert('Preencha data, horário de dormir e horário de acordar.');return;}
+ const [h1,m1]=entrada.split(':').map(Number),[h2,m2]=saida.split(':').map(Number);
+ let minutos=(h2*60+m2)-(h1*60+m1);if(minutos<=0)minutos+=1440;
+ if(minutos>1200){alert('Confira os horários: o período ultrapassa 20 horas.');return;}
+ const registros=lerSono().filter(x=>x.data!==data);registros.push({data,dormir:entrada,acordar:saida,horas:Math.round(minutos/6)/10,qualidade});localStorage.setItem('me_sono_v1',JSON.stringify(registros));renderTela();
+}
+function sonoHTML(){const hoje=new Date().toISOString().slice(0,10),mes=hoje.slice(0,7),lista=lerSono().filter(x=>x.data.startsWith(mes)).sort((a,b)=>b.data.localeCompare(a.data));const media=lista.length?(lista.reduce((a,b)=>a+b.horas,0)/lista.length).toFixed(1):'—';return `<div class="card"><h3>☾ Diário do sono</h3><p>Registro manual. Os dados ficam apenas neste navegador/dispositivo, sem sincronização com o Supabase.</p><div class="form-grid"><div class="form-field"><label>Data do despertar</label><input type="date" id="sonoData" value="${hoje}"></div><div class="form-field"><label>Qualidade percebida</label><select id="sonoQualidade"><option>Boa</option><option>Regular</option><option>Ruim</option></select></div><div class="form-field"><label>Hora de dormir</label><input type="time" id="sonoDormir" value="23:00"></div><div class="form-field"><label>Hora de acordar</label><input type="time" id="sonoAcordar" value="07:00"></div></div><button class="btn-primario" onclick="salvarSono()">Salvar noite</button></div><div class="card" style="margin-top:14px"><h3>Resumo de ${mes}</h3><p><strong>${lista.length}</strong> noites registradas · Média <strong>${media} h</strong></p>${lista.map(x=>`<div style="padding:10px 0;border-bottom:1px solid var(--cor-borda)">${x.data.split('-').reverse().join('/')} · ${x.dormir}–${x.acordar} · <strong>${x.horas} h</strong> · ${textoHTML(x.qualidade)}</div>`).join('')||'<p>Sem registros neste mês.</p>'}</div>`}
+
 function renderTela(){
   const [titulo, sub] = NOMES_TELA[telaAtual] || ["", ""];
-  if(telaAtual === 'dashboard'){
+  if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
+  else if(telaAtual === 'dashboard'){
     const agora = new Date();
     const hora = agora.getHours();
     const saudacao = hora<12 ? 'Bom dia' : hora<18 ? 'Boa tarde' : 'Boa noite';
@@ -4924,7 +4963,9 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(telaAtual === 'dashboard'){
+  if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
+  else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
+  else if(telaAtual === 'dashboard'){
     document.getElementById('conteudoTela').innerHTML = dashboardHTML();
   } else if(telaAtual === 'agenda'){
     document.getElementById('conteudoTela').innerHTML = agendaHTML();
@@ -5375,7 +5416,7 @@ function restaurarTelaAtualSessao(){
     const cliente = sessionStorage.getItem('me_cliente_selecionado');
     const etapa = sessionStorage.getItem('me_etapa_visita');
     if(espaco){ espacoAtual = espaco; document.body.setAttribute('data-espaco', espaco); }
-    if(tela){ telaAtual = ['pendencias','obrigacoes'].includes(tela) ? 'dashboard' : tela; }
+    telaAtual='visao_geral';espacoAtual='geral';
     if(visita){ visitaSelecionadaId = visita; const v = VISITAS.find(x=>x.id===visita); if(v) etapaVisitaAtual = v.status==='concluida'?'apos':etapaVisitaAtual; }
     if(cliente){ clienteSelecionadoId = cliente; }
     if(etapa && ['durante','apos'].includes(etapa)) etapaVisitaAtual = etapa;
