@@ -771,7 +771,14 @@
       .dashboard-grid > .dash-agenda { order: 2; }
       .dashboard-grid > .dash-projetos { order: 3; }
     }
-  </style>
+  
+/* V02 - detalhes cromaticos harmonicos no tema escuro */
+html[data-tema-interface="escuro"] .card {border-color:rgba(185,154,255,.17)}
+html[data-tema-interface="escuro"] .card h3 {color:#CBB4FF}
+html[data-tema-interface="escuro"] .rascunho-status {background:#234B47;color:#86E2C8}
+html[data-tema-interface="escuro"] .autosave-bar {background:#25383B;border-color:#41736B;color:#A8EAD8}
+html[data-tema-interface="escuro"] .btn-primario {box-shadow:0 3px 16px rgba(185,154,255,.14)}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2441,6 +2448,7 @@ async function concluirVisita(id){
   v.assinaturaTecnico = (canvasTecnico && !canvasVazio(canvasTecnico)) ? canvasTecnico.toDataURL('image/png') : null;
 
   const resultadosSalvos = await Promise.all(v.checklist.filter(i=>i.resultado).map(i=>salvarRascunhoItem(v,i)));
+  await sincronizarRascunhos();
   if(resultadosSalvos.some(x=>!x)||Object.values(lerRascunhos()).some(r=>r.visita.id===v.id)){
     dispararAutomacao('Checklist ainda em rascunho','Há respostas aguardando sincronização. Revise antes de finalizar.');renderTela();return;
   }

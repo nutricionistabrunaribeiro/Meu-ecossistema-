@@ -37,8 +37,10 @@ async function enviarRascunho(r,forcar=false){
     if(ev||!visita||visita.status==='concluida')return false;
     const {data:remoto,error:er}=await supa.from('checklist_respostas_itens').select('*').eq('id',r.payload.id).maybeSingle();
     if(er)return false;
-    const igual=remoto&&Object.keys(valoresRascunho(r.item)).every(k=>(remoto[k]||null)===(r.payload[k]||null));
-    if(!forcar&&remoto&&!igual&&remoto.atualizado_em!==r.base){
+    const igual=remoto&&Object.keys(valoresRascunho(r.item)).every(k=>(remoto[k]??null)===(r.payload[k]??null));
+    // Se o servidor ja tem a mesma resposta, a fila local nao e um conflito.
+    if(igual){const fila=lerRascunhos();if(fila[r.key]?.revisao===r.revisao){delete fila[r.key];gravarRascunhos(fila);}return true;}
+    if(!forcar&&remoto&&!igual&&r.base&&remoto.atualizado_em!==r.base){
       const fila=lerRascunhos();if(fila[r.key]?.revisao===r.revisao){fila[r.key].conflito=true;gravarRascunhos(fila);}return false;
     }
     let salvo=remoto;
@@ -58,18 +60,18 @@ async function enviarRascunho(r,forcar=false){
 async function sincronizarRascunhos(){
   if(rascunhoSincronizando||!rascunhoUsuario||!navigator.onLine)return;
   rascunhoSincronizando=true;
-  try{for(const key of Object.keys(lerRascunhos())){const r=lerRascunhos()[key];if(r&&!r.conflito)await enviarRascunho(r);}await salvarCopiaChecklist();}
+  try{for(const key of Object.keys(lerRascunhos())){const r=lerRascunhos()[key];if(r)await enviarRascunho(r);}await salvarCopiaChecklist();}
   finally{rascunhoSincronizando=false;}
 }
 function statusRascunhoTexto(){
   if(rascunhoErroLocal)return 'Atenção: armazenamento local indisponível';
-  const fila=Object.values(lerRascunhos()),conflitos=fila.filter(r=>r.conflito).length;
+  const fila=Object.values(lerRascunhos()).filter(r=>!visitaSelecionadaId||r.visita.id===visitaSelecionadaId),conflitos=fila.filter(r=>r.conflito).length;
   if(conflitos)return `${conflitos} resposta(s) precisam de revisão entre aparelhos`;
   if(fila.length)return `Salvo neste aparelho · ${fila.length} resposta(s) aguardando sincronização`;
   return navigator.onLine?'Respostas sincronizadas com o banco':'Sem conexão · rascunho disponível neste aparelho';
 }
 function abrirRevisaoRascunhos(){
-  const fila=Object.values(lerRascunhos());
+  const fila=Object.values(lerRascunhos()).filter(r=>!visitaSelecionadaId||r.visita.id===visitaSelecionadaId);
   abrirModalSistema(`<div class="system-modal-head"><h2>Rascunhos neste aparelho</h2><button onclick="fecharModalSistema()">✕</button></div><p>Confira as respostas que ainda não foram confirmadas no banco. Uma alteração feita em outro aparelho não será sobrescrita automaticamente.</p>${fila.map(r=>`<div class="item-lista-simples"><span>${textoHTML(r.visita.clienteNome||'Cliente')} · ${textoHTML(r.item.desc||'Item')}<small style="display:block">${r.conflito?'Alterado também em outro aparelho':'Aguardando envio'}</small></span>${r.conflito?`<button onclick="resolverRascunho('${r.key}')">Revisar envio</button>`:''}</div>`).join('')||'<p>Nenhum envio pendente.</p>'}<button class="btn-primario" onclick="sincronizarRascunhos().then(()=>{fecharModalSistema();renderTela()})">Tentar sincronizar</button>`);
 }
 async function resolverRascunho(key){const r=lerRascunhos()[key];if(!r)return;if(!confirm('Enviar a resposta deste aparelho, substituindo a resposta deste item no banco?'))return;if(await enviarRascunho(r,true)){fecharModalSistema();renderTela();}else dispararAutomacao('Rascunho mantido','Não foi possível enviar. Confira a conexão e se o checklist ainda está em andamento.');}
