@@ -13,7 +13,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="icon" type="image/png" href="/icon-192.png">
-<meta name="theme-color" content="#72BD88">
+<meta name="theme-color" content="#292035">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -804,12 +804,53 @@ body[data-theme="dark"] .card:nth-child(5n){border-top:3px solid #78A9F7}
 .temas-v04{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:12px}
 .tema-v04{padding:12px;border:1px solid var(--cor-borda,#555);border-radius:13px;background:var(--cor-card,#292438);color:var(--cor-texto,#fff);cursor:pointer;text-align:left}
 .tema-v04 span{display:block;height:14px;border-radius:8px;margin-bottom:8px}
-html[data-paleta-v04="aurora"]{--cor-acento:#72b8ff!important;--cor-primaria:#72b8ff!important}
-html[data-paleta-v04="jardim"]{--cor-acento:#90d8b0!important;--cor-primaria:#90d8b0!important}
-html[data-paleta-v04="rose"]{--cor-acento:#f1a4bf!important;--cor-primaria:#f1a4bf!important}
-html[data-paleta-v04="oceano"]{--cor-acento:#7ad5db!important;--cor-primaria:#7ad5db!important}
-html[data-paleta-v04="ametista"]{--cor-acento:#c38dfa!important;--cor-primaria:#c38dfa!important}
-html[data-paleta-v04="lavanda"]{--cor-acento:#bca1ff!important;--cor-primaria:#bca1ff!important}
+
+
+
+
+
+
+
+/* V05 — design tokens: same palette in Trabalho, Pessoal and Visão Geral */
+html[data-paleta-v04]{
+ --cor-primaria:var(--tema-primaria)!important;--cor-primaria-clara:var(--tema-clara)!important;
+ --cor-acento:var(--tema-acento)!important;
+ --cor-fundo:var(--tema-fundo)!important;--cor-superficie:var(--tema-superficie)!important;
+ --cor-borda:var(--tema-borda)!important;--cor-texto:var(--tema-texto)!important;
+ --cor-texto-suave:var(--tema-suave)!important;
+ --sombra-card:0 8px 26px rgba(0,0,0,.12);
+}
+html[data-paleta-v04] [data-espaco="pessoal"],html[data-paleta-v04] [data-espaco="trabalho"]{
+ --cor-primaria:var(--tema-primaria)!important;--cor-primaria-clara:var(--tema-clara)!important;
+ --cor-acento:var(--tema-acento)!important;
+}
+html[data-paleta-v04="lavanda"]{--tema-fundo:#292035;--tema-superficie:#3c304b;--tema-borda:#594763;--tema-primaria:#c8a6ed;--tema-clara:#dec5f7;--tema-acento:#e6a9c9;--tema-texto:#f6eefa;--tema-suave:#d0bfdc}
+html[data-paleta-v04="aurora"]{--tema-fundo:#1c293a;--tema-superficie:#293b51;--tema-borda:#3c566d;--tema-primaria:#72b8ff;--tema-clara:#a4d4ff;--tema-acento:#f49bb9;--tema-texto:#eff5ff;--tema-suave:#bacbdd}
+html[data-paleta-v04="jardim"]{--tema-fundo:#1d302a;--tema-superficie:#2d443b;--tema-borda:#476356;--tema-primaria:#90d8b0;--tema-clara:#b8e9cd;--tema-acento:#dcb68e;--tema-texto:#eff9f2;--tema-suave:#b9d5c7}
+html[data-paleta-v04="rose"]{--tema-fundo:#332331;--tema-superficie:#493345;--tema-borda:#69485f;--tema-primaria:#f1a4bf;--tema-clara:#f9c6d7;--tema-acento:#c5a8f5;--tema-texto:#fff0f5;--tema-suave:#e4c7d7}
+html[data-paleta-v04="oceano"]{--tema-fundo:#202c32;--tema-superficie:#30434a;--tema-borda:#45616b;--tema-primaria:#83cfcd;--tema-clara:#b4e6e2;--tema-acento:#9eafe2;--tema-texto:#ecf7f7;--tema-suave:#bad1d5}
+html[data-paleta-v04="ametista"]{--tema-fundo:#2a203c;--tema-superficie:#3d2e55;--tema-borda:#5a4577;--tema-primaria:#c38dfa;--tema-clara:#ddbbff;--tema-acento:#f3a4a8;--tema-texto:#f8f0ff;--tema-suave:#d6c2e7}
+html[data-paleta-v04="terra"]{--tema-fundo:#30251f;--tema-superficie:#44342a;--tema-borda:#685143;--tema-primaria:#e4ba77;--tema-clara:#f1d7a8;--tema-acento:#c18d77;--tema-texto:#faedda;--tema-suave:#d8c3ad}
+html[data-paleta-v04="marsala"]{--tema-fundo:#301f2a;--tema-superficie:#472d3c;--tema-borda:#674253;--tema-primaria:#d99aac;--tema-clara:#f1c4d1;--tema-acento:#c8a0d4;--tema-texto:#fae9ed;--tema-suave:#dabec8}
+/* Use palette on banners that previously hard-coded green and orange. */
+html[data-paleta-v04] :is(.dashboard-hoje,.horas-ativo,.casa-hero){background:linear-gradient(120deg,color-mix(in srgb,var(--cor-primaria) 25%,var(--cor-superficie)),var(--cor-superficie) 65%,color-mix(in srgb,var(--cor-acento) 20%,var(--cor-superficie)))!important;color:var(--cor-texto)!important;border:1px solid var(--cor-borda)!important;box-shadow:var(--sombra-card)!important}
+html[data-paleta-v04] :is(.dashboard-hoje,.horas-ativo,.casa-hero) :is(h2,strong,small,.hoje-eyebrow,.hoje-sub,.horas-ativo-meta){color:var(--cor-texto)!important}
+html[data-paleta-v04] .horas-finalizar{background:var(--cor-primaria)!important;color:var(--cor-fundo)!important}
+html[data-paleta-v04] .horas-abrir{color:var(--cor-texto)!important;border-color:var(--cor-borda)!important}
+html[data-paleta-v04] .hoje-metrica{border-color:var(--cor-borda)!important}
+html[data-paleta-v04] .nav-badge{background:color-mix(in srgb,var(--cor-acento) 18%,var(--cor-superficie));color:var(--cor-texto)}
+html[data-paleta-v04] :is(.card,.horas-metrica,.tema-v04){border-color:var(--cor-borda)}
+/* Align dashboard cards consistently at desktop, tablet and phone sizes. */
+.dashboard-grid{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:stretch;grid-auto-flow:row}
+.dashboard-grid>*{min-width:0;box-sizing:border-box;align-self:stretch}
+.dashboard-grid>.card{height:100%;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.dashboard-grid>.card :is(button,input,select){max-width:100%}
+.dashboard-grid>.card :is(.card-body,.lista-dia-dashboard-lista,.mercado-dashboard-lista){min-width:0}
+@media(min-width:1101px){.dashboard-grid>.card:not(.doc-calendar-card):not(.rapidos){grid-column:span 6}.dashboard-grid>.doc-calendar-card,.dashboard-grid>.rapidos,.dashboard-grid>.horas-dashboard{grid-column:1/-1}}
+@media(min-width:651px) and (max-width:1100px){.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid>*{grid-column:span 1!important}.dashboard-grid>.doc-calendar-card,.dashboard-grid>.rapidos,.dashboard-grid>.horas-dashboard{grid-column:1/-1!important}}
+@media(max-width:650px){.dashboard-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px}.dashboard-grid>*{grid-column:1/-1!important}.dashboard-hoje{grid-template-columns:repeat(2,minmax(0,1fr))!important}.hoje-chamada{grid-column:1/-1}}
+.tema-v04.ativo{outline:2px solid var(--cor-primaria);outline-offset:2px}
+
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -4093,7 +4134,7 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#111713':'#72BD88';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;}
+function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{b.classList.toggle('ativo',b.getAttribute('onclick')?.includes("'"+id+"'"));});}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
 function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
@@ -4182,7 +4223,7 @@ function configChecklistsHTML(){
 function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
-    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#d99aac']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
