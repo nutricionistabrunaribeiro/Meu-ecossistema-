@@ -986,19 +986,28 @@ html[data-paleta-v04] .v12-insp-ref{font-weight:700;color:var(--cor-primaria);ma
 @supports not (backdrop-filter:blur(1px)){html[data-paleta-v04] .card{background:var(--cor-superficie)!important}}
 @media(prefers-reduced-transparency:reduce){html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,.v12-inspiracao){background:var(--cor-superficie)!important;backdrop-filter:none;-webkit-backdrop-filter:none}}
 
-/* V15 — Liquid Glass mais transparente e fotos locais em cards selecionados */
-html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v12-inspiracao,.system-modal,.modal-content,.horas-metrica){background:linear-gradient(145deg,color-mix(in srgb,var(--cor-superficie) 54%,transparent),color-mix(in srgb,var(--cor-superficie) 37%,transparent))!important;backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);border-color:color-mix(in srgb,var(--cor-texto) 20%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 18%,transparent),0 12px 28px rgba(0,0,0,.13)}
-html[data-paleta-v04] :is(input,select,textarea){background:color-mix(in srgb,var(--cor-superficie) 49%,transparent)}
-html[data-paleta-v04] :is(.v11-welcome,.v11-kpi,.v11-link,.v11-sono-intro){backdrop-filter:blur(20px) saturate(135%);-webkit-backdrop-filter:blur(20px) saturate(135%);border-color:color-mix(in srgb,var(--cor-texto) 19%,transparent)}
-html[data-paleta-v04] .v11-kpi{background:linear-gradient(140deg,color-mix(in srgb,var(--v11-tint) 24%,transparent),color-mix(in srgb,var(--cor-superficie) 44%,transparent))}
-html[data-paleta-v04] .v11-welcome{background:linear-gradient(120deg,color-mix(in srgb,var(--cor-primaria) 22%,transparent),color-mix(in srgb,var(--cor-superficie) 40%,transparent))}
-/* Fotografias locais, sem rede, sob uma película que respeita a paleta. */
-html[data-paleta-v04] :is(.v15-link-dashboard,.v15-link-projetos,.v15-link-controle_horas,.v15-link-clientes,.v15-link-visitas){background:linear-gradient(95deg,color-mix(in srgb,var(--cor-superficie) 91%,transparent),color-mix(in srgb,var(--cor-superficie) 57%,transparent)),url('card-trabalho.webp') center/cover!important}
-html[data-paleta-v04] :is(.v15-link-sono,.v11-sono-intro){background:linear-gradient(95deg,color-mix(in srgb,var(--cor-superficie) 91%,transparent),color-mix(in srgb,var(--cor-superficie) 53%,transparent)),url('card-sono.webp') center/cover!important}
-html[data-paleta-v04] :is(.v15-link-jornada_biblica,.biblia-hero){background:linear-gradient(95deg,color-mix(in srgb,var(--cor-superficie) 90%,transparent),color-mix(in srgb,var(--cor-superficie) 55%,transparent)),url('card-biblia.webp') center/cover!important}
-html[data-paleta-v04] :is(.v15-link-rotina_casa,.v15-link-habitos,.casa-hero){background:linear-gradient(95deg,color-mix(in srgb,var(--cor-superficie) 90%,transparent),color-mix(in srgb,var(--cor-superficie) 56%,transparent)),url('card-casa.webp') center/cover!important}
-html[data-paleta-v04] .v11-link{min-height:91px;transition:transform .2s,border-color .2s}
-@media(prefers-reduced-transparency:reduce){html[data-paleta-v04] :is(.card,.v11-kpi,.v11-welcome,.v11-link,.v11-sono-intro){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
+/* V16 — vidro real: fundo fotografico + camadas translucidas e legibilidade */
+html[data-paleta-v04] body{background:var(--cor-fundo)!important;isolation:isolate}
+html[data-paleta-v04] body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(135deg,color-mix(in srgb,var(--cor-fundo) 49%,transparent),color-mix(in srgb,var(--cor-primaria) 19%,transparent) 52%,color-mix(in srgb,var(--cor-fundo) 43%,transparent)),url('card-casa.webp') center/cover no-repeat;filter:saturate(110%)}
+html[data-paleta-v04] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 88% 12%,color-mix(in srgb,var(--cor-acento) 19%,transparent),transparent 58%),radial-gradient(ellipse at 12% 90%,color-mix(in srgb,var(--cor-primaria) 20%,transparent),transparent 57%)}
+html[data-paleta-v04] :is(main,aside,.main-content,#conteudoTela){background-color:transparent!important}
+html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v12-inspiracao,.system-modal,.modal-content,.horas-metrica,.v11-kpi,.v11-welcome,.v11-link,.v11-sono-intro){backdrop-filter:blur(18px) saturate(160%)!important;-webkit-backdrop-filter:blur(18px) saturate(160%)!important;border:1px solid color-mix(in srgb,var(--cor-texto) 23%,transparent)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.23),0 13px 34px rgba(0,0,0,.13)!important}
+html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v12-inspiracao,.system-modal,.modal-content,.horas-metrica){background:color-mix(in srgb,var(--cor-superficie) 48%,transparent)!important}
+html[data-paleta-v04] .v11-kpi{background:linear-gradient(135deg,color-mix(in srgb,var(--v11-tint) 24%,transparent),color-mix(in srgb,var(--cor-superficie) 39%,transparent))!important}
+html[data-paleta-v04] .v11-welcome{background:color-mix(in srgb,var(--cor-superficie) 36%,transparent)!important}
+html[data-paleta-v04] .v11-link{background:color-mix(in srgb,var(--cor-superficie) 36%,transparent)!important;min-height:80px;position:relative;overflow:hidden;transition:transform .2s}
+html[data-paleta-v04] .v11-link:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--cor-fundo) 50%,transparent),color-mix(in srgb,var(--cor-fundo) 16%,transparent))}
+html[data-paleta-v04] .v11-link>*{position:relative;z-index:1}
+/* Fotografias diferentes apenas nos cards principais; demais ficam em vidro puro. */
+html[data-paleta-v04] .v15-link-dashboard{background:linear-gradient(90deg,color-mix(in srgb,var(--cor-fundo) 58%,transparent),color-mix(in srgb,var(--cor-fundo) 15%,transparent)),url('card-trabalho.webp') center/cover!important}
+html[data-paleta-v04] .v15-link-sono{background:linear-gradient(90deg,color-mix(in srgb,var(--cor-fundo) 58%,transparent),color-mix(in srgb,var(--cor-fundo) 15%,transparent)),url('card-sono.webp') center/cover!important}
+html[data-paleta-v04] .v15-link-jornada_biblica{background:linear-gradient(90deg,color-mix(in srgb,var(--cor-fundo) 58%,transparent),color-mix(in srgb,var(--cor-fundo) 15%,transparent)),url('card-biblia.webp') center/cover!important}
+html[data-paleta-v04] .v15-link-rotina_casa{background:linear-gradient(90deg,color-mix(in srgb,var(--cor-fundo) 58%,transparent),color-mix(in srgb,var(--cor-fundo) 15%,transparent)),url('card-casa.webp') center/cover!important}
+html[data-paleta-v04] .v11-link :is(strong,small),html[data-paleta-v04] .v11-arrow{color:var(--cor-texto)!important;text-shadow:0 1px 8px color-mix(in srgb,var(--cor-fundo) 35%,transparent)}
+html[data-paleta-v04] :is(input,select,textarea){background:color-mix(in srgb,var(--cor-superficie) 62%,transparent)}
+@media(min-width:750px){html[data-paleta-v04] .v11-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:550px){html[data-paleta-v04] .v11-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}html[data-paleta-v04] .v11-link{min-height:120px;padding:11px;flex-wrap:wrap;align-content:center}html[data-paleta-v04] .v11-link>span:nth-child(2){flex-basis:calc(100% - 46px)}html[data-paleta-v04] .v11-arrow{display:none}html[data-paleta-v04] .v11-link strong{font-size:11px}html[data-paleta-v04] .v11-link small{font-size:10px}}
+@media(prefers-reduced-transparency:reduce){html[data-paleta-v04] :is(.card,.v11-kpi,.v11-link){background:var(--cor-superficie)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
 </style>
 </head>
 <body data-espaco="trabalho">
