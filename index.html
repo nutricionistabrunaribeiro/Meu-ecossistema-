@@ -922,6 +922,8 @@ html[data-paleta-v04] .agenda-hoje{color:var(--cor-fundo)!important}
 @media(max-width:1000px){.v07-overview .v06-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v07-quicklinks{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.v07-overview .v06-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v07-overview .v06-metrica{min-height:154px;padding:12px!important}.v07-overview .v06-metrica-top{font-size:11px}.v07-overview .v06-metrica-icon{width:29px;height:29px}.v07-overview .v06-atalhos,.v07-quicklinks{grid-template-columns:minmax(0,1fr)}}
 
+
+.v09-atividade-destaque{margin:14px 0 18px;width:100%}.v09-atividade-destaque > *{width:100%;box-sizing:border-box}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -5324,8 +5326,8 @@ function dashboardHTML(){
 
   return `
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${entregasAtrasadas}</strong><span>entregas atrasadas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
+  <div class="v09-atividade-destaque">${controleHorasDashboardHTML()}</div>
   <div class="grid dashboard-grid">
-    ${controleHorasDashboardHTML()}
     <div class="card card-destaque dash-arco">
       <h3>Arco do dia</h3>
       <div class="arco-wrap">
