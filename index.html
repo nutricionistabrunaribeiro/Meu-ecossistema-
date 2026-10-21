@@ -1046,6 +1046,20 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 
 </style>
 <meta name="ecossistema-release" content="19-glass-tabela-documental">
+
+<style id="v20-documentos-glass">
+/* V20: tabela compacta real, inclusive no celular */
+.v20-version{display:inline-block;vertical-align:middle;font:700 10px system-ui,sans-serif;letter-spacing:.05em;border:1px solid var(--cor-primaria);border-radius:8px;padding:4px 7px;margin-left:6px;color:var(--cor-primaria)}
+.v19-documentos{background:rgba(255,255,255,.065)!important;backdrop-filter:blur(26px) saturate(160%)!important;-webkit-backdrop-filter:blur(26px) saturate(160%)!important}
+.v19-table-wrap{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+.v19-doc-table{display:table!important;min-width:620px!important;border-collapse:collapse!important}
+.v19-doc-table thead{display:table-header-group!important}
+.v19-doc-table tbody{display:table-row-group!important}
+.v19-doc-table tr{display:table-row!important}
+.v19-doc-table td,.v19-doc-table th{display:table-cell!important;white-space:normal;vertical-align:middle}
+.v19-doc-table td:first-child{min-width:190px}
+@media(max-width:720px){.v19-documentos{padding:12px!important}.v19-doc-table td,.v19-doc-table th{padding:9px 8px!important}.v19-doc-top{align-items:flex-start}}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2075,7 +2089,7 @@ function checklistDocumentacaoHTML(c){
    const acao=d?`abrirDocumentoModelo('${c.id}','${l.chave}','','${d.id}')`:`abrirDocumentoModelo('${c.id}','${l.chave}','')`;
    return `<tr><td><strong>${textoHTML(l.nome)}</strong><small>${textoHTML(l.grupo)}</small></td><td>${d?.emissao?textoHTML(d.emissao):'—'}</td><td>${d?.validade?textoHTML(d.validade):'—'}</td><td><span class="v19-situacao ${st.cor}">${st.nome}</span></td><td><button class="v19-editar" onclick="${acao}">${d?'Editar':'Preencher'}</button></td></tr>`;
  }).join('');
- return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação</h3><p>Documentos, colaboradores e treinamentos em uma só tabela.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v19-table-wrap"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
+ return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação <span class="v20-version">TABELA V20</span></h3><p>Visão única: documentos, colaboradores e treinamentos. Deslize a tabela para os lados no celular.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v19-table-wrap"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
 }
 
 async function editarCampoCliente(clienteId, campoDb, rotulo){
