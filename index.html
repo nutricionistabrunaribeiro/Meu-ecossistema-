@@ -922,15 +922,6 @@ html[data-paleta-v04] .agenda-hoje{color:var(--cor-fundo)!important}
 @media(max-width:1000px){.v07-overview .v06-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v07-quicklinks{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.v07-overview .v06-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v07-overview .v06-metrica{min-height:154px;padding:12px!important}.v07-overview .v06-metrica-top{font-size:11px}.v07-overview .v06-metrica-icon{width:29px;height:29px}.v07-overview .v06-atalhos,.v07-quicklinks{grid-template-columns:minmax(0,1fr)}}
 
-
-.v09-atividade-destaque{margin:14px 0 18px;width:100%}.v09-atividade-destaque > *{width:100%;box-sizing:border-box}
-
-/* V10 — Calendário menstrual integrado às oito paletas. */
-.ciclo-dia{aspect-ratio:1;min-width:0;border-radius:7px;font-size:11px;font-weight:600;background:color-mix(in srgb,var(--cor-primaria) 8%,var(--cor-superficie));color:var(--cor-texto);border:1px solid var(--cor-borda);transition:background .15s,border-color .15s,transform .15s}
-.ciclo-dia:hover,.ciclo-dia:focus-visible{background:color-mix(in srgb,var(--cor-acento) 24%,var(--cor-superficie));border-color:var(--cor-acento);outline-offset:2px}
-.ciclo-dia.marcado{background:var(--cor-primaria);border-color:var(--cor-primaria);color:var(--cor-fundo);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cor-texto) 12%,transparent)}
-.ciclo-dia.marcado:hover{background:var(--cor-primaria-clara)}
-html[data-paleta-v04] .ciclo-dia.marcado{color:var(--tema-fundo)}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -2644,17 +2635,17 @@ async function gerarPDFVisita(v){
   }
   y += 27;
 
-  // Identidade fixa Bruna Ribeiro, independente do tema do aplicativo.
-  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(52,112,91);
-  doc.text('BRUNA RIBEIRO CONSULTORIA',105,y-2,{align:'center'});
-  y+=2;
-  doc.setFillColor(52,112,91);
-  doc.roundedRect(margem,y,largura,12,2,2,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(12);
-  const tituloPdf=doc.splitTextToSize((v.modeloNome||'CHECKLIST DE INSPEÇÃO').toUpperCase(),largura-14);
-  doc.text(tituloPdf[0]||'CHECKLIST DE INSPEÇÃO',105,y+7.5,{align:'center'});
-  y+=12;
-  doc.setFillColor(227,98,22);doc.rect(margem,y,largura,1.1,'F');y+=7;
+  // Faixa de título, igual ao modelo (verde + friso laranja)
+  doc.setFillColor(114,189,136);
+  doc.roundedRect(margem, y, largura, 9.5, 1.2, 1.2, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13);
+  doc.setFont(undefined,'bold');
+  doc.text((v.modeloNome||'CHECKLIST').toUpperCase(), 105, y+6.5, {align:'center'});
+  y += 9.5;
+  doc.setFillColor(227,98,22);
+  doc.rect(margem, y, largura, 1.4, 'F');
+  y += 8;
 
   // Tabela de cabeçalho (Cliente / Mês-Ano / Nutricionista / Datas), igual ao modelo
   doc.autoTable({
@@ -2669,8 +2660,7 @@ async function gerarPDFVisita(v){
   });
   y = doc.lastAutoTable.finalY + 8;
 
-  // V08: perguntas, status e evidências fotográficas em áreas independentes.
-  // Nunca desenhar fotos dentro da coluna de respostas ou sobre observações.
+  // V03: respostas em coluna própria; altura calculada pelas linhas reais.
   const itensRespondidos=v.checklist.filter(i=>i.resultado);
   const corStatus={conforme:[49,129,100],nao_conforme:[178,69,79],na:[105,111,128]};
   const statusTexto={conforme:'CONFORME',nao_conforme:'NÃO CONFORME',na:'N/A'};
@@ -2678,73 +2668,41 @@ async function gerarPDFVisita(v){
   const novaPagina=()=>{doc.addPage();y=18;categoriaAtual=null;};
   function cabecalhoCategoria(nome){
     const linhas=doc.splitTextToSize(String(nome||'GERAL').toUpperCase(),largura-10);
-    const h=Math.max(10,5+linhas.length*4.3);
-    if(y+h>274)novaPagina();
+    const h=Math.max(9,4+linhas.length*4.2);
+    if(y+h>276)novaPagina();
     doc.setFillColor(52,112,91);doc.roundedRect(margem,y,largura,h,1.5,1.5,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(255,255,255);
-    doc.text(linhas,margem+5,y+6);y+=h+3;categoriaAtual=nome;
+    doc.text(linhas,margem+5,y+5.8);y+=h+3;categoriaAtual=nome;
   }
-  function cabecalhoEvidencias(){
-    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(52,112,91);
-    doc.text('EVIDÊNCIAS FOTOGRÁFICAS',margem+5,y+4);y+=8;
-  }
-  for(let idx=0;idx<itensRespondidos.length;idx++){
-    const item=itensRespondidos[idx];
+  itensRespondidos.forEach((item,idx)=>{
     if(item.categoria!==categoriaAtual)cabecalhoCategoria(item.categoria);
-    const colunaTexto=largura-47;
+    const colunaTexto=largura-49;
     doc.setFont('helvetica','bold');doc.setFontSize(9);
-    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc||''}`,colunaTexto-11);
+    const desc=doc.splitTextToSize(`${idx+1}. ${item.desc||''}`,colunaTexto-10);
     doc.setFont('helvetica','normal');doc.setFontSize(8);
-    const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,colunaTexto-11):[];
-    const validade=item.validade?doc.splitTextToSize(`Validade: ${isoParaBRCompleto(item.validade)}`,colunaTexto-11):[];
-    const alturaTexto=Math.max(20,11+desc.length*4.4+(obs.length?3+obs.length*4:0)+(validade.length?3+validade.length*4:0));
-    if(y+Math.min(alturaTexto,240)>274){novaPagina();cabecalhoCategoria(item.categoria);}
-    // Textos muito extensos são divididos em blocos sem invadir o rodapé.
-    const linhas=[...desc.map(t=>({t,b:true})),...obs.map(t=>({t,b:false})),...validade.map(t=>({t,b:false}))];
-    let cursor=0;
-    do{
-      if(y>265){novaPagina();cabecalhoCategoria(item.categoria);}
-      const disponivel=Math.max(12,270-y-12);
-      const maxLinhas=Math.max(1,Math.floor(disponivel/4.4));
-      const parte=linhas.slice(cursor,cursor+maxLinhas);
-      const h=Math.max(18,10+parte.length*4.4);
-      doc.setFillColor(250,250,251);doc.setDrawColor(222,225,231);
-      doc.roundedRect(margem,y,largura,h,2,2,'FD');
-      doc.line(margem+colunaTexto,y,margem+colunaTexto,y+h);
-      const cor=corStatus[item.resultado]||corStatus.na;
-      doc.setFillColor(...cor);doc.roundedRect(margem+colunaTexto+3,y+4,largura-colunaTexto-6,10,1.5,1.5,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(6.4);doc.setTextColor(255,255,255);
-      doc.text(statusTexto[item.resultado]||'N/A',margem+colunaTexto+(largura-colunaTexto)/2,y+10.2,{align:'center'});
-      let yy=y+7;
-      parte.forEach(l=>{doc.setFont('helvetica',l.b?'bold':'normal');doc.setFontSize(l.b?9:8);doc.setTextColor(l.b?35:89,l.b?39:94,l.b?49:106);doc.text(l.t,margem+5,yy);yy+=4.4;});
-      y+=h+3;cursor+=parte.length;
-    }while(cursor<linhas.length);
+    const obs=item.obs?.trim()?doc.splitTextToSize(`Observação: ${item.obs.trim()}`,colunaTexto-10):[];
+    const validade=item.validade?doc.splitTextToSize(`Validade: ${isoParaBRCompleto(item.validade)}`,colunaTexto-10):[];
     const fotos=item.fotos||[];
-    if(fotos.length){
-      if(y+18>274){novaPagina();cabecalhoCategoria(item.categoria);}
-      cabecalhoEvidencias();
-      const larguraFoto=(largura-17)/2,alturaFoto=51;
-      for(let i=0;i<fotos.length;i+=2){
-        if(y+alturaFoto+8>274){novaPagina();cabecalhoCategoria(item.categoria);cabecalhoEvidencias();}
-        for(let j=0;j<2&&i+j<fotos.length;j++){
-          const foto=fotos[i+j],x=margem+5+j*(larguraFoto+7),fy=y;
-          doc.setFillColor(255,255,255);doc.setDrawColor(198,203,202);
-          doc.roundedRect(x-1,fy-1,larguraFoto+2,alturaFoto+2,2,2,'FD');
-          const origem=urlFoto(foto);
-          try{
-            const info=doc.getImageProperties(origem),proporcao=info.width/info.height;
-            const boxW=larguraFoto-5,boxH=alturaFoto-9;
-            let w=boxW,h=w/proporcao;if(h>boxH){h=boxH;w=h*proporcao;}
-            doc.addImage(origem,info.fileType||'JPEG',x+(larguraFoto-w)/2,fy+2+(boxH-h)/2,w,h);
-          }catch(e){doc.setFontSize(7);doc.setTextColor(120,120,120);doc.text('Imagem indisponível',x+4,fy+20);}
-          doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(85,85,85);
-          doc.text(`Foto ${i+j+1} · Item ${idx+1}`,x+3,fy+alturaFoto-2);
-        }
-        y+=alturaFoto+7;
-      }
-    }
-    y+=3;
-  }
+    const textoAltura=7+desc.length*4.5+(obs.length?3+obs.length*4:0)+(validade.length?3+validade.length*4:0)+5;
+    const fotosAltura=fotos.length?5+Math.ceil(fotos.length/3)*37:0;
+    const altura=Math.max(19,textoAltura+fotosAltura);
+    if(y+altura>276){novaPagina();cabecalhoCategoria(item.categoria);}
+    // Não reduzir fonte nem desenhar sobre o texto: itens extensos continuam em página própria.
+    doc.setFillColor(250,250,251);doc.setDrawColor(222,225,231);
+    doc.roundedRect(margem,y,largura,altura,2,2,'FD');
+    doc.setDrawColor(222,225,231);doc.line(margem+colunaTexto,y,margem+colunaTexto,y+altura);
+    const cor=corStatus[item.resultado]||corStatus.na;
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(35,39,49);
+    doc.text(desc,margem+5,y+7);
+    doc.setFillColor(...cor);doc.roundedRect(margem+colunaTexto+3,y+4,largura-colunaTexto-6,10,1.5,1.5,'F');
+    doc.setFontSize(6.4);doc.setTextColor(255,255,255);
+    doc.text(statusTexto[item.resultado]||'N/A',margem+colunaTexto+(largura-colunaTexto)/2,y+10.2,{align:'center'});
+    let yi=y+7+desc.length*4.5;
+    if(obs.length){yi+=3;doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(89,94,106);doc.text(obs,margem+5,yi);yi+=obs.length*4;}
+    if(validade.length){yi+=3;doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(145,96,43);doc.text(validade,margem+5,yi);yi+=validade.length*4;}
+    if(fotos.length){yi+=5;fotos.forEach((foto,i)=>{const x=margem+5+(i%3)*((colunaTexto-10)/3);const fy=yi+Math.floor(i/3)*37;const origem=urlFoto(foto);try{doc.addImage(origem,'JPEG',x,fy,(colunaTexto-15)/3,33)}catch(e){try{doc.addImage(origem,'PNG',x,fy,(colunaTexto-15)/3,33)}catch(e2){}}});}
+    y+=altura+4;
+  });
   const respondidos = v.checklist.filter(i=>i.resultado);
   const totalItens = respondidos.length;
   const totalConforme = respondidos.filter(i=>i.resultado==='conforme').length;
@@ -4635,7 +4593,7 @@ function cicloHTML(){
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;">
         ${meses.map(m=>`<div><div style="font-size:12px;font-weight:700;margin-bottom:6px;">${m.nome}</div>
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
-            ${Array.from({length:m.dias},(_,i)=>{const dia=i+1;const iso=`${ano}-${String(m.mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;const ativo=marcados.has(iso);return `<button aria-label="${dia} de ${m.nome}" title="${dia}/${String(m.mes).padStart(2,'0')}" onclick="alternarDiaCiclo('${iso}')" class="ciclo-dia ${ativo?'marcado':''}" aria-pressed="${ativo}">${dia}</button>`;}).join('')}
+            ${Array.from({length:m.dias},(_,i)=>{const dia=i+1;const iso=`${ano}-${String(m.mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;const ativo=marcados.has(iso);return `<button aria-label="${dia} de ${m.nome}" title="${dia}/${String(m.mes).padStart(2,'0')}" onclick="alternarDiaCiclo('${iso}')" style="aspect-ratio:1;border-radius:5px;font-size:10px;background:${ativo?'#E36216':'#F1EDE5'};color:${ativo?'white':'var(--cor-texto-suave)'};">${dia}</button>`;}).join('')}
           </div></div>`).join('')}
       </div>
     </div>
@@ -5333,8 +5291,8 @@ function dashboardHTML(){
 
   return `
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${entregasAtrasadas}</strong><span>entregas atrasadas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
-  <div class="v09-atividade-destaque">${controleHorasDashboardHTML()}</div>
   <div class="grid dashboard-grid">
+    ${controleHorasDashboardHTML()}
     <div class="card card-destaque dash-arco">
       <h3>Arco do dia</h3>
       <div class="arco-wrap">
