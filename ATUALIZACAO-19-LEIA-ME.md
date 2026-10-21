@@ -1,0 +1,1 @@
+Atualização 19: tabela contínua de documentação por cliente com status de validade e filtros; reforço de transparência nos cards. Publicar arquivos extraídos na raiz do GitHub. Testar no iPhone e na Vercel.

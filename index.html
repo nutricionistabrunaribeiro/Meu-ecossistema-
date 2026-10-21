@@ -1037,7 +1037,15 @@ html[data-paleta-v04] #appRoot .v11-links{grid-template-columns:repeat(3,minmax(
 @media(max-width:900px){html[data-paleta-v04] #appRoot .v11-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){html[data-paleta-v04] #appRoot .v11-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}html[data-paleta-v04] #appRoot .v11-link{min-height:108px;padding:11px;flex-wrap:wrap}html[data-paleta-v04] #appRoot .v11-link>span:nth-child(2){flex-basis:calc(100% - 46px)}html[data-paleta-v04] #appRoot .v11-arrow{display:none}html[data-paleta-v04] #appRoot .v11-link strong{font-size:11px}html[data-paleta-v04] #appRoot .v11-link small{font-size:10px}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-paleta-v04] #appRoot :is(.card,.v11-link,.v11-kpi){background:color-mix(in srgb,var(--cor-superficie) 73%,transparent)!important}}
+
+/* V19: glass perceptível e tabela documental contínua */
+html[data-paleta-v04] body{background-attachment:fixed!important}
+html[data-paleta-v04] #appRoot :is(.card,.v11-overview-card,.v11-atalho,.v11-link,.v11-kpi,.doc-grupo,.v19-documentos){background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.025) 65%)!important;-webkit-backdrop-filter:blur(24px) saturate(165%)!important;backdrop-filter:blur(24px) saturate(165%)!important;border:1px solid rgba(255,255,255,.25)!important;box-shadow:inset 0 1px rgba(255,255,255,.23),0 12px 28px rgba(0,0,0,.11)!important}
+html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;color:var(--cor-texto)}
+.v19-doc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.v19-doc-top h3{margin:0 0 5px}.v19-doc-top p{margin:0;color:var(--cor-texto-suave);font-size:12px}.v19-legenda{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.v19-situacao{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.v19-situacao.verde{color:#9ce8b7;background:rgba(30,130,73,.24);border:1px solid rgba(91,210,133,.4)}.v19-situacao.laranja{color:#ffcf89;background:rgba(172,101,16,.24);border:1px solid rgba(240,161,54,.42)}.v19-situacao.vermelho{color:#ffadb0;background:rgba(170,39,52,.25);border:1px solid rgba(234,94,101,.4)}.v19-situacao.neutro{color:var(--cor-texto-suave);background:rgba(160,160,160,.12);border:1px solid var(--cor-borda)}.v19-filtro{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px}.v19-filtro select{max-width:240px}.v19-table-wrap{width:100%;overflow-x:auto;border-radius:13px;border:1px solid var(--cor-borda)}.v19-doc-table{width:100%;border-collapse:collapse;min-width:580px;text-align:left}.v19-doc-table th{padding:12px 10px;font-size:11px;background:rgba(255,255,255,.07);color:var(--cor-texto)}.v19-doc-table td{padding:11px 10px;font-size:12px;border-top:1px solid var(--cor-borda);vertical-align:middle}.v19-doc-table td small{display:block;color:var(--cor-texto-suave);font-size:10px;margin-top:3px}.v19-doc-table tr:hover td{background:rgba(255,255,255,.035)}.v19-editar{border:1px solid var(--cor-borda);border-radius:9px;padding:7px 11px;color:var(--cor-texto);background:rgba(255,255,255,.07);cursor:pointer}
+
 </style>
+<meta name="ecossistema-release" content="19-glass-tabela-documental">
 </head>
 <body data-espaco="trabalho">
 
@@ -2039,26 +2047,35 @@ async function removerDocumentoCliente(clienteId, docId){
   dispararAutomacao('Documento excluído', doc.nome);
   renderTela();
 }
+let FILTRO_DOC_V19='todos';
+function filtrarDocumentosV19(valor){FILTRO_DOC_V19=valor;renderTela();}
+function statusValidadeV19(d){
+ if(!d)return {nome:'Não cadastrado',cor:'neutro'};
+ if(d.aplicavel===false)return {nome:'Não se aplica',cor:'neutro'};
+ const status=statusAutomaticoDoc(d.validade);
+ if(status==='Vigente')return {nome:'Em dia',cor:'verde'};
+ if(status==='Próximo do vencimento')return {nome:'Vence em breve',cor:'laranja'};
+ if(status==='Vencido')return {nome:'Vencido',cor:'vermelho'};
+ return {nome:'Sem validade',cor:'neutro'};
+}
 function checklistDocumentacaoHTML(c){
-  const docs = c.documentacao || [];
-  const arquivados=docs.filter(d=>d.aplicavel!==false&&documentoStatusPainel(d)==='Arquivado').length;
-  const pendentes=docs.filter(d=>d.aplicavel!==false&&documentoStatusPainel(d)==='Pendente').length;
-  const vencidos=docs.filter(d=>d.aplicavel!==false&&statusAutomaticoDoc(d.validade)==='Vencido').length;
-  const vencendo=docs.filter(d=>d.aplicavel!==false&&statusAutomaticoDoc(d.validade)==='Próximo do vencimento').length;
-  const usados=new Set();
-  const cabecalho='<div class="doc-check-head"><div>Documento</div><div>Data de emissão</div><div>Data de validade</div><div>Status</div><div></div></div>';
-  const grupos=MODELO_DOCUMENTACAO.map(g=>{
-    const itens=g.itens.map(([chave,nome])=>{
-      const d=documentoModelo(c,chave);if(d)usados.add(d.id);
-      const status=documentoStatusPainel(d),meta=[d?.empresaResponsavel,d?.possuiContrato===true?'Contrato vigente':d?.possuiContrato===false?'Sem contrato':''].filter(Boolean).join(' · ');
-      return `<div class="doc-check-item ${d?'':'pendente'}"><div><div class="doc-check-nome">${textoHTML(nome)}</div>${meta?`<div class="doc-check-meta">${textoHTML(meta)}</div>`:''}</div><div class="doc-check-data">${d?.emissao&&d.emissao!=='—'?textoHTML(d.emissao):'—'}</div><div class="doc-check-data">${d?.validade&&d.validade!=='—'?textoHTML(d.validade):'—'}</div><div class="doc-check-status"><span class="doc-status-pill ${classeStatusOperacional(status)}">${status}</span></div><div class="doc-check-acoes"><button onclick="abrirDocumentoModelo('${c.id}','${chave}','${textoHTML(nome)}')">${d?'Editar':'Preencher'}</button>${d?`<button onclick="removerDocumentoCliente('${c.id}','${d.id}')" title="Excluir">✕</button>`:''}</div></div>`;
-    }).join('');
-    const qtd=g.itens.filter(([ch])=>documentoModelo(c,ch)).length,aberta=CATEGORIA_DOCUMENTO_ABERTA===g.id;
-    return `<details class="doc-grupo" ${aberta?'open':''} ontoggle="manterCategoriaDocumento('${g.id}',this.open)"><summary><div class="doc-grupo-titulo"><span class="doc-grupo-icone">${g.icone}</span>${g.nome}</div><span class="doc-grupo-contagem">${qtd}/${g.itens.length} preenchido(s) ▾</span></summary><div class="doc-grupo-corpo">${cabecalho}${itens}</div></details>`;
-  }).join('');
-  const personalizados=docs.filter(d=>!usados.has(d.id));
-  const linhasPersonalizadas=personalizados.map(d=>{const status=documentoStatusPainel(d);return `<div class="doc-check-item"><div><div class="doc-check-nome">${textoHTML(d.nome)}</div></div><div class="doc-check-data">${d.emissao&&d.emissao!=='—'?textoHTML(d.emissao):'—'}</div><div class="doc-check-data">${d.validade&&d.validade!=='—'?textoHTML(d.validade):'—'}</div><div class="doc-check-status"><span class="doc-status-pill ${classeStatusOperacional(status)}">${status}</span></div><div class="doc-check-acoes"><button onclick="abrirDocumentoModelo('${c.id}','','${textoHTML(d.nome)}','${d.id}')">Editar</button><button onclick="removerDocumentoCliente('${c.id}','${d.id}')">✕</button></div></div>`}).join('');
-  return `<div class="module-explainer"><strong>Painel documental do cliente.</strong> Visualização direta: documento, emissão, validade e situação de arquivamento. Os vencimentos continuam alimentando o calendário do Dashboard.</div><div class="doc-panel-resumo"><div><strong>${arquivados}</strong><span>arquivados</span></div><div><strong>${pendentes}</strong><span>pendentes preenchidos</span></div><div><strong>${vencendo}</strong><span>vencendo em até 30 dias</span></div><div><strong>${vencidos}</strong><span>vencidos</span></div></div>${grupos}<details class="doc-grupo" ${CATEGORIA_DOCUMENTO_ABERTA==='personalizados'?'open':''} ontoggle="manterCategoriaDocumento('personalizados',this.open)"><summary><div class="doc-grupo-titulo"><span class="doc-grupo-icone">＋</span>Documentos personalizados</div><span class="doc-grupo-contagem">${personalizados.length} registro(s) ▾</span></summary><div class="doc-grupo-corpo"><div style="padding:10px 0"><button class="btn-primario" onclick="CATEGORIA_DOCUMENTO_ABERTA='personalizados';novoDocumentoCliente('${c.id}')">+ Adicionar documento</button></div>${cabecalho}${linhasPersonalizadas}</div></details>`;
+ const docs=c.documentacao||[];
+ const usados=new Set();
+ const linhas=[];
+ MODELO_DOCUMENTACAO.forEach(g=>g.itens.forEach(([chave,nome])=>{
+   const d=documentoModelo(c,chave);if(d)usados.add(d.id);
+   linhas.push({grupo:g.nome,chave,nome,d});
+ }));
+ docs.filter(d=>!usados.has(d.id)).forEach(d=>linhas.push({grupo:'Personalizados',chave:'',nome:d.nome,d}));
+ const contagens={verde:0,laranja:0,vermelho:0,neutro:0};
+ linhas.forEach(l=>contagens[statusValidadeV19(l.d).cor]++);
+ const exibidas=linhas.filter(l=>FILTRO_DOC_V19==='todos'||statusValidadeV19(l.d).cor===FILTRO_DOC_V19);
+ const linhasHTML=exibidas.map(l=>{
+   const st=statusValidadeV19(l.d),d=l.d;
+   const acao=d?`abrirDocumentoModelo('${c.id}','${l.chave}','','${d.id}')`:`abrirDocumentoModelo('${c.id}','${l.chave}','')`;
+   return `<tr><td><strong>${textoHTML(l.nome)}</strong><small>${textoHTML(l.grupo)}</small></td><td>${d?.emissao?textoHTML(d.emissao):'—'}</td><td>${d?.validade?textoHTML(d.validade):'—'}</td><td><span class="v19-situacao ${st.cor}">${st.nome}</span></td><td><button class="v19-editar" onclick="${acao}">${d?'Editar':'Preencher'}</button></td></tr>`;
+ }).join('');
+ return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação</h3><p>Documentos, colaboradores e treinamentos em uma só tabela.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v19-table-wrap"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
 }
 
 async function editarCampoCliente(clienteId, campoDb, rotulo){
