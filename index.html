@@ -972,6 +972,9 @@ html[data-paleta-v04] .ciclo-dia.marcado{color:var(--tema-fundo)}
 .v11-sono-form .form-field input[type=date],.v11-sono-form .form-field input[type=time]{-webkit-appearance:none;appearance:none}
 .v11-noite{min-width:0}.v11-noite>span{min-width:0;overflow-wrap:anywhere}.v11-noite>strong{white-space:nowrap}
 @media(max-width:700px){.v11-sono-form .form-grid{grid-template-columns:minmax(0,1fr)!important}.v11-sono-form,.v11-sono-history{padding:17px!important}.v11-sono-form .form-field input,.v11-sono-form .form-field select{width:100%!important;min-width:0!important;max-width:100%!important}.v11-sono-form .btn-primario{width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) minmax(0,95px)!important}.mercado-add button{grid-column:1/-1;width:100%}.v11-noite{align-items:flex-start}}
+
+/* Atualização 13 — editor de inspiração */
+.v13-editor{display:grid;gap:10px;color:var(--cor-texto);max-width:560px}.v13-editor h2{margin:0;color:var(--cor-texto)}.v13-editor p{margin:3px 0}.v13-editor label{font-weight:700;font-size:12px;margin-top:5px}.v13-editor input,.v13-editor select,.v13-editor textarea{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:11px;color:var(--cor-texto);padding:12px;font:inherit}.v13-editor small{display:block;color:var(--cor-texto-suave);font-size:11px;margin-top:7px}.v13-editor #v13-referencia-wrap,.v13-editor #v13-texto-wrap{min-width:0}.v13-buscar,.v13-save{background:var(--cor-primaria);color:var(--cor-fundo);border-radius:10px;padding:10px 14px;margin-top:8px;font-weight:700}.v13-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.v13-cancel{border:1px solid var(--cor-borda);padding:10px 14px;border-radius:10px}.v13-editor #v13-status{font-size:12px;color:var(--cor-texto-suave)}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -1159,30 +1162,75 @@ function abrirConfiguracoesGlobais(){
   espacoAtual='trabalho';telaAtual='configuracoes';renderSidebar();renderTela();fecharMenuMobile();
 }
 const V12_FRASES=[
-  'Um pequeno avanço também é progresso.',
-  'Organize o que importa e respeite o seu ritmo.',
-  'A constância constrói o que a pressa não consegue.',
-  'Hoje é uma nova oportunidade de recomeçar.',
-  'Cuide de você enquanto cuida dos seus sonhos.'
+ 'Um pequeno avanço também é progresso.',
+ 'Organize o que importa e respeite o seu ritmo.',
+ 'A constância constrói o que a pressa não consegue.',
+ 'Hoje é uma nova oportunidade de recomeçar.',
+ 'Cuide de você enquanto cuida dos seus sonhos.'
 ];
+const V13_REFERENCIAS=['Salmos 23:1','Provérbios 3:5','Filipenses 4:13','Isaías 41:10','Salmos 46:1','Mateus 6:34','Romanos 12:12','Jeremias 29:11','Salmos 121:2','Josué 1:9','1 Coríntios 13:4','Salmos 37:5','Provérbios 16:3','Mateus 11:28'];
 function lerInspiracao(){try{return JSON.parse(localStorage.getItem('me-inspiracao-v12')||'{}')}catch(e){return {}}}
+function salvarInspiracao(d){localStorage.setItem('me-inspiracao-v12',JSON.stringify(d));renderSidebar()}
+function diaInspiracao(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function referenciaDoDia(){const d=new Date();const n=Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000);return V13_REFERENCIAS[((n%V13_REFERENCIAS.length)+V13_REFERENCIAS.length)%V13_REFERENCIAS.length]}
+async function buscarTextoBiblico(referencia){
+ const r=await fetch('https://bible-api.com/'+encodeURIComponent(referencia)+'?translation=almeida',{headers:{Accept:'application/json'}});
+ if(!r.ok)throw new Error('Passagem não encontrada');
+ const d=await r.json();if(!d.text||!d.reference)throw new Error('Passagem não encontrada');
+ return {versiculo:d.text.trim().slice(0,1200),referencia:d.reference};
+}
+let v13BuscandoDia=false;
 function inspiracaoSidebarHTML(){
- const dados=lerInspiracao(),dia=Math.floor(Date.now()/86400000);
- const frase=dados.frase||V12_FRASES[dia%V12_FRASES.length];
+ const dados=lerInspiracao(),dia=diaInspiracao(),idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
+ const frase=dados.frase||V12_FRASES[((idx%V12_FRASES.length)+V12_FRASES.length)%V12_FRASES.length];
+ const diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
+ if(diario&&!valido&&!v13BuscandoDia){setTimeout(atualizarVersiculoDoDia,100)}
+ const verso=valido?dados.versiculo:'';
+ const ref=valido?dados.referencia:referenciaDoDia();
  return `<div class="v12-insp-title">✦ Pausa para inspirar</div>
- <div class="v12-insp-label">Versículo escolhido</div>
- <p class="v12-insp-verse">${textoHTML(dados.versiculo||'Adicione um versículo que fale ao seu coração.')}</p>
- ${dados.referencia?`<small class="v12-insp-ref">${textoHTML(dados.referencia)}</small>`:''}
+ <div class="v12-insp-label">${diario?'Versículo do dia':'Versículo escolhido'}</div>
+ <p class="v12-insp-verse">${textoHTML(verso|| (diario?'Buscando passagem do dia…':'Escolha uma passagem para se inspirar.'))}</p>
+ ${ref?`<small class="v12-insp-ref">${textoHTML(ref)}</small>`:''}
  <div class="v12-insp-label">Mensagem do dia</div><p class="v12-insp-frase">${textoHTML(frase)}</p>
- <button class="v12-insp-edit" onclick="editarInspiracao()">✎ Personalizar inspiração</button>`;
+ <button class="v12-insp-edit" onclick="editarInspiracao()">✎ Escolher versículo</button>`;
+}
+async function atualizarVersiculoDoDia(){
+ if(v13BuscandoDia)return;v13BuscandoDia=true;
+ const dia=diaInspiracao(),referencia=referenciaDoDia();
+ try{const dados=lerInspiracao();if(dados.modo!=='diario'||dados.dia===dia)return;
+ const passagem=await buscarTextoBiblico(referencia);
+ const atual=lerInspiracao();if(atual.modo==='diario'){salvarInspiracao({...atual,...passagem,dia})}
+ }catch(e){const atual=lerInspiracao();if(atual.modo==='diario'){
+ salvarInspiracao({...atual,versiculo:'A passagem de hoje estará disponível quando houver conexão com a internet.',referencia,dia});
+ }}finally{v13BuscandoDia=false}
 }
 function editarInspiracao(){
- const dados=lerInspiracao();
- const versiculo=prompt('Escreva o texto do seu versículo (ou deixe vazio):',dados.versiculo||'');if(versiculo===null)return;
- const referencia=prompt('Referência bíblica (ex.: Salmos 23:1):',dados.referencia||'');if(referencia===null)return;
- const frase=prompt('Sua frase motivacional (vazio = frase do dia automática):',dados.frase||'');if(frase===null)return;
- localStorage.setItem('me-inspiracao-v12',JSON.stringify({versiculo:versiculo.slice(0,500),referencia:referencia.slice(0,90),frase:frase.slice(0,280)}));
- renderSidebar();
+ const d=lerInspiracao();
+ abrirModalSistema(`<div class="v13-editor"><h2>✦ Pausa para inspirar</h2><p>Escolha como deseja exibir seu versículo.</p>
+ <label for="v13-modo">Como escolher</label><select id="v13-modo" onchange="alternarModoInspiracao()"><option value="diario" ${d.modo==='diario'?'selected':''}>Versículo do dia (automático)</option><option value="buscar" ${d.modo==='buscar'?'selected':''}>Buscar na Bíblia por referência</option><option value="manual" ${!d.modo||d.modo==='manual'?'selected':''}>Escrever meu versículo</option></select>
+ <div id="v13-referencia-wrap"><label for="v13-ref">Livro, capítulo e versículo</label><input id="v13-ref" placeholder="Ex.: Salmos 23:1" value="${textoHTML(d.referencia||'Salmos 23:1')}"><button class="v13-buscar" type="button" onclick="pesquisarInspiracao()">⌕ Buscar passagem</button><small>Busca on-line na tradução Almeida disponibilizada pela Bible API. Algumas referências podem não estar disponíveis.</small></div>
+ <div id="v13-texto-wrap"><label for="v13-verso">Texto do versículo</label><textarea id="v13-verso" rows="4" placeholder="Digite ou busque uma passagem">${textoHTML(d.versiculo||'')}</textarea></div>
+ <label for="v13-frase">Sua frase motivacional (opcional)</label><textarea id="v13-frase" rows="2" placeholder="Em branco: mensagem automática">${textoHTML(d.frase||'')}</textarea>
+ <p id="v13-status" role="status" aria-live="polite"></p><div class="v13-actions"><button class="v13-cancel" onclick="fecharModalSistema()">Cancelar</button><button class="v13-save" onclick="salvarEditorInspiracao()">Salvar inspiração</button></div></div>`);
+ alternarModoInspiracao();
+}
+function alternarModoInspiracao(){const m=document.getElementById('v13-modo')?.value;
+ document.getElementById('v13-referencia-wrap').style.display=m==='buscar'?'block':'none';
+ document.getElementById('v13-texto-wrap').style.display=m==='diario'?'none':'block';
+}
+async function pesquisarInspiracao(){
+ const ref=document.getElementById('v13-ref').value.trim(),status=document.getElementById('v13-status');
+ if(!ref){status.textContent='Informe uma referência bíblica.';return}
+ status.textContent='Buscando passagem…';
+ try{const passagem=await buscarTextoBiblico(ref);document.getElementById('v13-ref').value=passagem.referencia;document.getElementById('v13-verso').value=passagem.versiculo;status.textContent='Passagem encontrada! Confira e salve.'}
+ catch(e){status.textContent='Não foi possível buscar a passagem. Confira a referência e a conexão, ou use o modo manual.'}
+}
+function salvarEditorInspiracao(){
+ const m=document.getElementById('v13-modo').value,frase=document.getElementById('v13-frase').value.trim().slice(0,280),old=lerInspiracao();
+ if(m==='diario'){salvarInspiracao({...old,modo:'diario',dia:'',frase});fecharModalSistema();atualizarVersiculoDoDia();return}
+ const versiculo=document.getElementById('v13-verso').value.trim(),referencia=document.getElementById('v13-ref').value.trim();
+ if(!versiculo){document.getElementById('v13-status').textContent='Digite ou busque um versículo antes de salvar.';return}
+ salvarInspiracao({modo:m,versiculo:versiculo.slice(0,1200),referencia:referencia.slice(0,120),frase});fecharModalSistema();
 }
 function abrirVisaoGeral(){espacoAtual="geral";telaAtual="visao_geral";renderSidebar();renderTela();fecharMenuMobile();}
 function trocarEspaco(esp){
