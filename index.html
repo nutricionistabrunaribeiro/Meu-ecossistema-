@@ -975,6 +975,16 @@ html[data-paleta-v04] .ciclo-dia.marcado{color:var(--tema-fundo)}
 
 /* Atualização 13 — editor de inspiração */
 .v13-editor{display:grid;gap:10px;color:var(--cor-texto);max-width:560px}.v13-editor h2{margin:0;color:var(--cor-texto)}.v13-editor p{margin:3px 0}.v13-editor label{font-weight:700;font-size:12px;margin-top:5px}.v13-editor input,.v13-editor select,.v13-editor textarea{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:11px;color:var(--cor-texto);padding:12px;font:inherit}.v13-editor small{display:block;color:var(--cor-texto-suave);font-size:11px;margin-top:7px}.v13-editor #v13-referencia-wrap,.v13-editor #v13-texto-wrap{min-width:0}.v13-buscar,.v13-save{background:var(--cor-primaria);color:var(--cor-fundo);border-radius:10px;padding:10px 14px;margin-top:8px;font-weight:700}.v13-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.v13-cancel{border:1px solid var(--cor-borda);padding:10px 14px;border-radius:10px}.v13-editor #v13-status{font-size:12px;color:var(--cor-texto-suave)}
+
+/* V14 — vidro translúcido, adaptável a todas as paletas */
+html[data-paleta-v04] #appRoot{background:radial-gradient(ellipse at 90% 4%,color-mix(in srgb,var(--cor-primaria) 15%,transparent),transparent 42%),radial-gradient(ellipse at 0% 85%,color-mix(in srgb,var(--cor-acento) 12%,transparent),transparent 48%),var(--cor-fundo)}
+html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,.v12-inspiracao,.system-modal,.modal-content,.horas-metrica){background:linear-gradient(145deg,color-mix(in srgb,var(--cor-superficie) 83%,transparent),color-mix(in srgb,var(--cor-superficie) 67%,transparent))!important;backdrop-filter:blur(18px) saturate(125%);-webkit-backdrop-filter:blur(18px) saturate(125%);border:1px solid color-mix(in srgb,var(--cor-texto) 15%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cor-texto) 8%,transparent),0 9px 26px rgba(0,0,0,.11)}
+html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,.v12-inspiracao){border-radius:19px}
+html[data-paleta-v04] :is(input,select,textarea){background:color-mix(in srgb,var(--cor-superficie) 73%,transparent);border-color:color-mix(in srgb,var(--cor-texto) 18%,transparent);color:var(--cor-texto)}
+html[data-paleta-v04] .v12-insp-verse{font-family:'Fraunces',Georgia,serif;font-size:17px;line-height:1.48;font-weight:600;padding:12px 13px;border-left:3px solid var(--cor-primaria);border-radius:9px;background:color-mix(in srgb,var(--cor-primaria) 10%,transparent)}
+html[data-paleta-v04] .v12-insp-ref{font-weight:700;color:var(--cor-primaria);margin:9px 0 14px}
+@supports not (backdrop-filter:blur(1px)){html[data-paleta-v04] .card{background:var(--cor-superficie)!important}}
+@media(prefers-reduced-transparency:reduce){html[data-paleta-v04] :is(.card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,.v12-inspiracao){background:var(--cor-superficie)!important;backdrop-filter:none;-webkit-backdrop-filter:none}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -2354,7 +2364,7 @@ async function novaVisita(clienteId=null){
   }
   const modelosAtivos=modelosChecklistOrdenados();
   if(!modelosAtivos.length){ alert('Crie e ative um modelo com pelo menos um item em Configurações.'); return; }
-  const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome} — ${resumoModeloChecklist(m)}`).join('\n')}\n\nChecklist Principal é o modelo completo. Digite o número:`, '1');
+  const escolhaModelo=prompt(`Selecione o checklist:\n${modelosAtivos.map((m,i)=>`${i+1}. ${m.nome} — ${resumoModeloChecklist(m)}`).join('\n')}\n\nEscolha o modelo pelo nome apresentado acima. Digite o número:`, '1');
   const modelo=modelosAtivos[parseInt(escolhaModelo)-1]; if(!modelo)return;
   const dataISO=await selecionarDataVisual({titulo:'Data de aplicação do checklist',valor:formatoISO(new Date()),opcional:false});
   if(!dataISO)return;const dataTxt=isoParaBRCompleto(dataISO);
@@ -2586,7 +2596,7 @@ function fichaVisitaHTML(v){
     const modeloCompleto=/principal/i.test(v.modeloNome||'');
     corpoEtapa = `
       <div class="autosave-bar"><span><span class="autosave-dot"></span>${statusRascunhoTexto()}</span><button class="btn-secundario" onclick="salvarChecklistAgora('${v.id}')">Salvar agora</button><button class="btn-secundario" onclick="abrirRevisaoRascunhos()">Ver sincronização</button></div>
-      ${modeloCompleto?'':`<div class="module-explainer" style="border-left:4px solid var(--cor-acento)"><strong>Modelo aberto: ${textoHTML(v.modeloNome||'Checklist de Auditoria - RDC')}.</strong> DML, Vestiários e Transporte fazem parte do <strong>Checklist Principal</strong>. Para utilizá-los, inicie um novo checklist e escolha a opção 1.</div>`}
+      ${modeloCompleto?'':`<div class="module-explainer" style="border-left:4px solid var(--cor-acento)"><strong>Modelo aberto: ${textoHTML(v.modeloNome||'Checklist de Auditoria - RDC')}.</strong> DML, Vestiários e Transporte dependem do modelo completo. Para utilizá-los, inicie um novo checklist e selecione o modelo correspondente pelo nome.</div>`}
       <div class="score-box">
         <div class="score-num ${pontuacao>=80?'score-boa':'score-baixa'}">${pontuacao}%</div>
         <div style="flex:1;">
@@ -2760,14 +2770,12 @@ async function gerarPDFVisita(v){
   }
   y += 27;
 
-  // Identidade fixa Bruna Ribeiro, independente do tema do aplicativo.
-  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(52,112,91);
-  doc.text('BRUNA RIBEIRO CONSULTORIA',105,y-2,{align:'center'});
-  y+=2;
+  // O logotipo já identifica a marca; não repetir o nome abaixo.
+
   doc.setFillColor(52,112,91);
   doc.roundedRect(margem,y,largura,12,2,2,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(12);
-  const tituloPdf=doc.splitTextToSize((v.modeloNome||'CHECKLIST DE INSPEÇÃO').toUpperCase(),largura-14);
+  const tituloPdf=doc.splitTextToSize((v.modeloNome||MODELOS_CHECKLIST?.find?.(m=>m.id===v.modeloId)?.nome||'CHECKLIST DE INSPEÇÃO').toUpperCase(),largura-14);
   doc.text(tituloPdf[0]||'CHECKLIST DE INSPEÇÃO',105,y+7.5,{align:'center'});
   y+=12;
   doc.setFillColor(227,98,22);doc.rect(margem,y,largura,1.1,'F');y+=7;
@@ -4291,7 +4299,7 @@ function editarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r
 async function salvarEdicaoControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id),inicioCampo=document.getElementById('horaEditInicio')?.value,fimCampo=document.getElementById('horaEditFim')?.value;if(!r||!inicioCampo||!fimCampo){alert('Informe início e término.');return;}const inicio=new Date(inicioCampo).toISOString(),fim=new Date(fimCampo).toISOString();if(new Date(fim)<new Date(inicio)){alert('O término não pode ser anterior ao início.');return;}const observacao=document.getElementById('horaEditObs')?.value.trim()||null;const {error}=await supa.from('controle_horas').update({inicio,fim,observacao,atualizado_em:new Date().toISOString()}).eq('id',id);if(error){dispararAutomacao('Erro ao corrigir registro',error.message);return;}Object.assign(r,{inicio,fim,observacao});fecharModalSistema();renderTela();}
 async function excluirControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||!confirm('Excluir definitivamente este registro de horas?'))return;const {error}=await supa.from('controle_horas').delete().eq('id',id);if(error){dispararAutomacao('Erro ao excluir registro',error.message);return;}CONTROLE_HORAS=CONTROLE_HORAS.filter(x=>x.id!==id);renderTela();}
 function registroHorasHTML(r){const d=new Date(r.inicio),cliente=clienteRegistroHoras(r);return `<div class="horas-lista-item"><div class="horas-data"><strong>${d.getDate()}</strong><span>${MESES_NOME[d.getMonth()].slice(0,3)}</span></div><div><div class="horas-item-titulo">${textoHTML(ROTULOS_HORAS[r.tipo]||r.tipo)}${cliente?' · '+textoHTML(cliente):''}</div><div class="horas-item-meta">${textoHTML(ROTULOS_CARTEIRA[r.carteira]||r.carteira)} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}–${r.fim?new Date(r.fim).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'em andamento'} · ${formatarDuracao(duracaoHorasMs(r))}${r.tipo==='deslocamento'?' · '+textoHTML(r.origem_texto||'Origem não informada')+' → '+textoHTML(r.destino_texto||'Destino não informado'):''}${r.observacao?' · '+textoHTML(r.observacao):''}</div></div><div class="horas-item-acoes">${r.fim?`<button onclick="editarControleHoras('${r.id}')">Editar</button>`:''}<button onclick="excluirControleHoras('${r.id}')" style="color:#B0413E">Excluir</button></div></div>`;}
-function controleHorasHTML(){const finalizados=CONTROLE_HORAS.filter(r=>r.fim&&dataHoraLocalInput(r.inicio).startsWith(mesControleHoras)),agora=new Date(),inicioSemana=new Date(agora);inicioSemana.setHours(0,0,0,0);inicioSemana.setDate(inicioSemana.getDate()-((inicioSemana.getDay()+6)%7));const semana=CONTROLE_HORAS.filter(r=>r.fim&&new Date(r.inicio)>=inicioSemana),soma=lista=>lista.reduce((s,r)=>s+duracaoHorasMs(r),0),visitas=finalizados.filter(r=>r.tipo==='visita'),admin=finalizados.filter(r=>r.tipo==='administrativo');return `${controleAtivoHTML()}${!atividadeHorasAtiva()?'<div style="margin-bottom:14px"><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div>':''}<div class="horas-resumo"><div class="horas-metrica"><strong>${formatarDuracao(soma(semana))}</strong><span>trabalhadas nesta semana</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(finalizados))}</strong><span>trabalhadas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(visitas))}</strong><span>em visitas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(admin))}</strong><span>administrativas no mês</span></div></div><div class="card"><div class="horas-filtros"><h3>Histórico mensal</h3><input type="month" value="${mesControleHoras}" onchange="mesControleHoras=this.value;renderTela()"></div>${finalizados.map(registroHorasHTML).join('')||'<div class="horas-vazio">Nenhuma atividade finalizada neste mês.</div>'}</div>`;}
+function controleHorasHTML(){const finalizados=CONTROLE_HORAS.filter(r=>r.fim&&dataHoraLocalInput(r.inicio).startsWith(mesControleHoras)),agora=new Date(),inicioSemana=new Date(agora);inicioSemana.setHours(0,0,0,0);inicioSemana.setDate(inicioSemana.getDate()-((inicioSemana.getDay()+6)%7));const semana=CONTROLE_HORAS.filter(r=>r.fim&&new Date(r.inicio)>=inicioSemana),soma=lista=>lista.reduce((s,r)=>s+duracaoHorasMs(r),0),visitas=finalizados.filter(r=>r.tipo==='visita'),admin=finalizados.filter(r=>r.tipo==='administrativo');return `${controleAtivoHTML()}<div class="horas-resumo"><div class="horas-metrica"><strong>${formatarDuracao(soma(semana))}</strong><span>trabalhadas nesta semana</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(finalizados))}</strong><span>trabalhadas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(visitas))}</strong><span>em visitas no mês</span></div><div class="horas-metrica"><strong>${formatarDuracao(soma(admin))}</strong><span>administrativas no mês</span></div></div><div class="card"><div class="horas-filtros"><h3>Histórico mensal</h3><input type="month" value="${mesControleHoras}" onchange="mesControleHoras=this.value;renderTela()"></div>${finalizados.map(registroHorasHTML).join('')||'<div class="horas-vazio">Nenhuma atividade finalizada neste mês.</div>'}</div>`;}
 function controleHorasDashboardHTML(){return controleAtivoHTML({dashboard:true});}
 
 function devocionalHTML(){
@@ -5315,14 +5323,45 @@ function visaoGeralHTML(){
  </div></section></div>`;
 }
 
+let SONO_SYNC_STATUS='Aguardando sincronização';
 function lerSono(){try{return JSON.parse(localStorage.getItem('me_sono_v1')||'[]')}catch(e){return []}}
-function salvarSono(){
+function gravarSonoLocal(registros){localStorage.setItem('me_sono_v1',JSON.stringify(registros));}
+async function sincronizarSono(){
+ if(typeof supa==='undefined'||!navigator.onLine)return;
+ try{
+  const {data:{user},error:authError}=await supa.auth.getUser();
+  if(authError||!user)return;
+  const {data:remotos,error}=await supa.from('registros_sono').select('data,dormir,acordar,horas,qualidade,updated_at').eq('user_id',user.id);
+  if(error){SONO_SYNC_STATUS='Sincronização pendente: configure a tabela registros_sono no Supabase.';return;}
+  const locais=lerSono(), mapa=new Map((remotos||[]).map(r=>[r.data,r]));
+  // Na primeira sincronização, preservar registros locais que ainda não estão na nuvem.
+  const faltantes=locais.filter(r=>r.data&&!mapa.has(r.data));
+  if(faltantes.length){
+   const {error:envioErro}=await supa.from('registros_sono').upsert(faltantes.map(r=>({user_id:user.id,data:r.data,dormir:r.dormir,acordar:r.acordar,horas:r.horas,qualidade:r.qualidade})),{onConflict:'user_id,data'});
+   if(envioErro){SONO_SYNC_STATUS='Não foi possível enviar registros locais';return;}
+   faltantes.forEach(r=>mapa.set(r.data,r));
+  }
+  gravarSonoLocal([...mapa.values()].map(({data,dormir,acordar,horas,qualidade})=>({data,dormir,acordar,horas,qualidade})));
+  SONO_SYNC_STATUS='Sincronizado com sua conta';
+  if(typeof telaAtual!=='undefined'&&telaAtual==='sono')renderTela();
+ }catch(e){SONO_SYNC_STATUS='Sincronização pendente';console.warn('Sono:',e);}
+}
+async function salvarSono(){
  const data=document.getElementById('sonoData').value,entrada=document.getElementById('sonoDormir').value,saida=document.getElementById('sonoAcordar').value,qualidade=document.getElementById('sonoQualidade').value;
  if(!data||!entrada||!saida){alert('Preencha data, horário de dormir e horário de acordar.');return;}
  const [h1,m1]=entrada.split(':').map(Number),[h2,m2]=saida.split(':').map(Number);
  let minutos=(h2*60+m2)-(h1*60+m1);if(minutos<=0)minutos+=1440;
  if(minutos>1200){alert('Confira os horários: o período ultrapassa 20 horas.');return;}
- const registros=lerSono().filter(x=>x.data!==data);registros.push({data,dormir:entrada,acordar:saida,horas:Math.round(minutos/6)/10,qualidade});localStorage.setItem('me_sono_v1',JSON.stringify(registros));renderTela();
+ const registro={data,dormir:entrada,acordar:saida,horas:Math.round(minutos/6)/10,qualidade};
+ const registros=lerSono().filter(x=>x.data!==data);registros.push(registro);gravarSonoLocal(registros);
+ SONO_SYNC_STATUS='Salvo neste aparelho; enviando à nuvem…';renderTela();
+ try{
+  const {data:{user}}=await supa.auth.getUser();if(!user)throw Error('Sem sessão');
+  const {error}=await supa.from('registros_sono').upsert({...registro,user_id:user.id},{onConflict:'user_id,data'});
+  if(error)throw error;
+  SONO_SYNC_STATUS='Sincronizado com sua conta';
+ }catch(e){SONO_SYNC_STATUS='Salvo neste aparelho. Sincronização pendente.';console.warn(e);}
+ renderTela();
 }
 function sonoHTML(){
  const hoje=new Date().toLocaleDateString('sv-SE'),mes=hoje.slice(0,7);
@@ -5333,7 +5372,7 @@ function sonoHTML(){
  <div class="v11-sono-intro"><div><span class="v11-eyebrow">☾ CUIDADO PESSOAL</span><h2>Meu Sono</h2><p>Acompanhe suas noites e seu descanso.</p></div><span class="v11-moon">☾</span></div>
  <div class="v11-sono-stats"><div class="v11-sono-stat"><span>☾ Hora de dormir</span><strong>${ultima?textoHTML(ultima.dormir):'—'}</strong><small>Último registro</small></div><div class="v11-sono-stat"><span>☀ Hora de acordar</span><strong>${ultima?textoHTML(ultima.acordar):'—'}</strong><small>Último registro</small></div></div>
  <div class="v11-sono-total"><span>✦ Média de descanso neste mês</span><strong>${media}${media==='—'?'':' h'}</strong><small>${lista.length} ${lista.length===1?'noite registrada':'noites registradas'}</small></div>
- <section class="card v11-sono-form"><h3>Registrar uma noite</h3><p>Preencha os horários para atualizar seu histórico.</p><div class="form-grid"><div class="form-field"><label>Data do despertar</label><input type="date" id="sonoData" value="${hoje}"></div><div class="form-field"><label>Qualidade percebida</label><select id="sonoQualidade"><option>Boa</option><option>Regular</option><option>Ruim</option></select></div><div class="form-field"><label>Hora de dormir</label><input type="time" id="sonoDormir" value="23:00"></div><div class="form-field"><label>Hora de acordar</label><input type="time" id="sonoAcordar" value="07:00"></div></div><button class="btn-primario" onclick="salvarSono()">Salvar noite</button><p class="v11-sono-note">Os registros ainda são salvos somente neste navegador. A sincronização entre aparelhos exige uma integração adicional com o Supabase.</p></section>
+ <section class="card v11-sono-form"><h3>Registrar uma noite</h3><p>Preencha os horários para atualizar seu histórico.</p><div class="form-grid"><div class="form-field"><label>Data do despertar</label><input type="date" id="sonoData" value="${hoje}"></div><div class="form-field"><label>Qualidade percebida</label><select id="sonoQualidade"><option>Boa</option><option>Regular</option><option>Ruim</option></select></div><div class="form-field"><label>Hora de dormir</label><input type="time" id="sonoDormir" value="23:00"></div><div class="form-field"><label>Hora de acordar</label><input type="time" id="sonoAcordar" value="07:00"></div></div><button class="btn-primario" onclick="salvarSono()">Salvar noite</button><p class="v11-sono-note">${textoHTML(SONO_SYNC_STATUS)}</p></section>
  <section class="card v11-sono-history"><h3>Histórico de ${mes.split('-').reverse().join('/')}</h3>${lista.map(x=>`<div class="v11-noite"><span>☾ <strong>${x.data.split('-').reverse().join('/')}</strong><small>${textoHTML(x.dormir)} – ${textoHTML(x.acordar)} · ${textoHTML(x.qualidade)}</small></span><strong>${x.horas} h</strong></div>`).join('')||'<p>Sem registros neste mês.</p>'}</section></div>`;
 }
 
@@ -5763,6 +5802,7 @@ async function entrarNoApp(){
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').classList.add('ativo');
   await carregarPerfilSupabase();
+  await sincronizarSono();
   await carregarTemaMarcaSupabase();
   await carregarClientesSupabase();
   await carregarEnviosMensaisSupabase();
