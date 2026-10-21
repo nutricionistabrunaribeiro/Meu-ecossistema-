@@ -955,6 +955,23 @@ html[data-paleta-v04] .ciclo-dia.marcado{color:var(--tema-fundo)}
 .v11-sono-form,.v11-sono-history{padding:21px!important}.v11-sono-form h3,.v11-sono-history h3{margin-bottom:9px}.v11-sono-form>p{margin-bottom:16px}.v11-sono-form .btn-primario{margin-top:12px}.v11-sono-note{font-size:11px!important;margin:14px 0 0!important;color:var(--cor-texto-suave)}.v11-noite{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--cor-borda)}.v11-noite:last-child{border:0}.v11-noite span{display:grid;gap:5px}.v11-noite small{font-size:11px;color:var(--cor-texto-suave)}
 @media(max-width:980px){.v11-links{grid-template-columns:repeat(2,minmax(0,1fr))}.v11-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){.v11-links{grid-template-columns:1fr}.v11-kpi{padding:12px}.v11-welcome,.v11-sono-intro{padding:17px}.v11-sono-stat{padding:15px}}
+
+/* V12 — Ajustes mobile, campos temáticos e inspiração no menu */
+.v12-global-settings{padding:0 12px}
+.v12-global-settings button{width:100%;padding:11px;border-radius:10px;border:1px solid var(--cor-borda);background:color-mix(in srgb,var(--cor-acento) 12%,var(--cor-superficie));color:var(--cor-texto);font-size:12px;text-align:center}
+.v12-global-settings button.active{border-color:var(--cor-primaria);color:var(--cor-primaria)}
+.v12-inspiracao{margin-top:auto;border:1px solid var(--cor-borda);border-radius:15px;padding:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--cor-primaria) 15%,var(--cor-superficie)),color-mix(in srgb,var(--cor-acento) 9%,var(--cor-superficie)));color:var(--cor-texto)}
+.v12-insp-title{font-family:'Fraunces',serif;font-weight:700;font-size:14px;margin-bottom:14px}.v12-insp-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--cor-primaria);margin:12px 0 6px}
+.v12-insp-verse,.v12-insp-frase{font-size:12px;line-height:1.55;overflow-wrap:anywhere;color:var(--cor-texto)}.v12-insp-ref{display:block;margin-top:5px;color:var(--cor-texto-suave)}.v12-insp-edit{font-size:11px;color:var(--cor-primaria);margin-top:12px;text-decoration:underline;text-align:left}
+.mercado-add input,.mercado-card-dashboard .mercado-add input,.mercado-add input:focus{background:var(--cor-superficie)!important;color:var(--cor-texto)!important;border-color:var(--cor-borda)!important;box-shadow:none;min-width:0}
+.mercado-add input::placeholder{color:var(--cor-texto-suave);opacity:.85}
+.v11-sono-form,.v11-sono-history{min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+.v11-sono-form .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.v11-sono-form .form-field{min-width:0;max-width:100%;width:100%}
+.v11-sono-form .form-field input,.v11-sono-form .form-field select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:48px;background:var(--cor-superficie)!important;color:var(--cor-texto)!important;border:1px solid var(--cor-borda);border-radius:12px;font-size:16px;padding:10px 12px}
+.v11-sono-form .form-field input[type=date],.v11-sono-form .form-field input[type=time]{-webkit-appearance:none;appearance:none}
+.v11-noite{min-width:0}.v11-noite>span{min-width:0;overflow-wrap:anywhere}.v11-noite>strong{white-space:nowrap}
+@media(max-width:700px){.v11-sono-form .form-grid{grid-template-columns:minmax(0,1fr)!important}.v11-sono-form,.v11-sono-history{padding:17px!important}.v11-sono-form .form-field input,.v11-sono-form .form-field select{width:100%!important;min-width:0!important;max-width:100%!important}.v11-sono-form .btn-primario{width:100%}.mercado-add{grid-template-columns:minmax(0,1fr) minmax(0,95px)!important}.mercado-add button{grid-column:1/-1;width:100%}.v11-noite{align-items:flex-start}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -1047,9 +1064,6 @@ const MODULOS = {
       {id:"produtos_rotulagem", nome:"Produtos e Rotulagem"},
       {id:"rotas_custos", nome:"Rotas e Custos"},
     ]},
-    {grupo:"Sistema", itens:[
-      {id:"configuracoes", nome:"Configurações"},
-    ]},
   ],
   pessoal: [
     {grupo:"Vida Pessoal", itens:[
@@ -1117,6 +1131,7 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
+    <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
       <button class="${espacoAtual==='pessoal'?'active':''}" onclick="trocarEspaco('pessoal')">Pessoal</button>
@@ -1128,7 +1143,7 @@ function renderSidebar(){
       html += `<button class="${telaAtual===it.id?'active':''}" onclick="irPara('${it.id}')"><span class="nav-icon">${ICONES_MODULO[it.id]||'•'}</span><span class="nav-text">${it.nome}</span>${contadores[it.id]?'<span class="nav-badge">'+contadores[it.id]+'</span>':''}</button>`;
     });
   });
-  html += `</nav>`;
+  html += `</nav><div class="v12-inspiracao" id="v12-inspiracao">${inspiracaoSidebarHTML()}</div>`;
   document.getElementById('sidebarDesktop').innerHTML = html;
 
   const mobileWrap = document.getElementById('sidebarMobileWrap');
@@ -1140,6 +1155,35 @@ function renderSidebar(){
   mobileWrap.appendChild(aside);
 }
 
+function abrirConfiguracoesGlobais(){
+  espacoAtual='trabalho';telaAtual='configuracoes';renderSidebar();renderTela();fecharMenuMobile();
+}
+const V12_FRASES=[
+  'Um pequeno avanço também é progresso.',
+  'Organize o que importa e respeite o seu ritmo.',
+  'A constância constrói o que a pressa não consegue.',
+  'Hoje é uma nova oportunidade de recomeçar.',
+  'Cuide de você enquanto cuida dos seus sonhos.'
+];
+function lerInspiracao(){try{return JSON.parse(localStorage.getItem('me-inspiracao-v12')||'{}')}catch(e){return {}}}
+function inspiracaoSidebarHTML(){
+ const dados=lerInspiracao(),dia=Math.floor(Date.now()/86400000);
+ const frase=dados.frase||V12_FRASES[dia%V12_FRASES.length];
+ return `<div class="v12-insp-title">✦ Pausa para inspirar</div>
+ <div class="v12-insp-label">Versículo escolhido</div>
+ <p class="v12-insp-verse">${textoHTML(dados.versiculo||'Adicione um versículo que fale ao seu coração.')}</p>
+ ${dados.referencia?`<small class="v12-insp-ref">${textoHTML(dados.referencia)}</small>`:''}
+ <div class="v12-insp-label">Mensagem do dia</div><p class="v12-insp-frase">${textoHTML(frase)}</p>
+ <button class="v12-insp-edit" onclick="editarInspiracao()">✎ Personalizar inspiração</button>`;
+}
+function editarInspiracao(){
+ const dados=lerInspiracao();
+ const versiculo=prompt('Escreva o texto do seu versículo (ou deixe vazio):',dados.versiculo||'');if(versiculo===null)return;
+ const referencia=prompt('Referência bíblica (ex.: Salmos 23:1):',dados.referencia||'');if(referencia===null)return;
+ const frase=prompt('Sua frase motivacional (vazio = frase do dia automática):',dados.frase||'');if(frase===null)return;
+ localStorage.setItem('me-inspiracao-v12',JSON.stringify({versiculo:versiculo.slice(0,500),referencia:referencia.slice(0,90),frase:frase.slice(0,280)}));
+ renderSidebar();
+}
 function abrirVisaoGeral(){espacoAtual="geral";telaAtual="visao_geral";renderSidebar();renderTela();fecharMenuMobile();}
 function trocarEspaco(esp){
   espacoAtual = esp;
