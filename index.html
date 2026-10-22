@@ -1198,6 +1198,7 @@ const MODULOS = {
     {grupo:"Vida Pessoal", itens:[
       {id:"projetos", nome:"Projetos"},
       {id:"minha_clareza", nome:"Minha Clareza"},
+      {id:"carga_mental", nome:"Minha Carga Mental"},
       {id:"habitos", nome:"Hábitos"},
       {id:"ciclo", nome:"Ciclo Menstrual"},
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
@@ -1221,7 +1222,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',carga_mental:'🧠',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -5622,6 +5623,70 @@ function clarezaAlternarVozV23(){
 clarezaCarregarV23();
 setTimeout(()=>clarezaSincronizarV23(),3500);
 
+
+/* V26 — Minha Carga Mental: registro consciente, sem estimativas inventadas. */
+let CARGA_V26=[];
+const CARGA_KEY_V26='me_carga_mental_v26';
+function cargaCarregarV26(){try{CARGA_V26=JSON.parse(localStorage.getItem(CARGA_KEY_V26)||'[]')}catch(e){CARGA_V26=[]}}
+function cargaGuardarV26(){localStorage.setItem(CARGA_KEY_V26,JSON.stringify(CARGA_V26))}
+function cargaMentalHTMLV26(){
+ const semana=Date.now()-7*86400000;
+ const recentes=CARGA_V26.filter(x=>new Date(x.criado_em).getTime()>=semana);
+ const abertas=recentes.filter(x=>!x.concluido).length;
+ const minutos=recentes.reduce((a,x)=>a+(Number(x.minutos)||0),0);
+ const areas={trabalho:'Trabalho',casa:'Casa',pessoal:'Pessoal',familia:'Família'};
+ const dimensoes={planejar:'Planejar',lembrar:'Lembrar',acompanhar:'Acompanhar',executar:'Executar',decidir:'Decidir'};
+ const linhas=Object.entries(areas).map(([k,n])=>`<p style="margin:8px 0">${n}: <strong>${recentes.filter(x=>x.area===k).length}</strong> registros</p>`).join('');
+ return `<div class="v11-overview"><header class="v11-welcome"><div><span class="v11-eyebrow">✧ VIDA PESSOAL</span><h2>Minha Carga Mental</h2><p>Registre também o que você precisa lembrar, decidir e acompanhar — não só executar.</p></div><span>🧠</span></header>
+ <section class="card" style="padding:20px"><h3>Últimos 7 dias</h3><div class="v11-kpis"><div class="v11-kpi"><span class="v11-kpi-label">Responsabilidades registradas</span><strong>${recentes.length}</strong></div><div class="v11-kpi"><span class="v11-kpi-label">Ainda em aberto</span><strong>${abertas}</strong></div><div class="v11-kpi"><span class="v11-kpi-label">Tempo informado</span><strong>${minutos} min</strong></div></div>${linhas}<small>Os números refletem apenas seus registros; esforço percebido não equivale a tempo medido.</small></section>
+ <section class="card" style="padding:20px"><h3>Registrar uma responsabilidade</h3><p>Uma decisão, preocupação prática, planejamento ou tarefa que depende de você.</p>
+ <div class="form-field"><label for="cargaTituloV26">O que está sob sua responsabilidade?</label><input id="cargaTituloV26" maxlength="300" placeholder="Ex.: lembrar de agendar a consulta"></div>
+ <div class="form-grid"><div class="form-field"><label for="cargaAreaV26">Área</label><select id="cargaAreaV26">${Object.entries(areas).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></div>
+ <div class="form-field"><label for="cargaDimV26">Tipo de esforço</label><select id="cargaDimV26">${Object.entries(dimensoes).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></div>
+ <div class="form-field"><label for="cargaEsforcoV26">Carga mental percebida (1 a 5)</label><select id="cargaEsforcoV26">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===3?'selected':''}>${n}</option>`).join('')}</select></div>
+ <div class="form-field"><label for="cargaMinV26">Minutos dedicados (opcional)</label><input type="number" id="cargaMinV26" min="0" max="1440" placeholder="Não estimar automaticamente"></div></div>
+ <button class="btn-primario" onclick="cargaSalvarV26()">Registrar</button><p id="cargaStatusV26" aria-live="polite"></p></section>
+ <section class="card" style="padding:20px"><h3>Minhas responsabilidades</h3>${CARGA_V26.slice().sort((a,b)=>b.criado_em.localeCompare(a.criado_em)).map(x=>`<article class="v23-registro"><strong>${textoHTML(x.titulo)}</strong><p>${areas[x.area]||'Pessoal'} · ${dimensoes[x.dimensao]||'Planejar'} · Esforço ${x.esforco}/5 ${x.minutos!==null&&x.minutos!==undefined?'· '+x.minutos+' min':''}</p><small>${new Date(x.criado_em).toLocaleDateString('pt-BR')} · ${x.concluido?'Concluído':'Em aberto'}</small><div class="v23-registro-acoes"><button class="btn-secundario" onclick="cargaAlternarV26('${x.id}')">${x.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="cargaExcluirV26('${x.id}')">Excluir</button></div></article>`).join('')||'<p>Nenhum registro ainda. Comece por algo que você costuma carregar na cabeça.</p>'}</section></div>`;
+}
+async function cargaSalvarV26(){
+ const titulo=document.getElementById('cargaTituloV26')?.value.trim();
+ if(!titulo){mostrarToast('Descreva a responsabilidade.');return}
+ const campo=document.getElementById('cargaMinV26');
+ const minutos=campo?.value.trim()?Number(campo.value):null;
+ if(minutos!==null&&(!Number.isInteger(minutos)||minutos<0||minutos>1440)){mostrarToast('Informe minutos entre 0 e 1440.');return}
+ const item={id:crypto.randomUUID(),titulo,area:document.getElementById('cargaAreaV26').value,dimensao:document.getElementById('cargaDimV26').value,esforco:Number(document.getElementById('cargaEsforcoV26').value),minutos,concluido:false,criado_em:new Date().toISOString()};
+ CARGA_V26.push(item);cargaGuardarV26();await cargaEnviarV26(item);renderTela();mostrarToast('Responsabilidade registrada 💜');
+}
+async function cargaEnviarV26(item){
+ const user=await clarezaUsuarioV23();
+ if(!user){return}
+ const {error}=await supa.from('carga_mental_registros').upsert({...item,user_id:user.id});
+ if(error)console.warn('Sincronização carga mental pendente',error);
+}
+async function cargaSincronizarV26(){
+ const user=await clarezaUsuarioV23();if(!user)return;
+ try{
+ const {data,error}=await supa.from('carga_mental_registros').select('id,titulo,area,dimensao,esforco,minutos,concluido,criado_em').eq('user_id',user.id);
+ if(error)throw error;
+ const remoto=new Map((data||[]).map(x=>[x.id,x]));
+ for(const x of CARGA_V26){if(!remoto.has(x.id)){await cargaEnviarV26(x);remoto.set(x.id,x)}}
+ CARGA_V26=[...remoto.values()];cargaGuardarV26();
+ if(telaAtual==='carga_mental')renderTela();
+ }catch(e){console.warn('Carga mental: sincronização pendente',e)}
+}
+async function cargaAlternarV26(id){
+ const x=CARGA_V26.find(y=>y.id===id);if(!x)return;x.concluido=!x.concluido;cargaGuardarV26();await cargaEnviarV26(x);renderTela();
+}
+async function cargaExcluirV26(id){
+ if(!confirm('Excluir esta responsabilidade?'))return;
+ CARGA_V26=CARGA_V26.filter(x=>x.id!==id);cargaGuardarV26();
+ const user=await clarezaUsuarioV23();if(user){const {error}=await supa.from('carga_mental_registros').delete().eq('id',id).eq('user_id',user.id);if(error)mostrarToast('Exclusão local; sincronização pendente.')}
+ renderTela();
+}
+cargaCarregarV26();
+window.addEventListener('online',()=>cargaSincronizarV26());
+setTimeout(()=>cargaSincronizarV26(),2500);
+
 function visaoGeralHTML(){
  const hoje=new Date().toLocaleDateString('sv-SE');
  const tarefas=(typeof LISTA_DIA!=='undefined'?LISTA_DIA:[])||[];
@@ -5649,6 +5714,7 @@ function visaoGeralHTML(){
  ${atalho('▤','Entregas e documentos','Relatórios e obrigações','trabalho','entregas')}
  </div></section>
  <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Vida Pessoal</h3><p>Rotina, cuidado e desenvolvimento</p></div></div><div class="v11-links">
+ ${atalho('🧠','Minha Carga Mental','O esforço que ninguém vê','pessoal','carga_mental')}
  ${atalho('✧','Hábitos e consistência','Seu mapa de evolução','pessoal','habitos')}
  ${atalho('◒','Estudos e leitura','Aprendizado e progresso','pessoal','estudos')}
  ${atalho('☾','Sono e descanso','Diário e histórico','pessoal','sono')}
@@ -5715,7 +5781,7 @@ function sonoHTML(){
 }
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
+  const [titulo, sub] = telaAtual==='carga_mental'?['Minha Carga Mental','Enxergue o esforço por trás da rotina']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
@@ -5734,6 +5800,7 @@ function renderTela(){
 
   if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
+  else if(telaAtual === 'carga_mental'){document.getElementById('conteudoTela').innerHTML=cargaMentalHTMLV26();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
   else if(telaAtual === 'dashboard'){
     document.getElementById('conteudoTela').innerHTML = dashboardHTML();
