@@ -1,0 +1,1 @@
+Atualização 22 — Agenda diária em linha do tempo compacta. Toque no compromisso para abrir detalhes e Concluir/Reabrir. As visões semanal e mensal continuam como antes. Não requer alterações no Supabase. Validação: sintaxe JS, não teste visual em iPhone.

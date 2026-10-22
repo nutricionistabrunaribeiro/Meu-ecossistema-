@@ -1071,6 +1071,22 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 .v21-agua-historico{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.v21-agua-historico span{padding:5px 8px;border:1px solid var(--cor-borda);border-radius:10px;font-size:11px}.v21-agua-historico button{margin-left:5px;color:var(--cor-texto-suave)}
 .v21-cycle-title{display:block;font-family:Fraunces,serif;font-size:clamp(20px,3vw,27px);margin-top:26px}.v21-open-cycle{display:inline-block;margin-top:14px}.v21-mini-label{font-size:11px;color:var(--cor-texto-suave)}
 @media(max-width:680px){.v21-saude-grid{grid-template-columns:1fr}.v21-health-card{padding:16px}}
+</style><style id="v22-agenda-timeline">
+.v22-agenda-timeline{gap:9px!important}
+.v22-agenda-linha{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:stretch;gap:10px}
+.v22-agenda-hora{padding-top:18px;text-align:center;font-family:'Fraunces',serif;font-size:15px;color:var(--cor-primaria);font-variant-numeric:tabular-nums}
+.v22-agenda-item{width:100%;min-width:0;display:flex;align-items:center;gap:12px;text-align:left;border:1px solid var(--cor-borda);border-radius:17px;padding:14px 13px;background:color-mix(in srgb,var(--cor-superficie) 76%,transparent);color:var(--cor-texto);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);cursor:pointer;transition:background .2s,transform .2s}
+.v22-agenda-item:active{transform:scale(.99)}.v22-agenda-item:focus-visible{outline:2px solid var(--cor-primaria);outline-offset:2px}
+.v22-agenda-faixa{width:5px;min-width:5px;align-self:stretch;min-height:35px;border-radius:8px}
+.v22-agenda-conteudo{display:block;flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px;line-height:1.45}
+.v22-agenda-conteudo strong{display:block;font-size:14px;line-height:1.35}
+.v22-agenda-conteudo .agenda-tipo{font-size:12px;margin-top:3px}
+.v22-agenda-conteudo .agenda-detalhe{font-size:12px}
+.v22-agenda-seta{font-size:26px;line-height:1;color:var(--cor-texto-suave)}
+.v22-agenda-item.concluido{opacity:.72}
+.v22-modal-resumo{padding:18px;border-radius:14px;border:1px solid var(--cor-borda);margin:16px 0;overflow-wrap:anywhere}
+.v22-modal-acoes{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:520px){.v22-agenda-linha{grid-template-columns:48px minmax(0,1fr);gap:7px}.v22-agenda-item{padding:12px 10px;gap:9px}.v22-agenda-hora{font-size:14px}.v22-agenda-conteudo strong{font-size:13px}}
 </style></head>
 <body data-espaco="trabalho">
 
@@ -1539,7 +1555,7 @@ function agendaDiaHTML(){
   return `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(-1)">‹</button><button class="agenda-hoje" onclick="irDiaHoje()">Hoje</button></div><div class="agenda-periodo-label">${DIAS_SEMANA[d.getDay()]}, ${isoParaBRCompleto(dataAgendaDiaria)}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(1)">›</button></div></div>
   ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${i.titulo}</span>`).join('')}</section>`:''}
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-primario" onclick="abrirFormularioAgenda('${dataAgendaDiaria}',${Math.min(19,Math.max(7,new Date().getHours()))})">+ Novo compromisso</button></div>
-  <div class="agenda-dia-cards">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="agenda-dia-card ${e.concluido?'concluido':''}"><div class="agenda-dia-hora">${String(e.hora).padStart(2,'0')}:00</div><div class="agenda-dia-cor" style="background:${cat.cor}"></div><div>${eventoResumoHTML(e)}</div><button class="btn-secundario" onclick="alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
+  <div class="agenda-dia-cards v22-agenda-timeline">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="v22-agenda-linha"><div class="v22-agenda-hora">${String(e.hora).padStart(2,'0')}:00</div><button type="button" class="v22-agenda-item ${e.concluido?'concluido':''}" onclick="abrirDetalheAgendaV22('${e.id}')" aria-label="Abrir compromisso das ${String(e.hora).padStart(2,'0')} horas"><span class="v22-agenda-faixa" style="background:${cat.cor}"></span><span class="v22-agenda-conteudo">${eventoResumoHTML(e)}</span><span class="v22-agenda-seta">›</span></button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
 }
 
 function agendaSemanaHTML(){
@@ -1626,6 +1642,15 @@ function selecionarCategoriaEvento(cat){
 const TIPOS_EVENTO_UI=[['visita','Visita'],['reuniao','Reunião'],['treinamento','Treinamento'],['demanda','Demanda administrativa'],['pessoal','Compromisso pessoal'],['financeiro','Financeiro'],['outro','Outro']];
 function rotuloTipoEvento(tipo){return TIPOS_EVENTO_UI.find(t=>t[0]===tipo)?.[1]||'Compromisso';}
 function nomeClienteEvento(e){return e.clienteNomeVinculado||e.clienteExterno||'';}
+function abrirDetalheAgendaV22(id){
+ const e=eventosSemana.find(item=>String(item.id)===String(id));
+ if(!e)return;
+ const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);
+ const horario=String(e.hora).padStart(2,'0')+':00';
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>Compromisso · ${horario}</h2><p>${textoHTML(cat.nome)}</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>
+ <div class="v22-modal-resumo">${eventoResumoHTML(e)}<p>${e.concluido?'Concluído':'Em aberto'}</p></div>
+ <div class="v22-modal-acoes"><button class="btn-primario" onclick="fecharModalSistema();alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="fecharModalSistema()">Fechar</button></div>`);
+}
 function eventoResumoHTML(e,compacto=false){const cliente=nomeClienteEvento(e),tipo=rotuloTipoEvento(e.tipo),detalhe=e.titulo&&e.titulo!==tipo?e.titulo:'';return `${cliente?`<strong${compacto?' style="font-size:inherit"':''}>${textoHTML(cliente)}</strong>`:''}<div class="agenda-tipo">${textoHTML(tipo)}</div>${detalhe?`<div${compacto?' class="agenda-detalhe"':''}>${textoHTML(detalhe)}</div>`:''}`;}
 function eventoResumoTexto(e){return [nomeClienteEvento(e),rotuloTipoEvento(e.tipo),e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?e.titulo:''].filter(Boolean).join(' · ');}
 function categoriaPorTipo(tipo,clienteId){
