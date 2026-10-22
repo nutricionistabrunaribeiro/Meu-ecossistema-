@@ -1044,6 +1044,7 @@ html[data-paleta-v04] #appRoot :is(.card,.v11-overview-card,.v11-atalho,.v11-lin
 html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;color:var(--cor-texto)}
 .v19-doc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.v19-doc-top h3{margin:0 0 5px}.v19-doc-top p{margin:0;color:var(--cor-texto-suave);font-size:12px}.v19-legenda{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.v19-situacao{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.v19-situacao.verde{color:#9ce8b7;background:rgba(30,130,73,.24);border:1px solid rgba(91,210,133,.4)}.v19-situacao.laranja{color:#ffcf89;background:rgba(172,101,16,.24);border:1px solid rgba(240,161,54,.42)}.v19-situacao.vermelho{color:#ffadb0;background:rgba(170,39,52,.25);border:1px solid rgba(234,94,101,.4)}.v19-situacao.neutro{color:var(--cor-texto-suave);background:rgba(160,160,160,.12);border:1px solid var(--cor-borda)}.v19-filtro{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px}.v19-filtro select{max-width:240px}.v19-table-wrap{width:100%;overflow-x:auto;border-radius:13px;border:1px solid var(--cor-borda)}.v19-doc-table{width:100%;border-collapse:collapse;min-width:580px;text-align:left}.v19-doc-table th{padding:12px 10px;font-size:11px;background:rgba(255,255,255,.07);color:var(--cor-texto)}.v19-doc-table td{padding:11px 10px;font-size:12px;border-top:1px solid var(--cor-borda);vertical-align:middle}.v19-doc-table td small{display:block;color:var(--cor-texto-suave);font-size:10px;margin-top:3px}.v19-doc-table tr:hover td{background:rgba(255,255,255,.035)}.v19-editar{border:1px solid var(--cor-borda);border-radius:9px;padding:7px 11px;color:var(--cor-texto);background:rgba(255,255,255,.07);cursor:pointer}
 
+.v24-previa{margin-top:18px;padding:16px;border:1px solid var(--cor-borda);border-radius:18px}.v24-item{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--cor-borda)}.v24-item input:not([type=checkbox]),.v24-item select{width:100%;min-width:0;padding:10px;border:1px solid var(--cor-borda);border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto)}
 </style>
 <meta name="ecossistema-release" content="19-glass-tabela-documental">
 
@@ -5509,8 +5510,8 @@ function minhaClarezaHTML(){
  <button type="button" class="v23-microfone ${clarezaOuvindoV23?'gravando':''}" id="v23BotaoVoz" onclick="clarezaAlternarVozV23()" aria-label="${clarezaOuvindoV23?'Parar ditado':'Iniciar ditado'}">🎙️</button>
  <p id="v23VozStatus" aria-live="polite">${clarezaOuvindoV23?'Ouvindo... toque para parar':'Toque para falar'}</p>
  <label for="v23Texto" class="v23-label">Seu pensamento</label><textarea id="v23Texto" rows="5" placeholder="Pode falar ou escrever sem organizar nada..."></textarea>
- <div class="v23-acoes"><button class="btn-primario" onclick="clarezaSalvarV23()">Guardar pensamento</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
- <small id="v23Sync">${textoHTML(clarezaSyncV23)}</small></section>
+ <div class="v23-acoes"><button class="btn-primario" onclick="clarezaPrepararV24()">Organizar para revisar</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
+ <div id="v24Previa" class="v24-previa" hidden></div><small id="v23Sync">${textoHTML(clarezaSyncV23)}</small></section>
  <section class="card v23-lista"><div class="v23-lista-topo"><h3>Meus pensamentos</h3><span>${CLAREZA_ITENS_V23.filter(x=>x.status!=='resolvido').length} em aberto</span></div>
  ${CLAREZA_ITENS_V23.slice().sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em))).map(x=>`<article class="v23-registro ${x.status==='resolvido'?'resolvido':''}"><p>${textoHTML(x.texto)}</p><small>${new Date(x.criado_em).toLocaleDateString('pt-BR')} · ${grupos[x.categoria]||'Para organizar'}</small><div class="v23-registro-acoes"><label>Organizar como <select aria-label="Categoria do pensamento" onchange="clarezaAlterarV23('${x.id}','categoria',this.value)">${Object.entries(grupos).map(([k,v])=>`<option value="${k}" ${x.categoria===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-secundario" onclick="clarezaAlterarV23('${x.id}','status','${x.status==='resolvido'?'pendente':'resolvido'}')">${x.status==='resolvido'?'Reabrir':'Resolvido'}</button><button class="btn-secundario" onclick="clarezaExcluirV23('${x.id}')">Excluir</button></div></article>`).join('')||'<p>Este espaço está prontinho para receber seu primeiro pensamento. 💜</p>'}
  </section></div>`;
@@ -5528,6 +5529,27 @@ async function clarezaSincronizarV23(){
  }catch(e){clarezaSyncV23='Salvo neste aparelho · sincronização pendente';console.warn('Minha Clareza:',e)}
 }
 async function clarezaEnviarV23(item){const user=await clarezaUsuarioV23();if(!user)return;try{const {error}=await supa.from('minha_clareza').upsert({...item,user_id:user.id});if(error)throw error;clarezaSyncV23='Sincronizado com sua conta'}catch(e){clarezaSyncV23='Salvo neste aparelho · sincronização pendente'}}
+let clarezaSugestoesV24=[];
+function clarezaFecharPreviaV24(){const el=document.getElementById("v24Previa");if(el)el.hidden=true}
+function clarezaPrepararV24(){
+ const texto=document.getElementById('v23Texto')?.value.trim();if(!texto){mostrarToast('Fale ou escreva primeiro.');return}
+ // Classificação local por regras: não se apresenta como inteligência artificial.
+ const partes=texto.split(/(?:[\n;]+|\.\s+|,\s+(?=(?:preciso|tenho que|comprar|marcar|lembrar|quero)\b))/i).map(x=>x.trim()).filter(Boolean);
+ clarezaSugestoesV24=partes.map((trecho,i)=>{const t=trecho.toLowerCase();return {titulo:trecho,tipo:/comprar|lista de compras/.test(t)?'checklist':/ideia|pensei em|criar um aplicativo/.test(t)?'ideia':/marcar|agendar|consulta|reunião/.test(t)?'compromisso':/lembrar/.test(t)?'lembrete':'tarefa',ambiente:/cliente|fábrica|manual|trabalho|relatório|consultoria|nutricion/.test(t)?'trabalho':'pessoal',categoria:'geral',aprovado:true}});
+ clarezaRenderPreviaV24();
+}
+function clarezaRenderPreviaV24(){
+ const el=document.getElementById('v24Previa');if(!el)return;el.hidden=false;
+ el.innerHTML='<h3>Revise antes de salvar</h3><p>Organização sugerida automaticamente por regras. Edite tudo antes de aprovar.</p>'+clarezaSugestoesV24.map((x,i)=>`<div class="v24-item"><label><input type="checkbox" ${x.aprovado?'checked':''} onchange="clarezaSugestoesV24[${i}].aprovado=this.checked"> Incluir</label><input aria-label="Título" value="${textoHTML(x.titulo).replace(/&quot;/g,'&quot;')}" oninput="clarezaSugestoesV24[${i}].titulo=this.value"><select onchange="clarezaSugestoesV24[${i}].tipo=this.value">${['tarefa','checklist','ideia','lembrete','compromisso','nota'].map(t=>`<option ${t===x.tipo?'selected':''}>${t}</option>`).join('')}</select><select onchange="clarezaSugestoesV24[${i}].ambiente=this.value"><option ${x.ambiente==='pessoal'?'selected':''}>pessoal</option><option ${x.ambiente==='trabalho'?'selected':''}>trabalho</option></select></div>`).join('')+'<button class="btn-primario" onclick="clarezaAprovarV24()">Aprovar e salvar</button> <button class="btn-secundario" onclick="clarezaFecharPreviaV24()">Voltar e editar texto</button>';
+}
+async function clarezaAprovarV24(){
+ const escolhidos=clarezaSugestoesV24.filter(x=>x.aprovado&&x.titulo.trim());if(!escolhidos.length){mostrarToast('Selecione ao menos um item.');return}
+ const texto=document.getElementById('v23Texto')?.value.trim();if(!texto)return;
+ const item={id:crypto.randomUUID(),texto,categoria:'entrada',status:'pendente',criado_em:new Date().toISOString()};
+ CLAREZA_ITENS_V23.push(item);clarezaPersistirV23();await clarezaEnviarV23(item);
+ const user=await clarezaUsuarioV23();if(user){const rows=escolhidos.map(x=>({registro_id:item.id,user_id:user.id,titulo:x.titulo,tipo:x.tipo,ambiente:x.ambiente,categoria:x.categoria,aprovado:true}));const {error}=await supa.from('minha_clareza_itens').insert(rows);if(error){console.warn(error);mostrarToast('Pensamento salvo; itens aguardam sincronização.')}}
+ clarezaSugestoesV24=[];clarezaAtualizarTelaV23();mostrarToast('Revisão aprovada e pensamento salvo 💜');
+}
 async function clarezaSalvarV23(){
  if(clarezaOuvindoV23)clarezaPararVozV23();
  const campo=document.getElementById('v23Texto');const texto=campo?.value.trim();
@@ -5551,9 +5573,9 @@ function clarezaAlternarVozV23(){
  if(!SR){mostrarToast('Ditado não disponível neste navegador. Use o microfone do teclado ou escreva.');document.getElementById('v23Texto')?.focus();return}
  const campo=document.getElementById('v23Texto');if(!campo)return;
  clarezaBaseV23=campo.value.trim();let finais='';
- const rec=new SR();clarezaVozV23=rec;rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+ const rec=new SR();clarezaVozV23=rec;rec.lang='pt-BR';rec.continuous=!/iPhone|iPad|iPod/i.test(navigator.userAgent);rec.interimResults=true;
  rec.onresult=(event)=>{let parcial='';for(let i=event.resultIndex;i<event.results.length;i++){const t=event.results[i][0].transcript;if(event.results[i].isFinal)finais+=t+' ';else parcial+=t}campo.value=[clarezaBaseV23,finais.trim(),parcial.trim()].filter(Boolean).join(' ').trim()};
- rec.onerror=(event)=>{const el=document.getElementById('v23VozStatus');if(el)el.textContent='Não foi possível continuar o ditado ('+event.error+'). Você pode escrever.'};
+ rec.onerror=(event)=>{const el=document.getElementById('v23VozStatus');if(el)el.textContent=event.error==='aborted'?'Ditado interrompido. Tente novamente ou use o microfone do teclado.':'Não foi possível continuar o ditado ('+event.error+'). Use o microfone do teclado ou escreva.'};
  rec.onend=()=>{clarezaOuvindoV23=false;const b=document.getElementById('v23BotaoVoz');if(b)b.classList.remove('gravando');const el=document.getElementById('v23VozStatus');if(el&&el.textContent==='Ouvindo... toque para parar')el.textContent='Ditado encerrado. Revise antes de guardar.'};
  try{rec.start();clarezaOuvindoV23=true;document.getElementById('v23BotaoVoz')?.classList.add('gravando');document.getElementById('v23VozStatus').textContent='Ouvindo... toque para parar'}catch(e){mostrarToast('Não foi possível ativar o microfone.')}
 }
@@ -5571,6 +5593,7 @@ function visaoGeralHTML(){
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
  <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Seu trabalho e sua vida pessoal, lado a lado.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
+ ${cardsSaudeV21()}${cardClarezaV23()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -5595,7 +5618,7 @@ function visaoGeralHTML(){
  ${atalho('✝','Jornada Bíblica','Leituras e capítulos','pessoal','jornada_biblica')}
  ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
  ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
- </div></section>${cardClarezaV23()}${cardsSaudeV21()}</div>`;
+ </div></section></div>`;
 }
 
 let SONO_SYNC_STATUS='Aguardando sincronização';
