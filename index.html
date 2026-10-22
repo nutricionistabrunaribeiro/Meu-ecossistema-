@@ -5566,19 +5566,59 @@ async function clarezaExcluirV23(id){
  const user=await clarezaUsuarioV23();if(user){const {error}=await supa.from('minha_clareza').delete().eq('id',id).eq('user_id',user.id);if(error)mostrarToast('Excluído deste aparelho; confira a sincronização.')}
  clarezaAtualizarTelaV23();
 }
-function clarezaPararVozV23(){if(clarezaVozV23){try{clarezaVozV23.stop()}catch(e){}}clarezaOuvindoV23=false}
-function clarezaAlternarVozV23(){
- if(clarezaOuvindoV23){clarezaPararVozV23();const el=document.getElementById('v23VozStatus');if(el)el.textContent='Ditado encerrado. Revise o texto antes de guardar.';return}
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SR){mostrarToast('Ditado não disponível neste navegador. Use o microfone do teclado ou escreva.');document.getElementById('v23Texto')?.focus();return}
- const campo=document.getElementById('v23Texto');if(!campo)return;
- clarezaBaseV23=campo.value.trim();let finais='';
- const rec=new SR();clarezaVozV23=rec;rec.lang='pt-BR';rec.continuous=!/iPhone|iPad|iPod/i.test(navigator.userAgent);rec.interimResults=true;
- rec.onresult=(event)=>{let parcial='';for(let i=event.resultIndex;i<event.results.length;i++){const t=event.results[i][0].transcript;if(event.results[i].isFinal)finais+=t+' ';else parcial+=t}campo.value=[clarezaBaseV23,finais.trim(),parcial.trim()].filter(Boolean).join(' ').trim()};
- rec.onerror=(event)=>{const el=document.getElementById('v23VozStatus');if(el)el.textContent=event.error==='aborted'?'Ditado interrompido. Tente novamente ou use o microfone do teclado.':'Não foi possível continuar o ditado ('+event.error+'). Use o microfone do teclado ou escreva.'};
- rec.onend=()=>{clarezaOuvindoV23=false;const b=document.getElementById('v23BotaoVoz');if(b)b.classList.remove('gravando');const el=document.getElementById('v23VozStatus');if(el&&el.textContent==='Ouvindo... toque para parar')el.textContent='Ditado encerrado. Revise antes de guardar.'};
- try{rec.start();clarezaOuvindoV23=true;document.getElementById('v23BotaoVoz')?.classList.add('gravando');document.getElementById('v23VozStatus').textContent='Ouvindo... toque para parar'}catch(e){mostrarToast('Não foi possível ativar o microfone.')}
+let clarezaSessaoV25=0;
+let clarezaIniciandoV25=false;
+function clarezaStatusV25(mensagem){const el=document.getElementById('v23VozStatus');if(el)el.textContent=mensagem}
+function clarezaBotaoV25(ativo){const b=document.getElementById('v23BotaoVoz');if(b){b.classList.toggle('gravando',ativo);b.setAttribute('aria-pressed',String(ativo))}}
+function clarezaPararVozV23(){
+ const anterior=clarezaVozV23;
+ clarezaSessaoV25++;
+ clarezaVozV23=null;
+ clarezaOuvindoV23=false;
+ clarezaIniciandoV25=false;
+ clarezaBotaoV25(false);
+ if(anterior){anterior.onresult=null;anterior.onerror=null;anterior.onend=null;try{anterior.abort()}catch(e){}}
 }
+function clarezaAlternarVozV23(){
+ if(clarezaOuvindoV23||clarezaIniciandoV25){clarezaPararVozV23();clarezaStatusV25('Ditado encerrado. Seu texto foi preservado.');return}
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const campo=document.getElementById('v23Texto');
+ if(!campo)return;
+ if(!SR){clarezaStatusV25('Este navegador não oferece ditado por este botão. Use o microfone do teclado do iPhone.');campo.focus();return}
+ // Cada tentativa recebe uma instância nova; sessões anteriores não podem alterar o estado atual.
+ clarezaPararVozV23();
+ const sessao=++clarezaSessaoV25;
+ const rec=new SR();clarezaVozV23=rec;
+ clarezaIniciandoV25=true;
+ clarezaBaseV23=campo.value.trim();
+ let finais='';
+ rec.lang='pt-BR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
+ rec.onstart=()=>{if(sessao!==clarezaSessaoV25)return;clarezaIniciandoV25=false;clarezaOuvindoV23=true;clarezaBotaoV25(true);clarezaStatusV25('Ouvindo... toque novamente para parar')};
+ rec.onresult=(event)=>{
+  if(sessao!==clarezaSessaoV25)return;
+  let parcial='';
+  for(let i=event.resultIndex;i<event.results.length;i++){
+   const t=event.results[i][0].transcript;
+   if(event.results[i].isFinal)finais+=t+' ';else parcial+=t;
+  }
+  campo.value=[clarezaBaseV23,finais.trim(),parcial.trim()].filter(Boolean).join(' ').trim();
+ };
+ rec.onerror=(event)=>{
+  if(sessao!==clarezaSessaoV25)return;
+  const mensagens={"not-allowed":"Permissão de microfone negada. Confira os ajustes do Safari.","audio-capture":"Microfone indisponível. Tente novamente.","no-speech":"Não ouvi sua voz. Toque para tentar novamente.","aborted":"Ditado interrompido. Toque novamente para recomeçar.","network":"Falha na conexão do reconhecimento de voz. Use o microfone do teclado."};
+  clarezaStatusV25(mensagens[event.error]||'Ditado não disponível ('+event.error+'). Tente novamente.');
+  clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);
+ };
+ rec.onend=()=>{
+  if(sessao!==clarezaSessaoV25)return;
+  clarezaVozV23=null;clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);
+  const el=document.getElementById('v23VozStatus');
+  if(el&&/Ouvindo|Iniciando/.test(el.textContent))clarezaStatusV25('Ditado encerrado. Toque novamente para continuar falando.');
+ };
+ try{rec.start();clarezaStatusV25('Iniciando microfone...');clarezaBotaoV25(true)}
+ catch(e){clarezaVozV23=null;clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);clarezaStatusV25('Não foi possível iniciar. Tente novamente ou use o microfone do teclado.')}
+}
+
 clarezaCarregarV23();
 setTimeout(()=>clarezaSincronizarV23(),3500);
 
