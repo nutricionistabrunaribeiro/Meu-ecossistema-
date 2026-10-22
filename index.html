@@ -1060,7 +1060,18 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 .v19-doc-table td:first-child{min-width:190px}
 @media(max-width:720px){.v19-documentos{padding:12px!important}.v19-doc-table td,.v19-doc-table th{padding:9px 8px!important}.v19-doc-top{align-items:flex-start}}
 </style>
-</head>
+<style id="v21-saude-styles">
+.v21-saude{margin-top:24px}.v21-saude-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.v21-health-card{min-width:0;border:1px solid var(--cor-borda);border-radius:20px;padding:19px;background:linear-gradient(140deg,color-mix(in srgb,var(--cor-primaria) 15%,transparent),color-mix(in srgb,var(--cor-superficie) 70%,transparent));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.v21-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:14px}.v21-small-btn,.v21-open-cycle{color:var(--cor-primaria);font-size:12px;text-decoration:underline;cursor:pointer}
+.v21-number{display:block;font-family:Fraunces,serif;font-size:30px;margin:18px 0 12px}.v21-number small{font:400 13px system-ui;color:var(--cor-texto-suave)}
+.v21-progress{height:10px;border-radius:20px;background:color-mix(in srgb,var(--cor-texto) 13%,transparent);overflow:hidden}.v21-progress span{display:block;height:100%;border-radius:20px;background:var(--cor-primaria)}
+.v21-health-card p{color:var(--cor-texto-suave);font-size:12px;line-height:1.55;margin:12px 0}
+.v21-water-form{display:flex;align-items:center;gap:8px;margin-top:14px}.v21-water-form input{width:90px;min-width:0;padding:10px;border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto);border:1px solid var(--cor-borda)}.v21-water-form span{font-size:12px}.v21-water-form button{padding:10px 12px;font-size:12px}
+.v21-agua-historico{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.v21-agua-historico span{padding:5px 8px;border:1px solid var(--cor-borda);border-radius:10px;font-size:11px}.v21-agua-historico button{margin-left:5px;color:var(--cor-texto-suave)}
+.v21-cycle-title{display:block;font-family:Fraunces,serif;font-size:clamp(20px,3vw,27px);margin-top:26px}.v21-open-cycle{display:inline-block;margin-top:14px}.v21-mini-label{font-size:11px;color:var(--cor-texto-suave)}
+@media(max-width:680px){.v21-saude-grid{grid-template-columns:1fr}.v21-health-card{padding:16px}}
+</style></head>
 <body data-espaco="trabalho">
 
 <div id="telaLogin">
@@ -5367,6 +5378,78 @@ async function abrirConteudoPlanejamento(dadosAtualizados=false){
 function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(14);doc.text('Entregas em aberto — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,18,y);y+=7;});doc.save(`fechamento-${m.pref}.pdf`);}
 
 
+
+/* Atualização 21 — hidratação sincronizada e previsão menstrual indicativa */
+let HIDRATACAO_REGISTROS=[];
+const hidratacaoHoje=()=>formatoISO(new Date());
+const metaAgua=()=>Math.max(250,Math.min(6000,Number(localStorage.getItem('me_meta_agua_ml')||2000)));
+const totalAguaHoje=()=>HIDRATACAO_REGISTROS.filter(r=>r.data===hidratacaoHoje()).reduce((t,r)=>t+Number(r.quantidade_ml||0),0);
+async function carregarHidratacaoSupabase(){
+ try{
+  const {data:{user}}=await supa.auth.getUser();if(!user)return;
+  const inicio=formatoISO(addDias(new Date(),-31));
+  const {data,error}=await supa.from('hidratacao_registros').select('id,data,quantidade_ml,criado_em').eq('user_id',user.id).gte('data',inicio).order('criado_em',{ascending:false});
+  if(error){console.warn('Hidratação indisponível',error.message);return;}
+  HIDRATACAO_REGISTROS=data||[];
+  if(telaAtual==='visao_geral')renderTela();
+ }catch(e){console.warn('Erro ao carregar hidratação',e)}
+}
+async function adicionarAguaV21(){
+ const input=document.getElementById('v21-agua-quantidade');
+ const ml=Number(input?.value||0);
+ if(!Number.isInteger(ml)||ml<1||ml>5000){alert('Informe uma quantidade entre 1 e 5000 mL.');return;}
+ const btn=document.getElementById('v21-salvar-agua');if(btn)btn.disabled=true;
+ try{
+  const {data:{user}}=await supa.auth.getUser();if(!user)throw new Error('Entre na sua conta para registrar.');
+  const {data,error}=await supa.from('hidratacao_registros').insert({user_id:user.id,data:hidratacaoHoje(),quantidade_ml:ml}).select('id,data,quantidade_ml,criado_em').single();
+  if(error)throw error;
+  HIDRATACAO_REGISTROS.unshift(data);renderTela();
+ }catch(e){alert('Não foi possível salvar a água: '+e.message);if(btn)btn.disabled=false;}
+}
+function mudarMetaAguaV21(){
+ const valor=prompt('Qual é sua meta diária de água em mL?',String(metaAgua()));
+ if(valor===null)return;
+ const n=Number(valor);if(!Number.isInteger(n)||n<250||n>6000){alert('Informe uma meta entre 250 e 6000 mL.');return;}
+ localStorage.setItem('me_meta_agua_ml',String(n));renderTela();
+}
+async function removerAguaV21(id){
+ if(!confirm('Excluir este registro de água?'))return;
+ const {error}=await supa.from('hidratacao_registros').delete().eq('id',id);
+ if(error){alert('Não foi possível excluir: '+error.message);return;}
+ HIDRATACAO_REGISTROS=HIDRATACAO_REGISTROS.filter(r=>String(r.id)!==String(id));renderTela();
+}
+function resumoCicloV21(){
+ const datas=[...new Set(REGISTROS_CICLO.filter(r=>r.perfil==='bruna').map(r=>r.dataISO))].sort();
+ if(!datas.length)return {titulo:'Sem registros',detalhe:'Marque os dias do ciclo no calendário para acompanhar.'};
+ const inicios=datas.filter((d,i)=>i===0||(Math.round((new Date(d+'T12:00:00')-new Date(datas[i-1]+'T12:00:00'))/86400000)>2));
+ const ultimo=inicios[inicios.length-1],ultimaData=new Date(ultimo+'T12:00:00'),hoje=new Date(hidratacaoHoje()+'T12:00:00');
+ const diasDesde=Math.round((hoje-ultimaData)/86400000);
+ const intervalos=inicios.slice(1).map((d,i)=>Math.round((new Date(d+'T12:00:00')-new Date(inicios[i]+'T12:00:00'))/86400000)).filter(n=>n>=21&&n<=45);
+ const duracao=intervalos.length?Math.round(intervalos.slice(-5).reduce((a,b)=>a+b,0)/Math.min(5,intervalos.length)):28;
+ const proxima=addDias(ultimaData,duracao);
+ const dias=Math.ceil((proxima-hoje)/86400000);
+ const dataPrevista=proxima.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+ const atual=REGISTROS_CICLO.some(r=>r.perfil==='bruna'&&r.dataISO===hidratacaoHoje());
+ if(atual)return {titulo:'Período registrado',detalhe:'Você marcou hoje como dia menstrual.'};
+ if(diasDesde<0)return {titulo:'Registros futuros',detalhe:'Confira as datas do calendário.'};
+ return {titulo:dias>=0?`Previsão em ${dias} dia${dias===1?'':'s'}`:'Atualize seu ciclo',detalhe:`Próxima data estimada: ${dataPrevista} · ciclo ${duracao} dias${intervalos.length?' (baseado nos registros)':' (estimativa inicial)'}. Não é previsão médica.`};
+}
+function cardsSaudeV21(){
+ const agua=totalAguaHoje(),meta=metaAgua(),percent=Math.min(100,Math.round(agua/meta*100)),ciclo=resumoCicloV21();
+ const registros=HIDRATACAO_REGISTROS.filter(r=>r.data===hidratacaoHoje()).slice(0,5);
+ return `<section class="v21-saude"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Meu bem-estar</h3><p>Hidratação e acompanhamento do ciclo</p></div></div>
+ <div class="v21-saude-grid">
+ <article class="v21-health-card"><div class="v21-card-head"><span>💧 Hidratação de hoje</span><button class="v21-small-btn" onclick="mudarMetaAguaV21()">Alterar meta</button></div>
+ <strong class="v21-number">${agua.toLocaleString('pt-BR')} <small>/ ${meta.toLocaleString('pt-BR')} mL</small></strong>
+ <div class="v21-progress" role="progressbar" aria-label="Meta diária de água" aria-valuenow="${agua}" aria-valuemin="0" aria-valuemax="${meta}"><span style="width:${percent}%"></span></div>
+ <p>${percent}% da meta diária · registre cada copo ou garrafa</p>
+ <div class="v21-water-form"><input id="v21-agua-quantidade" type="number" inputmode="numeric" min="1" max="5000" step="50" value="250" aria-label="Quantidade de água em mililitros"><span>mL</span><button id="v21-salvar-agua" class="btn-primario" onclick="adicionarAguaV21()">+ Registrar</button></div>
+ ${registros.length?`<div class="v21-agua-historico">${registros.map(r=>`<span>${Number(r.quantidade_ml)} mL <button aria-label="Excluir registro de ${Number(r.quantidade_ml)} mililitros" onclick="removerAguaV21('${r.id}')">×</button></span>`).join('')}</div>`:''}
+ </article>
+ <article class="v21-health-card"><div class="v21-card-head"><span>🌷 Ciclo menstrual</span><span class="v21-mini-label">Bruna</span></div><strong class="v21-cycle-title">${ciclo.titulo}</strong><p>${ciclo.detalhe}</p><button class="v21-open-cycle" onclick="trocarEspaco('pessoal');irPara('ciclo')">Abrir calendário do ciclo →</button></article>
+ </div></section>`;
+}
+
 // Visão geral: indicadores reutilizam os registros já carregados pelos módulos existentes.
 function visaoGeralHTML(){
  const hoje=new Date().toLocaleDateString('sv-SE');
@@ -5403,7 +5486,7 @@ function visaoGeralHTML(){
  ${atalho('✝','Jornada Bíblica','Leituras e capítulos','pessoal','jornada_biblica')}
  ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
  ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
- </div></section></div>`;
+ </div></section>${cardsSaudeV21()}</div>`;
 }
 
 let SONO_SYNC_STATUS='Aguardando sincronização';
@@ -5907,6 +5990,7 @@ async function entrarNoApp(){
   await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();
   await carregarCicloSupabase();
+  await carregarHidratacaoSupabase();
   await carregarPixelSupabase();
   await carregarProjetosSupabase();
   await carregarMarketingSupabase();
