@@ -1,0 +1,1 @@
+Atualização 23 — Minha Clareza. Voz (SpeechRecognition onde suportado), texto, categorias, status, exclusão, card na Visão Geral e sincronização com Supabase. No iPhone, caso o reconhecimento do navegador não esteja disponível, usar o ditado do teclado. A gravação de áudio original não é armazenada. Testar no aparelho.
