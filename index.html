@@ -1044,7 +1044,6 @@ html[data-paleta-v04] #appRoot :is(.card,.v11-overview-card,.v11-atalho,.v11-lin
 html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;color:var(--cor-texto)}
 .v19-doc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.v19-doc-top h3{margin:0 0 5px}.v19-doc-top p{margin:0;color:var(--cor-texto-suave);font-size:12px}.v19-legenda{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.v19-situacao{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.v19-situacao.verde{color:#9ce8b7;background:rgba(30,130,73,.24);border:1px solid rgba(91,210,133,.4)}.v19-situacao.laranja{color:#ffcf89;background:rgba(172,101,16,.24);border:1px solid rgba(240,161,54,.42)}.v19-situacao.vermelho{color:#ffadb0;background:rgba(170,39,52,.25);border:1px solid rgba(234,94,101,.4)}.v19-situacao.neutro{color:var(--cor-texto-suave);background:rgba(160,160,160,.12);border:1px solid var(--cor-borda)}.v19-filtro{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px}.v19-filtro select{max-width:240px}.v19-table-wrap{width:100%;overflow-x:auto;border-radius:13px;border:1px solid var(--cor-borda)}.v19-doc-table{width:100%;border-collapse:collapse;min-width:580px;text-align:left}.v19-doc-table th{padding:12px 10px;font-size:11px;background:rgba(255,255,255,.07);color:var(--cor-texto)}.v19-doc-table td{padding:11px 10px;font-size:12px;border-top:1px solid var(--cor-borda);vertical-align:middle}.v19-doc-table td small{display:block;color:var(--cor-texto-suave);font-size:10px;margin-top:3px}.v19-doc-table tr:hover td{background:rgba(255,255,255,.035)}.v19-editar{border:1px solid var(--cor-borda);border-radius:9px;padding:7px 11px;color:var(--cor-texto);background:rgba(255,255,255,.07);cursor:pointer}
 
-.v24-previa{margin-top:18px;padding:16px;border:1px solid var(--cor-borda);border-radius:18px}.v24-item{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--cor-borda)}.v24-item input:not([type=checkbox]),.v24-item select{width:100%;min-width:0;padding:10px;border:1px solid var(--cor-borda);border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto)}
 </style>
 <meta name="ecossistema-release" content="19-glass-tabela-documental">
 
@@ -1102,6 +1101,26 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 .v23-registro>p{white-space:pre-wrap;margin:0 0 9px}.v23-registro.resolvido{opacity:.66}
 .v23-registro-acoes label{font-size:12px}.v23-registro-acoes select{border:1px solid var(--cor-borda);border-radius:9px;background:var(--cor-fundo-card);color:var(--cor-texto);padding:8px;max-width:150px}
 @media(max-width:540px){.v23-captura,.v23-lista{padding:15px}.v23-registro-acoes{gap:7px}.v23-registro-acoes button{font-size:12px}}
+</style><style id="v24-pausa-style">
+.v24-pausa{margin:20px 0 26px}.v24-pausa-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.v24-pausa-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--cor-primaria)}
+.v24-pausa-header h3{font-family:'Fraunces',Georgia,serif;font-size:23px;margin:4px 0 3px;color:var(--cor-texto)}
+.v24-pausa-header p,.v24-print-hint{color:var(--cor-texto-suave);font-size:12px}
+.v24-print-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.v24-print{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:4/5;min-height:275px;border-radius:24px;padding:22px;color:#fbf1e7;border:1px solid #ffffff26;box-shadow:0 12px 30px #00000018;background:#35283f}
+.v24-print::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.8;background:radial-gradient(ellipse at 90% 5%,#e9cba02c,transparent 42%),radial-gradient(ellipse at 5% 100%,#d9b8e02c,transparent 50%)}
+.v24-verso{background:linear-gradient(155deg,#3e304f,#242139 80%)}.v24-frase{background:linear-gradient(145deg,#603c52,#32253f 83%)}
+.v24-pergunta{background:linear-gradient(145deg,#3a4358,#2c2943 80%)}.v24-beleza{background:linear-gradient(145deg,#54443b,#322b40 85%)}
+.v24-print-top,.v24-print-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.v24-print-top{font-size:9px;letter-spacing:.15em;font-weight:700;color:#eed5bc}.v24-print-icon{font-size:23px;opacity:.8}
+.v24-print-main{margin:20px 0;display:flex;flex-direction:column;gap:13px}
+.v24-print-kicker{font-size:10px;letter-spacing:.16em;color:#dfc7e9;font-weight:700}
+.v24-print-quote{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(17px,2vw,26px);line-height:1.36;overflow-wrap:anywhere;white-space:pre-wrap}
+.v24-print-extra{font-size:12px;color:#e9d3c5;line-height:1.4}
+.v24-print-bottom{padding-top:13px;border-top:1px solid #ffffff35;font-size:10px;letter-spacing:.035em;color:#f0d7c9}
+.v24-print-hint{margin-top:12px}
+@media(max-width:680px){.v24-print-grid{grid-template-columns:1fr;gap:14px}.v24-print{width:100%;max-width:460px;margin:0 auto;aspect-ratio:4/4.5;min-height:300px;padding:24px}.v24-print-quote{font-size:clamp(20px,5.4vw,29px)}.v24-pausa-header{align-items:flex-start}.v24-pausa-header h3{font-size:21px}}
+@media(min-width:1100px){.v24-print{min-height:350px}}
 </style></head>
 <body data-espaco="trabalho">
 
@@ -1198,7 +1217,6 @@ const MODULOS = {
     {grupo:"Vida Pessoal", itens:[
       {id:"projetos", nome:"Projetos"},
       {id:"minha_clareza", nome:"Minha Clareza"},
-      {id:"carga_mental", nome:"Minha Carga Mental"},
       {id:"habitos", nome:"Hábitos"},
       {id:"ciclo", nome:"Ciclo Menstrual"},
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
@@ -1222,7 +1240,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',carga_mental:'🧠',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -5511,8 +5529,8 @@ function minhaClarezaHTML(){
  <button type="button" class="v23-microfone ${clarezaOuvindoV23?'gravando':''}" id="v23BotaoVoz" onclick="clarezaAlternarVozV23()" aria-label="${clarezaOuvindoV23?'Parar ditado':'Iniciar ditado'}">🎙️</button>
  <p id="v23VozStatus" aria-live="polite">${clarezaOuvindoV23?'Ouvindo... toque para parar':'Toque para falar'}</p>
  <label for="v23Texto" class="v23-label">Seu pensamento</label><textarea id="v23Texto" rows="5" placeholder="Pode falar ou escrever sem organizar nada..."></textarea>
- <div class="v23-acoes"><button class="btn-primario" onclick="clarezaPrepararV24()">Organizar para revisar</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
- <div id="v24Previa" class="v24-previa" hidden></div><small id="v23Sync">${textoHTML(clarezaSyncV23)}</small></section>
+ <div class="v23-acoes"><button class="btn-primario" onclick="clarezaSalvarV23()">Guardar pensamento</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
+ <small id="v23Sync">${textoHTML(clarezaSyncV23)}</small></section>
  <section class="card v23-lista"><div class="v23-lista-topo"><h3>Meus pensamentos</h3><span>${CLAREZA_ITENS_V23.filter(x=>x.status!=='resolvido').length} em aberto</span></div>
  ${CLAREZA_ITENS_V23.slice().sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em))).map(x=>`<article class="v23-registro ${x.status==='resolvido'?'resolvido':''}"><p>${textoHTML(x.texto)}</p><small>${new Date(x.criado_em).toLocaleDateString('pt-BR')} · ${grupos[x.categoria]||'Para organizar'}</small><div class="v23-registro-acoes"><label>Organizar como <select aria-label="Categoria do pensamento" onchange="clarezaAlterarV23('${x.id}','categoria',this.value)">${Object.entries(grupos).map(([k,v])=>`<option value="${k}" ${x.categoria===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-secundario" onclick="clarezaAlterarV23('${x.id}','status','${x.status==='resolvido'?'pendente':'resolvido'}')">${x.status==='resolvido'?'Reabrir':'Resolvido'}</button><button class="btn-secundario" onclick="clarezaExcluirV23('${x.id}')">Excluir</button></div></article>`).join('')||'<p>Este espaço está prontinho para receber seu primeiro pensamento. 💜</p>'}
  </section></div>`;
@@ -5530,27 +5548,6 @@ async function clarezaSincronizarV23(){
  }catch(e){clarezaSyncV23='Salvo neste aparelho · sincronização pendente';console.warn('Minha Clareza:',e)}
 }
 async function clarezaEnviarV23(item){const user=await clarezaUsuarioV23();if(!user)return;try{const {error}=await supa.from('minha_clareza').upsert({...item,user_id:user.id});if(error)throw error;clarezaSyncV23='Sincronizado com sua conta'}catch(e){clarezaSyncV23='Salvo neste aparelho · sincronização pendente'}}
-let clarezaSugestoesV24=[];
-function clarezaFecharPreviaV24(){const el=document.getElementById("v24Previa");if(el)el.hidden=true}
-function clarezaPrepararV24(){
- const texto=document.getElementById('v23Texto')?.value.trim();if(!texto){mostrarToast('Fale ou escreva primeiro.');return}
- // Classificação local por regras: não se apresenta como inteligência artificial.
- const partes=texto.split(/(?:[\n;]+|\.\s+|,\s+(?=(?:preciso|tenho que|comprar|marcar|lembrar|quero)\b))/i).map(x=>x.trim()).filter(Boolean);
- clarezaSugestoesV24=partes.map((trecho,i)=>{const t=trecho.toLowerCase();return {titulo:trecho,tipo:/comprar|lista de compras/.test(t)?'checklist':/ideia|pensei em|criar um aplicativo/.test(t)?'ideia':/marcar|agendar|consulta|reunião/.test(t)?'compromisso':/lembrar/.test(t)?'lembrete':'tarefa',ambiente:/cliente|fábrica|manual|trabalho|relatório|consultoria|nutricion/.test(t)?'trabalho':'pessoal',categoria:'geral',aprovado:true}});
- clarezaRenderPreviaV24();
-}
-function clarezaRenderPreviaV24(){
- const el=document.getElementById('v24Previa');if(!el)return;el.hidden=false;
- el.innerHTML='<h3>Revise antes de salvar</h3><p>Organização sugerida automaticamente por regras. Edite tudo antes de aprovar.</p>'+clarezaSugestoesV24.map((x,i)=>`<div class="v24-item"><label><input type="checkbox" ${x.aprovado?'checked':''} onchange="clarezaSugestoesV24[${i}].aprovado=this.checked"> Incluir</label><input aria-label="Título" value="${textoHTML(x.titulo).replace(/&quot;/g,'&quot;')}" oninput="clarezaSugestoesV24[${i}].titulo=this.value"><select onchange="clarezaSugestoesV24[${i}].tipo=this.value">${['tarefa','checklist','ideia','lembrete','compromisso','nota'].map(t=>`<option ${t===x.tipo?'selected':''}>${t}</option>`).join('')}</select><select onchange="clarezaSugestoesV24[${i}].ambiente=this.value"><option ${x.ambiente==='pessoal'?'selected':''}>pessoal</option><option ${x.ambiente==='trabalho'?'selected':''}>trabalho</option></select></div>`).join('')+'<button class="btn-primario" onclick="clarezaAprovarV24()">Aprovar e salvar</button> <button class="btn-secundario" onclick="clarezaFecharPreviaV24()">Voltar e editar texto</button>';
-}
-async function clarezaAprovarV24(){
- const escolhidos=clarezaSugestoesV24.filter(x=>x.aprovado&&x.titulo.trim());if(!escolhidos.length){mostrarToast('Selecione ao menos um item.');return}
- const texto=document.getElementById('v23Texto')?.value.trim();if(!texto)return;
- const item={id:crypto.randomUUID(),texto,categoria:'entrada',status:'pendente',criado_em:new Date().toISOString()};
- CLAREZA_ITENS_V23.push(item);clarezaPersistirV23();await clarezaEnviarV23(item);
- const user=await clarezaUsuarioV23();if(user){const rows=escolhidos.map(x=>({registro_id:item.id,user_id:user.id,titulo:x.titulo,tipo:x.tipo,ambiente:x.ambiente,categoria:x.categoria,aprovado:true}));const {error}=await supa.from('minha_clareza_itens').insert(rows);if(error){console.warn(error);mostrarToast('Pensamento salvo; itens aguardam sincronização.')}}
- clarezaSugestoesV24=[];clarezaAtualizarTelaV23();mostrarToast('Revisão aprovada e pensamento salvo 💜');
-}
 async function clarezaSalvarV23(){
  if(clarezaOuvindoV23)clarezaPararVozV23();
  const campo=document.getElementById('v23Texto');const texto=campo?.value.trim();
@@ -5567,125 +5564,87 @@ async function clarezaExcluirV23(id){
  const user=await clarezaUsuarioV23();if(user){const {error}=await supa.from('minha_clareza').delete().eq('id',id).eq('user_id',user.id);if(error)mostrarToast('Excluído deste aparelho; confira a sincronização.')}
  clarezaAtualizarTelaV23();
 }
-let clarezaSessaoV25=0;
-let clarezaIniciandoV25=false;
-function clarezaStatusV25(mensagem){const el=document.getElementById('v23VozStatus');if(el)el.textContent=mensagem}
-function clarezaBotaoV25(ativo){const b=document.getElementById('v23BotaoVoz');if(b){b.classList.toggle('gravando',ativo);b.setAttribute('aria-pressed',String(ativo))}}
-function clarezaPararVozV23(){
- const anterior=clarezaVozV23;
- clarezaSessaoV25++;
- clarezaVozV23=null;
- clarezaOuvindoV23=false;
- clarezaIniciandoV25=false;
- clarezaBotaoV25(false);
- if(anterior){anterior.onresult=null;anterior.onerror=null;anterior.onend=null;try{anterior.abort()}catch(e){}}
-}
+function clarezaPararVozV23(){if(clarezaVozV23){try{clarezaVozV23.stop()}catch(e){}}clarezaOuvindoV23=false}
 function clarezaAlternarVozV23(){
- if(clarezaOuvindoV23||clarezaIniciandoV25){clarezaPararVozV23();clarezaStatusV25('Ditado encerrado. Seu texto foi preservado.');return}
+ if(clarezaOuvindoV23){clarezaPararVozV23();const el=document.getElementById('v23VozStatus');if(el)el.textContent='Ditado encerrado. Revise o texto antes de guardar.';return}
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- const campo=document.getElementById('v23Texto');
- if(!campo)return;
- if(!SR){clarezaStatusV25('Este navegador não oferece ditado por este botão. Use o microfone do teclado do iPhone.');campo.focus();return}
- // Cada tentativa recebe uma instância nova; sessões anteriores não podem alterar o estado atual.
- clarezaPararVozV23();
- const sessao=++clarezaSessaoV25;
- const rec=new SR();clarezaVozV23=rec;
- clarezaIniciandoV25=true;
- clarezaBaseV23=campo.value.trim();
- let finais='';
- rec.lang='pt-BR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
- rec.onstart=()=>{if(sessao!==clarezaSessaoV25)return;clarezaIniciandoV25=false;clarezaOuvindoV23=true;clarezaBotaoV25(true);clarezaStatusV25('Ouvindo... toque novamente para parar')};
- rec.onresult=(event)=>{
-  if(sessao!==clarezaSessaoV25)return;
-  let parcial='';
-  for(let i=event.resultIndex;i<event.results.length;i++){
-   const t=event.results[i][0].transcript;
-   if(event.results[i].isFinal)finais+=t+' ';else parcial+=t;
-  }
-  campo.value=[clarezaBaseV23,finais.trim(),parcial.trim()].filter(Boolean).join(' ').trim();
- };
- rec.onerror=(event)=>{
-  if(sessao!==clarezaSessaoV25)return;
-  const mensagens={"not-allowed":"Permissão de microfone negada. Confira os ajustes do Safari.","audio-capture":"Microfone indisponível. Tente novamente.","no-speech":"Não ouvi sua voz. Toque para tentar novamente.","aborted":"Ditado interrompido. Toque novamente para recomeçar.","network":"Falha na conexão do reconhecimento de voz. Use o microfone do teclado."};
-  clarezaStatusV25(mensagens[event.error]||'Ditado não disponível ('+event.error+'). Tente novamente.');
-  clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);
- };
- rec.onend=()=>{
-  if(sessao!==clarezaSessaoV25)return;
-  clarezaVozV23=null;clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);
-  const el=document.getElementById('v23VozStatus');
-  if(el&&/Ouvindo|Iniciando/.test(el.textContent))clarezaStatusV25('Ditado encerrado. Toque novamente para continuar falando.');
- };
- try{rec.start();clarezaStatusV25('Iniciando microfone...');clarezaBotaoV25(true)}
- catch(e){clarezaVozV23=null;clarezaIniciandoV25=false;clarezaOuvindoV23=false;clarezaBotaoV25(false);clarezaStatusV25('Não foi possível iniciar. Tente novamente ou use o microfone do teclado.')}
+ if(!SR){mostrarToast('Ditado não disponível neste navegador. Use o microfone do teclado ou escreva.');document.getElementById('v23Texto')?.focus();return}
+ const campo=document.getElementById('v23Texto');if(!campo)return;
+ clarezaBaseV23=campo.value.trim();let finais='';
+ const rec=new SR();clarezaVozV23=rec;rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+ rec.onresult=(event)=>{let parcial='';for(let i=event.resultIndex;i<event.results.length;i++){const t=event.results[i][0].transcript;if(event.results[i].isFinal)finais+=t+' ';else parcial+=t}campo.value=[clarezaBaseV23,finais.trim(),parcial.trim()].filter(Boolean).join(' ').trim()};
+ rec.onerror=(event)=>{const el=document.getElementById('v23VozStatus');if(el)el.textContent='Não foi possível continuar o ditado ('+event.error+'). Você pode escrever.'};
+ rec.onend=()=>{clarezaOuvindoV23=false;const b=document.getElementById('v23BotaoVoz');if(b)b.classList.remove('gravando');const el=document.getElementById('v23VozStatus');if(el&&el.textContent==='Ouvindo... toque para parar')el.textContent='Ditado encerrado. Revise antes de guardar.'};
+ try{rec.start();clarezaOuvindoV23=true;document.getElementById('v23BotaoVoz')?.classList.add('gravando');document.getElementById('v23VozStatus').textContent='Ouvindo... toque para parar'}catch(e){mostrarToast('Não foi possível ativar o microfone.')}
 }
-
 clarezaCarregarV23();
 setTimeout(()=>clarezaSincronizarV23(),3500);
 
 
-/* V26 — Minha Carga Mental: registro consciente, sem estimativas inventadas. */
-let CARGA_V26=[];
-const CARGA_KEY_V26='me_carga_mental_v26';
-function cargaCarregarV26(){try{CARGA_V26=JSON.parse(localStorage.getItem(CARGA_KEY_V26)||'[]')}catch(e){CARGA_V26=[]}}
-function cargaGuardarV26(){localStorage.setItem(CARGA_KEY_V26,JSON.stringify(CARGA_V26))}
-function cargaMentalHTMLV26(){
- const semana=Date.now()-7*86400000;
- const recentes=CARGA_V26.filter(x=>new Date(x.criado_em).getTime()>=semana);
- const abertas=recentes.filter(x=>!x.concluido).length;
- const minutos=recentes.reduce((a,x)=>a+(Number(x.minutos)||0),0);
- const areas={trabalho:'Trabalho',casa:'Casa',pessoal:'Pessoal',familia:'Família'};
- const dimensoes={planejar:'Planejar',lembrar:'Lembrar',acompanhar:'Acompanhar',executar:'Executar',decidir:'Decidir'};
- const linhas=Object.entries(areas).map(([k,n])=>`<p style="margin:8px 0">${n}: <strong>${recentes.filter(x=>x.area===k).length}</strong> registros</p>`).join('');
- return `<div class="v11-overview"><header class="v11-welcome"><div><span class="v11-eyebrow">✧ VIDA PESSOAL</span><h2>Minha Carga Mental</h2><p>Registre também o que você precisa lembrar, decidir e acompanhar — não só executar.</p></div><span>🧠</span></header>
- <section class="card" style="padding:20px"><h3>Últimos 7 dias</h3><div class="v11-kpis"><div class="v11-kpi"><span class="v11-kpi-label">Responsabilidades registradas</span><strong>${recentes.length}</strong></div><div class="v11-kpi"><span class="v11-kpi-label">Ainda em aberto</span><strong>${abertas}</strong></div><div class="v11-kpi"><span class="v11-kpi-label">Tempo informado</span><strong>${minutos} min</strong></div></div>${linhas}<small>Os números refletem apenas seus registros; esforço percebido não equivale a tempo medido.</small></section>
- <section class="card" style="padding:20px"><h3>Registrar uma responsabilidade</h3><p>Uma decisão, preocupação prática, planejamento ou tarefa que depende de você.</p>
- <div class="form-field"><label for="cargaTituloV26">O que está sob sua responsabilidade?</label><input id="cargaTituloV26" maxlength="300" placeholder="Ex.: lembrar de agendar a consulta"></div>
- <div class="form-grid"><div class="form-field"><label for="cargaAreaV26">Área</label><select id="cargaAreaV26">${Object.entries(areas).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></div>
- <div class="form-field"><label for="cargaDimV26">Tipo de esforço</label><select id="cargaDimV26">${Object.entries(dimensoes).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></div>
- <div class="form-field"><label for="cargaEsforcoV26">Carga mental percebida (1 a 5)</label><select id="cargaEsforcoV26">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===3?'selected':''}>${n}</option>`).join('')}</select></div>
- <div class="form-field"><label for="cargaMinV26">Minutos dedicados (opcional)</label><input type="number" id="cargaMinV26" min="0" max="1440" placeholder="Não estimar automaticamente"></div></div>
- <button class="btn-primario" onclick="cargaSalvarV26()">Registrar</button><p id="cargaStatusV26" aria-live="polite"></p></section>
- <section class="card" style="padding:20px"><h3>Minhas responsabilidades</h3>${CARGA_V26.slice().sort((a,b)=>b.criado_em.localeCompare(a.criado_em)).map(x=>`<article class="v23-registro"><strong>${textoHTML(x.titulo)}</strong><p>${areas[x.area]||'Pessoal'} · ${dimensoes[x.dimensao]||'Planejar'} · Esforço ${x.esforco}/5 ${x.minutos!==null&&x.minutos!==undefined?'· '+x.minutos+' min':''}</p><small>${new Date(x.criado_em).toLocaleDateString('pt-BR')} · ${x.concluido?'Concluído':'Em aberto'}</small><div class="v23-registro-acoes"><button class="btn-secundario" onclick="cargaAlternarV26('${x.id}')">${x.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="cargaExcluirV26('${x.id}')">Excluir</button></div></article>`).join('')||'<p>Nenhum registro ainda. Comece por algo que você costuma carregar na cabeça.</p>'}</section></div>`;
+/* V24 — Pausa para Inspirar: cards individuais para print */
+const V24_PERGUNTAS=[
+'O que merece mais espaço no seu dia — e o que já pode ir embora?',
+'Quando foi a última vez que você se permitiu fazer algo sem pressa?',
+'Que detalhe de hoje você gostaria de guardar na memória?',
+'O que você tem feito por hábito, mas já não faz sentido?',
+'Qual pequena decisão pode deixar seu dia mais leve?',
+'O que você diria a si mesma se pudesse começar esta manhã de novo?',
+'Você está reservando tempo para aquilo que diz ser importante?',
+'Que expectativa você pode soltar hoje?',
+'Qual gesto de cuidado você tem adiado consigo mesma?',
+'O que aconteceu de bonito enquanto você estava ocupada?',
+'De que maneira você pode tornar este dia mais seu?',
+'O que você gostaria de fazer com mais presença?',
+'Que conversa merece acontecer?',
+'O que não precisa ser perfeito para ser especial?',
+'O que te trouxe paz recentemente?',
+'Qual coisa simples você não quer mais deixar passar?',
+'O que você aprendeu sobre seu próprio ritmo?',
+'Qual parte do seu dia merece ser celebrada?',
+'Se hoje fosse mais simples, o que mudaria?',
+'O que você gostaria de agradecer antes de dormir?'
+];
+const V24_BELEZAS=[
+'Observe a luz entrando pela janela. Ela nunca desenha o mesmo caminho duas vezes.',
+'Preste atenção no primeiro gole de algo que você gosta. Há aconchego nos detalhes.',
+'Olhe para o céu por alguns segundos, mesmo que ele esteja cinza.',
+'Repare em uma gentileza pequena. Às vezes, ela passa sem fazer barulho.',
+'Encontre uma cor bonita no caminho. O cotidiano também sabe surpreender.',
+'Perceba o som de um lugar familiar. Nem toda beleza precisa ser vista.',
+'Observe como a natureza insiste em crescer nos lugares improváveis.',
+'Escolha uma coisa comum e olhe para ela como se fosse a primeira vez.',
+'Deixe que um cheiro bom interrompa a pressa por um instante.',
+'Procure a beleza de uma mesa posta, mesmo que seja só para você.',
+'Perceba a sombra de uma árvore ou o movimento das folhas.',
+'Note o cuidado escondido em um gesto que alguém fez por você.',
+'Encontre poesia em uma refeição simples, feita com atenção.',
+'Observe as nuvens. Nenhuma delas está tentando ser outra.',
+'Escute uma música inteira sem fazer mais nada ao mesmo tempo.',
+'Olhe com carinho para algo que suas mãos construíram.',
+'Repare no silêncio entre dois compromissos.',
+'Encontre um motivo para sorrir que não precise ser fotografado.',
+'Perceba como o fim da tarde muda as cores de tudo.',
+'Guarde mentalmente uma cena pequena que valeu o seu dia.'
+];
+function v24IndiceDia(tamanho,salto=0){const [a,m,d]=diaInspiracao().split('-').map(Number);const n=Math.floor(Date.UTC(a,m-1,d)/86400000);return ((n*7+salto)%tamanho+tamanho)%tamanho}
+function v24CardHTML(tipo,etiqueta,conteudo,extra,icone){
+ return `<article class="v24-print v24-${tipo}" aria-label="${etiqueta}"><div class="v24-print-top"><span>✦ PAUSA PARA INSPIRAR</span><span class="v24-print-icon">${icone}</span></div><div class="v24-print-main"><div class="v24-print-kicker">${etiqueta}</div><div class="v24-print-quote">${textoHTML(conteudo)}</div>${extra?`<div class="v24-print-extra">${textoHTML(extra)}</div>`:''}</div><div class="v24-print-bottom"><span>Meu Ecossistema · Bruna Ribeiro</span><span>✧</span></div></article>`;
 }
-async function cargaSalvarV26(){
- const titulo=document.getElementById('cargaTituloV26')?.value.trim();
- if(!titulo){mostrarToast('Descreva a responsabilidade.');return}
- const campo=document.getElementById('cargaMinV26');
- const minutos=campo?.value.trim()?Number(campo.value):null;
- if(minutos!==null&&(!Number.isInteger(minutos)||minutos<0||minutos>1440)){mostrarToast('Informe minutos entre 0 e 1440.');return}
- const item={id:crypto.randomUUID(),titulo,area:document.getElementById('cargaAreaV26').value,dimensao:document.getElementById('cargaDimV26').value,esforco:Number(document.getElementById('cargaEsforcoV26').value),minutos,concluido:false,criado_em:new Date().toISOString()};
- CARGA_V26.push(item);cargaGuardarV26();await cargaEnviarV26(item);renderTela();mostrarToast('Responsabilidade registrada 💜');
+function pausaInspirarV24(){
+ const dados=lerInspiracao(),dia=diaInspiracao(),diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
+ const idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
+ const frase=dados.frase||V12_FRASES[((idx%V12_FRASES.length)+V12_FRASES.length)%V12_FRASES.length];
+ if(diario&&!valido&&!v13BuscandoDia)setTimeout(atualizarVersiculoDoDia,100);
+ const verso=valido?dados.versiculo:'';
+ const referencia=valido?dados.referencia:referenciaDoDia();
+ return `<section class="v24-pausa"><div class="v24-pausa-header"><div><span class="v24-pausa-eyebrow">UM INSTANTE PARA VOCÊ</span><h3>✦ Pausa para Inspirar</h3><p>Quatro pequenos encontros com o dia. Um print de cada vez.</p></div><button class="btn-secundario" onclick="editarInspiracao()">Editar versículo</button></div>
+ <div class="v24-print-grid">
+ ${v24CardHTML('verso','VERSÍCULO DO DIA',verso||(diario?'Buscando passagem do dia…':'Escolha seu versículo no menu de edição.'),referencia,'✝')}
+ ${v24CardHTML('frase','FRASE DO DIA',frase,'','❞')}
+ ${v24CardHTML('pergunta','PERGUNTA DO DIA',V24_PERGUNTAS[v24IndiceDia(V24_PERGUNTAS.length,3)],'Uma pergunta para levar com você.','?')}
+ ${v24CardHTML('beleza','PEQUENA BELEZA DO DIA',V24_BELEZAS[v24IndiceDia(V24_BELEZAS.length,9)],'Há delicadeza no que parece comum.','✿')}
+ </div><p class="v24-print-hint">Dica: para postar, aproxime o card na tela e faça seu print. Nenhuma informação pessoal da Agenda aparece aqui.</p></section>`;
 }
-async function cargaEnviarV26(item){
- const user=await clarezaUsuarioV23();
- if(!user){return}
- const {error}=await supa.from('carga_mental_registros').upsert({...item,user_id:user.id});
- if(error)console.warn('Sincronização carga mental pendente',error);
-}
-async function cargaSincronizarV26(){
- const user=await clarezaUsuarioV23();if(!user)return;
- try{
- const {data,error}=await supa.from('carga_mental_registros').select('id,titulo,area,dimensao,esforco,minutos,concluido,criado_em').eq('user_id',user.id);
- if(error)throw error;
- const remoto=new Map((data||[]).map(x=>[x.id,x]));
- for(const x of CARGA_V26){if(!remoto.has(x.id)){await cargaEnviarV26(x);remoto.set(x.id,x)}}
- CARGA_V26=[...remoto.values()];cargaGuardarV26();
- if(telaAtual==='carga_mental')renderTela();
- }catch(e){console.warn('Carga mental: sincronização pendente',e)}
-}
-async function cargaAlternarV26(id){
- const x=CARGA_V26.find(y=>y.id===id);if(!x)return;x.concluido=!x.concluido;cargaGuardarV26();await cargaEnviarV26(x);renderTela();
-}
-async function cargaExcluirV26(id){
- if(!confirm('Excluir esta responsabilidade?'))return;
- CARGA_V26=CARGA_V26.filter(x=>x.id!==id);cargaGuardarV26();
- const user=await clarezaUsuarioV23();if(user){const {error}=await supa.from('carga_mental_registros').delete().eq('id',id).eq('user_id',user.id);if(error)mostrarToast('Exclusão local; sincronização pendente.')}
- renderTela();
-}
-cargaCarregarV26();
-window.addEventListener('online',()=>cargaSincronizarV26());
-setTimeout(()=>cargaSincronizarV26(),2500);
 
 function visaoGeralHTML(){
  const hoje=new Date().toLocaleDateString('sv-SE');
@@ -5698,7 +5657,6 @@ function visaoGeralHTML(){
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
  <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Seu trabalho e sua vida pessoal, lado a lado.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
- ${cardsSaudeV21()}${cardClarezaV23()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -5714,7 +5672,6 @@ function visaoGeralHTML(){
  ${atalho('▤','Entregas e documentos','Relatórios e obrigações','trabalho','entregas')}
  </div></section>
  <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Vida Pessoal</h3><p>Rotina, cuidado e desenvolvimento</p></div></div><div class="v11-links">
- ${atalho('🧠','Minha Carga Mental','O esforço que ninguém vê','pessoal','carga_mental')}
  ${atalho('✧','Hábitos e consistência','Seu mapa de evolução','pessoal','habitos')}
  ${atalho('◒','Estudos e leitura','Aprendizado e progresso','pessoal','estudos')}
  ${atalho('☾','Sono e descanso','Diário e histórico','pessoal','sono')}
@@ -5724,7 +5681,7 @@ function visaoGeralHTML(){
  ${atalho('✝','Jornada Bíblica','Leituras e capítulos','pessoal','jornada_biblica')}
  ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
  ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
- </div></section></div>`;
+ </div></section>${pausaInspirarV24()}${cardClarezaV23()}${cardsSaudeV21()}</div>`;
 }
 
 let SONO_SYNC_STATUS='Aguardando sincronização';
@@ -5781,7 +5738,7 @@ function sonoHTML(){
 }
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='carga_mental'?['Minha Carga Mental','Enxergue o esforço por trás da rotina']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
+  const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
@@ -5800,7 +5757,6 @@ function renderTela(){
 
   if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
-  else if(telaAtual === 'carga_mental'){document.getElementById('conteudoTela').innerHTML=cargaMentalHTMLV26();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
   else if(telaAtual === 'dashboard'){
     document.getElementById('conteudoTela').innerHTML = dashboardHTML();
