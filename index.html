@@ -1121,6 +1121,12 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 .v24-print-hint{margin-top:12px}
 @media(max-width:680px){.v24-print-grid{grid-template-columns:1fr;gap:14px}.v24-print{width:100%;max-width:460px;margin:0 auto;aspect-ratio:4/4.5;min-height:300px;padding:24px}.v24-print-quote{font-size:clamp(20px,5.4vw,29px)}.v24-pausa-header{align-items:flex-start}.v24-pausa-header h3{font-size:21px}}
 @media(min-width:1100px){.v24-print{min-height:350px}}
+</style><style id="v25-style">
+.v25-estilos{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-top:12px}.v25-estilo{display:flex;flex-direction:column;gap:5px;text-align:left;padding:10px;border-radius:15px;border:1px solid var(--cor-borda,#ffffff35);background:var(--cor-card,#ffffff12);color:var(--cor-texto);cursor:pointer}.v25-estilo.ativo{outline:2px solid var(--cor-primaria);outline-offset:1px}.v25-estilo small{font-size:10px;color:var(--cor-texto-suave)}.v25-amostra{height:46px;border-radius:9px;width:100%;background:linear-gradient(130deg,#4a5066,#a69db9)}.v25-softglass{background:linear-gradient(135deg,#4d3a69,#b5a1c8,#3e3656)}.v25-editorial{background:linear-gradient(135deg,#311d35,#794052,#d4b2a6)}.v25-atelier{background:linear-gradient(135deg,#392a24,#88684c,#d2b59a)}.v25-aurora{background:linear-gradient(135deg,#292448,#8a4e8f,#ce829e)}
+html[data-design-v25="softglass"] .card,html[data-design-v25="softglass"] .habito-card,html[data-design-v25="softglass"] .config-secao{background-color:color-mix(in srgb,var(--cor-card,#493951) 55%,transparent)!important;backdrop-filter:blur(22px) saturate(145%);-webkit-backdrop-filter:blur(22px) saturate(145%);border:1px solid #ffffff38!important;box-shadow:inset 0 1px #ffffff20,0 14px 35px #00000018;border-radius:23px}html[data-design-v25="softglass"] body{background-image:radial-gradient(ellipse at 10% 20%,#a17bd42a,transparent 43%),radial-gradient(ellipse at 90% 75%,#df9db42a,transparent 45%)!important;background-attachment:fixed}
+html[data-design-v25="editorial"] h1,html[data-design-v25="editorial"] h2,html[data-design-v25="editorial"] h3{font-family:Georgia,serif;letter-spacing:-.025em}html[data-design-v25="editorial"] .card,html[data-design-v25="editorial"] .habito-card{border-radius:12px!important;box-shadow:0 8px 25px #0000000b}
+html[data-design-v25="atelier"] .card,html[data-design-v25="atelier"] .habito-card,html[data-design-v25="atelier"] .config-secao{border-radius:18px;background-image:linear-gradient(135deg,#b7894c12,transparent 65%);box-shadow:0 8px 24px #261d1b14}html[data-design-v25="atelier"] h2,html[data-design-v25="atelier"] h3{font-family:Georgia,serif}
+html[data-design-v25="aurora"] body{background-image:radial-gradient(ellipse at 5% 10%,#ad66ce2e,transparent 50%),radial-gradient(ellipse at 95% 75%,#df759a27,transparent 50%)!important;background-attachment:fixed}html[data-design-v25="aurora"] .card,html[data-design-v25="aurora"] .habito-card,html[data-design-v25="aurora"] .config-secao{border-radius:24px;box-shadow:0 12px 30px #6d44831a;border:1px solid #ffffff2b}
 </style></head>
 <body data-espaco="trabalho">
 
@@ -4070,29 +4076,37 @@ async function carregarHabitosSupabase(){
     semana: datasSemana.map(d => (registros||[]).some(r=>r.habito_id===h.id && r.data===d && r.concluido))
   }));
 }
-async function alternarHabitoDia(id, idx){
-  const h = HABITOS.find(x=>x.id===id);
-  h.semana[idx] = !h.semana[idx];
-  const segunda = REF_INICIO_SEMANA;
-  const dataISO = formatoISO(addDias(segunda, idx));
-  const { data: existente } = await supa.from('habito_registros').select('id').eq('habito_id', id).eq('data', dataISO).maybeSingle();
-  if(existente){
-    await supa.from('habito_registros').update({concluido: h.semana[idx]}).eq('id', existente.id);
-  } else {
-    await supa.from('habito_registros').insert({habito_id: id, data: dataISO, concluido: h.semana[idx]});
-  }
-  h.registrosAno=h.registrosAno||[];
-  h.registrosAno=h.registrosAno.filter(d=>d!==dataISO);
-  if(h.semana[idx])h.registrosAno.push(dataISO);
-  renderTela();
+async function registrarHabitoNaData(id,dataISO,forcar=null){
+ const h=HABITOS.find(x=>String(x.id)===String(id));if(!h||!/^\d{4}-\d{2}-\d{2}$/.test(dataISO))return false;
+ if(dataISO>formatoISO(new Date())){dispararAutomacao('Data futura','Escolha hoje ou uma data anterior.');return false;}
+ const {data:existente,error:erro}=await supa.from('habito_registros').select('id,concluido').eq('habito_id',id).eq('data',dataISO).maybeSingle();
+ if(erro){dispararAutomacao('Erro ao consultar hábito',erro.message);return false;}
+ const concluido=forcar===null?!existente?.concluido:!!forcar;
+ const resposta=existente?await supa.from('habito_registros').update({concluido}).eq('id',existente.id):await supa.from('habito_registros').insert({habito_id:id,data:dataISO,concluido});
+ if(resposta.error){dispararAutomacao('Erro ao salvar hábito',resposta.error.message);return false;}
+ h.registrosAno=(h.registrosAno||[]).filter(d=>d!==dataISO);if(concluido)h.registrosAno.push(dataISO);
+ h.semana=Array.from({length:7},(_,i)=>h.registrosAno.includes(formatoISO(addDias(REF_INICIO_SEMANA,i))));renderTela();return true;
 }
+async function alternarHabitoDia(id,idx){await registrarHabitoNaData(id,formatoISO(addDias(REF_INICIO_SEMANA,idx)));}
+function editarHabitoRetroativo(id){
+ const h=HABITOS.find(x=>String(x.id)===String(id));if(!h)return;
+ const hoje=formatoISO(new Date());
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>Editar histórico</h2><p>${textoHTML(h.nome)} · Corrija qualquer dia anterior.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-field"><label>Data</label><input type="date" id="v25DataHabito" max="${hoje}" value="${hoje}" onchange="atualizarEstadoHabitoRetro('${id}')"></div><p id="v25EstadoHabito" style="margin:12px 0;color:var(--cor-texto-suave)">Consultando…</p><div class="system-modal-actions"><button class="btn-secundario" onclick="salvarHabitoRetroativo('${id}',false)">Não realizado</button><button class="btn-primario" onclick="salvarHabitoRetroativo('${id}',true)">Realizado ✓</button></div>`);
+ atualizarEstadoHabitoRetro(id);
+}
+async function atualizarEstadoHabitoRetro(id){
+ const dia=document.getElementById('v25DataHabito')?.value,alvo=document.getElementById('v25EstadoHabito');if(!dia||!alvo)return;
+ alvo.textContent='Consultando…';const {data,error}=await supa.from('habito_registros').select('concluido').eq('habito_id',id).eq('data',dia).maybeSingle();
+ if(document.getElementById('v25DataHabito')?.value===dia)alvo.textContent=error?'Erro ao consultar.':data?.concluido?'✓ Já realizado':'Sem registro de realização';
+}
+async function salvarHabitoRetroativo(id,concluido){const dia=document.getElementById('v25DataHabito')?.value;if(!dia)return;const ok=await registrarHabitoNaData(id,dia,concluido);if(ok)fecharModalSistema();}
 function pixelsHabitoV04(h){
  const ano=new Date().getFullYear(),marcados=new Set(h.registrosAno||[]);
  const meses=Array.from({length:12},(_,m)=>{
   const qtd=new Date(ano,m+1,0).getDate();
   return `<div class="pixel-mes-v04"><span>${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][m]}</span><div class="pixel-dias-v04">${Array.from({length:qtd},(_,d)=>{const data=`${ano}-${String(m+1).padStart(2,'0')}-${String(d+1).padStart(2,'0')}`;return `<span class="pixel-v04 ${marcados.has(data)?'feito':''}" title="${data}: ${marcados.has(data)?'Realizado':'Sem registro'}"></span>`;}).join('')}</div></div>`;
  }).join('');
- return `<details class="pixel-painel-v04"><summary>▦ Mapa de Consistência · ${ano} · ${marcados.size} dias</summary><div class="pixel-meses-v04">${meses}</div><small>Os quadradinhos coloridos representam dias realizados. Marque ou desmarque os dias pela visão semanal.</small></details>`;
+ return `<details class="pixel-painel-v04"><summary>▦ Mapa de Consistência · ${ano} · ${marcados.size} dias</summary><div class="pixel-meses-v04">${meses}</div><small>Os quadradinhos coloridos representam dias realizados. Para corrigir dias anteriores, use Editar histórico.</small></details>`;
 }
 async function novoHabito(){
   const nome = prompt("Nome do novo hábito:");
@@ -4110,7 +4124,7 @@ function habitosHTML(){
     ${HABITOS.map(h=>`
     <div class="habito-card">
       <div class="habito-topo">
-        <div class="habito-nome">${h.nome}</div>
+        <div class="habito-nome">${textoHTML(h.nome)}</div><button class="btn-secundario" onclick="editarHabitoRetroativo('${h.id}')">✎ Editar histórico</button>
         <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias</div>
       </div>
       <div class="habito-semana">
@@ -4527,6 +4541,9 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
 }
 function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{b.classList.toggle('ativo',b.getAttribute('onclick')?.includes("'"+id+"'"));});}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
+const V25_ESTILOS=['classico','softglass','editorial','atelier','aurora'];
+function escolherDesignV25(id){if(!V25_ESTILOS.includes(id))return;localStorage.setItem('me-design-v25',id);document.documentElement.dataset.designV25=id;if(telaAtual==='configuracoes')renderTela();}
+document.documentElement.dataset.designV25=localStorage.getItem('me-design-v25')||'classico';
 function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
 consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
@@ -4615,6 +4632,7 @@ function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
     <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#d99aac']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Escolha o design independentemente das cores. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Degradês luminosos']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
