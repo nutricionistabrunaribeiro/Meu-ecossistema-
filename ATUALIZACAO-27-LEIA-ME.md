@@ -1,0 +1,1 @@
+Atualização 27 — Editar histórico de hábitos em calendário anual interativo. Selecione ou desmarque vários dias e salve as alterações em lote. Suporta anos anteriores, bloqueia dias futuros, sincroniza registros no Supabase. Sem alteração de esquema de banco.

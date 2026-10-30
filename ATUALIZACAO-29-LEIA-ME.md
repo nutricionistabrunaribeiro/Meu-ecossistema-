@@ -1,0 +1,1 @@
+V29: ordenação alfabética A-Z, pt-BR, nos clientes vinculados à carteira Saber Nutrir e no Controle de Checklists (lista mensal e tabela anual). Preserva dados e vínculos. Inclui melhorias da versão 28.
