@@ -1760,6 +1760,46 @@ html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v19-situacao.neutro
  #appRoot:has(.v19-documentos) .fab-wrap{display:none!important}
 }
 </style>
+<style id="v37-melhorias">
+/* Clientes ativos/inativos: facil de localizar, sem excluir historico */
+.v37-clientes-filtros{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px}
+.v37-clientes-filtros button{border:1px solid var(--tema-borda,var(--cor-borda));border-radius:999px;padding:9px 14px;color:var(--tema-texto,var(--cor-texto));background:var(--glass-subtle,transparent);font-size:12px;font-weight:600}
+.v37-clientes-filtros button.selecionado{background:var(--tema-primaria,var(--cor-primaria));color:#fff;border-color:transparent}
+.v37-status-chip{display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;font-weight:700;font-size:11px;white-space:nowrap;vertical-align:middle}
+.v37-status-chip.ativo{background:rgba(55,134,91,.13);color:#277449;border:1px solid rgba(55,134,91,.25)}
+.v37-status-chip.inativo{background:rgba(123,113,122,.15);color:var(--tema-texto,var(--cor-texto));border:1px solid rgba(115,108,118,.3)}
+.v37-status-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.v37-inline-status{margin-left:8px;font-size:12px;color:var(--tema-primaria,var(--cor-primaria));text-decoration:underline;font-weight:600}
+html[data-paleta-v04] #appRoot .brand-mark{background:var(--tema-primaria)!important;background-image:none!important}
+html[data-paleta-v04] #appRoot .brand-sub{text-transform:none;letter-spacing:.02em;color:var(--tema-suave)!important}
+/* Pausa para inspirar: acabamento editorial, com uma familia de cores por tema. */
+html[data-paleta-v04] #appRoot .v24-print:nth-child(n){
+ background:color-mix(in srgb,var(--tema-superficie) 66%,transparent)!important;
+ color:var(--tema-texto)!important;border:1px solid var(--glass-line)!important;
+ padding:clamp(20px,3vw,30px)!important;border-radius:25px!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.34),0 12px 35px rgba(57,27,46,.09)!important;
+ -webkit-backdrop-filter:blur(42px) saturate(110%)!important;backdrop-filter:blur(42px) saturate(110%)!important;
+}
+html[data-paleta-v04] #appRoot .v24-print::after{content:'✦';position:absolute;right:-12px;top:18%;font-size:clamp(100px,12vw,165px);font-family:Georgia,serif;line-height:1;color:var(--tema-primaria);opacity:.07;pointer-events:none}
+html[data-paleta-v04] #appRoot .v24-print-quote{font-family:'Fraunces',Georgia,serif;font-size:clamp(21px,2.4vw,32px);line-height:1.36;font-weight:600;letter-spacing:-.02em;color:var(--tema-texto)!important;position:relative;z-index:1}
+html[data-paleta-v04] #appRoot .v24-print :is(.v24-print-top,.v24-print-kicker){color:var(--tema-primaria)!important;font-weight:700}
+html[data-paleta-v04] #appRoot .v24-print-extra{color:var(--tema-suave)!important;font-size:12px}
+html[data-paleta-v04] #appRoot .v24-print-bottom{border-top:1px solid var(--glass-line);gap:12px;flex-wrap:wrap;color:var(--tema-suave)!important}
+.v37-posta-btn{border:1px solid var(--tema-borda,var(--cor-borda));padding:7px 10px;border-radius:999px;background:var(--glass-subtle,transparent);color:var(--tema-primaria,var(--cor-primaria));font-size:10px;font-weight:700;letter-spacing:0;cursor:pointer}
+.v37-posta-arte{aspect-ratio:4/5;width:min(100%,420px);margin:12px auto;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;border:1px solid var(--glass-line);border-radius:20px;background:color-mix(in srgb,var(--tema-primaria) 7%,var(--tema-superficie));color:var(--tema-texto);padding:clamp(24px,5vw,40px);box-shadow:0 16px 50px rgba(40,18,35,.16)}
+.v37-posta-arte::before{content:'';position:absolute;width:170px;height:170px;border-radius:50%;border:35px solid var(--tema-primaria);opacity:.065;right:-75px;top:11%;pointer-events:none}
+.v37-posta-topo,.v37-posta-rodape{position:relative;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--tema-primaria)}
+.v37-posta-topo span:last-child{font-family:Georgia,serif;font-size:25px}
+.v37-posta-corpo{position:relative;margin:32px 0;overflow-wrap:anywhere}
+.v37-posta-kicker{font-size:11px;letter-spacing:.12em;color:var(--tema-primaria);font-weight:700;margin-bottom:18px}
+.v37-posta-citacao{font-family:'Fraunces',Georgia,serif;font-size:clamp(22px,5.2vw,35px);line-height:1.4;color:var(--tema-texto);font-weight:600}
+.v37-posta-complemento{font-size:12px;color:var(--tema-suave);margin-top:22px}
+.v37-posta-rodape{border-top:1px solid var(--glass-line);padding-top:14px}
+.v37-posta-botoes{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.v37-posta-ajuda{font-size:11px;color:var(--tema-suave);text-align:center;margin-top:10px}
+.v37-posta .system-modal-head h2{margin:0}
+@media(max-width:650px){.v37-status-acoes{justify-content:flex-start}.v37-posta-arte{max-height:62vh}.v37-posta-citacao{font-size:clamp(19px,5vw,27px)}.v37-posta-botoes button{flex:1;min-width:0}.v37-clientes-filtros button{padding:9px 11px}}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -1899,10 +1939,7 @@ function renderSidebar(){
   let html = `
     <div class="brand">
       <div class="brand-mark" style="padding:0;overflow:hidden;"><svg viewBox="0 0 40 40" width="34" height="34">
-          <defs><linearGradient id="gSide" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="var(--cor-primaria)"/><stop offset="100%" stop-color="var(--cor-primaria-clara)"/>
-          </linearGradient></defs>
-          <rect width="40" height="40" rx="9" fill="url(#gSide)"/>
+          <rect width="40" height="40" rx="9" fill="var(--tema-primaria, var(--cor-primaria))"/>
           <g stroke="#ffffff" stroke-width="1.6" opacity="0.9">
             <line x1="20" y1="20" x2="12" y2="12"/><line x1="20" y1="20" x2="28" y2="12"/>
             <line x1="20" y1="20" x2="12" y2="27"/><line x1="20" y1="20" x2="28" y2="27"/>
@@ -1915,7 +1952,7 @@ function renderSidebar(){
         </svg></div>
       <div>
         <div class="brand-name">Meu Ecossistema</div>
-        <div class="brand-sub">BRUNA RIBEIRO CONSULTORIA</div>
+        <div class="brand-sub">Bruna Ribeiro</div>
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
@@ -2056,7 +2093,7 @@ function abrirModalSistema(html){const modal=document.getElementById('modalSiste
 function fecharModalSistema(){const modal=document.getElementById('modalSistema');modal.classList.remove('aberto');document.getElementById('modalSistemaConteudo').innerHTML='';celulaAtiva=null;}
 function selecionarClientesVisual({titulo='Selecionar cliente',clientes=CLIENTES,multiplo=false,atuais=[],opcional=false}={}){
   return new Promise(resolve=>{
-    const lista=(clientes||[]).filter(Boolean),selecionados=new Set(atuais||[]),bg=document.createElement('div');bg.className='cliente-picker-bg';
+    const lista=ordenarClientesAZ((clientes||[]).filter(c=>c&&(clienteAtivoV37(c)||(atuais||[]).some(id=>String(id)===String(c.id))))),selecionados=new Set(atuais||[]),bg=document.createElement('div');bg.className='cliente-picker-bg';
     bg.innerHTML=`<div class="cliente-picker" role="dialog" aria-modal="true"><div class="cliente-picker-top"><h3>${textoHTML(titulo)}</h3><p>${lista.length} cliente(s) disponível(is) · pesquise pelo nome ou carteira</p></div><input class="cliente-picker-busca" placeholder="Buscar cliente..." autocomplete="off"><div class="cliente-picker-tools">${multiplo?'<button data-all>Selecionar todos</button><button data-none>Limpar seleção</button><span data-count></span>':''}</div><div class="cliente-picker-lista"></div><div class="cliente-picker-actions"><div><button class="btn-secundario" data-cancel>Cancelar</button>${opcional&&!multiplo?' <button class="btn-secundario" data-empty>Sem cliente</button>':''}</div>${multiplo?'<button class="btn-primario" data-confirm>Confirmar seleção</button>':''}</div></div>`;
     const area=bg.querySelector('.cliente-picker-lista'),busca=bg.querySelector('.cliente-picker-busca');
     const rotulo=c=>{const pai=CLIENTES.find(x=>x.id===c.contratanteId);return pai?`Vinculado a ${pai.nome}`:(c.tipoCliente==='contratante'?'Contratante/parceira':'Cliente direto')};
@@ -2332,7 +2369,7 @@ function categoriaPorTipo(tipo,clienteId){
   return ({reuniao:'reuniao',treinamento:'treinamento',pessoal:'pessoal'})[tipo]||'outro';
 }
 function abrirFormularioAgenda(dataISO,hora){
-  const clientes=CLIENTES.filter(c=>String(c.status||'Ativo').toLowerCase()!=='inativo');
+  const clientes=ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37));
   abrirModalSistema(`<div class="system-modal-head"><div><h2>Novo compromisso</h2><p>Preencha na ordem da sua rotina. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
     <div class="form-field full"><label>1. Cliente</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()" autofocus><option value="">Sem cliente / compromisso pessoal</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
     <div class="form-field full"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
@@ -2443,6 +2480,7 @@ const CLIENTES = [
   },
 ];
 
+let filtroStatusClientesV37='ativos';
 let clienteSelecionadoId = null;
 let abaClienteAtiva = "cadastro";
 
@@ -2468,17 +2506,22 @@ function clientesHTML(){
   }
   return `
     <div class="clientes-topo">
-      <input class="clientes-busca" placeholder="Buscar cliente...">
+      <input class="clientes-busca" placeholder="Buscar cliente..." oninput="buscarClientesV37(this.value)">
       <button class="btn-novo-cliente" onclick="novoCliente()">+ Novo cliente</button>
     </div>
+    <div class="v37-clientes-filtros" role="group" aria-label="Situação dos clientes">
+      <button class="${filtroStatusClientesV37==='ativos'?'selecionado':''}" onclick="selecionarStatusClientesV37('ativos')">Ativos (${CLIENTES.filter(c=>c.tipoCliente!=='vinculado'&&clienteAtivoV37(c)).length})</button>
+      <button class="${filtroStatusClientesV37==='inativos'?'selecionado':''}" onclick="selecionarStatusClientesV37('inativos')">Inativos (${CLIENTES.filter(c=>c.tipoCliente!=='vinculado'&&!clienteAtivoV37(c)).length})</button>
+      <button class="${filtroStatusClientesV37==='todos'?'selecionado':''}" onclick="selecionarStatusClientesV37('todos')">Todos</button>
+    </div>
     <div class="lista-clientes">
-      ${CLIENTES.filter(c=>c.tipoCliente!=='vinculado').map(c=>`
-        <div class="cliente-card" onclick="abrirCliente('${c.id}')">
+      ${ordenarClientesAZ(CLIENTES.filter(c=>c.tipoCliente!=='vinculado'&&(filtroStatusClientesV37==='todos'||(filtroStatusClientesV37==='ativos'?clienteAtivoV37(c):!clienteAtivoV37(c))))).map(c=>`
+        <div class="cliente-card" data-nome="${textoHTML(c.nome.toLocaleLowerCase('pt-BR'))}" onclick="abrirCliente('${c.id}')">
           <div class="cliente-card-topo">
             <div class="cliente-card-ini">${iniciais(c.nome)}</div>
             <div>
               <div class="cliente-card-nome">${c.nome}</div>
-              <div class="cliente-card-status">${c.status} · ${c.tipoCliente==='contratante'?'Contratante/parceira':c.tipoCliente==='vinculado'?'Vinculado a '+(CLIENTES.find(x=>x.id===c.contratanteId)?.nome||'contratante'):'Cliente direto'}</div>
+              <div class="cliente-card-status"><span class="v37-status-chip ${clienteAtivoV37(c)?'ativo':'inativo'}">${clienteAtivoV37(c)?'Ativo':'Inativo'}</span> · ${c.tipoCliente==='contratante'?'Contratante/parceira':c.tipoCliente==='vinculado'?'Vinculado a '+(CLIENTES.find(x=>x.id===c.contratanteId)?.nome||'contratante'):'Cliente direto'}</div>
             </div>
           </div>
           <span class="prioridade-pill prioridade-${c.prioridade}">${labelPrioridade(c.prioridade)}</span>
@@ -2539,7 +2582,7 @@ async function novoCliente(contratanteInicial=null){
   const tipoCliente=tipoEscolha==='2'?'contratante':tipoEscolha==='3'?'vinculado':'direto';
   let contratanteId=contratanteInicial;
   if(tipoCliente==='vinculado'&&!contratanteId){
-    const contratantes=CLIENTES.filter(c=>c.tipoCliente==='contratante');
+    const contratantes=ordenarClientesAZ(CLIENTES.filter(c=>c.tipoCliente==='contratante'&&clienteAtivoV37(c)));
     if(!contratantes.length){alert('Cadastre primeiro a contratante/parceira.');return;}
     const n=prompt(`Vincular a qual contratante?\n${contratantes.map((c,i)=>`${i+1}. ${c.nome}`).join('\n')}`);const contratante=contratantes[parseInt(n)-1];if(!contratante)return;contratanteId=contratante.id;
   }
@@ -2579,8 +2622,23 @@ function visitasRealizadasMes(clienteId){const mes=formatoISO(new Date()).slice(
 function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));return {prev:c.visitasPrevistasMes||((c.visitasPrevistasSemana||0)*4),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
 function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
 function ordenarClientesAZ(lista){return [...lista].sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base',numeric:true}));}
-function carteiraContratanteHTML(c){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')" style="text-align:left"><strong>${f.nome}</strong></button><span style="display:flex;align-items:center;gap:8px"><button class="tag" onclick="alternarChecklistMensalCliente('${f.id}')">${f.recebeChecklistMensal?'Checklist mensal ✓':'Ativar checklist mensal'}</button>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>${controleChecklistsContratanteHTML(c)}`;}
-async function configurarCarteiraCliente(id){const c=CLIENTES.find(x=>x.id===id);const tipo=prompt('Tipo: direto, contratante ou vinculado',c.tipoCliente);if(!['direto','contratante','vinculado'].includes(tipo))return;let contratanteId=null;if(tipo==='vinculado'){const lista=CLIENTES.filter(x=>x.tipoCliente==='contratante'&&x.id!==id);const n=prompt(`Contratante:\n${lista.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);const pai=lista[parseInt(n)-1];if(!pai)return;contratanteId=pai.id;}const semana=parseInt(prompt('Visitas previstas por semana:',String(c.visitasPrevistasSemana||0)))||0;const mes=parseInt(prompt('Visitas previstas por mês:',String(c.visitasPrevistasMes||0)))||0;const recebe=tipo==='vinculado'?confirm('Este estabelecimento recebe checklist mensal?'):false;const {error}=await supa.from('clientes').update({tipo_cliente:tipo,contratante_id:contratanteId,visitas_previstas_semana:semana,visitas_previstas_mes:mes,recebe_checklist_mensal:recebe}).eq('id',id);if(error){dispararAutomacao('Erro ao salvar carteira',error.message);return;}Object.assign(c,{tipoCliente:tipo,contratanteId,visitasPrevistasSemana:semana,visitasPrevistasMes:mes,recebeChecklistMensal:recebe});renderTela();}
+function clienteAtivoV37(c){return String(c?.status||'Ativo').trim().toLocaleLowerCase('pt-BR')!=='inativo';}
+function selecionarStatusClientesV37(filtro){filtroStatusClientesV37=filtro;renderTela();}
+function buscarClientesV37(valor){const termo=String(valor||'').trim().toLocaleLowerCase('pt-BR');document.querySelectorAll('.lista-clientes .cliente-card').forEach(el=>{el.style.display=(el.dataset.nome||'').includes(termo)?'':'none'});}
+async function alternarStatusClienteV37(id){
+ const cliente=CLIENTES.find(c=>String(c.id)===String(id));if(!cliente)return;
+ const ativar=!clienteAtivoV37(cliente),novo=ativar?'Ativo':'Inativo';
+ const texto=ativar?`Reativar ${cliente.nome}? Ele voltará a aparecer nas listas de seleção.`:`Inativar ${cliente.nome}? Ele deixará de aparecer em novas seleções, mas os compromissos, documentos e históricos permanecerão preservados.`;
+ if(!confirm(texto))return;
+ const {error}=await supa.from('clientes').update({status:novo}).eq('id',cliente.id);
+ if(error){dispararAutomacao('Não foi possível alterar o status',error.message);return;}
+ cliente.status=novo;
+ dispararAutomacao(ativar?'Cliente reativado':'Cliente inativado',cliente.nome);
+ renderSidebar();renderTela();
+}
+
+function carteiraContratanteHTML(c){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')" style="text-align:left"><strong>${textoHTML(f.nome)}</strong> ${clienteAtivoV37(f)?'':'<small class="v37-status-chip inativo">Inativo</small>'}</button><span style="display:flex;align-items:center;gap:8px"><button class="tag" onclick="alternarChecklistMensalCliente('${f.id}')">${f.recebeChecklistMensal?'Checklist mensal ✓':'Ativar checklist mensal'}</button>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>${controleChecklistsContratanteHTML(c)}`;}
+async function configurarCarteiraCliente(id){const c=CLIENTES.find(x=>x.id===id);const tipo=prompt('Tipo: direto, contratante ou vinculado',c.tipoCliente);if(!['direto','contratante','vinculado'].includes(tipo))return;let contratanteId=null;if(tipo==='vinculado'){const lista=ordenarClientesAZ(CLIENTES.filter(x=>x.tipoCliente==='contratante'&&x.id!==id&&clienteAtivoV37(x)));const n=prompt(`Contratante:\n${lista.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);const pai=lista[parseInt(n)-1];if(!pai)return;contratanteId=pai.id;}const semana=parseInt(prompt('Visitas previstas por semana:',String(c.visitasPrevistasSemana||0)))||0;const mes=parseInt(prompt('Visitas previstas por mês:',String(c.visitasPrevistasMes||0)))||0;const recebe=tipo==='vinculado'?confirm('Este estabelecimento recebe checklist mensal?'):false;const {error}=await supa.from('clientes').update({tipo_cliente:tipo,contratante_id:contratanteId,visitas_previstas_semana:semana,visitas_previstas_mes:mes,recebe_checklist_mensal:recebe}).eq('id',id);if(error){dispararAutomacao('Erro ao salvar carteira',error.message);return;}Object.assign(c,{tipoCliente:tipo,contratanteId,visitasPrevistasSemana:semana,visitasPrevistasMes:mes,recebeChecklistMensal:recebe});renderTela();}
 
 /* ---------- CONTROLE MENSAL DE CHECKLISTS DAS CONTRATANTES ---------- */
 let CHECKLIST_ENVIOS_MENSAIS=[];
@@ -2885,9 +2943,9 @@ function fichaClienteHTML(c){
       <div class="ficha-ini">${iniciais(c.nome)}</div>
       <div style="flex:1;">
         <div class="ficha-nome">${c.nome}</div>
-        <div class="ficha-sub">${c.status} · Responsável: ${c.responsavel}</div>
+        <div class="ficha-sub"><span class="v37-status-chip ${clienteAtivoV37(c)?'ativo':'inativo'}">${clienteAtivoV37(c)?'Ativo':'Inativo'}</span> · Responsável: ${textoHTML(c.responsavel||'')}</div>
       </div>
-      <button onclick="excluirCliente('${c.id}')" style="color:#B0413E;font-size:12px;font-weight:600;border:1px solid #F6E1E5;padding:8px 12px;border-radius:8px;">🗑 Excluir cliente</button>
+      <div class="v37-status-acoes"><button class="btn-secundario" onclick="alternarStatusClienteV37('${c.id}')">${clienteAtivoV37(c)?'Arquivar como inativo':'Reativar cliente'}</button><button onclick="excluirCliente('${c.id}')" style="color:#B0413E;font-size:12px;font-weight:600;border:1px solid #F6E1E5;padding:8px 12px;border-radius:8px;">🗑 Excluir cliente</button></div>
     </div>
     <div class="abas">
       ${ABAS_CLIENTE.map(a=>`<button class="${abaClienteAtiva===a.id?'active':''}" onclick="selecionarAbaCliente('${a.id}')">${a.nome}</button>`).join('')}
@@ -2904,7 +2962,7 @@ function abaConteudoClienteHTML(c){
         <div class="linha-2">
           <div class="campo"><label>Nome</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','nome','Nome')">${c.nome} ✎</div></div>
           <div class="campo"><label>CNPJ/CPF</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','cnpj_cpf','CNPJ/CPF')">${c.cnpj} ✎</div></div>
-          <div class="campo"><label>Status</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','status','Status')">${c.status} ✎</div></div>
+          <div class="campo"><label>Situação do cliente</label><div class="valor"><span class="v37-status-chip ${clienteAtivoV37(c)?'ativo':'inativo'}">${clienteAtivoV37(c)?'Ativo':'Inativo'}</span> <button class="v37-inline-status" onclick="alternarStatusClienteV37('${c.id}')">${clienteAtivoV37(c)?'Inativar':'Reativar'} ↗</button></div></div>
           <div class="campo"><label>Prioridade</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','prioridade','Prioridade (alta/media/baixa)')">${labelPrioridade(c.prioridade)} ✎</div></div>
           <div class="campo"><label>Responsável</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','responsavel','Responsável')">${c.responsavel} ✎</div></div>
           <div class="campo"><label>Cliente desde</label><div class="valor editavel" onclick="editarCampoCliente('${c.id}','inicio','Cliente desde')">${c.inicio} ✎</div></div>
@@ -3156,10 +3214,11 @@ function mesAnoPorData(dataISO){
 
 async function novaVisita(clienteId=null){
   if(!navigator.onLine||modoConsultaOffline){alert('Inicie o checklist com conexão. Depois você poderá continuar o preenchimento sem internet.');return;}
-  const clientesChecklist=CLIENTES.filter(c=>c.tipoCliente!=='vinculado');
+  const clientesChecklist=CLIENTES.filter(c=>c.tipoCliente!=='vinculado'&&clienteAtivoV37(c));
   if(clientesChecklist.length===0){ alert('Cadastre um cliente direto antes de iniciar um checklist.'); return; }
   let clienteEscolhido=CLIENTES.find(c=>c.id===clienteId);
   if(clienteEscolhido?.tipoCliente==='vinculado'){alert('Os estabelecimentos vinculados são controlados dentro da contratante e não entram no seletor de checklists.');return;}
+  if(clienteEscolhido&&!clienteAtivoV37(clienteEscolhido)){alert('Este cliente está inativo. Reative o cadastro antes de iniciar um novo checklist.');return;}
   if(!clienteEscolhido){
     clienteEscolhido=await selecionarClientesVisual({titulo:'Cliente do checklist',clientes:clientesChecklist});
     if(!clienteEscolhido)return;
@@ -5155,7 +5214,7 @@ function formatarDuracao(ms,comSegundos=false){const total=Math.floor(ms/1000),h
 function clienteRegistroHoras(r){return CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'';}
 function atualizarCronometros(){const ativo=atividadeHorasAtiva();if(!ativo)return;document.querySelectorAll('[data-cronometro]').forEach(el=>el.textContent=formatarDuracao(duracaoHorasMs(ativo),true));}
 function controleAtivoHTML({dashboard=false}={}){const a=atividadeHorasAtiva();if(!a)return `<div class="card ${dashboard?'horas-dashboard':''}" style="border-top:4px solid var(--cor-primaria)"><h3>Controle de horas <button onclick="irPara('controle_horas')">ver histórico</button></h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="pend-desc">Nenhuma atividade em andamento.</div></div><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div></div>`;const cliente=clienteRegistroHoras(a);return `<section class="horas-ativo ${dashboard?'horas-dashboard':''}"><div class="horas-ativo-top"><div><small>${dashboard?'Atividade em andamento':'Cronômetro ativo'}</small><h2>${textoHTML(ROTULOS_HORAS[a.tipo]||a.tipo)}</h2><div class="horas-ativo-meta">${cliente?textoHTML(cliente)+' · ':''}${textoHTML(ROTULOS_CARTEIRA[a.carteira]||a.carteira)} · iniciada às ${new Date(a.inicio).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="horas-cronometro" data-cronometro>${formatarDuracao(duracaoHorasMs(a),true)}</div></div><div class="horas-ativo-acoes"><button class="horas-finalizar" onclick="finalizarControleHoras('${a.id}')">■ Finalizar</button>${dashboard?`<button class="horas-abrir" onclick="irPara('controle_horas')">Abrir controle</button>`:''}</div></section>`;}
-function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${CLIENTES.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
+function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37)).map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
 async function iniciarControleHoras(){const tipo=document.getElementById('horaTipo')?.value,carteira=document.getElementById('horaCarteira')?.value,cliente_id=document.getElementById('horaCliente')?.value||null,observacao=document.getElementById('horaObservacao')?.value.trim()||null;if(tipo==='deslocamento'&&(!document.getElementById('horaOrigem')?.value.trim()||!document.getElementById('horaDestino')?.value.trim())){alert('Informe origem e destino.');return;}const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').insert({user_id:user.id,tipo,carteira,cliente_id,observacao,...(tipo==='deslocamento'?{origem_tipo:'outro',origem_texto:document.getElementById('horaOrigem').value.trim(),destino_tipo:'outro',destino_texto:document.getElementById('horaDestino').value.trim()}:{}),inicio:new Date().toISOString()}).select().single();if(error){dispararAutomacao('Erro ao iniciar atividade',error.message);return;}CONTROLE_HORAS.unshift(data);fecharModalSistema();dispararAutomacao('Cronômetro iniciado',ROTULOS_HORAS[tipo]);renderSidebar();renderTela();}
 async function finalizarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||r.fim)return;if(!confirm(`Finalizar ${ROTULOS_HORAS[r.tipo]||'atividade'} agora?`))return;const fim=new Date().toISOString();const {error}=await supa.from('controle_horas').update({fim,atualizado_em:fim}).eq('id',id);if(error){dispararAutomacao('Erro ao finalizar atividade',error.message);return;}r.fim=fim;r.atualizado_em=fim;dispararAutomacao('Atividade finalizada',`Duração: ${formatarDuracao(duracaoHorasMs(r))}`);renderSidebar();renderTela();}
 function dataHoraLocalInput(iso){if(!iso)return '';const d=new Date(iso),off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
@@ -6341,7 +6400,7 @@ const V24_BELEZAS=[
 ];
 function v24IndiceDia(tamanho,salto=0){const [a,m,d]=diaInspiracao().split('-').map(Number);const n=Math.floor(Date.UTC(a,m-1,d)/86400000);return ((n*7+salto)%tamanho+tamanho)%tamanho}
 function v24CardHTML(tipo,etiqueta,conteudo,extra,icone){
- return `<article class="v24-print v24-${tipo}" aria-label="${etiqueta}"><div class="v24-print-top"><span>✦ PAUSA PARA INSPIRAR</span><span class="v24-print-icon">${icone}</span></div><div class="v24-print-main"><div class="v24-print-kicker">${etiqueta}</div><div class="v24-print-quote">${textoHTML(conteudo)}</div>${extra?`<div class="v24-print-extra">${textoHTML(extra)}</div>`:''}</div><div class="v24-print-bottom"><span>Meu Ecossistema · Bruna Ribeiro</span><span>✧</span></div></article>`;
+ return `<article class="v24-print v24-${tipo}" aria-label="${etiqueta}"><div class="v24-print-top"><span>✦ PAUSA PARA INSPIRAR</span><span class="v24-print-icon">${icone}</span></div><div class="v24-print-main"><div class="v24-print-kicker">${etiqueta}</div><div class="v24-print-quote">${textoHTML(conteudo)}</div>${extra?`<div class="v24-print-extra">${textoHTML(extra)}</div>`:''}</div><div class="v24-print-bottom"><span>Meu Ecossistema · Bruna Ribeiro</span><button type="button" class="v37-posta-btn" onclick="abrirPausaPostagemV37('${tipo}')" aria-label="Preparar ${etiqueta.toLowerCase()} para postar">Visualizar para postar ↗</button></div></article>`;
 }
 function pausaInspirarV24(){
  const dados=lerInspiracao(),dia=diaInspiracao(),diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
@@ -6356,9 +6415,59 @@ function pausaInspirarV24(){
  ${v24CardHTML('frase','FRASE DO DIA',frase,'','❞')}
  ${v24CardHTML('pergunta','PERGUNTA DO DIA',V24_PERGUNTAS[v24IndiceDia(V24_PERGUNTAS.length,3)],'Uma pergunta para levar com você.','?')}
  ${v24CardHTML('beleza','PEQUENA BELEZA DO DIA',V24_BELEZAS[v24IndiceDia(V24_BELEZAS.length,9)],'Há delicadeza no que parece comum.','✿')}
- </div><p class="v24-print-hint">Dica: para postar, aproxime o card na tela e faça seu print. Nenhuma informação pessoal da Agenda aparece aqui.</p></section>`;
+ </div><p class="v24-print-hint">Toque em “Visualizar para postar” para abrir o card sem distrações e gerar sua imagem vertical para o Instagram.</p></section>`;
 }
 
+// Cartoes de inspiracao preparados para publicacao, sem dados de agenda ou clientes.
+function dadosPausaPostagemV37(tipo){
+ const dados=lerInspiracao(),dia=diaInspiracao(),diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
+ const idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
+ const frase=dados.frase||V12_FRASES[((idx%V12_FRASES.length)+V12_FRASES.length)%V12_FRASES.length];
+ const opcoes={
+  verso:{rotulo:'VERSÍCULO DO DIA',conteudo:(valido?dados.versiculo:'')||'Escolha seu versículo para compartilhar.',extra:valido?dados.referencia:referenciaDoDia(),icone:'✝'},
+  frase:{rotulo:'FRASE DO DIA',conteudo:frase,extra:'',icone:'✧'},
+  pergunta:{rotulo:'PERGUNTA DO DIA',conteudo:V24_PERGUNTAS[v24IndiceDia(V24_PERGUNTAS.length,3)],extra:'Uma pergunta para levar com você.',icone:'?'},
+  beleza:{rotulo:'PEQUENA BELEZA DO DIA',conteudo:V24_BELEZAS[v24IndiceDia(V24_BELEZAS.length,9)],extra:'Há delicadeza no que parece comum.',icone:'✿'}
+ };
+ return {tipo,...(opcoes[tipo]||opcoes.frase)};
+}
+function abrirPausaPostagemV37(tipo){
+ const d=dadosPausaPostagemV37(tipo);
+ abrirModalSistema(`<div class="v37-posta"><div class="system-modal-head"><div><h2>Pronto para postar</h2><p>Prévia vertical 4:5 · sem dados pessoais</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="v37-posta-arte"><div class="v37-posta-topo"><span>✦ PAUSA PARA INSPIRAR</span><span>${d.icone}</span></div><div class="v37-posta-corpo"><div class="v37-posta-kicker">${d.rotulo}</div><div class="v37-posta-citacao">${textoHTML(d.conteudo)}</div>${d.extra?`<div class="v37-posta-complemento">${textoHTML(d.extra)}</div>`:''}</div><div class="v37-posta-rodape">BRUNA RIBEIRO <span>✦</span></div></div><div class="v37-posta-botoes"><button class="btn-secundario" onclick="fecharModalSistema()">Voltar</button><button class="btn-primario" onclick="baixarPausaPostagemV37('${tipo}')">Salvar / compartilhar imagem</button></div><p class="v37-posta-ajuda">A imagem é gerada no seu aparelho, em 1080 × 1350 pixels.</p></div>`);
+}
+function linhasTextoCanvasV37(ctx,texto,largura){
+ const palavras=String(texto||'').split(/\s+/).filter(Boolean),linhas=[];let linha='';
+ for(const palavra of palavras){const teste=linha?linha+' '+palavra:palavra;if(ctx.measureText(teste).width>largura&&linha){linhas.push(linha);linha=palavra;}else linha=teste;}
+ if(linha)linhas.push(linha);return linhas;
+}
+async function baixarPausaPostagemV37(tipo){
+ const d=dadosPausaPostagemV37(tipo),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ const claro=document.documentElement.getAttribute('data-tema-interface')==='claro';
+ const estilo=getComputedStyle(document.documentElement),primaria=estilo.getPropertyValue('--tema-primaria').trim()||'#93435D';
+ const fundo=claro?'#F8F1EE':'#291C28',texto=claro?'#332632':'#F8F1EE',suave=claro?'#72606A':'#D7C4CE';
+ ctx.fillStyle=fundo;ctx.fillRect(0,0,1080,1350);
+ ctx.fillStyle=primaria;ctx.fillRect(0,0,1080,16);ctx.fillRect(0,1334,1080,16);
+ ctx.strokeStyle=claro?'rgba(103,64,79,.22)':'rgba(244,230,234,.25)';ctx.lineWidth=3;ctx.strokeRect(72,72,936,1206);
+ ctx.fillStyle=primaria;ctx.beginPath();ctx.arc(922,205,68,0,2*Math.PI);ctx.fill();
+ ctx.fillStyle='#FFFFFF';ctx.font='54px Georgia';ctx.textAlign='center';ctx.fillText(d.icone,922,225);ctx.textAlign='left';
+ ctx.fillStyle=suave;ctx.font='bold 27px Arial';ctx.fillText('✦   P A U S A   P A R A   I N S P I R A R',126,174);
+ ctx.fillStyle=primaria;ctx.font='bold 28px Arial';ctx.fillText(d.rotulo,126,385);
+ let font=66,linhas=[],passo=0;
+ do{font-=2;ctx.font=`${font}px Georgia`;linhas=linhasTextoCanvasV37(ctx,d.conteudo,810);passo=font*1.36;}while(font>40&&linhas.length*passo>640);
+ const altura=linhas.length*passo,comeco=510+Math.max(0,(530-altura)/2);
+ ctx.fillStyle=texto;ctx.font=`${font}px Georgia`;linhas.forEach((l,i)=>ctx.fillText(l,126,comeco+i*passo));
+ if(d.extra){ctx.fillStyle=suave;ctx.font='31px Arial';linhasTextoCanvasV37(ctx,d.extra,830).slice(0,2).forEach((l,i)=>ctx.fillText(l,126,1120+i*43));}
+ ctx.strokeStyle=claro?'rgba(103,64,79,.22)':'rgba(244,230,234,.25)';ctx.beginPath();ctx.moveTo(126,1195);ctx.lineTo(954,1195);ctx.stroke();
+ ctx.font='bold 26px Arial';ctx.fillStyle=primaria;ctx.fillText('BRUNA RIBEIRO',126,1244);ctx.textAlign='right';ctx.fillText('✦',954,1244);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+ if(!blob){alert('Não foi possível gerar a imagem neste navegador. Você pode tirar um print da prévia.');return;}
+ const nome=`pausa-para-inspirar-${tipo}-${diaInspiracao()}.png`;
+ try{
+  if(navigator.canShare&&navigator.share){const arquivo=new File([blob],nome,{type:'image/png'});if(navigator.canShare({files:[arquivo]})){await navigator.share({files:[arquivo],title:'Pausa para inspirar'});return;}}
+ }catch(e){if(e?.name==='AbortError')return;}
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
+}
 function visaoGeralHTML(){
  const hoje=new Date().toLocaleDateString('sv-SE');
  const tarefas=(typeof LISTA_DIA!=='undefined'?LISTA_DIA:[])||[];

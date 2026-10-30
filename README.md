@@ -1,1 +1,4 @@
-Meu Ecossistema Bruna Ribeiro — Atualização 36 completa (v35 + ajustes de contraste e responsividade). Consulte ATUALIZACAO-36-LEIA-ME.md.
+# Meu Ecossistema — Bruna Ribeiro
+
+Atualização 37 completa, incluindo os ajustes anteriores da versão 36.
+Leia `ATUALIZACAO-37-LEIA-ME.md` antes de publicar.
