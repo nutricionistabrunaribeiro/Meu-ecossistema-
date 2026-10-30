@@ -1222,6 +1222,208 @@ html[data-design-v25="ameixachampagne"] .v25-ameixachampagne::after{content:"";p
 @media(max-width:700px){html[data-design-v25="ameixachampagne"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.plan-card){border-radius:19px!important}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-design-v25="ameixachampagne"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.sidebar){background:rgba(60,44,65,.93)!important}}
 </style>
+
+<style id="v34-paletas-calmas-vidro-maximo">
+/* Atualizacao 34: padrao cromatico calmo: 1 cor dominante + 2 de destaque.
+   Esta camada vem por ultimo para sobrepor gradientes e cores legadas.
+   Estados semanticos (valido, vencido, alerta) continuam distinguiveis. */
+html[data-paleta-v04]{
+  --glass-bg:rgba(255,255,255,.075);
+  --glass-bg-high:rgba(255,255,255,.105);
+  --glass-subtle:rgba(255,255,255,.055);
+  --glass-line:rgba(255,255,255,.27);
+  --glass-rim:rgba(255,255,255,.32);
+  --glass-btn-text:var(--tema-fundo);
+  --tema-destaque:var(--tema-clara);
+  --cor-card:var(--glass-bg)!important;
+  --cor-fundo-card:var(--glass-bg)!important;
+}
+/* Familia unica por paleta: principal = cor de interacao; 
+   champagne/variante suave = detalhes; base escura = apoio. */
+html[data-paleta-v04="lavanda"]{--tema-primaria:#b79cda;--tema-clara:#d5c3e7;--tema-acento:#e4d2bc;--tema-destaque:#c4afcf}
+html[data-paleta-v04="aurora"]{--tema-primaria:#85b9de;--tema-clara:#b7d6ea;--tema-acento:#e5d7ca;--tema-destaque:#adc9dc}
+html[data-paleta-v04="jardim"]{--tema-primaria:#8bc4a7;--tema-clara:#b8dcc6;--tema-acento:#e3d6bb;--tema-destaque:#afcbb9}
+html[data-paleta-v04="rose"]{--tema-primaria:#d79bae;--tema-clara:#ebc0cd;--tema-acento:#e8d7cb;--tema-destaque:#d4b2bc}
+html[data-paleta-v04="oceano"]{--tema-primaria:#91c9d0;--tema-clara:#badfe0;--tema-acento:#e0d7ca;--tema-destaque:#b0d0d6}
+html[data-paleta-v04="ametista"]{--tema-primaria:#ba9ddc;--tema-clara:#dbc8ec;--tema-acento:#e6d4c8;--tema-destaque:#cab4da}
+html[data-paleta-v04="terra"]{--tema-primaria:#d1ae7d;--tema-clara:#e7cca6;--tema-acento:#eadbc9;--tema-destaque:#cbb7a4}
+html[data-paleta-v04="marsala"]{
+  --tema-fundo:#261820;
+  --tema-superficie:#563241;
+  --tema-borda:#79505f;
+  --tema-primaria:#93435d;
+  --tema-clara:#b7758a;
+  --tema-acento:#e6d2bb;
+  --tema-destaque:#c89bab;
+  --tema-texto:#f8edf0;
+  --tema-suave:#e1cbd3;
+  --glass-btn-text:#fff7f8;
+}
+/* Fundo quase liso. Dois brilhos difusos, sem misturar gradientes em cada card. */
+html[data-paleta-v04][data-design-v25] body{
+  background:var(--tema-fundo)!important;
+  background-image:none!important;
+  color:var(--tema-texto)!important;
+}
+html[data-paleta-v04][data-design-v25] body::before{
+  content:""!important;
+  position:fixed!important;inset:auto -18vw auto auto!important;
+  top:-16vh!important;width:52vw!important;height:65vh!important;
+  border-radius:50%!important;
+  background:color-mix(in srgb,var(--tema-primaria) 46%,transparent)!important;
+  filter:blur(105px)!important;opacity:.52!important;
+  pointer-events:none!important;z-index:0!important;
+}
+html[data-paleta-v04][data-design-v25] body::after{
+  content:"";position:fixed;left:-18vw;bottom:-18vh;
+  width:55vw;height:58vh;border-radius:50%;
+  background:color-mix(in srgb,var(--tema-destaque) 28%,transparent);
+  filter:blur(112px);opacity:.35;z-index:0;pointer-events:none;
+}
+html[data-paleta-v04][data-design-v25] #appRoot{
+  position:relative;z-index:1;background:transparent!important;
+  --cor-primaria:var(--tema-primaria)!important;
+  --cor-primaria-clara:var(--tema-clara)!important;
+  --cor-acento:var(--tema-acento)!important;
+  --cor-texto:var(--tema-texto)!important;
+  --cor-texto-suave:var(--tema-suave)!important;
+}
+html[data-paleta-v04][data-design-v25] #appRoot::before{
+  content:none!important;background:none!important;
+}
+html[data-paleta-v04][data-design-v25] #appRoot main{
+  background:transparent!important;
+}
+/* Uma unica superficie de vidro, independente de cartao, estilo ou area. */
+html[data-paleta-v04] #appRoot :is(
+ .card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,
+ .v12-inspiracao,.horas-metrica,.v11-kpi,.v11-welcome,.v11-link,
+ .v11-sono-intro,.dashboard-hoje,.horas-ativo,.casa-hero,
+ .plan-hero,.plan-card,.plan-mes,.doc-grupo,.v19-documentos,
+ .config-secao,.habito-card,.checklist-navegacao-secoes,.casa-dashboard,
+ .v06-metrica,.v06-atalho,.v07-quick,.agenda-hero,.agenda-dia-card,
+ .agenda-dia-vazio,.rascunho-card,.assinatura-box,.plan-row,.doc-month,
+ .v21-health-card,.v24-print,.v23-captura,.v23-lista,.v23-registro,
+ .passos-metrica,.passo-card,.plan-tabs button,.v25-estilo
+ ){
+  background:var(--glass-bg)!important;
+  background-image:none!important;
+  border:1px solid var(--glass-line)!important;
+  color:var(--cor-texto);
+  -webkit-backdrop-filter:blur(42px) saturate(115%)!important;
+  backdrop-filter:blur(42px) saturate(115%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),
+             0 14px 32px rgba(9,5,18,.14)!important;
+}
+/* Fora da raiz do app: modais e popovers em portal proprio. */
+html[data-paleta-v04] :is(.system-modal,.modal-content,.modal-busca,.painel-notif,.fab-menu){
+  background:color-mix(in srgb,var(--tema-superficie) 33%,transparent)!important;
+  background-image:none!important;
+  border:1px solid var(--glass-line)!important;
+  color:var(--tema-texto)!important;
+  -webkit-backdrop-filter:blur(48px) saturate(120%)!important;
+  backdrop-filter:blur(48px) saturate(120%)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.24),0 20px 48px rgba(0,0,0,.26)!important;
+}
+/* Evita cartoes coloridos alternados herdados das versoes antigas. */
+html[data-paleta-v04] #appRoot .v11-kpi:nth-child(n),
+html[data-paleta-v04] #appRoot .v11-link:nth-child(n),
+html[data-paleta-v04] #appRoot .v07-overview .v06-metrica:nth-child(n),
+html[data-paleta-v04] #appRoot .v07-overview .v06-atalho,
+html[data-paleta-v04] #appRoot .v07-quick,
+html[data-paleta-v04] #appRoot .v24-print:nth-child(n){
+  background:var(--glass-bg)!important;background-image:none!important;
+}
+html[data-paleta-v04] #appRoot :is(.v11-welcome,.plan-hero,.casa-hero,.agenda-hero,.dashboard-hoje,.v11-sono-intro){
+  background:var(--glass-bg-high)!important;
+  border-color:var(--glass-rim)!important;
+}
+html[data-paleta-v04] #appRoot .v24-print::before{content:none!important;background:none!important}
+html[data-paleta-v04] #appRoot .v24-print :is(.v24-print-top,.v24-print-kicker,.v24-print-extra,.v24-print-bottom){color:var(--tema-acento)!important}
+html[data-paleta-v04] #appRoot .v24-print-quote{color:var(--tema-texto)!important}
+/* Sidebar e campos tambem sao vidro - nunca blocos opacos. */
+html[data-paleta-v04] #appRoot .sidebar,
+html[data-paleta-v04] .sidebar-mobile-wrap .sidebar{
+  background:var(--glass-bg-high)!important;background-image:none!important;
+  border-right:1px solid var(--glass-rim)!important;
+  -webkit-backdrop-filter:blur(48px) saturate(120%)!important;
+  backdrop-filter:blur(48px) saturate(120%)!important;
+  box-shadow:inset -1px 0 rgba(255,255,255,.18),8px 0 35px rgba(0,0,0,.12)!important;
+}
+html[data-paleta-v04] #appRoot :is(input,select,textarea,.search,.space-switch,.theme-toggle,.plan-tabs button,.doc-date-value,.form-field input,.form-field textarea,.form-field select){
+  background:var(--glass-subtle)!important;background-image:none!important;
+  color:var(--tema-texto)!important;
+  border:1px solid var(--glass-line)!important;
+  -webkit-backdrop-filter:blur(30px)!important;
+  backdrop-filter:blur(30px)!important;
+}
+html[data-paleta-v04] #appRoot :is(input,textarea)::placeholder{color:var(--tema-suave)!important;opacity:.75}
+html[data-paleta-v04] #appRoot :is(.v11-kpi-icon,.v11-link-icon,.v07-quick-icon,.v06-metrica-icon,.v06-atalho-icon,.v11-section-icon,.doc-grupo-icone,.nav-icon){
+  background:color-mix(in srgb,var(--tema-primaria) 18%,transparent)!important;
+  background-image:none!important;
+  color:var(--tema-acento)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+}
+html[data-paleta-v04] #appRoot :is(.v11-kpi,.v11-link){--v11-tint:var(--tema-primaria)!important}
+/* Acoes principais so usam a cor dominante - sem faixas multicoloridas. */
+html[data-paleta-v04] #appRoot :is(.btn-primario,.fab-main,.space-switch button.active,.plan-tabs button.active,.agenda-view-switch button.active,.v13-save,.v13-buscar,.btn-instalar-app){
+  background:var(--tema-primaria)!important;
+  background-image:none!important;
+  color:var(--glass-btn-text)!important;
+  border-color:color-mix(in srgb,var(--tema-primaria) 80%,transparent)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.17),0 6px 18px rgba(0,0,0,.12)!important;
+}
+html[data-paleta-v04] #appRoot nav button.active{
+  background:color-mix(in srgb,var(--tema-primaria) 20%,transparent)!important;
+  background-image:none!important;
+  color:var(--tema-texto)!important;
+  box-shadow:inset 3px 0 var(--tema-primaria)!important;
+}
+html[data-paleta-v04] #appRoot :is(.brand-mark,.v13-editor .v13-save){
+  background:var(--tema-primaria)!important;background-image:none!important;
+}
+html[data-paleta-v04] #appRoot :is(.rascunho-progresso div,.casa-progresso-barra div,.habito-progresso-fill,.progresso-fill){
+  background:var(--tema-primaria)!important;background-image:none!important;
+}
+html[data-paleta-v04] #appRoot :is(.card h3,.v11-section-head h3,.config-secao h4){color:var(--tema-texto)!important}
+/* Barra de selecao, destaques editoriais e linhas com tons da mesma paleta. */
+html[data-paleta-v04] #appRoot :is(.v11-eyebrow,.casa-eyebrow,.v24-pausa-eyebrow,.v24-print-kicker){color:var(--tema-acento)!important}
+html[data-paleta-v04] #appRoot :is(.v25-amostra,.v25-softglass,.v25-editorial,.v25-atelier,.v25-aurora,.v25-liquidpremium,.v25-ameixachampagne){
+  background:var(--tema-superficie)!important;background-image:none!important;
+  border:1px solid var(--glass-rim);box-shadow:inset 0 1px rgba(255,255,255,.24);
+}
+html[data-paleta-v04] #appRoot .v25-amostra::after{
+  background:var(--glass-bg-high)!important;
+}
+/* Login acompanha a paleta em vez de manter um cartao branco solido. */
+html[data-paleta-v04] #telaLogin{background:var(--tema-fundo)!important;color:var(--tema-texto)!important}
+html[data-paleta-v04] #telaLogin .login-card{
+  background:color-mix(in srgb,var(--tema-superficie) 35%,transparent)!important;
+  border:1px solid var(--glass-line)!important;color:var(--tema-texto)!important;
+  -webkit-backdrop-filter:blur(42px)!important;backdrop-filter:blur(42px)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.22),0 20px 55px rgba(0,0,0,.2)!important;
+}
+html[data-paleta-v04] #telaLogin .login-campo input{
+  background:var(--glass-subtle)!important;color:var(--tema-texto)!important;
+  border:1px solid var(--glass-line)!important;
+}
+html[data-paleta-v04] #telaLogin .login-btn{
+  background:var(--tema-primaria)!important;color:var(--glass-btn-text)!important;
+}
+/* Na falta do efeito nativo, mantem translucidez moderada e contraste. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ html[data-paleta-v04] #appRoot :is(.card,.v11-link,.v11-kpi,.sidebar,.plan-card,.doc-grupo){background:color-mix(in srgb,var(--tema-superficie) 80%,transparent)!important}
+}
+/* Acessibilidade: se o sistema pedir reducao, contraste prevalece. */
+@media(prefers-reduced-transparency:reduce){
+ html[data-paleta-v04] #appRoot :is(.card,.v11-link,.v11-kpi,.sidebar,.plan-card,.doc-grupo){background:color-mix(in srgb,var(--tema-superficie) 90%,transparent)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
+@media(max-width:700px){
+ html[data-paleta-v04] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.plan-card,.doc-grupo){border-radius:19px}
+ html[data-paleta-v04][data-design-v25] body::before{width:86vw!important;right:-45vw!important}
+ html[data-paleta-v04][data-design-v25] body::after{width:75vw;left:-44vw}
+}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -4789,8 +4991,8 @@ function configChecklistsHTML(){
 function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
-    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#d99aac']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
-    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Escolha o design independentemente das cores. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Degradês luminosos'],['liquidpremium','Liquid Glass Premium','Vidro profundo · vinho e dourado'],['ameixachampagne','Ameixa & Champagne','Vidro uniforme · ameixa e champagne']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#93435d']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Todas as opções usam vidro altamente transparente e seguem a paleta escolhida, com menos degradês. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Luz suave'],['liquidpremium','Liquid Glass Premium','Vidro profundo · segue a paleta'],['ameixachampagne','Ameixa & Champagne','Vidro elegante · segue a paleta']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
