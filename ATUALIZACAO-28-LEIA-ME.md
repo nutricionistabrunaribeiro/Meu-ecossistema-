@@ -1,0 +1,1 @@
+V28: card Visão do Mês clicável. Abre lista real de checklists, entregas, próximos passos e rotinas pendentes, com acesso aos clientes e à aba de rotinas. A contagem principal mantém a regra original (checklists+entregas+próximos passos); rotinas aparecem separadamente. Sem mudanças de banco.
