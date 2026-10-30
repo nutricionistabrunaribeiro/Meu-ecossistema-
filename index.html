@@ -1799,6 +1799,48 @@ html[data-paleta-v04] #appRoot .v24-print-bottom{border-top:1px solid var(--glas
 .v37-posta-ajuda{font-size:11px;color:var(--tema-suave);text-align:center;margin-top:10px}
 .v37-posta .system-modal-head h2{margin:0}
 @media(max-width:650px){.v37-status-acoes{justify-content:flex-start}.v37-posta-arte{max-height:62vh}.v37-posta-citacao{font-size:clamp(19px,5vw,27px)}.v37-posta-botoes button{flex:1;min-width:0}.v37-clientes-filtros button{padding:9px 11px}}
+/* V38: Ampliacao editorial dos cards para print, sobre a tela atual. */
+html[data-paleta-v04] #appRoot .v24-print[role="button"]{cursor:zoom-in}
+html[data-paleta-v04] #appRoot .v24-print[role="button"]:focus-visible,
+html[data-paleta-v04] #appRoot .v37-posta-arte[role="button"]:focus-visible{
+ outline:3px solid var(--tema-primaria);outline-offset:4px;
+}
+.v37-posta-arte[role="button"]{cursor:zoom-in}
+.v37-posta-rodape{letter-spacing:.055em;font-size:clamp(9px,2.6vw,11px);text-transform:none}
+.v38-overlay{
+ position:fixed;inset:0;z-index:2147483000;display:flex;justify-content:center;align-items:center;
+ padding:max(20px,env(safe-area-inset-top)) 8px max(20px,env(safe-area-inset-bottom));
+ background:rgba(18,13,20,.88);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+ overscroll-behavior:contain;overflow:hidden;
+}
+.v38-overlay:before{content:'';position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(ellipse at 52% 35%,color-mix(in srgb,var(--tema-primaria) 17%,transparent),transparent 68%)}
+.v38-overlay .v38-full-card{
+ width:min(calc(100vw - 20px),calc((100dvh - 90px)*.8),640px)!important;
+ max-height:none!important;min-height:0!important;aspect-ratio:4/5!important;
+ margin:0!important;border-radius:clamp(12px,3vw,21px)!important;
+ padding:clamp(23px,5vw,42px)!important;flex-shrink:0;
+ box-shadow:0 22px 80px rgba(0,0,0,.25);
+}
+.v38-overlay .v37-posta-citacao{font-size:clamp(21px,5.5vw,39px);line-height:1.38}
+.v38-overlay .v37-posta-topo,.v38-overlay .v37-posta-kicker{font-size:clamp(9px,2.55vw,12px)}
+.v38-overlay .v37-posta-rodape{font-size:clamp(9px,2.5vw,12px)}
+/* No modo escuro, o Marsala fechado nao deve apagar letras e assinatura. */
+html[data-paleta-v04][data-tema-interface="escuro"] .v38-overlay .v37-posta-topo,
+html[data-paleta-v04][data-tema-interface="escuro"] .v38-overlay .v37-posta-kicker,
+html[data-paleta-v04][data-tema-interface="escuro"] .v38-overlay .v37-posta-rodape{
+ color:var(--tema-acento)!important;
+}
+.v38-overlay .v37-posta-corpo{margin:clamp(16px,5vw,40px) 0}
+.v38-fechar{
+ position:absolute;z-index:2;right:clamp(12px,3vw,22px);top:max(16px,env(safe-area-inset-top));
+ display:flex;justify-content:center;align-items:center;width:39px;height:39px;
+ background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);
+ color:white;border-radius:50%;font-size:23px;cursor:pointer;
+}
+.v38-fechar:focus-visible{outline:3px solid #fff;outline-offset:3px}
+body.v38-sem-rolagem{overflow:hidden!important}
+@media(max-height:600px){.v38-overlay .v38-full-card{width:min(calc(100vw - 20px),calc((100dvh - 35px)*.8),640px)!important}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -6400,7 +6442,7 @@ const V24_BELEZAS=[
 ];
 function v24IndiceDia(tamanho,salto=0){const [a,m,d]=diaInspiracao().split('-').map(Number);const n=Math.floor(Date.UTC(a,m-1,d)/86400000);return ((n*7+salto)%tamanho+tamanho)%tamanho}
 function v24CardHTML(tipo,etiqueta,conteudo,extra,icone){
- return `<article class="v24-print v24-${tipo}" aria-label="${etiqueta}"><div class="v24-print-top"><span>✦ PAUSA PARA INSPIRAR</span><span class="v24-print-icon">${icone}</span></div><div class="v24-print-main"><div class="v24-print-kicker">${etiqueta}</div><div class="v24-print-quote">${textoHTML(conteudo)}</div>${extra?`<div class="v24-print-extra">${textoHTML(extra)}</div>`:''}</div><div class="v24-print-bottom"><span>Meu Ecossistema · Bruna Ribeiro</span><button type="button" class="v37-posta-btn" onclick="abrirPausaPostagemV37('${tipo}')" aria-label="Preparar ${etiqueta.toLowerCase()} para postar">Visualizar para postar ↗</button></div></article>`;
+ return `<article class="v24-print v24-${tipo}" role="button" tabindex="0" aria-label="Ampliar ${etiqueta.toLowerCase()} para tirar print" onclick="if(!event.target.closest('button'))abrirPausaDestaqueV38('${tipo}')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();abrirPausaDestaqueV38('${tipo}')}"><div class="v24-print-top"><span>✦ PAUSA PARA INSPIRAR</span><span class="v24-print-icon">${icone}</span></div><div class="v24-print-main"><div class="v24-print-kicker">${etiqueta}</div><div class="v24-print-quote">${textoHTML(conteudo)}</div>${extra?`<div class="v24-print-extra">${textoHTML(extra)}</div>`:''}</div><div class="v24-print-bottom"><span>Meu Ecossistema · Bruna Ribeiro</span><button type="button" class="v37-posta-btn" onclick="abrirPausaPostagemV37('${tipo}')" aria-label="Preparar ${etiqueta.toLowerCase()} para postar">Visualizar para postar ↗</button></div></article>`;
 }
 function pausaInspirarV24(){
  const dados=lerInspiracao(),dia=diaInspiracao(),diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
@@ -6415,7 +6457,7 @@ function pausaInspirarV24(){
  ${v24CardHTML('frase','FRASE DO DIA',frase,'','❞')}
  ${v24CardHTML('pergunta','PERGUNTA DO DIA',V24_PERGUNTAS[v24IndiceDia(V24_PERGUNTAS.length,3)],'Uma pergunta para levar com você.','?')}
  ${v24CardHTML('beleza','PEQUENA BELEZA DO DIA',V24_BELEZAS[v24IndiceDia(V24_BELEZAS.length,9)],'Há delicadeza no que parece comum.','✿')}
- </div><p class="v24-print-hint">Toque em “Visualizar para postar” para abrir o card sem distrações e gerar sua imagem vertical para o Instagram.</p></section>`;
+ </div><p class="v24-print-hint">Toque em um card para ampliá-lo sobre a tela e tirar um print. “Visualizar para postar” mantém a opção de salvar a imagem.</p></section>`;
 }
 
 // Cartoes de inspiracao preparados para publicacao, sem dados de agenda ou clientes.
@@ -6431,9 +6473,32 @@ function dadosPausaPostagemV37(tipo){
  };
  return {tipo,...(opcoes[tipo]||opcoes.frase)};
 }
+function artePausaPostagemV38(d,{ampliada=false}={}){
+ const classe=ampliada?' v38-full-card':'';
+ const acessibilidade=ampliada?'':` role="button" tabindex="0" aria-label="Ampliar card para print" onclick="abrirPausaDestaqueV38('${d.tipo}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirPausaDestaqueV38('${d.tipo}')}"`;
+ return `<div class="v37-posta-arte${classe}"${acessibilidade}><div class="v37-posta-topo"><span>✦ PAUSA PARA INSPIRAR</span><span>${d.icone}</span></div><div class="v37-posta-corpo"><div class="v37-posta-kicker">${d.rotulo}</div><div class="v37-posta-citacao">${textoHTML(d.conteudo)}</div>${d.extra?`<div class="v37-posta-complemento">${textoHTML(d.extra)}</div>`:''}</div><div class="v37-posta-rodape"><span>Meu Ecossistema · Bruna Ribeiro</span><span>✦</span></div></div>`;
+}
 function abrirPausaPostagemV37(tipo){
  const d=dadosPausaPostagemV37(tipo);
- abrirModalSistema(`<div class="v37-posta"><div class="system-modal-head"><div><h2>Pronto para postar</h2><p>Prévia vertical 4:5 · sem dados pessoais</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="v37-posta-arte"><div class="v37-posta-topo"><span>✦ PAUSA PARA INSPIRAR</span><span>${d.icone}</span></div><div class="v37-posta-corpo"><div class="v37-posta-kicker">${d.rotulo}</div><div class="v37-posta-citacao">${textoHTML(d.conteudo)}</div>${d.extra?`<div class="v37-posta-complemento">${textoHTML(d.extra)}</div>`:''}</div><div class="v37-posta-rodape">BRUNA RIBEIRO <span>✦</span></div></div><div class="v37-posta-botoes"><button class="btn-secundario" onclick="fecharModalSistema()">Voltar</button><button class="btn-primario" onclick="baixarPausaPostagemV37('${tipo}')">Salvar / compartilhar imagem</button></div><p class="v37-posta-ajuda">A imagem é gerada no seu aparelho, em 1080 × 1350 pixels.</p></div>`);
+ abrirModalSistema(`<div class="v37-posta"><div class="system-modal-head"><div><h2>Pronto para postar</h2><p>Toque no card para ampliar e tirar um print.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>${artePausaPostagemV38(d)}<div class="v37-posta-botoes"><button class="btn-secundario" onclick="fecharModalSistema()">Voltar</button><button class="btn-primario" onclick="baixarPausaPostagemV37('${tipo}')">Salvar / compartilhar imagem</button></div><p class="v37-posta-ajuda">Na visualização ampliada, o card fica sem botões sobre a imagem. Toque fora dele para voltar.</p></div>`);
+}
+let v38FocoAnterior=null;
+function abrirPausaDestaqueV38(tipo){
+ fecharPausaDestaqueV38();
+ const d=dadosPausaPostagemV37(tipo);
+ v38FocoAnterior=document.activeElement;
+ const overlay=document.createElement('div');overlay.id='v38ImagemDestaque';overlay.className='v38-overlay';
+ overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label',`${d.rotulo}: card ampliado para print`);
+ overlay.innerHTML=`<button type="button" class="v38-fechar" aria-label="Fechar imagem ampliada" onclick="fecharPausaDestaqueV38()">×</button>${artePausaPostagemV38(d,{ampliada:true})}`;
+ overlay.addEventListener('click',e=>{if(e.target===overlay)fecharPausaDestaqueV38()});
+ document.body.appendChild(overlay);document.body.classList.add('v38-sem-rolagem');
+ document.addEventListener('keydown',v38TeclaFechar);overlay.querySelector('.v38-fechar').focus({preventScroll:true});
+}
+function v38TeclaFechar(e){if(e.key==='Escape'){e.preventDefault();fecharPausaDestaqueV38()}}
+function fecharPausaDestaqueV38(){
+ const overlay=document.getElementById('v38ImagemDestaque');if(!overlay)return;
+ overlay.remove();document.body.classList.remove('v38-sem-rolagem');document.removeEventListener('keydown',v38TeclaFechar);
+ if(v38FocoAnterior&&v38FocoAnterior.isConnected)v38FocoAnterior.focus({preventScroll:true});v38FocoAnterior=null;
 }
 function linhasTextoCanvasV37(ctx,texto,largura){
  const palavras=String(texto||'').split(/\s+/).filter(Boolean),linhas=[];let linha='';
@@ -6459,7 +6524,7 @@ async function baixarPausaPostagemV37(tipo){
  ctx.fillStyle=texto;ctx.font=`${font}px Georgia`;linhas.forEach((l,i)=>ctx.fillText(l,126,comeco+i*passo));
  if(d.extra){ctx.fillStyle=suave;ctx.font='31px Arial';linhasTextoCanvasV37(ctx,d.extra,830).slice(0,2).forEach((l,i)=>ctx.fillText(l,126,1120+i*43));}
  ctx.strokeStyle=claro?'rgba(103,64,79,.22)':'rgba(244,230,234,.25)';ctx.beginPath();ctx.moveTo(126,1195);ctx.lineTo(954,1195);ctx.stroke();
- ctx.font='bold 26px Arial';ctx.fillStyle=primaria;ctx.fillText('BRUNA RIBEIRO',126,1244);ctx.textAlign='right';ctx.fillText('✦',954,1244);
+ ctx.font='bold 26px Arial';ctx.fillStyle=primaria;ctx.fillText('Meu Ecossistema · Bruna Ribeiro',126,1244);ctx.textAlign='right';ctx.fillText('✦',954,1244);
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
  if(!blob){alert('Não foi possível gerar a imagem neste navegador. Você pode tirar um print da prévia.');return;}
  const nome=`pausa-para-inspirar-${tipo}-${diaInspiracao()}.png`;

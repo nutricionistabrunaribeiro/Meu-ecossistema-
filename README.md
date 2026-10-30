@@ -1,4 +1,1 @@
-# Meu Ecossistema — Bruna Ribeiro
-
-Atualização 37 completa, incluindo os ajustes anteriores da versão 36.
-Leia `ATUALIZACAO-37-LEIA-ME.md` antes de publicar.
+Meu Ecossistema — Bruna Ribeiro · Atualização 38 completa. Veja ATUALIZACAO-38-LEIA-ME.md.
