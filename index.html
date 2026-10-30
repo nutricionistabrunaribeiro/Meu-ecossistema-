@@ -1591,6 +1591,175 @@ html[data-paleta-v04][data-tema-interface="claro"] #telaLogin .login-btn{backgro
  html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.card,.v11-kpi,.v11-link,.sidebar,.plan-card,.doc-grupo){background:rgba(255,255,255,.95)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
 </style>
+
+<style id="v36-contraste-agenda-formulario-documentos">
+/* O modal usa o mesmo vidro claro do restante do aplicativo. A regra
+   específica impede que o antigo tema "Liquid Premium" injete vidro escuro. */
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.system-modal,.modal-busca,.painel-notif,.fab-menu){
+ background:rgba(255,253,251,.84)!important;
+ background-image:none!important;
+ color:var(--tema-texto)!important;
+ border:1px solid rgba(255,255,255,.92)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.96),0 24px 60px rgba(72,45,59,.16)!important;
+ -webkit-backdrop-filter:blur(44px) saturate(135%)!important;
+ backdrop-filter:blur(44px) saturate(135%)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .system-modal :is(.form-field label,.system-modal-head p,.form-hint){
+ color:var(--tema-suave)!important;
+ opacity:1!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .system-modal :is(h2,h3,strong){
+ color:var(--tema-texto)!important;
+}
+
+/* Atualizacao 36 — legibilidade de verdade nos dois modos, sem reduzir o vidro. */
+/* A cor do texto da agenda era branca em qualquer tema, mesmo com card claro. */
+html[data-paleta-v04] #appRoot .agenda-hero{
+ color:var(--tema-texto)!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero :is(
+ .agenda-hero-title strong,.agenda-hero-title span,.agenda-hero-label,
+ .legenda-item,.agenda-filtro,.agenda-view-switch button
+){color:var(--tema-texto)!important;opacity:1!important}
+html[data-paleta-v04] #appRoot .agenda-hero-title span{opacity:.82!important}
+html[data-paleta-v04] #appRoot .agenda-hero-label{
+ color:var(--tema-suave)!important;opacity:1!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero-details{
+ border-top:1px solid var(--tema-borda)!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero .agenda-view-switch{
+ background:color-mix(in srgb,var(--tema-primaria) 10%,transparent)!important;
+ border:1px solid var(--tema-borda);
+}
+html[data-paleta-v04] #appRoot .agenda-hero .agenda-view-switch button:not(.active){
+ color:var(--tema-texto)!important;background:transparent!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero .agenda-view-switch button.active{
+ color:#fff!important;background:var(--tema-primaria)!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero .agenda-filtro{
+ color:var(--tema-texto)!important;
+ background:color-mix(in srgb,var(--tema-primaria) 8%,transparent)!important;
+ border:1px solid var(--tema-borda)!important;
+}
+html[data-paleta-v04] #appRoot .agenda-hero .agenda-filtro.off{
+ opacity:.62!important;
+}
+html[data-paleta-v04] #appRoot .agenda-icon{
+ background:color-mix(in srgb,var(--tema-primaria) 12%,transparent)!important;
+ color:var(--tema-primaria)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(
+ .agenda-faixa,.agenda-periodo,.v22-agenda-item,.v22-modal-resumo,
+ .ficha-cabecalho,.aba-conteudo,.form-color-preview
+){color:var(--tema-texto)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .agenda-faixa :is(
+ .agenda-faixa-contagem,.agenda-faixa-data,.agenda-tipo
+){color:var(--tema-suave)!important}
+/* Modal de compromisso: bordas, rótulos e campos sem corte no iPhone. */
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente){
+ width:min(560px,100%);padding:24px;overflow-x:hidden;
+ color:var(--tema-texto)!important;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .system-modal-head h2{
+ color:var(--tema-texto)!important;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) :is(
+ .system-modal-head p,.form-hint,.form-field label
+){color:var(--tema-suave)!important;opacity:1!important}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .form-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) :is(input,select,textarea){
+ color:var(--tema-texto)!important;
+ background:var(--glass-subtle)!important;
+ border:1px solid var(--tema-borda)!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ box-sizing:border-box!important;border-radius:12px;min-height:46px;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) input[type="date"]{
+ display:block;min-width:0!important;width:100%!important;
+ -webkit-appearance:none;appearance:none;
+ font-size:16px!important;line-height:1.3;overflow:hidden;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .form-color-preview{
+ color:var(--tema-texto)!important;
+ background:var(--glass-subtle)!important;border:1px solid var(--tema-borda)!important;
+ min-width:0;overflow-wrap:anywhere;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .system-modal-actions{
+ border-top:1px solid var(--tema-borda)!important;
+}
+html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .system-modal-close{
+ color:var(--tema-texto)!important;
+ background:var(--glass-subtle)!important;border:1px solid var(--glass-line);
+}
+/* Uma moldura, nao duas, para a ficha de documentacao. */
+html[data-paleta-v04] #appRoot .aba-conteudo:has(> .v19-documentos){
+ background:transparent!important;border:none!important;box-shadow:none!important;
+ padding:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ min-width:0;
+}
+html[data-paleta-v04] #appRoot .v19-documentos{
+ min-width:0;width:100%;overflow:hidden;border-radius:22px!important;
+ padding:clamp(15px,3vw,24px)!important;
+ color:var(--tema-texto)!important;
+}
+html[data-paleta-v04] #appRoot .v19-doc-top>div{flex:1;min-width:0}
+html[data-paleta-v04] #appRoot .v19-doc-top h3{
+ font-size:clamp(21px,3.5vw,27px);line-height:1.2;overflow-wrap:anywhere;
+ color:var(--tema-texto)!important;
+}
+html[data-paleta-v04] #appRoot .v19-doc-top p{line-height:1.5;color:var(--tema-suave)!important;}
+html[data-paleta-v04] #appRoot .v19-filtro{flex-wrap:wrap;min-width:0}
+html[data-paleta-v04] #appRoot .v19-filtro select{
+ min-width:0;max-width:100%;flex:1;
+}
+html[data-paleta-v04] #appRoot .v19-table-wrap{max-width:100%;min-width:0;overscroll-behavior-x:contain}
+html[data-paleta-v04] #appRoot .v19-table-wrap:focus-visible{outline:2px solid var(--tema-primaria);outline-offset:2px}
+html[data-paleta-v04] #appRoot .v19-doc-table th{
+ color:var(--tema-texto)!important;
+ background:color-mix(in srgb,var(--tema-primaria) 9%,transparent)!important;
+}
+html[data-paleta-v04] #appRoot .v19-doc-table td{color:var(--tema-texto)!important;}
+html[data-paleta-v04] #appRoot .v19-doc-table td small{color:var(--tema-suave)!important}
+html[data-paleta-v04] #appRoot .v19-editar{color:var(--tema-texto)!important}
+.v36-table-hint{display:none;font-size:11px;line-height:1.4;margin:10px 0;color:var(--tema-suave)}
+/* Indicadores semanticos precisam manter contraste tambem no tema claro. */
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v19-situacao.verde{color:#256243!important;background:rgba(40,142,89,.10)!important;border-color:rgba(40,142,89,.27)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v19-situacao.laranja{color:#855000!important;background:rgba(205,129,22,.11)!important;border-color:rgba(205,129,22,.3)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v19-situacao.vermelho{color:#9b323e!important;background:rgba(180,53,66,.09)!important;border-color:rgba(180,53,66,.27)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v19-situacao.neutro{color:#5a5360!important;background:rgba(85,82,96,.08)!important;border-color:rgba(85,82,96,.2)!important}
+@media(max-width:700px){
+ html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente){
+  max-width:calc(100vw - 24px)!important;width:100%!important;
+  padding:18px!important;max-height:calc(100dvh - 24px)!important;
+ }
+ html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .form-grid{
+  grid-template-columns:minmax(0,1fr)!important;gap:13px!important;
+ }
+ html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .form-field{width:100%!important;min-width:0!important;}
+ html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .system-modal-actions{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+ html[data-paleta-v04] #appRoot .system-modal:has(#agendaCliente) .system-modal-actions button{
+  min-width:0;white-space:normal;overflow-wrap:anywhere;
+ }
+ html[data-paleta-v04] #appRoot .v19-doc-top{
+  display:flex;align-items:stretch!important;flex-direction:column;
+ }
+ html[data-paleta-v04] #appRoot .v19-doc-top>.btn-primario{align-self:flex-start;}
+ html[data-paleta-v04] #appRoot .v19-filtro{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;}
+ html[data-paleta-v04] #appRoot .v19-filtro select{width:100%!important;max-width:none!important}
+ html[data-paleta-v04] #appRoot .v19-legenda{gap:8px;}
+ html[data-paleta-v04] #appRoot .v19-situacao{white-space:normal;}
+ html[data-paleta-v04] #appRoot .v19-doc-table{min-width:620px!important}
+ html[data-paleta-v04] #appRoot .v19-documentos{padding:17px!important;}
+ html[data-paleta-v04] #appRoot .v36-table-hint{display:block}
+ #appRoot:has(.v19-documentos) .fab-wrap{display:none!important}
+}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2639,7 +2808,7 @@ function checklistDocumentacaoHTML(c){
    const acao=d?`abrirDocumentoModelo('${c.id}','${l.chave}','','${d.id}')`:`abrirDocumentoModelo('${c.id}','${l.chave}','')`;
    return `<tr><td><strong>${textoHTML(l.nome)}</strong><small>${textoHTML(l.grupo)}</small></td><td>${d?.emissao?textoHTML(d.emissao):'—'}</td><td>${d?.validade?textoHTML(d.validade):'—'}</td><td><span class="v19-situacao ${st.cor}">${st.nome}</span></td><td><button class="v19-editar" onclick="${acao}">${d?'Editar':'Preencher'}</button></td></tr>`;
  }).join('');
- return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação <span class="v20-version">TABELA V20</span></h3><p>Visão única: documentos, colaboradores e treinamentos. Deslize a tabela para os lados no celular.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v19-table-wrap"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
+ return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação</h3><p>Documentos, colaboradores e treinamentos em um só lugar.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v36-table-hint">Deslize para o lado para ver as datas, a situação e as ações.</div><div class="v19-table-wrap" tabindex="0" aria-label="Tabela de documentos com rolagem horizontal"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
 }
 
 async function editarCampoCliente(clienteId, campoDb, rotulo){
