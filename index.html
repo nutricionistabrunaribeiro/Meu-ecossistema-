@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro Consultoria</title>
+<title>Meu Ecossistema — Bruna Ribeiro</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -1422,6 +1422,173 @@ html[data-paleta-v04] #telaLogin .login-btn{
  html[data-paleta-v04] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.plan-card,.doc-grupo){border-radius:19px}
  html[data-paleta-v04][data-design-v25] body::before{width:86vw!important;right:-45vw!important}
  html[data-paleta-v04][data-design-v25] body::after{width:75vw;left:-44vw}
+}
+</style>
+<style id="v35-vidro-unico-modo-claro">
+/* V35: paletas continuam disponiveis; o unico acabamento e Liquid Glass.
+   Na interface clara, substituir a antiga base escura imposta pelo estilo v30.
+   Paletas mudam o tom, nao a translucidez nem a hierarquia. */
+html[data-paleta-v04]{--v35-primaria-clara:#8f6382;}
+html[data-paleta-v04="marsala"]{--v35-primaria-clara:#93435d;}
+html[data-paleta-v04="lavanda"]{--v35-primaria-clara:#79609c;}
+html[data-paleta-v04="aurora"]{--v35-primaria-clara:#427b99;}
+html[data-paleta-v04="jardim"]{--v35-primaria-clara:#477a60;}
+html[data-paleta-v04="rose"]{--v35-primaria-clara:#a55673;}
+html[data-paleta-v04="oceano"]{--v35-primaria-clara:#477e8b;}
+html[data-paleta-v04="ametista"]{--v35-primaria-clara:#76539e;}
+html[data-paleta-v04="terra"]{--v35-primaria-clara:#886443;}
+
+html[data-paleta-v04][data-tema-interface="claro"]{
+  color-scheme:light!important;
+  --tema-fundo:#f7f2ef;
+  --tema-superficie:#f0e9e6;
+  --tema-borda:rgba(98,66,83,.18);
+  --tema-texto:#31242d;
+  --tema-suave:#655762;
+  --tema-primaria:var(--v35-primaria-clara);
+  --tema-clara:color-mix(in srgb,var(--v35-primaria-clara) 50%,white);
+  --tema-destaque:color-mix(in srgb,var(--v35-primaria-clara) 25%,#fff0e9);
+  --tema-acento:#8a5d67;
+  --glass-bg:rgba(255,255,255,.41);
+  --glass-bg-high:rgba(255,255,255,.53);
+  --glass-subtle:rgba(255,255,255,.44);
+  --glass-line:rgba(255,255,255,.83);
+  --glass-rim:rgba(255,255,255,.92);
+  --glass-btn-text:#fff;
+  --cor-fundo:var(--tema-fundo)!important;
+  --cor-superficie:var(--tema-superficie)!important;
+  --cor-texto:var(--tema-texto)!important;
+  --cor-texto-suave:var(--tema-suave)!important;
+  --cor-borda:var(--tema-borda)!important;
+  --cor-primaria:var(--tema-primaria)!important;
+  --cor-primaria-clara:var(--tema-clara)!important;
+  --cor-acento:var(--tema-acento)!important;
+  --sombra-card:0 14px 32px rgba(70,42,56,.08);
+}
+/* Marsala + champagne + rosa seco funciona como uma paleta nomeada,
+   nao como segundo estilo concorrente. */
+html[data-paleta-v04="marsala"][data-tema-interface="claro"]{
+ --tema-fundo:#f8f1ee;--tema-superficie:#f0e2df;
+ --tema-primaria:#93435d;--tema-clara:#c89bab;
+ --tema-acento:#8c5d6c;--tema-destaque:#e6d2bb;
+}
+html[data-paleta-v04="terra"][data-tema-interface="claro"]{--tema-fundo:#f7f2e9;--tema-superficie:#ece3d6;--tema-acento:#846b53;}
+html[data-paleta-v04="oceano"][data-tema-interface="claro"]{--tema-fundo:#f0f6f5;--tema-superficie:#e2edf0;--tema-acento:#517982;}
+html[data-paleta-v04="aurora"][data-tema-interface="claro"]{--tema-fundo:#f1f4f8;--tema-superficie:#e7ebf2;--tema-acento:#5e718e;}
+html[data-paleta-v04="jardim"][data-tema-interface="claro"]{--tema-fundo:#f1f6f0;--tema-superficie:#e8f0e7;--tema-acento:#5b7d65;}
+html[data-paleta-v04="rose"][data-tema-interface="claro"]{--tema-fundo:#faf2f4;--tema-superficie:#f1e8ed;--tema-acento:#995d77;}
+html[data-paleta-v04="lavanda"][data-tema-interface="claro"]{--tema-fundo:#f5f2fa;--tema-superficie:#ebe7f2;--tema-acento:#78648b;}
+html[data-paleta-v04="ametista"][data-tema-interface="claro"]{--tema-fundo:#f5f0f9;--tema-superficie:#ece6f2;--tema-acento:#78658e;}
+
+/* O aplicativo real recebe seus proprios tokens para impedir que regras
+   antigas de modo escuro e de trabalho/pessoal injetem cores legadas. */
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot,
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot [data-espaco]{
+ --cor-fundo:var(--tema-fundo)!important;
+ --cor-superficie:var(--tema-superficie)!important;
+ --cor-primaria:var(--tema-primaria)!important;
+ --cor-primaria-clara:var(--tema-clara)!important;
+ --cor-acento:var(--tema-acento)!important;
+ --cor-texto:var(--tema-texto)!important;
+ --cor-texto-suave:var(--tema-suave)!important;
+ --cor-borda:var(--tema-borda)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] body{
+ background:var(--tema-fundo)!important;
+ background-image:none!important;color:var(--tema-texto)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] body::before{
+ background:color-mix(in srgb,var(--tema-primaria) 22%,transparent)!important;
+ opacity:.46!important;filter:blur(106px)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] body::after{
+ background:color-mix(in srgb,var(--tema-destaque) 48%,transparent)!important;
+ opacity:.6!important;filter:blur(100px)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot,
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot main{
+ background:transparent!important;color:var(--tema-texto)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(
+ .card,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,
+ .v12-inspiracao,.horas-metrica,.v11-kpi,.v11-welcome,.v11-link,
+ .v11-sono-intro,.dashboard-hoje,.horas-ativo,.casa-hero,.plan-hero,
+ .plan-card,.plan-mes,.doc-grupo,.v19-documentos,.config-secao,
+ .habito-card,.checklist-navegacao-secoes,.casa-dashboard,
+ .v06-metrica,.v06-atalho,.v07-quick,.agenda-hero,.agenda-dia-card,
+ .agenda-dia-vazio,.rascunho-card,.assinatura-box,.plan-row,.doc-month,
+ .v21-health-card,.v24-print,.v23-captura,.v23-lista,.v23-registro,
+ .passos-metrica,.passo-card,.plan-tabs button,.v22-agenda-item
+){
+ background:var(--glass-bg)!important;background-image:none!important;
+ color:var(--tema-texto)!important;
+ border:1px solid var(--glass-line)!important;
+ -webkit-backdrop-filter:blur(42px) saturate(125%)!important;
+ backdrop-filter:blur(42px) saturate(125%)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.82),0 13px 30px rgba(82,50,68,.095)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.v11-welcome,.plan-hero,.casa-hero,.agenda-hero,.dashboard-hoje,.v11-sono-intro){
+ background:var(--glass-bg-high)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.v11-kpi,.v11-link,.v07-quick,.v24-print):nth-child(n){
+ background:var(--glass-bg)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.sidebar,.search,.space-switch,.theme-toggle,input,select,textarea,.plan-tabs button,.doc-date-value),
+html[data-paleta-v04][data-tema-interface="claro"] .sidebar-mobile-wrap .sidebar{
+ background:var(--glass-subtle)!important;
+ background-image:none!important;color:var(--tema-texto)!important;
+ border-color:var(--glass-line)!important;
+ -webkit-backdrop-filter:blur(34px) saturate(120%)!important;
+ backdrop-filter:blur(34px) saturate(120%)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] :is(.system-modal,.modal-content,.modal-busca,.painel-notif,.fab-menu){
+ background:rgba(253,250,248,.72)!important;background-image:none!important;
+ color:var(--tema-texto)!important;border-color:var(--glass-line)!important;
+ -webkit-backdrop-filter:blur(44px)!important;backdrop-filter:blur(44px)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(input,textarea)::placeholder{color:var(--tema-suave)!important;opacity:.78;}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.btn-primario,.fab-main,.space-switch button.active,.plan-tabs button.active,.agenda-view-switch button.active,.v13-save,.v13-buscar,.btn-instalar-app){
+ background:var(--tema-primaria)!important;background-image:none!important;color:#fff!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot nav button.active{
+ background:color-mix(in srgb,var(--tema-primaria) 14%,transparent)!important;
+ color:var(--tema-primaria)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.v11-kpi-icon,.v11-link-icon,.v07-quick-icon,.v06-metrica-icon,.nav-icon){
+ color:var(--tema-primaria)!important;
+ background:color-mix(in srgb,var(--tema-primaria) 11%,transparent)!important;
+ border-color:rgba(100,70,85,.10)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.v11-kpi-label,.v11-section-head p,.v11-welcome p,.v11-sono-intro p,.config-linha-desc,small){color:var(--tema-suave)}
+html[data-paleta-v04][data-tema-interface="claro"] #appRoot .v24-print :is(.v24-print-top,.v24-print-kicker,.v24-print-extra,.v24-print-bottom,.v24-print-quote){color:var(--tema-texto)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #telaLogin{background:var(--tema-fundo)!important;color:var(--tema-texto)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #telaLogin .login-card{
+ background:rgba(255,255,255,.68)!important;color:var(--tema-texto)!important;border:1px solid rgba(255,255,255,.9)!important;
+ backdrop-filter:blur(40px)!important;-webkit-backdrop-filter:blur(40px)!important;
+}
+html[data-paleta-v04][data-tema-interface="claro"] #telaLogin .login-campo input{color:var(--tema-texto)!important;background:rgba(255,255,255,.46)!important}
+html[data-paleta-v04][data-tema-interface="claro"] #telaLogin .login-btn{background:var(--tema-primaria)!important;color:#fff!important}
+
+/* Paletas ficam visiveis e claras; a antiga grade de estilos some. */
+.v35-paletas{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin:13px 0 8px}
+.v35-paletas .tema-v04{display:flex;align-items:center;gap:10px;padding:12px;text-align:left;border:1px solid var(--glass-line)!important;border-radius:14px;background:var(--glass-bg)!important;color:var(--tema-texto)!important;min-height:62px}
+.v35-paletas .tema-v04 strong{font-size:12px;line-height:1.3;overflow-wrap:anywhere;font-weight:650;flex:1}
+.v35-paletas .tema-v04.ativo{outline:2px solid var(--tema-primaria);outline-offset:1px;background:color-mix(in srgb,var(--tema-primaria) 12%,transparent)!important}
+.v35-paletas .tema-v04 .v35-amostras{display:flex;align-items:center;flex:0 0 auto;gap:0;min-width:65px;height:30px;margin:0;border-radius:0;background:none!important}
+.v35-amostras i{display:block;width:22px;height:30px;border-radius:0;box-shadow:inset 0 0 0 1px #00000016}
+.v35-amostras i:first-child{border-radius:8px 0 0 8px}
+.v35-amostras i:last-child{border-radius:0 8px 8px 0}
+.v35-estilo-unico .v35-vidro-selo{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 15px;border-radius:16px;border:1px solid var(--glass-line);background:var(--glass-bg);backdrop-filter:blur(35px);-webkit-backdrop-filter:blur(35px)}
+.v35-vidro-icone{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:color-mix(in srgb,var(--tema-primaria) 20%,transparent);font-size:21px;color:var(--tema-acento)}
+.v35-vidro-selo>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.v35-vidro-selo strong{font-size:13px;color:var(--tema-texto)}
+.v35-vidro-selo small{font-size:11px;color:var(--tema-suave)}
+.v35-vidro-check{font-size:18px;color:var(--tema-primaria)}
+@media(max-width:650px){.v35-paletas{grid-template-columns:1fr 1fr;gap:8px}.v35-paletas .tema-v04{padding:9px;min-height:72px;flex-wrap:wrap}.v35-paletas .tema-v04 strong{flex-basis:100%}.v35-paletas .tema-v04 .v35-amostras{height:20px}.v35-amostras i{height:20px}}
+@media(max-width:390px){.v35-paletas{grid-template-columns:1fr}}
+/* Preferencia de acessibilidade se sobrepoe ao efeito intenso. */
+@media(prefers-reduced-transparency:reduce){
+ html[data-paleta-v04][data-tema-interface="claro"] #appRoot :is(.card,.v11-kpi,.v11-link,.sidebar,.plan-card,.doc-grupo){background:rgba(255,255,255,.95)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
 </style>
 </head>
@@ -4896,14 +5063,16 @@ function preferenciaTemaInterface(){return localStorage.getItem('me-tema-interfa
 function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const escuro=escolha==='escuro'||(escolha==='automatico'&&consultaTemaSistema.matches);
   document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;
-  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#111713':'#72BD88';
+  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#271c27':'#f6f1ee';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{b.classList.toggle('ativo',b.getAttribute('onclick')?.includes("'"+id+"'"));});}
+function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
-const V25_ESTILOS=['classico','softglass','editorial','atelier','aurora','liquidpremium','ameixachampagne'];
-function escolherDesignV25(id){if(!V25_ESTILOS.includes(id))return;localStorage.setItem('me-design-v25',id);document.documentElement.dataset.designV25=id;if(telaAtual==='configuracoes')renderTela();}
-document.documentElement.dataset.designV25=localStorage.getItem('me-design-v25')||'ameixachampagne';
+// V35: um so acabamento de vidro, sem opcoes visuais concorrentes.
+const V25_ESTILOS=['liquidpremium'];
+function escolherDesignV25(){localStorage.setItem('me-design-v25','liquidpremium');document.documentElement.dataset.designV25='liquidpremium';if(telaAtual==='configuracoes')renderTela();}
+document.documentElement.dataset.designV25='liquidpremium';
+try{localStorage.setItem('me-design-v25','liquidpremium');}catch(e){}
 function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
 consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
@@ -4991,8 +5160,9 @@ function configChecklistsHTML(){
 function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
-    <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#93435d']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
-    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Todas as opções usam vidro altamente transparente e seguem a paleta escolhida, com menos degradês. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Luz suave'],['liquidpremium','Liquid Glass Premium','Vidro profundo · segue a paleta'],['ameixachampagne','Ameixa & Champagne','Vidro elegante · segue a paleta']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Suas paletas</h4><div class="config-linha-desc">Escolha a cor que combina com seu momento. Todas utilizam o mesmo Liquid Glass e funcionam em modo claro e escuro.</div><div class="temas-v04 v35-paletas">${[['marsala','Marsala · Champagne · Rosa seco',['#93435d','#e6d2bb','#c89bab']],['lavanda','Lavanda Noturna',['#8d72b3','#d5c3e7','#e4d2bc']],['aurora','Aurora',['#6099b7','#b7d6ea','#e5d7ca']],['jardim','Jardim Secreto',['#548c70','#b8dcc6','#e3d6bb']],['rose','Rosé',['#b36987','#ebc0cd','#e8d7cb']],['oceano','Oceano',['#4c8c9c','#badfe0','#e0d7ca']],['ametista','Ametista',['#8362b2','#dbc8ec','#e6d4c8']],['terra','Terra Dourada',['#9a7450','#e7cca6','#eadbc9']]].map(([id,nome,cores])=>`<button type="button" class="tema-v04 ${document.documentElement.dataset.paletaV04===id?'ativo':''}" aria-pressed="${document.documentElement.dataset.paletaV04===id}" onclick="selecionarPaletaV04('${id}')"><span class="v35-amostras">${cores.map(c=>`<i style="background:${c}"></i>`).join('')}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Modo de exibição</h4><div class="config-linha-desc">Claro e Escuro são duas versões reais de cada paleta. O modo Automático segue a aparência do seu dispositivo.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button type="button" class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao v35-estilo-unico"><h4>Liquid Glass</h4><div class="config-linha-desc">Estilo único, com transparência intensa e bordas delicadas em todas as telas. Para renovar o visual, troque a paleta ou alterne entre Claro e Escuro.</div><div class="v35-vidro-selo"><span class="v35-vidro-icone">✧</span><div><strong>Liquid Glass Premium</strong><small>Ativo em todas as paletas</small></div><span class="v35-vidro-check" aria-label="Ativo">✓</span></div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
@@ -5003,31 +5173,6 @@ function configTemaHTML(){
       <div class="config-linha">
         <div><div class="config-linha-label">Assinatura padrão</div><div class="config-linha-desc">Usada em propostas e relatórios, se desejar</div></div>
         <label class="upload-area">${TEMA_MARCA.assinaturaData?`<img src="${TEMA_MARCA.assinaturaData}" alt="Assinatura salva" style="max-width:110px;max-height:48px;display:block;margin:auto">`:'📤 Enviar assinatura'}<input type="file" accept="image/*" hidden onchange="uploadMarca('assinatura',this)"></label>
-      </div>
-    </div>
-
-    <div class="config-secao">
-      <h4>Cores (experimente — muda o sistema inteiro em tempo real)</h4>
-      <div class="config-linha">
-        <div class="config-linha-label">Cor primária</div>
-        <div class="cor-picker">
-          <input type="color" value="#72BD88" oninput="mudarCorTema('--cor-primaria', this.value)">
-          <span class="cor-hex" id="hex---cor-primaria">#72BD88</span>
-        </div>
-      </div>
-      <div class="config-linha">
-        <div class="config-linha-label">Cor de acento</div>
-        <div class="cor-picker">
-          <input type="color" value="#E36216" oninput="mudarCorTema('--cor-acento', this.value)">
-          <span class="cor-hex" id="hex---cor-acento">#E36216</span>
-        </div>
-      </div>
-      <div class="config-linha">
-        <div class="config-linha-label">Cor de fundo</div>
-        <div class="cor-picker">
-          <input type="color" value="#F7F3EC" oninput="mudarCorTema('--cor-fundo', this.value)">
-          <span class="cor-hex" id="hex---cor-fundo">#F7F3EC</span>
-        </div>
       </div>
     </div>
 
