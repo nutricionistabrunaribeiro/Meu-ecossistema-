@@ -1191,6 +1191,37 @@ html[data-design-v25="liquidpremium"] .v25-liquidpremium::after{content:"";posit
 @media(prefers-reduced-motion:reduce){html[data-design-v25="liquidpremium"] #appRoot :is(.v11-kpi,.card,.v11-link,.plan-card){transition:none!important}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-design-v25="liquidpremium"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.sidebar){background:rgba(62,42,61,.91)!important}}
 </style>
+<style>
+.checklist-navegacao-secoes{margin:14px 0;padding:18px!important}
+.checklist-secao-cabecalho{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.checklist-navegacao-secoes label{display:block;margin:14px 0 7px;font-size:13px;color:var(--cor-texto-suave)}
+.checklist-navegacao-secoes select{width:100%;max-width:100%;padding:12px;border-radius:12px;background:var(--cor-fundo);color:var(--cor-texto);border:1px solid var(--cor-borda)}
+.checklist-botoes-secoes{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 24px}
+.checklist-botoes-secoes button{flex:1 1 160px}
+@media(max-width:600px){.checklist-botoes-secoes button{flex:1 1 45%}}
+</style>
+<style id="v33-ameixa-champagne">
+/* Novo tema visual opt-in: não altera dados, fluxos, cadastros ou checklist. */
+html[data-design-v25="ameixachampagne"]{color-scheme:dark;--cor-fundo:#241b2b;--cor-superficie:#34283a;--cor-card:#49334b;--cor-texto:#f5ede8;--cor-texto-suave:#d6c6d3;--cor-borda:rgba(245,237,232,.24);--cor-primaria:#b79aae;--cor-primaria-clara:#d3b9ca;--cor-acento:#e7d6bd;--sombra-card:0 16px 40px rgba(18,10,24,.24)}
+html[data-design-v25="ameixachampagne"] body{background:#241b2b!important;color:#f5ede8!important}
+html[data-design-v25="ameixachampagne"] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 50% 52% at 90% 14%,rgba(183,154,174,.27),transparent 85%),radial-gradient(ellipse 65% 60% at 10% 85%,rgba(101,68,101,.48),transparent 84%),linear-gradient(125deg,#211a29,#3b2a3c 58%,#2a202f)!important}
+html[data-design-v25="ameixachampagne"] #appRoot{position:relative;z-index:1;background:transparent!important;isolation:isolate}
+html[data-design-v25="ameixachampagne"] #appRoot main{background:transparent!important}
+html[data-design-v25="ameixachampagne"] #appRoot .sidebar,html[data-design-v25="ameixachampagne"] .sidebar-mobile-wrap .sidebar{background:rgba(40,28,47,.54)!important;border:1px solid rgba(245,237,232,.22)!important;backdrop-filter:blur(32px) saturate(125%)!important;-webkit-backdrop-filter:blur(32px) saturate(125%)!important;box-shadow:inset 0 1px rgba(255,255,255,.13),12px 0 40px rgba(20,10,24,.17)!important}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.v11-sono-intro,.v11-sono-stat,.v11-sono-total,.v11-overview-card,.v11-atalho,.v12-inspiracao,.dashboard-hoje,.horas-ativo,.casa-hero,.plan-hero,.plan-card,.plan-mes,.doc-grupo,.v19-documentos,.config-secao,.habito-card,.system-modal,.modal-content,.horas-metrica,.checklist-navegacao-secoes){background:linear-gradient(130deg,rgba(245,237,232,.13),rgba(245,237,232,.055) 55%,rgba(183,154,174,.09))!important;border:1px solid rgba(245,237,232,.28)!important;border-radius:22px!important;backdrop-filter:blur(30px) saturate(125%)!important;-webkit-backdrop-filter:blur(30px) saturate(125%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 15px 38px rgba(18,10,24,.2)!important;color:#f5ede8}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.v11-welcome,.casa-hero,.plan-hero){background:linear-gradient(115deg,rgba(95,66,101,.45),rgba(245,237,232,.09))!important}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.search,.space-switch,.theme-toggle,input,select,textarea,.plan-tabs button){background:rgba(245,237,232,.09)!important;border:1px solid rgba(245,237,232,.22)!important;color:#f5ede8!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html[data-design-v25="ameixachampagne"] #appRoot :is(input,textarea)::placeholder{color:rgba(245,237,232,.62)}
+html[data-design-v25="ameixachampagne"] #appRoot nav button.active{background:rgba(231,214,189,.19)!important;color:#f5ede8!important;border-color:rgba(231,214,189,.4)!important}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.btn-primario,.space-switch button.active){background:#e7d6bd!important;color:#302235!important;box-shadow:inset 0 1px rgba(255,255,255,.4),0 8px 20px rgba(18,10,24,.16)!important}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.v11-link-icon,.v11-kpi-icon,.nav-icon){background:rgba(231,214,189,.13)!important;color:#e7d6bd!important}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.v11-welcome h2,.v11-sono-intro h2,header.top h1){font-family:'Fraunces',Georgia,serif;letter-spacing:-.025em}
+html[data-design-v25="ameixachampagne"] #appRoot :is(.v11-kpi-label,.v11-section-head p,.v11-welcome p,.v11-sono-intro p){color:#d6c6d3!important}
+html[data-design-v25="ameixachampagne"] .v25-ameixachampagne{background:linear-gradient(135deg,#241b2b,#49334b 55%,#e7d6bd);position:relative;overflow:hidden}
+html[data-design-v25="ameixachampagne"] .v25-ameixachampagne::after{content:"";position:absolute;inset:7px 12px;border:1px solid #ffffff78;border-radius:10px;background:#ffffff20;backdrop-filter:blur(7px)}
+@media(max-width:700px){html[data-design-v25="ameixachampagne"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.plan-card){border-radius:19px!important}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-design-v25="ameixachampagne"] #appRoot :is(.card,.v11-kpi,.v11-link,.v11-welcome,.sidebar){background:rgba(60,44,65,.93)!important}}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2010,7 +2041,7 @@ function visitasRealizadasMes(clienteId){const mes=formatoISO(new Date()).slice(
 function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));return {prev:c.visitasPrevistasMes||((c.visitasPrevistasSemana||0)*4),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
 function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
 function ordenarClientesAZ(lista){return [...lista].sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base',numeric:true}));}
-function carteiraContratanteHTML(c){const filhos=CLIENTES.filter(x=>x.contratanteId===c.id);const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')" style="text-align:left"><strong>${f.nome}</strong></button><span style="display:flex;align-items:center;gap:8px"><button class="tag" onclick="alternarChecklistMensalCliente('${f.id}')">${f.recebeChecklistMensal?'Checklist mensal ✓':'Ativar checklist mensal'}</button>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>${controleChecklistsContratanteHTML(c)}`;}
+function carteiraContratanteHTML(c){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));const mes=new Date().toISOString().slice(0,7);const ids=filhos.map(x=>x.id);const rotas=ROTAS_CUSTOS.filter(r=>ids.includes(r.cliente_id)&&r.data?.startsWith(mes));return `<div class="card" style="margin-top:18px"><h3>Carteira vinculada <button onclick="novoCliente('${c.id}')">+ Vincular estabelecimento</button></h3><div style="font-size:12px;color:var(--cor-texto-suave);margin-bottom:10px">${filhos.length} estabelecimento(s) · ${numerosVisitasCliente(c).real}/${numerosVisitasCliente(c).prev} visitas no mês · ${moeda(rotas.reduce((s,r)=>s+custoRota(r),0))} em deslocamentos</div>${filhos.map(f=>`<div class="item-lista-simples"><button onclick="abrirCliente('${f.id}')" style="text-align:left"><strong>${f.nome}</strong></button><span style="display:flex;align-items:center;gap:8px"><button class="tag" onclick="alternarChecklistMensalCliente('${f.id}')">${f.recebeChecklistMensal?'Checklist mensal ✓':'Ativar checklist mensal'}</button>${visitasRealizadasMes(f.id)}/${f.visitasPrevistasMes} visitas</span></div>`).join('')||semRegistro()}</div>${controleChecklistsContratanteHTML(c)}`;}
 async function configurarCarteiraCliente(id){const c=CLIENTES.find(x=>x.id===id);const tipo=prompt('Tipo: direto, contratante ou vinculado',c.tipoCliente);if(!['direto','contratante','vinculado'].includes(tipo))return;let contratanteId=null;if(tipo==='vinculado'){const lista=CLIENTES.filter(x=>x.tipoCliente==='contratante'&&x.id!==id);const n=prompt(`Contratante:\n${lista.map((x,i)=>`${i+1}. ${x.nome}`).join('\n')}`);const pai=lista[parseInt(n)-1];if(!pai)return;contratanteId=pai.id;}const semana=parseInt(prompt('Visitas previstas por semana:',String(c.visitasPrevistasSemana||0)))||0;const mes=parseInt(prompt('Visitas previstas por mês:',String(c.visitasPrevistasMes||0)))||0;const recebe=tipo==='vinculado'?confirm('Este estabelecimento recebe checklist mensal?'):false;const {error}=await supa.from('clientes').update({tipo_cliente:tipo,contratante_id:contratanteId,visitas_previstas_semana:semana,visitas_previstas_mes:mes,recebe_checklist_mensal:recebe}).eq('id',id);if(error){dispararAutomacao('Erro ao salvar carteira',error.message);return;}Object.assign(c,{tipoCliente:tipo,contratanteId,visitasPrevistasSemana:semana,visitasPrevistasMes:mes,recebeChecklistMensal:recebe});renderTela();}
 
 /* ---------- CONTROLE MENSAL DE CHECKLISTS DAS CONTRATANTES ---------- */
@@ -2806,9 +2837,21 @@ function atualizarObsItem(visitaId, itemId, texto){
   timersObsChecklist[chave]=setTimeout(()=>salvarRascunhoItem(v,item),600);
 }
 
+let secaoChecklistAtivaPorVisita = {};
+function navegarSecaoChecklist(visitaId, indice){
+  const v=VISITAS.find(x=>x.id===visitaId);if(!v)return;
+  const categorias=[...new Set(v.checklist.map(i=>i.categoria))];
+  secaoChecklistAtivaPorVisita[visitaId]=Math.max(0,Math.min(categorias.length-1,Number(indice)||0));
+  renderTela();
+  const alvo=document.getElementById('navegacao-secoes-checklist');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function fichaVisitaHTML(v){
   if(etapaVisitaAtual==='antes') etapaVisitaAtual='durante';
   const categorias = [...new Set(v.checklist.map(i=>i.categoria))];
+  const indiceSecao=Math.max(0,Math.min(categorias.length-1,secaoChecklistAtivaPorVisita[v.id]||0));
+  const categoriaAtiva=categorias[indiceSecao];
+  const respondidosSecao=v.checklist.filter(i=>i.categoria===categoriaAtiva&&i.resultado).length;
+  const totalSecao=v.checklist.filter(i=>i.categoria===categoriaAtiva).length;
   const pontuacao = v.status==='concluida' ? v.pontuacao : calcularPontuacao(v.checklist);
   const naoConformidades = v.checklist.filter(i=>i.resultado==='nao_conforme');
 
@@ -2837,7 +2880,13 @@ function fichaVisitaHTML(v){
           <div class="score-barra"><div style="width:${pontuacao}%;"></div></div>
         </div>
       </div>
-      ${categorias.map(cat=>`
+      <div class="card checklist-navegacao-secoes" id="navegacao-secoes-checklist">
+        <div class="checklist-secao-cabecalho"><strong>Seção ${indiceSecao+1} de ${categorias.length}</strong><span>${respondidosSecao}/${totalSecao} itens respondidos</span></div>
+        <div class="score-barra"><div style="width:${totalSecao?Math.round(respondidosSecao/totalSecao*100):0}%"></div></div>
+        <label for="seletor-secao-checklist">Ir para seção</label>
+        <select id="seletor-secao-checklist" onchange="navegarSecaoChecklist('${v.id}',this.value)">${categorias.map((cat,i)=>`<option value="${i}" ${i===indiceSecao?'selected':''}>${i+1}. ${textoHTML(cat)} — ${v.checklist.filter(item=>item.categoria===cat&&item.resultado).length}/${v.checklist.filter(item=>item.categoria===cat).length}</option>`).join('')}</select>
+      </div>
+      ${categorias.filter((cat,i)=>i===indiceSecao).map(cat=>`
         <div class="checklist-categoria">
           <h4>${cat}</h4>
           ${v.checklist.filter(i=>i.categoria===cat).map(item=>`
@@ -2871,9 +2920,11 @@ function fichaVisitaHTML(v){
           `).join('')}
         </div>
       `).join('')}
-      <div style="display:flex;gap:10px;">
-        <button class="btn-secundario" onclick="voltarVisitas()">← Voltar para o cliente</button>
-        <button class="btn-primario" onclick="irParaEtapaVisita('apos')">Finalizar checklist →</button>
+      <div class="checklist-botoes-secoes">
+        <button class="btn-secundario" onclick="salvarChecklistAgora('${v.id}')">Salvar agora</button>
+        <button class="btn-secundario" ${indiceSecao===0?'disabled':''} onclick="navegarSecaoChecklist('${v.id}',${indiceSecao-1})">← Seção anterior</button>
+        <button class="btn-primario" ${indiceSecao>=categorias.length-1?'disabled':''} onclick="navegarSecaoChecklist('${v.id}',${indiceSecao+1})">Próxima seção →</button>
+        <button class="btn-secundario" onclick="irParaEtapaVisita('apos')">Finalizar e revisar →</button>
       </div>`;
   } else {
     corpoEtapa = `
@@ -4648,9 +4699,9 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
 }
 function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{b.classList.toggle('ativo',b.getAttribute('onclick')?.includes("'"+id+"'"));});}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
-const V25_ESTILOS=['classico','softglass','editorial','atelier','aurora','liquidpremium'];
+const V25_ESTILOS=['classico','softglass','editorial','atelier','aurora','liquidpremium','ameixachampagne'];
 function escolherDesignV25(id){if(!V25_ESTILOS.includes(id))return;localStorage.setItem('me-design-v25',id);document.documentElement.dataset.designV25=id;if(telaAtual==='configuracoes')renderTela();}
-document.documentElement.dataset.designV25=localStorage.getItem('me-design-v25')||'liquidpremium';
+document.documentElement.dataset.designV25=localStorage.getItem('me-design-v25')||'ameixachampagne';
 function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
 consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
@@ -4739,7 +4790,7 @@ function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
     <div class="config-secao"><h4>Aparência do sistema</h4><div class="config-linha-desc">Paleta de cores</div><div class="temas-v04">${[['lavanda','Lavanda Noturna','#bca1ff'],['aurora','Aurora','#72b8ff'],['jardim','Jardim Secreto','#90d8b0'],['rose','Rosé','#f1a4bf'],['oceano','Oceano','#7ad5db'],['ametista','Ametista','#c38dfa'],['terra','Terra Dourada','#e4ba77'],['marsala','Marsala','#d99aac']].map(([id,nome,cor])=>`<button class="tema-v04" onclick="selecionarPaletaV04('${id}')"><span style="background:${cor}"></span>${nome}</button>`).join('')}</div><div class="config-linha-desc">Escolha o visual deste aparelho. No Automático, o Meu Ecossistema acompanha o modo do iPhone, tablet ou computador.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
-    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Escolha o design independentemente das cores. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Degradês luminosos'],['liquidpremium','Liquid Glass Premium','Vidro profundo · vinho e dourado']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Estilo visual</h4><div class="config-linha-desc">Escolha o design independentemente das cores. Sua escolha fica salva neste aparelho.</div><div class="v25-estilos">${[['classico','Clássico','Original'],['softglass','Soft Glass','Vidro translúcido'],['editorial','Editorial Chic','Elegância editorial'],['atelier','Atelier','Aconchegante'],['aurora','Aurora','Degradês luminosos'],['liquidpremium','Liquid Glass Premium','Vidro profundo · vinho e dourado'],['ameixachampagne','Ameixa & Champagne','Vidro uniforme · ameixa e champagne']].map(([id,nome,desc])=>`<button type="button" class="v25-estilo ${document.documentElement.dataset.designV25===id?'ativo':''}" onclick="escolherDesignV25('${id}')"><span class="v25-amostra v25-${id}"></span><strong>${nome}</strong><small>${desc}</small></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
     <div class="config-secao">
       <h4>Identidade da marca</h4>
