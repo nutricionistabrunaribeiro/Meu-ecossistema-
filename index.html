@@ -1127,6 +1127,27 @@ html[data-design-v25="softglass"] .card,html[data-design-v25="softglass"] .habit
 html[data-design-v25="editorial"] h1,html[data-design-v25="editorial"] h2,html[data-design-v25="editorial"] h3{font-family:Georgia,serif;letter-spacing:-.025em}html[data-design-v25="editorial"] .card,html[data-design-v25="editorial"] .habito-card{border-radius:12px!important;box-shadow:0 8px 25px #0000000b}
 html[data-design-v25="atelier"] .card,html[data-design-v25="atelier"] .habito-card,html[data-design-v25="atelier"] .config-secao{border-radius:18px;background-image:linear-gradient(135deg,#b7894c12,transparent 65%);box-shadow:0 8px 24px #261d1b14}html[data-design-v25="atelier"] h2,html[data-design-v25="atelier"] h3{font-family:Georgia,serif}
 html[data-design-v25="aurora"] body{background-image:radial-gradient(ellipse at 5% 10%,#ad66ce2e,transparent 50%),radial-gradient(ellipse at 95% 75%,#df759a27,transparent 50%)!important;background-attachment:fixed}html[data-design-v25="aurora"] .card,html[data-design-v25="aurora"] .habito-card,html[data-design-v25="aurora"] .config-secao{border-radius:24px;box-shadow:0 12px 30px #6d44831a;border:1px solid #ffffff2b}
+</style><style id="v26-responsive-fix">
+.v26-doc-title{display:flex;align-items:center;min-height:47px;padding:12px 14px;border-radius:12px;border:1px solid var(--cor-borda);background:color-mix(in srgb,var(--cor-primaria) 8%,var(--cor-superficie));color:var(--cor-texto);font-size:15px;font-weight:700;overflow-wrap:anywhere}
+.system-modal,.system-modal *{box-sizing:border-box}
+.system-modal{min-width:0;max-width:min(560px,calc(100vw - 24px));overflow-x:hidden}
+.system-modal .form-grid,.system-modal .form-field,.system-modal input,.system-modal select,.system-modal textarea,.system-modal .doc-date-control,.system-modal .doc-date-value{min-width:0;max-width:100%}
+.system-modal .form-field input:not([type=checkbox]),.system-modal .form-field select,.system-modal .form-field textarea{width:100%;box-sizing:border-box}
+.system-modal .system-modal-head>div{min-width:0;flex:1}
+.system-modal .system-modal-head h2,.system-modal .system-modal-head p{overflow-wrap:anywhere}
+@media(max-width:700px){
+ .system-modal-bg{padding:12px!important;align-items:center!important;overflow-y:auto}
+ .system-modal{width:100%!important;max-width:calc(100vw - 24px)!important;padding:18px!important;max-height:calc(100dvh - 24px)!important;border-radius:20px!important}
+ .system-modal .form-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ .system-modal .form-field.full{grid-column:1/-1!important}
+ .system-modal .system-modal-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%}
+ .system-modal .system-modal-actions button{width:100%!important;min-width:0!important;padding:12px 8px!important;white-space:normal}
+ .system-modal input[type=datetime-local]{font-size:15px!important;min-height:48px;max-width:100%!important}
+ .system-modal .system-modal-head{align-items:flex-start}
+ .system-modal .system-modal-head h2{font-size:22px!important}
+ .system-modal .system-modal-close,.system-modal .system-modal-top>button{flex-shrink:0}
+ .system-modal .system-modal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+}
 </style></head>
 <body data-espaco="trabalho">
 
@@ -2102,10 +2123,18 @@ async function editarCampoDataDocumento(id,titulo){
   input.value=data||'';atualizarVisualCampoDataDocumento(id);
 }
 function limparCampoDataDocumento(id){const input=document.getElementById(id);if(!input)return;input.value='';atualizarVisualCampoDataDocumento(id);}
+function nomeDocumentoPorChave(chave){
+  for(const grupo of MODELO_DOCUMENTACAO){const item=grupo.itens.find(i=>i[0]===chave);if(item)return item[1];}
+  return '';
+}
 function abrirDocumentoModelo(clienteId,chave,nome=null,docId=null){
-  const c=CLIENTES.find(x=>x.id===clienteId),d=docId?(c.documentacao||[]).find(x=>x.id===docId):(chave?documentoModelo(c,chave):null),grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||categoriaDocumento(chave)));
+  const c=CLIENTES.find(x=>x.id===clienteId);if(!c)return;
+  const d=docId?(c.documentacao||[]).find(x=>x.id===docId):(chave?documentoModelo(c,chave):null);
+  const grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||categoriaDocumento(chave)));
+  const nomeResolvido=d?.nome||nome||nomeDocumentoPorChave(chave)||'';
+  
   abrirModalSistema(`<div class="doc-form-modal"><div class="system-modal-head"><div><h2>${d?'Atualizar':'Preencher'} documentação</h2><p>O sistema acompanha os dados; o arquivo permanece no seu computador.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
-    <div class="form-field full"><label>Documento</label><input id="docNome" value="${textoHTML(d?.nome||nome||'')}" ${chave?'readonly':''}></div>
+    <div class="form-field full"><label>Documento</label>${chave?`<div class="v26-doc-title">${textoHTML(nomeResolvido)}</div><input type="hidden" id="docNome" value="${textoHTML(nomeResolvido)}">`:`<input id="docNome" value="${textoHTML(nomeResolvido)}" placeholder="Digite o nome do documento">`}</div>
     ${campoDataDocumentoHTML('docEmissao','Data de emissão/elaboração',d?.emissao)}
     ${campoDataDocumentoHTML('docValidade','Data de validade/próxima execução',d?.validade)}
     <div class="form-field"><label>Status</label><select id="docStatusOperacional"><option value="pendente" ${d?.statusOperacional==='pendente'||!d?'selected':''}>Pendente</option><option value="arquivado" ${d?.statusOperacional==='arquivado'?'selected':''}>Arquivado</option><option value="implantado" ${d?.statusOperacional==='implantado'?'selected':''}>Implantado</option></select></div>
@@ -2115,7 +2144,7 @@ function abrirDocumentoModelo(clienteId,chave,nome=null,docId=null){
   </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarDocumentoPainel('${clienteId}','${chave||''}','${d?.id||''}')">Salvar</button></div></div>`);
 }
 async function salvarDocumentoPainel(clienteId,chave,docId){
-  const c=CLIENTES.find(x=>x.id===clienteId),nome=document.getElementById('docNome').value.trim();if(!nome){document.getElementById('docNome').focus();return;}
+  const c=CLIENTES.find(x=>x.id===clienteId),nome=(document.getElementById('docNome')?.value||nomeDocumentoPorChave(chave)).trim();if(!nome){dispararAutomacao('Documento não identificado','Informe o nome do documento.');document.getElementById('docNome')?.focus();return;}
   const emissaoISO=document.getElementById('docEmissao').value,validadeISO=document.getElementById('docValidade').value,aplicavel=document.getElementById('docAplicavel').checked;
   const emissao=emissaoISO?isoParaBRCompleto(emissaoISO):null,validade=validadeISO?isoParaBRCompleto(validadeISO):null,statusTela=aplicavel?statusAutomaticoDoc(validade):'Sem validade',status=statusTela==='Vigente'?'Válido':statusTela==='Próximo do vencimento'?'Vencendo':statusTela==='Vencido'?'Vencido':'Em revisão';
   const statusOperacional=document.getElementById('docStatusOperacional').value;
