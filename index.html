@@ -1044,6 +1044,24 @@ html[data-paleta-v04] #appRoot :is(.card,.v11-overview-card,.v11-atalho,.v11-lin
 html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;color:var(--cor-texto)}
 .v19-doc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.v19-doc-top h3{margin:0 0 5px}.v19-doc-top p{margin:0;color:var(--cor-texto-suave);font-size:12px}.v19-legenda{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.v19-situacao{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.v19-situacao.verde{color:#9ce8b7;background:rgba(30,130,73,.24);border:1px solid rgba(91,210,133,.4)}.v19-situacao.laranja{color:#ffcf89;background:rgba(172,101,16,.24);border:1px solid rgba(240,161,54,.42)}.v19-situacao.vermelho{color:#ffadb0;background:rgba(170,39,52,.25);border:1px solid rgba(234,94,101,.4)}.v19-situacao.neutro{color:var(--cor-texto-suave);background:rgba(160,160,160,.12);border:1px solid var(--cor-borda)}.v19-filtro{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px}.v19-filtro select{max-width:240px}.v19-table-wrap{width:100%;overflow-x:auto;border-radius:13px;border:1px solid var(--cor-borda)}.v19-doc-table{width:100%;border-collapse:collapse;min-width:580px;text-align:left}.v19-doc-table th{padding:12px 10px;font-size:11px;background:rgba(255,255,255,.07);color:var(--cor-texto)}.v19-doc-table td{padding:11px 10px;font-size:12px;border-top:1px solid var(--cor-borda);vertical-align:middle}.v19-doc-table td small{display:block;color:var(--cor-texto-suave);font-size:10px;margin-top:3px}.v19-doc-table tr:hover td{background:rgba(255,255,255,.035)}.v19-editar{border:1px solid var(--cor-borda);border-radius:9px;padding:7px 11px;color:var(--cor-texto);background:rgba(255,255,255,.07);cursor:pointer}
 
+
+/* v39: legibilidade de chips da agenda semanal em qualquer tema */
+.evento-chip,.evento-chip small,.evento-chip span{color:#fff !important;text-shadow:0 1px 2px rgba(0,0,0,.22)}
+.evento-chip{position:relative}
+.v39-radar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.v39-radar-stat{padding:18px;border:1px solid var(--cor-borda);border-radius:18px;background:var(--cor-fundo-card);backdrop-filter:blur(22px)}
+.v39-radar-stat strong{display:block;font-size:29px;color:var(--cor-texto)}
+.v39-radar-stat span{font-size:12px;color:var(--cor-texto-suave)}
+.v39-radar-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:12px 0}
+.v39-radar-controls label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--cor-texto-suave)}
+.v39-radar-controls select,.v39-radar-controls input{max-width:100%;min-width:115px}
+.v39-radar-bar{height:9px;background:var(--cor-borda);border-radius:20px;overflow:hidden;margin:7px 0 13px}
+.v39-radar-bar i{display:block;height:100%;background:var(--cor-primaria);border-radius:20px}
+.v39-radar-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.v39-radar-form label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--cor-texto-suave)}
+.v39-radar-form .wide{grid-column:1/-1}
+.v39-radar-form input,.v39-radar-form select,.v39-radar-form textarea{width:100%;min-width:0;color:var(--cor-texto);background:var(--cor-fundo-card);border:1px solid var(--cor-borda);border-radius:12px;padding:12px;font:inherit}
+@media(max-width:600px){.v39-radar-form{grid-template-columns:1fr}}
 </style>
 <meta name="ecossistema-release" content="19-glass-tabela-documental">
 
@@ -1922,6 +1940,7 @@ const MODULOS = {
       {id:"entregas", nome:"Entregas"},
       {id:"controle_horas", nome:"Controle de Horas"},
       {id:"planejamento", nome:"Planejamento"},
+      {id:"radar_recorrencias", nome:"Radar de Recorrências"},
       {id:"lideranca", nome:"Liderança"},
     ]},
     {grupo:"Crescimento", itens:[
@@ -1961,7 +1980,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -2163,6 +2182,7 @@ const NOMES_TELA = {
   biblioteca:["Biblioteca","8 documentos"],
   entregas:["Entregas","Prazos e clientes envolvidos"],
   planejamento:["Planejamento","Radar, datas, rotinas e fechamento mensal"],
+  radar_recorrencias:["Radar de Recorrências","Orientações, cobranças e não conformidades ao longo do ano"],
   lideranca:["Liderança","Delegações e acompanhamento"],
   marketing:["Marketing","Calendário editorial"],
   comercial:["Comercial","Pipeline de leads"],
@@ -6624,6 +6644,39 @@ function sonoHTML(){
  <section class="card v11-sono-history"><h3>Histórico de ${mes.split('-').reverse().join('/')}</h3>${lista.map(x=>`<div class="v11-noite"><span>☾ <strong>${x.data.split('-').reverse().join('/')}</strong><small>${textoHTML(x.dormir)} – ${textoHTML(x.acordar)} · ${textoHTML(x.qualidade)}</small></span><strong>${x.horas} h</strong></div>`).join('')||'<p>Sem registros neste mês.</p>'}</section></div>`;
 }
 
+
+/* v39 — Radar de Recorrências (persistência no Supabase com RLS) */
+let RADAR_RECORRENCIAS=[];
+let RADAR_ANO=new Date().getFullYear();
+let RADAR_TIPO='todos';
+const RADAR_ASSUNTOS=['Atendimento pessoal','Limpeza e higienização','Planilhas e registros','Armazenamento','Identificação de produtos','Temperatura e conservação','Documentação','Controle de pragas','Higiene dos colaboradores','Treinamentos','Manutenção','Outros'];
+const RADAR_TIPOS={orientacao:'Orientação',nao_conformidade:'Não conformidade',cobranca:'Cobrança de adequação'};
+async function carregarRadarRecorrencias(){
+  try{const {data:{user}}=await supa.auth.getUser();if(!user)return;const {data,error}=await supa.from('radar_recorrencias').select('*').eq('user_id',user.id).order('data',{ascending:false});if(error)throw error;RADAR_RECORRENCIAS=data||[];}
+  catch(e){console.warn('Radar de Recorrências:',e.message);}
+}
+function radarRecorrenciasHTML(){
+ const ano=Number(RADAR_ANO)||new Date().getFullYear();
+ const filtrados=RADAR_RECORRENCIAS.filter(r=>String(r.data||'').startsWith(String(ano))&&(RADAR_TIPO==='todos'||r.tipo===RADAR_TIPO));
+ const total=filtrados.reduce((s,r)=>s+Number(r.quantidade||1),0);
+ const porTipo=k=>filtrados.filter(r=>r.tipo===k).reduce((s,r)=>s+Number(r.quantidade||1),0);
+ const grupos={};filtrados.forEach(r=>{const a=String(r.assunto||'Outros');grupos[a]=(grupos[a]||0)+Number(r.quantidade||1)});
+ const ranking=Object.entries(grupos).sort((a,b)=>b[1]-a[1]);
+ const max=ranking[0]?.[1]||1;
+ return `<div class="card"><h2>Radar de Recorrências</h2><p style="color:var(--cor-texto-suave)">Conte cada orientação, não conformidade e cobrança. Os resultados são gerais, mesmo quando o registro estiver vinculado a um cliente.</p><div class="v39-radar-controls"><label>Ano <select id="radarAno" onchange="RADAR_ANO=Number(this.value);renderTela()">${[ano-2,ano-1,ano,ano+1].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>b-a).map(v=>`<option value="${v}" ${v===ano?'selected':''}>${v}</option>`).join('')}</select></label><label>Tipo <select onchange="RADAR_TIPO=this.value;renderTela()"><option value="todos">Todos</option>${Object.entries(RADAR_TIPOS).map(([k,v])=>`<option value="${k}" ${RADAR_TIPO===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-primario" onclick="abrirNovoRadar()">+ Nova ocorrência</button></div><div class="v39-radar-grid">${[['Total de ocorrências',total],['Orientações',porTipo('orientacao')],['Não conformidades',porTipo('nao_conformidade')],['Cobranças',porTipo('cobranca')]].map(([label,num])=>`<div class="v39-radar-stat"><strong>${num}</strong><span>${label}</span></div>`).join('')}</div></div><div class="card" style="margin-top:14px"><h3>Assuntos mais recorrentes · ${ano}</h3>${ranking.length?ranking.map(([nome,n])=>`<div style="display:flex;justify-content:space-between;gap:10px"><strong>${textoHTML(nome)}</strong><span>${n} ${n===1?'vez':'vezes'}</span></div><div class="v39-radar-bar"><i style="width:${Math.round(n/max*100)}%"></i></div>`).join(''):'<p style="color:var(--cor-texto-suave)">Nenhum registro neste período. Toque em Nova ocorrência para começar.</p>'}</div><div class="card" style="margin-top:14px"><h3>Histórico de registros</h3>${filtrados.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);return `<div class="item-lista-simples"><div><strong>${textoHTML(r.assunto)}</strong><div style="font-size:12px;color:var(--cor-texto-suave)">${textoHTML(RADAR_TIPOS[r.tipo]||r.tipo)} · ${dataBR(r.data)} · ${Number(r.quantidade||1)} vez(es)${c?' · '+textoHTML(c.nome):' · Geral'}</div>${r.observacoes?`<small>${textoHTML(r.observacoes)}</small>`:''}</div><button class="btn-secundario" onclick="excluirRadar('${r.id}')" aria-label="Excluir ocorrência">Excluir</button></div>`}).join('')||'<p style="color:var(--cor-texto-suave)">Sem registros.</p>'}</div>`;
+}
+function abrirNovoRadar(){
+ const hoje=formatoISO(new Date());
+ const clientes=typeof ordenarClientesAZ==='function'?ordenarClientesAZ(CLIENTES.filter(c=>typeof clienteAtivoV37!=='function'||clienteAtivoV37(c))):CLIENTES;
+ abrirModalSistema(`<div class="system-modal-top"><div><h3>Nova ocorrência</h3><p>Registre rapidamente um assunto recorrente.</p></div><button onclick="fecharModalSistema()">✕</button></div><form id="radarForm" class="v39-radar-form" onsubmit="salvarNovoRadar(event)"><label>Data<input name="data" type="date" value="${hoje}" required></label><label>Tipo<select name="tipo"><option value="orientacao">Orientação</option><option value="nao_conformidade">Não conformidade</option><option value="cobranca">Cobrança de adequação</option></select></label><label class="wide">Assunto<select name="assunto">${RADAR_ASSUNTOS.map(a=>`<option ${a==='Atendimento pessoal'?'selected':''}>${textoHTML(a)}</option>`).join('')}</select></label><label>Quantidade<input name="quantidade" type="number" min="1" max="999" value="1" required></label><label>Cliente (opcional)<select name="cliente_id"><option value="">Geral / sem cliente</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></label><label class="wide">Observações (opcional)<textarea name="observacoes" rows="3" maxlength="1200" placeholder="O que foi orientado ou identificado?"></textarea></label><button class="btn-primario wide" type="submit">Salvar ocorrência</button><p id="radarErro" class="wide" role="status" style="color:var(--cor-texto-suave)"></p></form>`);
+}
+async function salvarNovoRadar(event){
+ event.preventDefault();const form=event.target,btn=form.querySelector('button[type=submit]'),erro=document.getElementById('radarErro');btn.disabled=true;erro.textContent='Salvando no Supabase…';
+ try{const f=new FormData(form),{data:{user}}=await supa.auth.getUser();if(!user)throw Error('Entre na sua conta para salvar.');const registro={user_id:user.id,data:String(f.get('data')),tipo:String(f.get('tipo')),assunto:String(f.get('assunto')),quantidade:Number(f.get('quantidade')),cliente_id:f.get('cliente_id')||null,observacoes:String(f.get('observacoes')||'').trim()||null};if(!registro.data||!registro.assunto||registro.quantidade<1||registro.quantidade>999)throw Error('Confira os campos.');const {data,error}=await supa.from('radar_recorrencias').insert(registro).select().single();if(error)throw error;RADAR_RECORRENCIAS.unshift(data);RADAR_ANO=Number(registro.data.slice(0,4));RADAR_TIPO='todos';fecharModalSistema();renderTela();dispararAutomacao('Ocorrência registrada',registro.assunto);}
+ catch(e){erro.textContent='Não foi possível salvar: '+e.message;btn.disabled=false;}
+}
+async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'))return;try{const {error}=await supa.from('radar_recorrencias').delete().eq('id',id);if(error)throw error;RADAR_RECORRENCIAS=RADAR_RECORRENCIAS.filter(r=>r.id!==id);renderTela();}catch(e){alert('Não foi possível excluir: '+e.message)}}
+
 function renderTela(){
   const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
@@ -6665,6 +6718,8 @@ function renderTela(){
   } else if(telaAtual === 'planejamento'){
     document.getElementById('conteudoTela').innerHTML=planejamentoHTML();
     setTimeout(abrirConteudoPlanejamento,0);
+  } else if(telaAtual === 'radar_recorrencias'){
+    document.getElementById('conteudoTela').innerHTML = radarRecorrenciasHTML();
   } else if(telaAtual === 'lideranca'){
     document.getElementById('conteudoTela').innerHTML = liderancaHTML();
   } else if(telaAtual === 'rotas_custos'){
@@ -7054,6 +7109,7 @@ async function entrarNoApp(){
   await sincronizarSono();
   await carregarTemaMarcaSupabase();
   await carregarClientesSupabase();
+  await carregarRadarRecorrencias();
   await carregarEnviosMensaisSupabase();
   await carregarEntregasSupabase();
   await carregarProximosPassosSupabase();
