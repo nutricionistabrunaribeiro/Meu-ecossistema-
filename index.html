@@ -1062,6 +1062,16 @@ html[data-paleta-v04] #appRoot .v19-documentos{padding:16px;border-radius:18px;c
 .v39-radar-form .wide{grid-column:1/-1}
 .v39-radar-form input,.v39-radar-form select,.v39-radar-form textarea{width:100%;min-width:0;color:var(--cor-texto);background:var(--cor-fundo-card);border:1px solid var(--cor-borda);border-radius:12px;padding:12px;font:inherit}
 @media(max-width:600px){.v39-radar-form{grid-template-columns:1fr}}
+
+/* V40 - global dashboard and consolidated recurrence report */
+.v40-global-placeholder{display:none}
+.v40-month-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin:14px 0}
+.v40-month{padding:12px 7px;border-radius:13px;background:var(--cor-fundo-card);border:1px solid var(--cor-borda);text-align:center;display:flex;flex-direction:column;gap:5px}
+.v40-month span{font-size:11px;color:var(--cor-texto-suave)}.v40-month strong{font-size:20px;color:var(--cor-primaria)}
+.v40-report-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.v40-global-dashboard{padding:0 12px 8px}.v40-global-dashboard button{width:100%;padding:12px;border-radius:11px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);font-weight:700;text-align:left;cursor:pointer}
+.v40-global-dashboard button.active{border-color:var(--cor-primaria);color:var(--cor-primaria)}
+@media(max-width:650px){.v40-month-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.v40-report-actions>*{width:100%}}
 </style>
 <meta name="ecossistema-release" content="19-glass-tabela-documental">
 
@@ -1933,7 +1943,6 @@ const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const MODULOS = {
   trabalho: [
     {grupo:"Operação", itens:[
-      {id:"dashboard", nome:"Dashboard"},
       {id:"agenda", nome:"Agenda"},
       {id:"clientes", nome:"Clientes"},
       {id:"visitas", nome:"Checklists"},
@@ -1974,7 +1983,7 @@ const MODULOS = {
 };
 
 const TAB_PRINCIPAL = {
-  trabalho: ["dashboard","agenda","clientes","visitas"],
+  trabalho: ["agenda","clientes","visitas","entregas"],
   pessoal: ["habitos","metas","contas","ideias_pessoais"]
 };
 
@@ -2017,6 +2026,7 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
+    <div class="v40-global-dashboard"><button class="${telaAtual==='dashboard'?'active':''}" onclick="abrirDashboardGlobal()">▥ &nbsp; Dashboard geral</button></div>
     <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
@@ -2060,7 +2070,7 @@ async function buscarTextoBiblico(referencia){
  const r=await fetch('https://bible-api.com/'+encodeURIComponent(referencia)+'?translation=almeida',{headers:{Accept:'application/json'}});
  if(!r.ok)throw new Error('Passagem não encontrada');
  const d=await r.json();if(!d.text||!d.reference)throw new Error('Passagem não encontrada');
- return {versiculo:d.text.trim().slice(0,1200),referencia:d.reference};
+ return {versiculo:d.text.trim().slice(0,1200),referencia:d.reference,traducao:'Almeida (Bible API)'};
 }
 let v13BuscandoDia=false;
 function inspiracaoSidebarHTML(){
@@ -2070,10 +2080,11 @@ function inspiracaoSidebarHTML(){
  if(diario&&!valido&&!v13BuscandoDia){setTimeout(atualizarVersiculoDoDia,100)}
  const verso=valido?dados.versiculo:'';
  const ref=valido?dados.referencia:referenciaDoDia();
+ const traducao=diario?'Almeida (Bible API)':(dados.traducao||'Tradução não informada');
  return `<div class="v12-insp-title">✦ Pausa para inspirar</div>
  <div class="v12-insp-label">${diario?'Versículo do dia':'Versículo escolhido'}</div>
  <p class="v12-insp-verse">${textoHTML(verso|| (diario?'Buscando passagem do dia…':'Escolha uma passagem para se inspirar.'))}</p>
- ${ref?`<small class="v12-insp-ref">${textoHTML(ref)}</small>`:''}
+ ${ref?`<small class="v12-insp-ref">${textoHTML(ref)} · ${textoHTML(traducao)}</small>`:''}
  <div class="v12-insp-label">Mensagem do dia</div><p class="v12-insp-frase">${textoHTML(frase)}</p>
  <button class="v12-insp-edit" onclick="editarInspiracao()">✎ Escolher versículo</button>`;
 }
@@ -2084,15 +2095,15 @@ async function atualizarVersiculoDoDia(){
  const passagem=await buscarTextoBiblico(referencia);
  const atual=lerInspiracao();if(atual.modo==='diario'){salvarInspiracao({...atual,...passagem,dia})}
  }catch(e){const atual=lerInspiracao();if(atual.modo==='diario'){
- salvarInspiracao({...atual,versiculo:'A passagem de hoje estará disponível quando houver conexão com a internet.',referencia,dia});
+ salvarInspiracao({...atual,versiculo:'A passagem de hoje estará disponível quando houver conexão com a internet.',referencia,dia,traducao:'Almeida (Bible API)'});
  }}finally{v13BuscandoDia=false}
 }
 function editarInspiracao(){
  const d=lerInspiracao();
  abrirModalSistema(`<div class="v13-editor"><h2>✦ Pausa para inspirar</h2><p>Escolha como deseja exibir seu versículo.</p>
  <label for="v13-modo">Como escolher</label><select id="v13-modo" onchange="alternarModoInspiracao()"><option value="diario" ${d.modo==='diario'?'selected':''}>Versículo do dia (automático)</option><option value="buscar" ${d.modo==='buscar'?'selected':''}>Buscar na Bíblia por referência</option><option value="manual" ${!d.modo||d.modo==='manual'?'selected':''}>Escrever meu versículo</option></select>
- <div id="v13-referencia-wrap"><label for="v13-ref">Livro, capítulo e versículo</label><input id="v13-ref" placeholder="Ex.: Salmos 23:1" value="${textoHTML(d.referencia||'Salmos 23:1')}"><button class="v13-buscar" type="button" onclick="pesquisarInspiracao()">⌕ Buscar passagem</button><small>Busca on-line na tradução Almeida disponibilizada pela Bible API. Algumas referências podem não estar disponíveis.</small></div>
- <div id="v13-texto-wrap"><label for="v13-verso">Texto do versículo</label><textarea id="v13-verso" rows="4" placeholder="Digite ou busque uma passagem">${textoHTML(d.versiculo||'')}</textarea></div>
+ <div id="v13-referencia-wrap"><label for="v13-ref">Livro, capítulo e versículo</label><input id="v13-ref" placeholder="Ex.: Salmos 23:1" value="${textoHTML(d.referencia||'Salmos 23:1')}"><button class="v13-buscar" type="button" onclick="pesquisarInspiracao()">⌕ Buscar passagem</button><small>Busca automática na tradução Almeida da Bible API. Para usar a NAA, selecione 'Escrever meu versículo', cole o texto e identifique a tradução abaixo.</small></div>
+ <div id="v13-texto-wrap"><label for="v13-verso">Texto do versículo</label><textarea id="v13-verso" rows="4" placeholder="Digite ou busque uma passagem">${textoHTML(d.versiculo||'')}</textarea><label for="v13-traducao">Tradução do texto</label><select id="v13-traducao"><option value="Almeida (Bible API)" ${d.traducao==='Almeida (Bible API)'?'selected':''}>Almeida (busca automática)</option><option value="Nova Almeida Atualizada (NAA)" ${d.traducao==='Nova Almeida Atualizada (NAA)'?'selected':''}>Nova Almeida Atualizada (NAA) — inserir texto manualmente</option><option value="Outra tradução" ${d.traducao==='Outra tradução'?'selected':''}>Outra tradução</option></select><small>Para a NAA, insira um texto que você tenha direito de utilizar. A busca automática utiliza Almeida e não altera a redação bíblica.</small></div>
  <label for="v13-frase">Sua frase motivacional (opcional)</label><textarea id="v13-frase" rows="2" placeholder="Em branco: mensagem automática">${textoHTML(d.frase||'')}</textarea>
  <p id="v13-status" role="status" aria-live="polite"></p><div class="v13-actions"><button class="v13-cancel" onclick="fecharModalSistema()">Cancelar</button><button class="v13-save" onclick="salvarEditorInspiracao()">Salvar inspiração</button></div></div>`);
  alternarModoInspiracao();
@@ -2105,21 +2116,23 @@ async function pesquisarInspiracao(){
  const ref=document.getElementById('v13-ref').value.trim(),status=document.getElementById('v13-status');
  if(!ref){status.textContent='Informe uma referência bíblica.';return}
  status.textContent='Buscando passagem…';
- try{const passagem=await buscarTextoBiblico(ref);document.getElementById('v13-ref').value=passagem.referencia;document.getElementById('v13-verso').value=passagem.versiculo;status.textContent='Passagem encontrada! Confira e salve.'}
+ try{const passagem=await buscarTextoBiblico(ref);document.getElementById('v13-ref').value=passagem.referencia;document.getElementById('v13-verso').value=passagem.versiculo;document.getElementById('v13-traducao').value='Almeida (Bible API)';status.textContent='Passagem encontrada! Confira e salve.'}
  catch(e){status.textContent='Não foi possível buscar a passagem. Confira a referência e a conexão, ou use o modo manual.'}
 }
 function salvarEditorInspiracao(){
  const m=document.getElementById('v13-modo').value,frase=document.getElementById('v13-frase').value.trim().slice(0,280),old=lerInspiracao();
- if(m==='diario'){salvarInspiracao({...old,modo:'diario',dia:'',frase});fecharModalSistema();atualizarVersiculoDoDia();return}
+ if(m==='diario'){salvarInspiracao({...old,modo:'diario',dia:'',frase,traducao:'Almeida (Bible API)'});fecharModalSistema();atualizarVersiculoDoDia();return}
  const versiculo=document.getElementById('v13-verso').value.trim(),referencia=document.getElementById('v13-ref').value.trim();
  if(!versiculo){document.getElementById('v13-status').textContent='Digite ou busque um versículo antes de salvar.';return}
- salvarInspiracao({modo:m,versiculo:versiculo.slice(0,1200),referencia:referencia.slice(0,120),frase});fecharModalSistema();
+ const traducao=document.getElementById('v13-traducao').value;
+ salvarInspiracao({modo:m,versiculo:versiculo.slice(0,1200),referencia:referencia.slice(0,120),frase,traducao});fecharModalSistema();
 }
 function abrirVisaoGeral(){espacoAtual="geral";telaAtual="visao_geral";renderSidebar();renderTela();fecharMenuMobile();}
+function abrirDashboardGlobal(){espacoAtual="geral";document.body.setAttribute("data-espaco","geral");telaAtual="dashboard";salvarTelaAtualSessao();renderSidebar();renderTela();fecharMenuMobile();}
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
-  telaAtual = esp === 'trabalho' ? 'dashboard' : 'menu_pessoal';
+  telaAtual = esp === 'trabalho' ? 'agenda' : 'menu_pessoal';
   salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -2129,6 +2142,7 @@ function trocarEspaco(esp){
 
 function irPara(id){
   if(['pendencias','obrigacoes'].includes(id)) id='dashboard';
+  if(id==='dashboard'){abrirDashboardGlobal();return;}
   if(modoConsultaOffline&&id!=='visitas'){alert('Sem conexão, continue os checklists já preparados neste aparelho. As outras áreas precisam de internet.');return;}
   telaAtual = id;
   if(id==='agenda'&&window.innerWidth<=640&&visaoAgenda==='semana')visaoAgenda='dia';
@@ -6663,8 +6677,43 @@ function radarRecorrenciasHTML(){
  const grupos={};filtrados.forEach(r=>{const a=String(r.assunto||'Outros');grupos[a]=(grupos[a]||0)+Number(r.quantidade||1)});
  const ranking=Object.entries(grupos).sort((a,b)=>b[1]-a[1]);
  const max=ranking[0]?.[1]||1;
- return `<div class="card"><h2>Radar de Recorrências</h2><p style="color:var(--cor-texto-suave)">Conte cada orientação, não conformidade e cobrança. Os resultados são gerais, mesmo quando o registro estiver vinculado a um cliente.</p><div class="v39-radar-controls"><label>Ano <select id="radarAno" onchange="RADAR_ANO=Number(this.value);renderTela()">${[ano-2,ano-1,ano,ano+1].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>b-a).map(v=>`<option value="${v}" ${v===ano?'selected':''}>${v}</option>`).join('')}</select></label><label>Tipo <select onchange="RADAR_TIPO=this.value;renderTela()"><option value="todos">Todos</option>${Object.entries(RADAR_TIPOS).map(([k,v])=>`<option value="${k}" ${RADAR_TIPO===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-primario" onclick="abrirNovoRadar()">+ Nova ocorrência</button></div><div class="v39-radar-grid">${[['Total de ocorrências',total],['Orientações',porTipo('orientacao')],['Não conformidades',porTipo('nao_conformidade')],['Cobranças',porTipo('cobranca')]].map(([label,num])=>`<div class="v39-radar-stat"><strong>${num}</strong><span>${label}</span></div>`).join('')}</div></div><div class="card" style="margin-top:14px"><h3>Assuntos mais recorrentes · ${ano}</h3>${ranking.length?ranking.map(([nome,n])=>`<div style="display:flex;justify-content:space-between;gap:10px"><strong>${textoHTML(nome)}</strong><span>${n} ${n===1?'vez':'vezes'}</span></div><div class="v39-radar-bar"><i style="width:${Math.round(n/max*100)}%"></i></div>`).join(''):'<p style="color:var(--cor-texto-suave)">Nenhum registro neste período. Toque em Nova ocorrência para começar.</p>'}</div><div class="card" style="margin-top:14px"><h3>Histórico de registros</h3>${filtrados.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);return `<div class="item-lista-simples"><div><strong>${textoHTML(r.assunto)}</strong><div style="font-size:12px;color:var(--cor-texto-suave)">${textoHTML(RADAR_TIPOS[r.tipo]||r.tipo)} · ${dataBR(r.data)} · ${Number(r.quantidade||1)} vez(es)${c?' · '+textoHTML(c.nome):' · Geral'}</div>${r.observacoes?`<small>${textoHTML(r.observacoes)}</small>`:''}</div><button class="btn-secundario" onclick="excluirRadar('${r.id}')" aria-label="Excluir ocorrência">Excluir</button></div>`}).join('')||'<p style="color:var(--cor-texto-suave)">Sem registros.</p>'}</div>`;
+ return `<div class="card"><h2>Radar de Recorrências</h2><p style="color:var(--cor-texto-suave)">Conte cada orientação, não conformidade e cobrança. Os resultados são gerais, mesmo quando o registro estiver vinculado a um cliente.</p><div class="v39-radar-controls"><label>Ano <select id="radarAno" onchange="RADAR_ANO=Number(this.value);renderTela()">${[ano-2,ano-1,ano,ano+1].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>b-a).map(v=>`<option value="${v}" ${v===ano?'selected':''}>${v}</option>`).join('')}</select></label><label>Tipo <select onchange="RADAR_TIPO=this.value;renderTela()"><option value="todos">Todos</option>${Object.entries(RADAR_TIPOS).map(([k,v])=>`<option value="${k}" ${RADAR_TIPO===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-primario" onclick="abrirNovoRadar()">+ Nova ocorrência</button><button class="btn-secundario" onclick="gerarPDFRadarRecorrencias()">↓ Relatório PDF</button></div><div class="v39-radar-grid">${[['Total de ocorrências',total],['Orientações',porTipo('orientacao')],['Não conformidades',porTipo('nao_conformidade')],['Cobranças',porTipo('cobranca')]].map(([label,num])=>`<div class="v39-radar-stat"><strong>${num}</strong><span>${label}</span></div>`).join('')}</div></div><div class="card" style="margin-top:14px"><h3>Assuntos mais recorrentes · ${ano}</h3>${ranking.length?ranking.map(([nome,n])=>`<div style="display:flex;justify-content:space-between;gap:10px"><strong>${textoHTML(nome)}</strong><span>${n} ${n===1?'vez':'vezes'}</span></div><div class="v39-radar-bar"><i style="width:${Math.round(n/max*100)}%"></i></div>`).join(''):'<p style="color:var(--cor-texto-suave)">Nenhum registro neste período. Toque em Nova ocorrência para começar.</p>'}</div><div class="card" style="margin-top:14px"><h3>Visão consolidada por mês · ${ano}</h3><p style="color:var(--cor-texto-suave)">Quantidade registrada em cada mês, somando todos os clientes.</p><div class="v40-month-grid">${Array.from({length:12},(_,i)=>{const n=filtrados.filter(r=>Number(String(r.data||'').slice(5,7))===i+1).reduce((a,r)=>a+Number(r.quantidade||1),0);return `<div class="v40-month"><span>${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][i]}</span><strong>${n}</strong></div>`}).join('')}</div><div class="v40-report-actions"><button class="btn-primario" onclick="gerarPDFRadarRecorrencias()">↓ Relatório consolidado em PDF</button><button class="btn-secundario" onclick="exportarCSVRadarRecorrencias()">Exportar dados CSV</button></div></div><div class="card" style="margin-top:14px"><h3>Histórico de registros</h3>${filtrados.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);return `<div class="item-lista-simples"><div><strong>${textoHTML(r.assunto)}</strong><div style="font-size:12px;color:var(--cor-texto-suave)">${textoHTML(RADAR_TIPOS[r.tipo]||r.tipo)} · ${dataBR(r.data)} · ${Number(r.quantidade||1)} vez(es)${c?' · '+textoHTML(c.nome):' · Geral'}</div>${r.observacoes?`<small>${textoHTML(r.observacoes)}</small>`:''}</div><button class="btn-secundario" onclick="excluirRadar('${r.id}')" aria-label="Excluir ocorrência">Excluir</button></div>`}).join('')||'<p style="color:var(--cor-texto-suave)">Sem registros.</p>'}</div>`;
 }
+
+function dadosRelatorioRadar(){
+ const ano=Number(RADAR_ANO)||new Date().getFullYear();
+ const linhas=RADAR_RECORRENCIAS.filter(r=>String(r.data||'').startsWith(String(ano))&&(RADAR_TIPO==='todos'||r.tipo===RADAR_TIPO));
+ const total=linhas.reduce((a,r)=>a+Number(r.quantidade||1),0);
+ const porTipo=Object.fromEntries(Object.keys(RADAR_TIPOS).map(t=>[t,linhas.filter(r=>r.tipo===t).reduce((a,r)=>a+Number(r.quantidade||1),0)]));
+ const assuntos={};linhas.forEach(r=>{const k=r.assunto||'Outros';assuntos[k]=(assuntos[k]||0)+Number(r.quantidade||1)});
+ const ranking=Object.entries(assuntos).sort((a,b)=>b[1]-a[1]);
+ const meses=Array.from({length:12},(_,i)=>linhas.filter(r=>Number(String(r.data||'').slice(5,7))===i+1).reduce((a,r)=>a+Number(r.quantidade||1),0));
+ return {ano,linhas,total,porTipo,ranking,meses};
+}
+function gerarPDFRadarRecorrencias(){
+ if(!window.jspdf?.jsPDF){alert('O gerador de PDF ainda não carregou. Verifique a conexão e tente novamente.');return;}
+ const d=dadosRelatorioRadar(),doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210;
+ doc.setFillColor(147,67,93);doc.rect(0,0,W,34,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('Radar de Recorrencias',15,17);doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(`Meu Ecossistema - Bruna Ribeiro | ${d.ano}`,15,25);
+ doc.setTextColor(51,40,47);doc.setFontSize(11);doc.text(`Total de ocorrencias: ${d.total}`,15,45);
+ doc.setFontSize(9);doc.text(`Orientacoes: ${d.porTipo.orientacao||0}    Nao conformidades: ${d.porTipo.nao_conformidade||0}    Cobrancas: ${d.porTipo.cobranca||0}`,15,52);
+ const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+ doc.autoTable({startY:59,head:[['Mes','Quantidade']],body:meses.map((m,i)=>[m,d.meses[i]]),theme:'striped',headStyles:{fillColor:[147,67,93]},margin:{left:15,right:15},styles:{fontSize:9}});
+ let y=doc.lastAutoTable.finalY+10;
+ doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text('Assuntos mais recorrentes',15,y);y+=4;
+ doc.autoTable({startY:y,head:[['Assunto','Quantidade']],body:d.ranking.length?d.ranking.map(([a,n])=>[a,n]):[['Sem registros no periodo',0]],theme:'striped',headStyles:{fillColor:[147,67,93]},margin:{left:15,right:15},styles:{fontSize:9}});
+ y=doc.lastAutoTable.finalY+10;doc.setFontSize(12);doc.text('Historico de ocorrencias',15,y);y+=4;
+ const hist=d.linhas.map(r=>{const c=CLIENTES.find(x=>x.id===r.cliente_id);return [dataBR(r.data),RADAR_TIPOS[r.tipo]||r.tipo,r.assunto||'',String(r.quantidade||1),c?.nome||'Geral']});
+ doc.autoTable({startY:y,head:[['Data','Tipo','Assunto','Qtd.','Cliente']],body:hist.length?hist:[['-','-','Sem registros','0','-']],theme:'grid',headStyles:{fillColor:[147,67,93]},margin:{left:15,right:15},styles:{fontSize:8,overflow:'linebreak'},columnStyles:{2:{cellWidth:45},4:{cellWidth:38}}});
+ const n=doc.internal.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(115,106,112);doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR')} | Pagina ${i} de ${n}`,15,289)}
+ doc.save(`radar-recorrencias-${d.ano}.pdf`);
+}
+function exportarCSVRadarRecorrencias(){
+ const d=dadosRelatorioRadar(),esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const linhas=[['Data','Tipo','Assunto','Quantidade','Cliente','Observacoes'],...d.linhas.map(r=>[r.data,RADAR_TIPOS[r.tipo]||r.tipo,r.assunto,r.quantidade,CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'Geral',r.observacoes||''])];
+ const csv='\uFEFF'+linhas.map(l=>l.map(esc).join(';')).join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download=`radar-recorrencias-${d.ano}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function abrirNovoRadar(){
  const hoje=formatoISO(new Date());
  const clientes=typeof ordenarClientesAZ==='function'?ordenarClientesAZ(CLIENTES.filter(c=>typeof clienteAtivoV37!=='function'||clienteAtivoV37(c))):CLIENTES;
@@ -6684,8 +6733,8 @@ function renderTela(){
     const agora = new Date();
     const hora = agora.getHours();
     const saudacao = hora<12 ? 'Bom dia' : hora<18 ? 'Boa tarde' : 'Boa noite';
-    document.getElementById('tituloTela').innerText = `${saudacao}, ${PERFIL_USUARIO.nome.split(' ')[0]}`;
-    document.getElementById('subtituloTela').innerText = agora.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
+    document.getElementById('tituloTela').innerText = 'Dashboard geral';
+    document.getElementById('subtituloTela').innerText = 'Trabalho e Pessoal · '+agora.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
   } else if(telaAtual === 'clientes'){
     document.getElementById('tituloTela').innerText = titulo;
     const visiveis=CLIENTES.filter(c=>c.tipoCliente!=='vinculado').length;
