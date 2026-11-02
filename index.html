@@ -1870,6 +1870,7 @@ html[data-paleta-v04][data-tema-interface="escuro"] .v38-overlay .v37-posta-roda
 body.v38-sem-rolagem{overflow:hidden!important}
 @media(max-height:600px){.v38-overlay .v38-full-card{width:min(calc(100vw - 20px),calc((100dvh - 35px)*.8),640px)!important}}
 </style>
+<link rel="stylesheet" href="na-presenca.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1932,6 +1933,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
 </div>
 
+<script src="na-presenca.js"></script>
 <script src="/proximos-passos.js"></script>
 <script src="/offline-drafts.js"></script>
 <script>
@@ -1975,13 +1977,13 @@ const MODULOS = {
       {id:"compras", nome:"Compras"},
       {id:"lista_dia", nome:"Lista do Dia"},
       {id:"rotina_casa", nome:"Rotina da Casa"},
-      {id:"jornada_biblica", nome:"Jornada Bíblica"},
       {id:"mercado", nome:"Lista de Mercado"},
       {id:"estudos", nome:"Estudos"},
     ]},
   ]
 };
 
+MODULOS.presenca=[{grupo:'Na Presença',itens:[{id:'na_presenca',nome:'Meu momento com Deus'},{id:'jornada_biblica',nome:'Jornada Bíblica'},{id:'painel_oracao',nome:'Painel de oração'},{id:'diario_deus',nome:'Diário e gratidão'},{id:'versiculos_guardados',nome:'Versículos para guardar'},{id:'propositos_oracao',nome:'Propósitos de oração'}]}];
 const TAB_PRINCIPAL = {
   trabalho: ["agenda","clientes","visitas","entregas"],
   pessoal: ["habitos","metas","contas","ideias_pessoais"]
@@ -1989,7 +1991,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={na_presenca:'✧',painel_oracao:'♡',diario_deus:'▤',versiculos_guardados:'✝',propositos_oracao:'◷',visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -2031,6 +2033,7 @@ function renderSidebar(){
     <div class="space-switch">
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
       <button class="${espacoAtual==='pessoal'?'active':''}" onclick="trocarEspaco('pessoal')">Pessoal</button>
+      <button class="np-space ${espacoAtual==='presenca'?'active':''}" onclick="trocarEspaco('presenca')">✧ Na Presença</button>
     </div>
     <nav>`;
   (grupos||[]).forEach(g=>{
@@ -2132,7 +2135,7 @@ function abrirDashboardGlobal(){espacoAtual="geral";document.body.setAttribute("
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
-  telaAtual = esp === 'trabalho' ? 'agenda' : 'menu_pessoal';
+  telaAtual = esp === 'trabalho' ? 'agenda' : esp === 'presenca' ? 'na_presenca' : 'menu_pessoal';
   salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -2188,7 +2191,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {
+const NOMES_TELA = {na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -6577,7 +6580,7 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
- <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Seu trabalho e sua vida pessoal, lado a lado.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
+ <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Trabalho, vida pessoal e sua caminhada com Deus.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -6599,9 +6602,13 @@ function visaoGeralHTML(){
  ${atalho('⌂','Rotina da casa','Tarefas e organização','pessoal','rotina_casa')}
  ${atalho('◇','Contas e compras','Organização financeira','pessoal','contas')}
  ${atalho('◎','Metas e ideias','Seus próximos passos','pessoal','metas')}
- ${atalho('✝','Jornada Bíblica','Leituras e capítulos','pessoal','jornada_biblica')}
+
  ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
  ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
+ </div></section><section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">✧</span><div><h3>Na Presença</h3><p>Palavra, oração e gratidão</p></div></div><div class="v11-links">
+ ${atalho('✧','Meu momento com Deus','Leitura, oração e gratidão','presenca','na_presenca')}
+ ${atalho('✝','Jornada Bíblica','Continue de onde parou','presenca','jornada_biblica')}
+ ${atalho('♡','Painel de oração',npLista('oracao').filter(r=>r.conteudo.semana===npSegunda()).map(r=>textoHTML(r.titulo)).slice(0,3).join(' · ')||'Por quem vou orar nesta semana','presenca','painel_oracao')}
  </div></section>${pausaInspirarV24()}${cardClarezaV23()}${cardsSaudeV21()}</div>`;
 }
 
@@ -6728,7 +6735,7 @@ async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'
 
 function renderTela(){
   const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
-  if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
+  if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho, Pessoal e Na Presença';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
     const hora = agora.getHours();
@@ -6744,7 +6751,11 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
+  if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
+    const paginas={na_presenca:naPresencaHTML,painel_oracao:painelOracaoHTML,diario_deus:()=>npColecaoHTML(['diario','gratidao'],'Diário e gratidão','Reflexões, dúvidas, respostas e lembranças.'),versiculos_guardados:()=>npColecaoHTML(['versiculo'],'Versículos para guardar','Guarde a passagem, sua tradução e o tema.'),propositos_oracao:()=>npColecaoHTML(['proposito'],'Propósitos de oração','Escolha uma intenção e os horários que fazem sentido para você.')};
+    document.getElementById('conteudoTela').innerHTML=paginas[telaAtual]();
+  }
+  else if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
   else if(telaAtual === 'dashboard'){
@@ -7174,6 +7185,7 @@ async function entrarNoApp(){
   await carregarComprasSupabase();
   await carregarListaDiaSupabase();
   await carregarBibliaSupabase();
+  await npCarregar();
   await carregarControleHorasSupabase();
   await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();

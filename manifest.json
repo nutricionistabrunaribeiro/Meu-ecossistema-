@@ -1,5 +1,5 @@
 {
-  "name": "Meu Ecossistema - Bruna Ribeiro Consultoria",
+  "name": "Meu Ecossistema - Bruna Ribeiro",
   "short_name": "Meu Ecossistema",
   "start_url": "/",
   "display": "standalone",
@@ -20,7 +20,7 @@
     }
   ],
   "id": "/",
-  "description": "Organização profissional e pessoal de Bruna Ribeiro.",
+  "description": "Trabalho, Pessoal e Na Presença.",
   "scope": "/",
   "orientation": "any"
 }

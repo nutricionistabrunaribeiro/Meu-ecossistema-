@@ -1,6 +1,6 @@
-const CACHE_NAME = 'meu-ecossistema-v64';
+const CACHE_NAME = 'meu-ecossistema-v42-presenca-20261102';
 const APP_SHELL = [
-  '/', '/index.html', '/proximos-passos.js', '/offline-drafts.js',
+  '/', '/index.html', '/na-presenca.js', '/na-presenca.css', '/proximos-passos.js', '/offline-drafts.js',
   '/manifest.json', '/icon-192.png', '/icon-512.png',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
