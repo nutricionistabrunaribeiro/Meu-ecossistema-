@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meu-ecossistema-v42-presenca-20261102';
+const CACHE_NAME = 'meu-ecossistema-v43-presenca-semanal-20261102';
 const APP_SHELL = [
   '/', '/index.html', '/na-presenca.js', '/na-presenca.css', '/proximos-passos.js', '/offline-drafts.js',
   '/manifest.json', '/icon-192.png', '/icon-512.png',
