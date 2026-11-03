@@ -1872,6 +1872,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 </style>
 <link rel="stylesheet" href="na-presenca.css">
 <link rel="stylesheet" href="visual-v44.css">
+<link rel="stylesheet" href="visual-v45.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1934,6 +1935,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
 </div>
 
+<script src="visual-v45.js"></script>
 <script src="visual-v44.js"></script>
 <script src="na-presenca.js"></script>
 <script src="/proximos-passos.js"></script>
@@ -6831,6 +6833,7 @@ function renderTela(){
         <div>Este módulo será construído na próxima etapa da Fase 6, seguindo a ordem já aprovada no documento mestre.</div>
       </div>`;
   }
+  v45AplicarVisual();
   atualizarCronometros();
   salvarEstado();
 }
