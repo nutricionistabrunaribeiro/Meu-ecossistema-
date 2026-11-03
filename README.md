@@ -1,2 +1,2 @@
 # Meu Ecossistema — Bruna Ribeiro
-Código completo da versão 43. Veja ATUALIZACAO-43-LEIA-ME.md para novidades e publicação pelo GitHub/Vercel.
+Código completo da versão 44. Consulte ATUALIZACAO-44-LEIA-ME.md para as novidades e instruções de atualização pelo GitHub/Vercel.

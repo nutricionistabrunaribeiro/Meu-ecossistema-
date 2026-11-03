@@ -1871,6 +1871,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 @media(max-height:600px){.v38-overlay .v38-full-card{width:min(calc(100vw - 20px),calc((100dvh - 35px)*.8),640px)!important}}
 </style>
 <link rel="stylesheet" href="na-presenca.css">
+<link rel="stylesheet" href="visual-v44.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1933,6 +1934,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
 </div>
 
+<script src="visual-v44.js"></script>
 <script src="na-presenca.js"></script>
 <script src="/proximos-passos.js"></script>
 <script src="/offline-drafts.js"></script>
@@ -2191,7 +2193,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
+const NOMES_TELA = {sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -4532,7 +4534,7 @@ function cardProjetoTemporarioHTML(dataReferencia=null){
   const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length,total=itens.length,perc=total?Math.round(feitos/total*100):0,missao=missaoAtualProjeto(p,hoje),dias=diasCalendarioEntre(hoje,'2026-10-07');
   return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Projeto pessoal temporário</div><h2>Chegar leve aos 38</h2><div class="projeto-pessoal-contagem">${dias} ${dias===1?'dia':'dias'} para a folga</div><div class="projeto-pessoal-barra"><div style="width:${perc}%"></div></div><div class="projeto-pessoal-resumo"><span>${feitos} de ${total} etapas concluídas</span><strong>${perc}% concluído</strong></div><div class="projeto-pessoal-missao"><small>Missão de hoje</small><strong>${missao?textoHTML(missao.t):'Tudo concluído. Agora é só manter leve!'}</strong>${missao?`<div style="font-size:10px;opacity:.75;margin-top:3px">${textoHTML(missao.grupo)} · ${periodoItemProjeto(missao)}</div>`:''}</div><button class="projeto-pessoal-abrir" onclick="abrirProjetoPessoal('${p.id}')">Abrir projeto →</button></section>`;
 }
-function dashboardPessoalHTML(){return `${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
+function dashboardPessoalHTML(){return `${v44ResumoCards()}${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
 
 function projetosHTML(){
   if(projetoSelecionadoId){
@@ -4958,8 +4960,8 @@ function habitosHTML(){
     ${HABITOS.map(h=>`
     <div class="habito-card">
       <div class="habito-topo">
-        <div class="habito-nome">${textoHTML(h.nome)}</div><button class="btn-secundario" onclick="editarHabitoRetroativo('${h.id}')">✎ Editar histórico</button>
-        <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias</div>
+        <div class="habito-nome"><span class="v44-habit-icon" aria-hidden="true">🌱</span>${textoHTML(h.nome)}</div><button class="btn-secundario" onclick="editarHabitoRetroativo('${h.id}')">✎ Editar histórico</button>
+        <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias <span class="v44-habit-trail" aria-hidden="true">${h.semana.filter(Boolean).length===7?"✦":"♡"}</span></div>
       </div>
       <div class="habito-semana">
         ${h.semana.map((f,idx)=>`<div class="habito-dia ${f?'feito':''}" onclick="alternarHabitoDia('${h.id}',${idx})">${DIAS_CURTO[idx]}</div>`).join('')}
@@ -6352,7 +6354,7 @@ function cardsSaudeV21(){
  <div class="v21-saude-grid">
  <article class="v21-health-card"><div class="v21-card-head"><span>💧 Hidratação de hoje</span><button class="v21-small-btn" onclick="mudarMetaAguaV21()">Alterar meta</button></div>
  <strong class="v21-number">${agua.toLocaleString('pt-BR')} <small>/ ${meta.toLocaleString('pt-BR')} mL</small></strong>
- <div class="v21-progress" role="progressbar" aria-label="Meta diária de água" aria-valuenow="${agua}" aria-valuemin="0" aria-valuemax="${meta}"><span style="width:${percent}%"></span></div>
+ <div class="v44-water-drops" aria-hidden="true">${Array.from({length:8},(_,i)=>`<span class="${agua/meta>i/8?'filled':''}">💧</span>`).join('')}</div><div class="v21-progress" role="progressbar" aria-label="Meta diária de água" aria-valuenow="${agua}" aria-valuemin="0" aria-valuemax="${meta}"><span style="width:${percent}%"></span></div>
  <p>${percent}% da meta diária · registre cada copo ou garrafa</p>
  <div class="v21-water-form"><input id="v21-agua-quantidade" type="number" inputmode="numeric" min="1" max="5000" step="50" value="250" aria-label="Quantidade de água em mililitros"><span>mL</span><button id="v21-salvar-agua" class="btn-primario" onclick="adicionarAguaV21()">+ Registrar</button></div>
  ${registros.length?`<div class="v21-agua-historico">${registros.map(r=>`<span>${Number(r.quantidade_ml)} mL <button aria-label="Excluir registro de ${Number(r.quantidade_ml)} mililitros" onclick="removerAguaV21('${r.id}')">×</button></span>`).join('')}</div>`:''}
@@ -6580,7 +6582,7 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
- <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Trabalho, vida pessoal e sua caminhada com Deus.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
+ ${v44ResumoCards()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -6658,9 +6660,7 @@ function sonoHTML(){
  const media=lista.length?(lista.reduce((a,b)=>a+Number(b.horas||0),0)/lista.length).toFixed(1):'—';
  const ultima=lista[0];
  return `<div class="v11-sono">
- <div class="v11-sono-intro"><div><span class="v11-eyebrow">☾ CUIDADO PESSOAL</span><h2>Meu Sono</h2><p>Acompanhe suas noites e seu descanso.</p></div><span class="v11-moon">☾</span></div>
- <div class="v11-sono-stats"><div class="v11-sono-stat"><span>☾ Hora de dormir</span><strong>${ultima?textoHTML(ultima.dormir):'—'}</strong><small>Último registro</small></div><div class="v11-sono-stat"><span>☀ Hora de acordar</span><strong>${ultima?textoHTML(ultima.acordar):'—'}</strong><small>Último registro</small></div></div>
- <div class="v11-sono-total"><span>✦ Média de descanso neste mês</span><strong>${media}${media==='—'?'':' h'}</strong><small>${lista.length} ${lista.length===1?'noite registrada':'noites registradas'}</small></div>
+ ${v44SonoPainel()}
  <section class="card v11-sono-form"><h3>Registrar uma noite</h3><p>Preencha os horários para atualizar seu histórico.</p><div class="form-grid"><div class="form-field"><label>Data do despertar</label><input type="date" id="sonoData" value="${hoje}"></div><div class="form-field"><label>Qualidade percebida</label><select id="sonoQualidade"><option>Boa</option><option>Regular</option><option>Ruim</option></select></div><div class="form-field"><label>Hora de dormir</label><input type="time" id="sonoDormir" value="23:00"></div><div class="form-field"><label>Hora de acordar</label><input type="time" id="sonoAcordar" value="07:00"></div></div><button class="btn-primario" onclick="salvarSono()">Salvar noite</button><p class="v11-sono-note">${textoHTML(SONO_SYNC_STATUS)}</p></section>
  <section class="card v11-sono-history"><h3>Histórico de ${mes.split('-').reverse().join('/')}</h3>${lista.map(x=>`<div class="v11-noite"><span>☾ <strong>${x.data.split('-').reverse().join('/')}</strong><small>${textoHTML(x.dormir)} – ${textoHTML(x.acordar)} · ${textoHTML(x.qualidade)}</small></span><strong>${x.horas} h</strong></div>`).join('')||'<p>Sem registros neste mês.</p>'}</section></div>`;
 }
