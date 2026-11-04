@@ -1873,6 +1873,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <link rel="stylesheet" href="na-presenca.css">
 <link rel="stylesheet" href="visual-v44.css">
 <link rel="stylesheet" href="visual-v45.css">
+<link rel="stylesheet" href="pessoal-v46.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1940,6 +1941,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <script src="na-presenca.js"></script>
 <script src="/proximos-passos.js"></script>
 <script src="/offline-drafts.js"></script>
+<script src="pessoal-v46.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -1973,6 +1975,9 @@ const MODULOS = {
       {id:"projetos", nome:"Projetos"},
       {id:"minha_clareza", nome:"Minha Clareza"},
       {id:"habitos", nome:"Hábitos"},
+      {id:"o_que_me_move", nome:"O que me move"},
+      {id:"diario_pessoal", nome:"Diário pessoal"},
+      {id:"humor_pessoal", nome:"Meu humor"},
       {id:"ciclo", nome:"Ciclo Menstrual"},
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
       {id:"ano_pixels", nome:"Meu Ano em Pixels"},
@@ -1995,7 +2000,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={na_presenca:'✧',painel_oracao:'♡',diario_deus:'▤',versiculos_guardados:'✝',propositos_oracao:'◷',visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={o_que_me_move:'♡',diario_pessoal:'✍',humor_pessoal:'☺',na_presenca:'✧',painel_oracao:'♡',diario_deus:'▤',versiculos_guardados:'✝',propositos_oracao:'◷',visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -2195,7 +2200,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
+const NOMES_TELA = {o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -4874,9 +4879,9 @@ async function carregarHabitosSupabase(){
   if(error){ dispararAutomacao('Erro ao carregar hábitos', error.message); return; }
   const segunda = REF_INICIO_SEMANA;
   const datasSemana = Array.from({length:7}, (_,i)=> formatoISO(addDias(segunda,i)));
-  const anoHabitosV04=new Date().getFullYear();const {data:registros,error:erroRegistros}=await supa.from('habito_registros').select('*').gte('data',`${anoHabitosV04}-01-01`).lte('data',`${anoHabitosV04}-12-31`);if(erroRegistros)console.warn('Registros anuais indisponíveis',erroRegistros);
+  const anoHabitosV04=new Date().getFullYear();const {data:registros,error:erroRegistros}=await v46CarregarHistoricoHabitos(habitosRows||[]);if(erroRegistros){dispararAutomacao('Não foi possível atualizar o histórico dos hábitos','Tente novamente em Atualizar hábitos.');return;}
   HABITOS = (habitosRows||[]).map(h=>({
-    id: h.id, nome: h.nome, registrosAno:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido).map(r=>r.data),
+    id: h.id, nome: h.nome, registrosHistorico:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido).map(r=>r.data), registrosAno:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido&&String(r.data).startsWith(String(anoHabitosV04))).map(r=>r.data),
     semana: datasSemana.map(d => (registros||[]).some(r=>r.habito_id===h.id && r.data===d && r.concluido))
   }));
 }
@@ -4888,8 +4893,9 @@ async function registrarHabitoNaData(id,dataISO,forcar=null){
  const concluido=forcar===null?!existente?.concluido:!!forcar;
  const resposta=existente?await supa.from('habito_registros').update({concluido}).eq('id',existente.id):await supa.from('habito_registros').insert({habito_id:id,data:dataISO,concluido});
  if(resposta.error){dispararAutomacao('Erro ao salvar hábito',resposta.error.message);return false;}
- h.registrosAno=(h.registrosAno||[]).filter(d=>d!==dataISO);if(concluido)h.registrosAno.push(dataISO);
- h.semana=Array.from({length:7},(_,i)=>h.registrosAno.includes(formatoISO(addDias(REF_INICIO_SEMANA,i))));renderTela();return true;
+ h.registrosHistorico=[...new Set([...(h.registrosHistorico||[]),...(h.registrosAno||[])])].filter(d=>d!==dataISO);if(concluido)h.registrosHistorico.push(dataISO);
+ h.registrosAno=h.registrosHistorico.filter(d=>d.startsWith(String(new Date().getFullYear())));
+ h.semana=Array.from({length:7},(_,i)=>h.registrosHistorico.includes(formatoISO(addDias(REF_INICIO_SEMANA,i))));renderTela();return true;
 }
 async function alternarHabitoDia(id,idx){await registrarHabitoNaData(id,formatoISO(addDias(REF_INICIO_SEMANA,idx)));}
 let V27_HISTORICO=null;
@@ -4956,7 +4962,7 @@ async function novoHabito(){
   dispararAutomacao('Hábito criado', `"${nome.trim()}" adicionado ao seu acompanhamento semanal.`);
   renderTela();
 }
-function habitosHTML(){
+function habitosIndividuaisV46HTML(){
   return `
     <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novoHabito()">+ Novo hábito</button></div>
     ${HABITOS.map(h=>`
@@ -4968,6 +4974,7 @@ function habitosHTML(){
       <div class="habito-semana">
         ${h.semana.map((f,idx)=>`<div class="habito-dia ${f?'feito':''}" onclick="alternarHabitoDia('${h.id}',${idx})">${DIAS_CURTO[idx]}</div>`).join('')}
       </div>
+      ${v46ConstanciaHTML(h)}
       ${pixelsHabitoV04(h)}
     </div>
   `).join('')}`;
@@ -5002,7 +5009,7 @@ async function atualizarProgressoMeta(id){
   await supa.from('metas_pessoais').update({progresso:m.progresso}).eq('id', id);
 }
 function metasHTML(){
-  return `<div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaMetaPessoal()">+ Nova meta</button></div>` +
+  return `${v46Tabs('metas')}<div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaMetaPessoal()">+ Nova meta</button></div>` +
   METAS_PESSOAIS.map(m=>`
     <div class="meta-pessoal" onclick="atualizarProgressoMeta('${m.id}')" style="cursor:pointer;">
       <div class="meta-pessoal-topo"><span class="meta-pessoal-titulo">${m.titulo}</span><span class="meta-pessoal-prazo">${m.prazo}</span></div>
@@ -6601,6 +6608,8 @@ function visaoGeralHTML(){
  </div></section>
  <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Vida Pessoal</h3><p>Rotina, cuidado e desenvolvimento</p></div></div><div class="v11-links">
  ${atalho('✧','Hábitos e consistência','Seu mapa de evolução','pessoal','habitos')}
+ ${atalho('♡','O que me move','Motivações, valores e lembretes','pessoal','o_que_me_move')}
+ ${atalho('✍','Diário e humor','Um encontro comigo','pessoal','diario_pessoal')}
  ${atalho('◒','Estudos e leitura','Aprendizado e progresso','pessoal','estudos')}
  ${atalho('☾','Sono e descanso','Diário e histórico','pessoal','sono')}
  ${atalho('⌂','Rotina da casa','Tarefas e organização','pessoal','rotina_casa')}
@@ -6753,7 +6762,10 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
+  if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
+    document.getElementById('conteudoTela').innerHTML=({o_que_me_move:v46MoveHTML,diario_pessoal:v46DiarioHTML,humor_pessoal:v46HumorHTML})[telaAtual]();
+  }
+  else if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
     const paginas={na_presenca:naPresencaHTML,painel_oracao:painelOracaoHTML,diario_deus:()=>npColecaoHTML(['diario','gratidao'],'Diário e gratidão','Reflexões, dúvidas, respostas e lembranças.'),versiculos_guardados:()=>npColecaoHTML(['versiculo'],'Versículos para guardar','Guarde a passagem, sua tradução e o tema.'),propositos_oracao:()=>npColecaoHTML(['proposito'],'Propósitos de oração','Escolha uma intenção e os horários que fazem sentido para você.')};
     document.getElementById('conteudoTela').innerHTML=paginas[telaAtual]();
   }
@@ -7183,6 +7195,7 @@ async function entrarNoApp(){
   await carregarLeadsSupabase();
   await carregarAtivosSupabase();
   await carregarHabitosSupabase();
+  await v46Carregar();
   await carregarMetasPessoaisSupabase();
   await carregarContasPessoaisSupabase();
   await carregarComprasSupabase();
@@ -7227,6 +7240,7 @@ function restaurarTelaAtualSessao(){
 async function sairDaConta(){
   if(Object.keys(lerRascunhos()).length){alert('Existem respostas aguardando sincronização neste aparelho. Sincronize antes de sair da conta.');return;}
   rascunhoUsuario=null;
+  V46_ITENS=[];V46_USUARIO=null;V46_STATUS='Entre na sua conta para acessar os registros.';HABITOS=[];V46_HABITOS_OK=false;
   await supa.auth.signOut();
   document.getElementById('appRoot').classList.remove('ativo');
   document.getElementById('telaLogin').style.display = 'flex';
