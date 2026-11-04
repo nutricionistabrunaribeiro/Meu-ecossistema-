@@ -1,14 +1,30 @@
-# Widgets iPhone — versão 49
+# Instalação da correção — versão 50
+
+## Para os dois widgets do print mudarem
+
+1. Atualize o GitHub com os arquivos deste ZIP e aguarde a publicação na Vercel.
+2. Abra o Ecossistema publicado → Configurações gerais → Widgets iPhone. A etapa 1 deve mostrar **versão 50**.
+3. Toque em **Copiar código: Agenda** e depois **Copiar código inteiro**.
+4. Abra o Scriptable → script **Minha Agenda** → editor. Apague todo o código antigo, cole o novo e salve. Execute para conferir a lista de hoje.
+5. Repita com **Copiar código: Pausa para inspirar** e substitua todo o código do script **Meu Versículo**. Execute para conferir o texto centralizado com serifa.
+6. Na tela inicial, segure cada widget → Editar Widget → Script e selecione exatamente Minha Agenda ou Meu Versículo, conforme o caso. Se houver scripts duplicados, confira qual contém o novo código (o comentário inicial diz Widgets v50).
+7. A chave existente continua valendo. Não precisa gerar outra nem refazer a instalação do Scriptable. A atualização da imagem na tela inicial pode demorar, conforme o iOS.
+
+O print com a agenda exibindo apenas um horário grande e o versículo com “Atualizado” no rodapé usa o código antigo. O novo versículo não mostra esse horário de atualização: tem um título pequeno, texto centralizado com serifa e referência destacada.
+
+O arquivo **Widget-Minha-Agenda.js** contém o mesmo código do botão Agenda. **Widget-Meu-Versiculo.js** contém o novo visual do versículo. Se preferir, abra esses arquivos extraídos do ZIP e copie o conteúdo inteiro para os respectivos scripts.
+
+# Widgets iPhone — versão 50
 
 ## Corrigir os três widgets iguais
 
 Os widgets anteriores usavam o último indicador escolhido quando o Parâmetro estava vazio. Para corrigi-los sem criar scripts novos: segure cada widget → Editar Widget → Parameter/Parâmetro. Preencha agenda no de agenda, habitos no de hábitos e agua no de hidratação. Só mudar o nome da conexão não muda o indicador do widget.
 
-A versão 48 também oferece códigos separados, que dispensam esse parâmetro. Esta é a opção recomendada para facilitar sua configuração.
+A versão 50 também oferece códigos separados, que dispensam esse parâmetro. Esta é a opção recomendada para facilitar sua configuração.
 
 ## Atualizar o aplicativo e os scripts
 
-1. Extraia Ecossistema49-completo.zip e envie os arquivos ao GitHub, com index.html na raiz, como na atualização anterior. Aguarde a Vercel publicar e reabra o Ecossistema pelo Safari.
+1. Extraia Ecossistema50-completo.zip e envie os arquivos ao GitHub, com index.html na raiz, como na atualização anterior. Aguarde a Vercel publicar e reabra o Ecossistema pelo Safari.
 2. Abra Configurações gerais → Widgets iPhone. Na etapa 1, existem botões de código para cada indicador.
 3. Copie o código de Agenda. No Scriptable, crie um script chamado Minha Agenda e cole esse código inteiro. Repita com Meus Hábitos e Minha Hidratação, usando os respectivos códigos. Os seis arquivos Widget-*.js do ZIP têm os mesmos códigos.
 4. Execute cada script uma vez para conferir. A conexão da versão 47 continua válida e é compartilhada pelos scripts neste aparelho; não precisa gerar outra chave. Se precisar conectar, use uma chave que autorize os indicadores desejados.
@@ -16,13 +32,13 @@ A versão 48 também oferece códigos separados, que dispensam esse parâmetro. 
 
 Importante: atualizar o GitHub não substitui o código já colado no Scriptable. Para receber a lista de compromissos, atualize também esse código no Scriptable conforme os passos acima.
 
-## Minha Agenda
+## Minha Agenda — somente hoje, como checklist
 
-A agenda passa a considerar todos os compromissos salvos da conta, incluindo concluídos, passados e futuros. Mostra data, horário, cliente quando houver e título. Os dias de hoje e futuros vêm primeiro; depois, o histórico do mais recente para o mais antigo. O visto indica um compromisso concluído.
+A versão 50 lista exclusivamente os compromissos do dia atual no fuso configurado na conexão. Inclui os já concluídos e os que ainda estão em aberto, em ordem de horário. Cada linha mostra ☑ ou ☐, horário, cliente quando houver e título. As caixas são indicadores visuais: para concluir ou reabrir compromissos, toque para abrir a agenda no Ecossistema e faça a marcação lá.
 
-O espaço físico do widget é limitado: pequeno mostra até 2 compromissos por página; médio, até 3; grande, até 9. O rodapé informa a página e o total de páginas. Para ver mais, use o widget grande; para outra página, escreva 2, 3 etc. no campo Parâmetro do script Minha Agenda. Você pode criar outros widgets de agenda com páginas diferentes. No script genérico Meu Ecossistema, use agenda:2, agenda:3 etc.
+O tamanho médio mostra até cinco linhas, o pequeno até duas e o grande até doze. Se houver mais, o rodapé informa a página e quantos itens não estão nela. No campo Parâmetro do script Minha Agenda, use 2, 3 etc. para outras páginas do mesmo dia. O script genérico aceita agenda:2 etc. Não existe rolagem dentro deste widget. O título de uma linha longa pode ser cortado; consulte o texto completo no aplicativo.
 
-Não existe rolagem dentro deste widget. Tocar abre a agenda no Ecossistema, onde você pode navegar pelas datas e editar os compromissos. O resumo considera até 10 mil registros; acima disso, informa falha de atualização em vez de apresentar uma contagem parcial.
+Não inclui compromissos passados ou futuros de outras datas. O dia é calculado no fuso que foi aplicado pelo Ecossistema à conexão. O iOS controla quando a tela inicial refaz a consulta; execute o script no Scriptable para conferir após a virada do dia ou uma alteração.
 
 ## Demais indicadores
 
@@ -42,13 +58,13 @@ O iOS decide quando atualizar; o script solicita uma atualização depois de cer
 Verificadas autenticação, revogação, isolamento por usuário, campos retornados, simulação dos cinco layouts, três scripts independentes sem parâmetro, aliases e páginas de agenda. A regressão da agenda usou 605 compromissos em duas páginas do banco, incluindo concluídos e passados, para garantir que a consulta não fique limitada ao próximo evento.
 
 
-## Novo visual do versículo — versão 49
+## Novo visual do versículo — versão 50
 
 O versículo tem composição centralizada, fonte Georgia com serifa, referência destacada e assinatura discreta. Mantém fundo, texto e detalhes do tema escolhido. A tradução continua identificada. Nos widgets pequenos ou com passagens longas, o texto pode ser reduzido ou truncado pelo iOS: toque para abrir o Ecossistema e ler a passagem completa. Para aplicar este visual, substitua o código do script Meu Versículo pelo novo, executando-o uma vez no Scriptable. Atualizar apenas o GitHub não muda o código já instalado no Scriptable.
 
 ## Novo widget: Iniciar atividade
 
-1. Atualize o aplicativo com a versão 49 e aguarde a publicação na Vercel.
+1. Atualize o aplicativo com a versão 50 e aguarde a publicação na Vercel.
 2. Pelo aplicativo publicado, abra Configurações gerais → Widgets iPhone → Copiar código: Iniciar atividade.
 3. No Scriptable, crie um novo script chamado Iniciar atividade, cole todo esse código e execute uma vez.
 4. Adicione um widget Scriptable à tela inicial, edite-o e escolha o script Iniciar atividade. Não precisa preencher Parâmetro.
