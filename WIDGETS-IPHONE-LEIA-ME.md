@@ -1,56 +1,62 @@
-# Meu Ecossistema na tela inicial do iPhone
+# Widgets iPhone — versão 49
 
-Esta versão usa o Scriptable, um aplicativo auxiliar para iPhone. Não precisa deixar o Ecossistema aberto. Você faz a instalação no seu aparelho; o ZIP, sozinho, não instala widgets no iPhone.
+## Corrigir os três widgets iguais
 
-## 1. Atualizar seu Ecossistema
+Os widgets anteriores usavam o último indicador escolhido quando o Parâmetro estava vazio. Para corrigi-los sem criar scripts novos: segure cada widget → Editar Widget → Parameter/Parâmetro. Preencha agenda no de agenda, habitos no de hábitos e agua no de hidratação. Só mudar o nome da conexão não muda o indicador do widget.
 
-Extraia Ecossistema47-completo.zip e envie todos os arquivos extraídos ao seu repositório GitHub, substituindo as versões anteriores. Mantenha o index.html na raiz. Aguarde a publicação da Vercel. Abra o aplicativo atualizado e entre na sua conta.
+A versão 48 também oferece códigos separados, que dispensam esse parâmetro. Esta é a opção recomendada para facilitar sua configuração.
 
-Os arquivos novos precisam acompanhar o index.html: widgets-v47.js, widgets-v47.css e Meu-Ecossistema-Widget.js. A pasta supabase contém o código de referência do servidor. A conexão do servidor já foi preparada no projeto atual; você não precisa executar SQL ou publicar essa pasta manualmente para usar este projeto.
+## Atualizar o aplicativo e os scripts
 
-## 2. Preparar o Scriptable
+1. Extraia Ecossistema49-completo.zip e envie os arquivos ao GitHub, com index.html na raiz, como na atualização anterior. Aguarde a Vercel publicar e reabra o Ecossistema pelo Safari.
+2. Abra Configurações gerais → Widgets iPhone. Na etapa 1, existem botões de código para cada indicador.
+3. Copie o código de Agenda. No Scriptable, crie um script chamado Minha Agenda e cole esse código inteiro. Repita com Meus Hábitos e Minha Hidratação, usando os respectivos códigos. Os seis arquivos Widget-*.js do ZIP têm os mesmos códigos.
+4. Execute cada script uma vez para conferir. A conexão da versão 47 continua válida e é compartilhada pelos scripts neste aparelho; não precisa gerar outra chave. Se precisar conectar, use uma chave que autorize os indicadores desejados.
+5. Na tela inicial, segure cada widget → Editar Widget → Script. Escolha Minha Agenda, Meus Hábitos ou Minha Hidratação conforme o widget. Deixe Parâmetro vazio nos scripts específicos.
 
-1. Instale pela App Store: https://apps.apple.com/br/app/scriptable/id1405459188
-2. No Ecossistema, abra **Configurações gerais → Widgets iPhone**.
-3. Toque em **Ver e copiar código do widget → Copiar código inteiro**.
-4. Abra o Scriptable, toque em **+**, cole todo o código e nomeie o script **Meu Ecossistema**. O arquivo Meu-Ecossistema-Widget.js do ZIP contém o mesmo código.
+Importante: atualizar o GitHub não substitui o código já colado no Scriptable. Para receber a lista de compromissos, atualize também esse código no Scriptable conforme os passos acima.
 
-## 3. Conectar sua conta
+## Minha Agenda
 
-1. Volte à aba Widgets iPhone no Ecossistema. Dê um nome à conexão e escolha quais indicadores autorizar.
-2. Toque em **Gerar conexão para meu iPhone → Copiar chave**.
-3. Execute o script no Scriptable e cole a chave quando ele pedir. Escolha um indicador para visualizar.
+A agenda passa a considerar todos os compromissos salvos da conta, incluindo concluídos, passados e futuros. Mostra data, horário, cliente quando houver e título. Os dias de hoje e futuros vêm primeiro; depois, o histórico do mais recente para o mais antigo. O visto indica um compromisso concluído.
 
-A chave não é sua senha. Ela fica guardada no Keychain do Scriptable; o banco guarda somente seu resumo criptográfico. Ela permite consultar apenas os indicadores autorizados. Você pode revogá-la em **Minhas conexões → Desativar**. Se perder a chave antes de conectar, desative a conexão e gere outra.
+O espaço físico do widget é limitado: pequeno mostra até 2 compromissos por página; médio, até 3; grande, até 9. O rodapé informa a página e o total de páginas. Para ver mais, use o widget grande; para outra página, escreva 2, 3 etc. no campo Parâmetro do script Minha Agenda. Você pode criar outros widgets de agenda com páginas diferentes. No script genérico Meu Ecossistema, use agenda:2, agenda:3 etc.
 
-## 4. Adicionar o widget
+Não existe rolagem dentro deste widget. Tocar abre a agenda no Ecossistema, onde você pode navegar pelas datas e editar os compromissos. O resumo considera até 10 mil registros; acima disso, informa falha de atualização em vez de apresentar uma contagem parcial.
 
-1. Pressione uma área vazia da tela inicial do iPhone.
-2. Abra Editar → Adicionar Widget, ou o botão +, conforme sua versão do iOS.
-3. Procure **Scriptable** e adicione um widget. Comece pelo tamanho médio.
-4. Segure o widget → **Editar Widget** → **Script: Meu Ecossistema**.
-5. No campo **Parameter / Parâmetro**, escreva um destes nomes:
+## Demais indicadores
 
-| Parâmetro | Indicador |
-| --- | --- |
-| agua | Volume registrado hoje e progresso da meta |
-| habitos | Hábitos registrados hoje e pendências |
-| agenda | Próximo compromisso em aberto e resumo do dia |
-| versiculo | Versículo escolhido ou passagem do dia, com tradução identificada |
-| oracao | Pedidos da semana e registros de oração de hoje |
+- Minha Hidratação: água registrada online hoje e progresso da meta.
+- Meus Hábitos: quantidade de hábitos registrados hoje e pendências.
+- Meu Versículo: passagem escolhida ou automática com tradução identificada.
+- Minha Oração: pessoas ou pedidos da semana, com marcações de hoje e sem o texto privado das anotações.
 
-6. Em When Interacting / Ao interagir, escolha executar o script se essa opção aparecer. O endereço do Ecossistema é configurado no próprio widget para abrir a área correspondente ao toque. O iOS pode abrir esse endereço no navegador; entre na sua conta se solicitado.
+## Conexão e atualização
 
-Repita para adicionar vários widgets, com parâmetros diferentes. Os tamanhos pequeno e médio têm layouts próprios; o grande usa o conteúdo do médio com mais espaço.
+A chave fica no Keychain do Scriptable. O servidor guarda seu resumo criptográfico e permite apenas leitura dos indicadores autorizados. É possível revogar em Minhas conexões → Desativar. O Scriptable pode ser instalado pela App Store: https://apps.apple.com/br/app/scriptable/id1405459188
 
-## Uso e atualização
+O iOS decide quando atualizar; o script solicita uma atualização depois de cerca de 30 minutos, sem garantia de intervalo exato. Tema, meta de água e versículo são aplicados ao abrir o Ecossistema, ou pelo botão Aplicar tema, meta e versículo atuais. A instalação e o visual no aparelho devem ser conferidos no iPhone.
 
-- Os widgets mostram dados já salvos online. Para registrar água, marcar hábitos ou oração, toque para abrir o Ecossistema.
-- O iOS controla a frequência de atualização. O script solicita uma nova atualização após cerca de 30 minutos, mas esse intervalo não é garantido. Execute o script no Scriptable para conferir os dados mais recentes.
-- Tema, meta de água, fuso e versículo escolhido são enviados à conexão quando você usa o Ecossistema. Existe também o botão **Aplicar tema, meta e versículo atuais**. Se usar vários aparelhos, prevalecem as preferências aplicadas mais recentemente.
-- A agenda mantém a precisão por hora do aplicativo atual. O painel de oração considera a semana iniciada na segunda-feira e mostra no máximo três nomes, sem as anotações dos pedidos.
-- Sem internet, o widget informa que não conseguiu atualizar. Se a conexão for desativada, a próxima consulta será bloqueada; uma imagem já exibida pode permanecer até o iOS atualizar.
+## Validação técnica
 
-## Verificação desta entrega
+Verificadas autenticação, revogação, isolamento por usuário, campos retornados, simulação dos cinco layouts, três scripts independentes sem parâmetro, aliases e páginas de agenda. A regressão da agenda usou 605 compromissos em duas páginas do banco, incluindo concluídos e passados, para garantir que a consulta não fique limitada ao próximo evento.
 
-Foram verificados o código, os cinco indicadores com a conexão real do servidor, bloqueio de acesso sem chave e após revogação, autorização por indicador, filtros por usuário e a tela web de configuração. Os layouts Scriptable foram exercitados com uma simulação das APIs. A instalação e a aparência final no iPhone físico ainda precisam ser conferidas no seu aparelho.
+
+## Novo visual do versículo — versão 49
+
+O versículo tem composição centralizada, fonte Georgia com serifa, referência destacada e assinatura discreta. Mantém fundo, texto e detalhes do tema escolhido. A tradução continua identificada. Nos widgets pequenos ou com passagens longas, o texto pode ser reduzido ou truncado pelo iOS: toque para abrir o Ecossistema e ler a passagem completa. Para aplicar este visual, substitua o código do script Meu Versículo pelo novo, executando-o uma vez no Scriptable. Atualizar apenas o GitHub não muda o código já instalado no Scriptable.
+
+## Novo widget: Iniciar atividade
+
+1. Atualize o aplicativo com a versão 49 e aguarde a publicação na Vercel.
+2. Pelo aplicativo publicado, abra Configurações gerais → Widgets iPhone → Copiar código: Iniciar atividade.
+3. No Scriptable, crie um novo script chamado Iniciar atividade, cole todo esse código e execute uma vez.
+4. Adicione um widget Scriptable à tela inicial, edite-o e escolha o script Iniciar atividade. Não precisa preencher Parâmetro.
+5. Ao tocar no widget, ele abre diretamente Trabalho → Controle de horas e o formulário de início. Se precisar entrar na conta, o formulário abre depois do login e carregamento dos dados.
+6. Escolha tipo, cliente e carteira, e toque em Iniciar agora. O horário começa nesse momento. Se já houver atividade ativa, o aplicativo avisa e mantém o cronômetro existente.
+
+Este widget é um atalho para o formulário. Ele não exibe o tempo transcorrido e não inicia nem finaliza registros em segundo plano. Não precisa gerar chave, pois nenhum dado de horas é consultado pelo widget. O código copiado pelo aplicativo recebe o endereço da sua publicação e uma cópia das cores atuais. Para mudar o tema deste atalho, copie novamente o código pelo aplicativo após escolher as novas cores.
+
+Se usar diretamente o arquivo Widget-Iniciar-Atividade.js do ZIP, execute-o no Scriptable e informe o endereço HTTPS do seu Ecossistema publicado quando solicitado. Não informe a URL do GitHub nem a URL do Supabase.
+
+A tela web, os dados e os atalhos seguem no pacote completo. A aparência final e a abertura no iPhone físico precisam ser conferidas no seu aparelho; o navegador pode pedir login. Não é necessário criar uma nova conexão para os widgets de leitura que já funcionam.
