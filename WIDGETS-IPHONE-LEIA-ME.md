@@ -1,36 +1,24 @@
-# Instalação da correção — versão 50
+# Versão 51 — corrigir Iniciar atividade
 
-## Para os dois widgets do print mudarem
+## Faça esta atualização primeiro
 
-1. Atualize o GitHub com os arquivos deste ZIP e aguarde a publicação na Vercel.
-2. Abra o Ecossistema publicado → Configurações gerais → Widgets iPhone. A etapa 1 deve mostrar **versão 50**.
-3. Toque em **Copiar código: Agenda** e depois **Copiar código inteiro**.
-4. Abra o Scriptable → script **Minha Agenda** → editor. Apague todo o código antigo, cole o novo e salve. Execute para conferir a lista de hoje.
-5. Repita com **Copiar código: Pausa para inspirar** e substitua todo o código do script **Meu Versículo**. Execute para conferir o texto centralizado com serifa.
-6. Na tela inicial, segure cada widget → Editar Widget → Script e selecione exatamente Minha Agenda ou Meu Versículo, conforme o caso. Se houver scripts duplicados, confira qual contém o novo código (o comentário inicial diz Widgets v50).
-7. A chave existente continua valendo. Não precisa gerar outra nem refazer a instalação do Scriptable. A atualização da imagem na tela inicial pode demorar, conforme o iOS.
+1. Extraia Ecossistema51-completo.zip e envie todos os arquivos ao GitHub, incluindo **iniciar-atividade.html**, **index.html**, **widgets-v47.js** e **Meu-Ecossistema-Widget.js**. Mantenha-os na raiz, junto aos demais arquivos existentes. Aguarde a Vercel publicar.
+2. Abra seu Ecossistema no Safari. Entre em Configurações gerais → Widgets iPhone. A tela deve indicar **versão 51**.
+3. Toque em **Copiar código geral: Meu Ecossistema**, depois em Copiar código inteiro. No Scriptable, abra o script Meu Ecossistema, substitua todo o código e salve. O arquivo **Meu-Ecossistema-codigo-geral-v51.txt** deste ZIP contém o mesmo código.
+4. No widget da tela inicial, mantenha Script: **Meu Ecossistema** e Parameter/Parâmetro: **horas**. A chave já existente continua valendo para os outros indicadores.
+5. Toque no widget. Ele aponta para uma página própria em **https://meu-ecossistema.vercel.app/iniciar-atividade.html**, que abre diretamente o formulário de atividade, com cliente, carteira, tipo e observação. Se precisar entrar na conta, a página mantém o destino depois do login.
 
-O print com a agenda exibindo apenas um horário grande e o versículo com “Atualizado” no rodapé usa o código antigo. O novo versículo não mostra esse horário de atualização: tem um título pequeno, texto centralizado com serifa e referência destacada.
+Nesta correção é necessário atualizar o aplicativo **e** o script. Só trocar o script, mantendo o aplicativo antigo, não disponibiliza a página nova e pode resultar em erro de página não encontrada. A publicação pelo GitHub/Vercel continua sendo feita por você.
 
-O arquivo **Widget-Minha-Agenda.js** contém o mesmo código do botão Agenda. **Widget-Meu-Versiculo.js** contém o novo visual do versículo. Se preferir, abra esses arquivos extraídos do ZIP e copie o conteúdo inteiro para os respectivos scripts.
+O cronômetro só começa ao tocar em **Iniciar agora**. Se houver uma atividade ativa, a página mostra esse registro, sem oferecer outro início. Se não conseguir conferir os dados de horas, bloqueia o início e oferece tentar novamente.
 
-# Widgets iPhone — versão 50
+Os demais parâmetros continuam: **agenda**, **habitos**, **agua**, **versiculo** e **oracao**. Você pode manter todos os widgets usando o mesmo script geral. Não é necessário excluir widgets ou gerar novas conexões.
 
-## Corrigir os três widgets iguais
+A abertura direta da página e os campos de deslocamento foram conferidos no navegador em uma prévia com dados de exemplo. A consulta real da conta, a gravação do início e o acionamento pelo widget no iPhone ainda precisam ser conferidos no seu aparelho, após publicar e instalar esta versão.
 
-Os widgets anteriores usavam o último indicador escolhido quando o Parâmetro estava vazio. Para corrigi-los sem criar scripts novos: segure cada widget → Editar Widget → Parameter/Parâmetro. Preencha agenda no de agenda, habitos no de hábitos e agua no de hidratação. Só mudar o nome da conexão não muda o indicador do widget.
+---
 
-A versão 50 também oferece códigos separados, que dispensam esse parâmetro. Esta é a opção recomendada para facilitar sua configuração.
-
-## Atualizar o aplicativo e os scripts
-
-1. Extraia Ecossistema50-completo.zip e envie os arquivos ao GitHub, com index.html na raiz, como na atualização anterior. Aguarde a Vercel publicar e reabra o Ecossistema pelo Safari.
-2. Abra Configurações gerais → Widgets iPhone. Na etapa 1, existem botões de código para cada indicador.
-3. Copie o código de Agenda. No Scriptable, crie um script chamado Minha Agenda e cole esse código inteiro. Repita com Meus Hábitos e Minha Hidratação, usando os respectivos códigos. Os seis arquivos Widget-*.js do ZIP têm os mesmos códigos.
-4. Execute cada script uma vez para conferir. A conexão da versão 47 continua válida e é compartilhada pelos scripts neste aparelho; não precisa gerar outra chave. Se precisar conectar, use uma chave que autorize os indicadores desejados.
-5. Na tela inicial, segure cada widget → Editar Widget → Script. Escolha Minha Agenda, Meus Hábitos ou Minha Hidratação conforme o widget. Deixe Parâmetro vazio nos scripts específicos.
-
-Importante: atualizar o GitHub não substitui o código já colado no Scriptable. Para receber a lista de compromissos, atualize também esse código no Scriptable conforme os passos acima.
+## Referência dos demais widgets
 
 ## Minha Agenda — somente hoje, como checklist
 

@@ -1,8 +1,8 @@
-// Meu Ecossistema • Bruna Ribeiro · Widgets v50 para Scriptable.
+// Meu Ecossistema • Bruna Ribeiro · Widgets v51 para Scriptable.
 // Não edite este arquivo para colocar senhas. A chave é solicitada ao executar.
 // Use os scripts específicos para não depender do último indicador escolhido.
 const ECO_FIXED_TYPE='';
-const ECO_HOURS_URL='';
+const ECO_HOURS_URL='https://meu-ecossistema.vercel.app/iniciar-atividade.html';
 const ECO_HOURS_THEME={};
 const ECO_ENDPOINT='https://laebprndhkckeauzgoxl.supabase.co/functions/v1/ecossistema-widget';
 const ECO_KEY='bruna-ecossistema-widget-v47',ECO_TYPE='bruna-ecossistema-widget-v47-tipo';
@@ -15,7 +15,7 @@ function ecoBar(w,value,total,theme,small){const pct=total>0?Math.max(0,Math.min
 function ecoDay(iso){return String(iso||'').split('-').reverse().join('/');}
 function ecoCentered(w,text,size,color,serif=false,lines=1){const t=ecoText(w,text,size,color,false,lines);if(serif)t.font=new Font('Georgia',size);t.centerAlignText();return t;}
 function ecoVerseWidget(payload,small){const w=new ListWidget(),t=payload.theme||{primary:'#93435d',background:'#faf5f0',text:'#302832',muted:'#76636e'},d=payload.data||{},large=config.widgetFamily==='large';w.backgroundColor=new Color(t.background);w.setPadding(large?26:14,small?12:22,14,small?12:22);w.spacing=1;w.refreshAfterDate=new Date(Date.now()+30*60*1000);if(payload.app_url)w.url=payload.app_url;ecoCentered(w,'✦  PAUSA PARA INSPIRAR  ✦',small?8:9,t.primary);w.addSpacer();ecoCentered(w,d.text||'Escolha uma passagem no Ecossistema.',small?14:large?25:18,t.text,true,small?4:large?8:3);w.addSpacer(large?18:8);if(d.reference)ecoCentered(w,d.reference,small?10:12,t.primary,false,1);if(d.translation)ecoCentered(w,d.translation,small?7:8,t.muted,false,1);w.addSpacer();ecoCentered(w,small?'Meu Ecossistema':'Meu Ecossistema • Bruna Ribeiro',small?7:8,t.muted);return w;}
-function ecoSafeHoursURL(value){const match=String(value||'').trim().match(/^https:\/\/([a-z0-9.-]+(?::[0-9]{1,5})?)(?:[/?#][^\s]*)?$/i);if(!match||match[1].split(':')[0].split('.').some(label=>!label||! /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label)))return '';return 'https://'+match[1]+'/?widget=horas';}
+function ecoSafeHoursURL(value){const match=String(value||'').trim().match(/^https:\/\/([a-z0-9.-]+(?::[0-9]{1,5})?)(?:[/?#][^\s]*)?$/i);if(!match||match[1].split(':')[0].split('.').some(label=>!label||! /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label)))return '';return 'https://'+match[1]+'/iniciar-atividade.html';}
 function ecoHoursURL(){return ecoSafeHoursURL(ECO_HOURS_URL||(Keychain.contains('eco-hours-url')?Keychain.get('eco-hours-url'):''));}
 async function ecoHoursMain(){let url=ecoHoursURL();if(!url&&!config.runsInWidget){const a=new Alert();a.title='Endereço do seu Ecossistema';a.message='Cole o endereço HTTPS do aplicativo publicado na Vercel, sem senha ou chave.';a.addTextField('https://seu-app.vercel.app');a.addAction('Salvar');a.addCancelAction('Cancelar');if(await a.presentAlert()<0){Script.complete();return;}const raw=a.textFieldValue(0).trim();try{url=ecoSafeHoursURL(raw);if(!url)throw Error();Keychain.set('eco-hours-url',url);}catch{throw Error('Informe o endereço HTTPS do seu aplicativo.');}}
 if(!url)throw Error('Execute o script no Scriptable para informar o endereço do Ecossistema.');const w=new ListWidget(),t={primary:'#93435d',background:'#faf5f0',text:'#302832',muted:'#76636e',...ECO_HOURS_THEME},small=config.widgetFamily==='small';w.backgroundColor=new Color(t.background);w.url=url;w.setPadding(18,18,16,18);ecoText(w,'CONTROLE DE HORAS',small?8:10,t.primary,true);w.addSpacer();const title=ecoText(w,'▶ Iniciar atividade',small?20:27,t.text,true,2);title.url=url;w.addSpacer(9);ecoText(w,'Toque, escolha a atividade e inicie.',small?10:12,t.muted,false,2);w.addSpacer();ecoText(w,'Meu Ecossistema • Bruna Ribeiro',small?7:8,t.muted);Script.setWidget(w);if(!config.runsInWidget)await w.presentMedium();Script.complete();}

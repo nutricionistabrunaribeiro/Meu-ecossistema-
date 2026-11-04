@@ -5299,14 +5299,16 @@ function jornadaBiblicaHTML(){const livros=LIVROS_BIBLIA.filter(l=>filtroBiblia=
 let CONTROLE_HORAS=[],mesControleHoras=formatoISO(new Date()).slice(0,7);
 const ROTULOS_HORAS={visita:'Visita técnica',administrativo:'Administrativo',treinamento:'Treinamento',auditoria:'Auditoria',deslocamento:'Deslocamento'};
 const ROTULOS_CARTEIRA={bruna_ribeiro:'Bruna Ribeiro',saber_nutrir:'Saber Nutrir',pessoal:'Pessoal'};
-async function carregarControleHorasSupabase(){const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').select('*').eq('user_id',user.id).order('inicio',{ascending:false});if(error){dispararAutomacao('Erro ao carregar Controle de Horas',error.message);return;}CONTROLE_HORAS=data||[];}
+async function carregarControleHorasSupabase(){const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').select('*').eq('user_id',user.id).order('inicio',{ascending:false});if(error){dispararAutomacao('Erro ao carregar Controle de Horas',error.message);return false;}CONTROLE_HORAS=data||[];return true;}
 function atividadeHorasAtiva(){return CONTROLE_HORAS.find(x=>!x.fim)||null;}
 function duracaoHorasMs(registro,agora=Date.now()){return Math.max(0,(registro.fim?new Date(registro.fim).getTime():agora)-new Date(registro.inicio).getTime());}
 function formatarDuracao(ms,comSegundos=false){const total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}${comSegundos?':'+String(s).padStart(2,'0'):''}`;}
 function clienteRegistroHoras(r){return CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'';}
 function atualizarCronometros(){const ativo=atividadeHorasAtiva();if(!ativo)return;document.querySelectorAll('[data-cronometro]').forEach(el=>el.textContent=formatarDuracao(duracaoHorasMs(ativo),true));}
 function controleAtivoHTML({dashboard=false}={}){const a=atividadeHorasAtiva();if(!a)return `<div class="card ${dashboard?'horas-dashboard':''}" style="border-top:4px solid var(--cor-primaria)"><h3>Controle de horas <button onclick="irPara('controle_horas')">ver histórico</button></h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="pend-desc">Nenhuma atividade em andamento.</div></div><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div></div>`;const cliente=clienteRegistroHoras(a);return `<section class="horas-ativo ${dashboard?'horas-dashboard':''}"><div class="horas-ativo-top"><div><small>${dashboard?'Atividade em andamento':'Cronômetro ativo'}</small><h2>${textoHTML(ROTULOS_HORAS[a.tipo]||a.tipo)}</h2><div class="horas-ativo-meta">${cliente?textoHTML(cliente)+' · ':''}${textoHTML(ROTULOS_CARTEIRA[a.carteira]||a.carteira)} · iniciada às ${new Date(a.inicio).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="horas-cronometro" data-cronometro>${formatarDuracao(duracaoHorasMs(a),true)}</div></div><div class="horas-ativo-acoes"><button class="horas-finalizar" onclick="finalizarControleHoras('${a.id}')">■ Finalizar</button>${dashboard?`<button class="horas-abrir" onclick="irPara('controle_horas')">Abrir controle</button>`:''}</div></section>`;}
-function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37)).map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
+function formularioHorasHTML(){return `<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37)).map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`;}
+function iniciarAtividadeHTML(){if(W51_HOURS_LOADING)return '<section class="card" role="status"><h3>Iniciar atividade</h3><p>Carregando clientes e conferindo o cronômetro…</p></section>';if(W51_HOURS_ERROR)return '<section class="card" role="alert"><h3>Não foi possível conferir o cronômetro</h3><p>Verifique sua conexão e tente novamente antes de iniciar uma atividade.</p><button class="btn-primario" onclick="location.reload()">Tentar novamente</button></section>';if(atividadeHorasAtiva())return controleAtivoHTML()+'<p>Já existe uma atividade em andamento. Finalize o registro atual antes de iniciar outro.</p>';return '<section class="card w51-inicio">'+formularioHorasHTML().replaceAll('onclick="fecharModalSistema()"','onclick="irPara(\'controle_horas\')"')+'</section>';}
+function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(formularioHorasHTML());}
 async function iniciarControleHoras(){const tipo=document.getElementById('horaTipo')?.value,carteira=document.getElementById('horaCarteira')?.value,cliente_id=document.getElementById('horaCliente')?.value||null,observacao=document.getElementById('horaObservacao')?.value.trim()||null;if(tipo==='deslocamento'&&(!document.getElementById('horaOrigem')?.value.trim()||!document.getElementById('horaDestino')?.value.trim())){alert('Informe origem e destino.');return;}const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').insert({user_id:user.id,tipo,carteira,cliente_id,observacao,...(tipo==='deslocamento'?{origem_tipo:'outro',origem_texto:document.getElementById('horaOrigem').value.trim(),destino_tipo:'outro',destino_texto:document.getElementById('horaDestino').value.trim()}:{}),inicio:new Date().toISOString()}).select().single();if(error){dispararAutomacao('Erro ao iniciar atividade',error.message);return;}CONTROLE_HORAS.unshift(data);fecharModalSistema();dispararAutomacao('Cronômetro iniciado',ROTULOS_HORAS[tipo]);renderSidebar();renderTela();}
 async function finalizarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||r.fim)return;if(!confirm(`Finalizar ${ROTULOS_HORAS[r.tipo]||'atividade'} agora?`))return;const fim=new Date().toISOString();const {error}=await supa.from('controle_horas').update({fim,atualizado_em:fim}).eq('id',id);if(error){dispararAutomacao('Erro ao finalizar atividade',error.message);return;}r.fim=fim;r.atualizado_em=fim;dispararAutomacao('Atividade finalizada',`Duração: ${formatarDuracao(duracaoHorasMs(r))}`);renderSidebar();renderTela();}
 function dataHoraLocalInput(iso){if(!iso)return '';const d=new Date(iso),off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
@@ -6749,7 +6751,7 @@ async function salvarNovoRadar(event){
 async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'))return;try{const {error}=await supa.from('radar_recorrencias').delete().eq('id',id);if(error)throw error;RADAR_RECORRENCIAS=RADAR_RECORRENCIAS.filter(r=>r.id!==id);renderTela();}catch(e){alert('Não foi possível excluir: '+e.message)}}
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
+  const [titulo, sub] = telaAtual==='iniciar_atividade'?['Iniciar atividade','Escolha o tipo e o cliente para começar']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho, Pessoal e Na Presença';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
@@ -6773,6 +6775,7 @@ function renderTela(){
     const paginas={na_presenca:naPresencaHTML,painel_oracao:painelOracaoHTML,diario_deus:()=>npColecaoHTML(['diario','gratidao'],'Diário e gratidão','Reflexões, dúvidas, respostas e lembranças.'),versiculos_guardados:()=>npColecaoHTML(['versiculo'],'Versículos para guardar','Guarde a passagem, sua tradução e o tema.'),propositos_oracao:()=>npColecaoHTML(['proposito'],'Propósitos de oração','Escolha uma intenção e os horários que fazem sentido para você.')};
     document.getElementById('conteudoTela').innerHTML=paginas[telaAtual]();
   }
+  else if(telaAtual === 'iniciar_atividade'){document.getElementById('conteudoTela').innerHTML=iniciarAtividadeHTML();}
   else if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
@@ -7185,10 +7188,17 @@ async function entrarNoApp(){
 
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').classList.add('ativo');
+  const entradaHoras=w51PedidoHoras();
+  if(entradaHoras){
+    w47Destino();renderSidebar();renderTela();
+    try{await carregarClientesSupabase();if(!await carregarControleHorasSupabase())throw Error('Cronômetro indisponível');W51_HOURS_LOADING=false;W51_HOURS_ERROR=false;}
+    catch(e){W51_HOURS_LOADING=false;W51_HOURS_ERROR=true;}
+    renderTela();
+  }
   await carregarPerfilSupabase();
   await sincronizarSono();
   await carregarTemaMarcaSupabase();
-  await carregarClientesSupabase();
+  if(!entradaHoras)await carregarClientesSupabase();
   await carregarRadarRecorrencias();
   await carregarEnviosMensaisSupabase();
   await carregarEntregasSupabase();
@@ -7208,7 +7218,7 @@ async function entrarNoApp(){
   await carregarListaDiaSupabase();
   await carregarBibliaSupabase();
   await npCarregar();
-  await carregarControleHorasSupabase();
+  if(!entradaHoras)await carregarControleHorasSupabase();
   await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();
   await carregarCicloSupabase();
@@ -7224,8 +7234,7 @@ async function entrarNoApp(){
   aplicarRascunhosLocais();
   await sincronizarRascunhos();
   await salvarCopiaChecklist();
-  restaurarTelaAtualSessao();
-  w47Destino();
+  if(!entradaHoras){restaurarTelaAtualSessao();w47Destino();}
   renderSidebar();
   renderTela();
   setTimeout(verificarPendenciasAtrasadas, 2200);
@@ -7265,6 +7274,7 @@ async function instalarMeuEcossistema(){
   abrirModalSistema(`<div class="system-modal-top"><div><h3>Instalar Meu Ecossistema</h3><p>Coloque o ícone diretamente na tela do celular.</p></div><button onclick="fecharModalSistema()">✕</button></div><div style="font-size:13px;line-height:1.65"><p><strong>Se você abriu pelo WhatsApp:</strong></p><p>1. Toque nos três pontos do navegador.<br>2. Escolha <strong>Abrir no Chrome</strong>.<br>3. No Chrome, toque novamente nos três pontos.<br>4. Entre em <strong>Instalar e criar atalho</strong>.<br>5. Toque em <strong>Instalar</strong> ou <strong>Criar atalho</strong>.</p><p style="margin-top:12px;color:var(--cor-texto-suave)">O navegador interno do WhatsApp não oferece a instalação completa do aplicativo.</p></div>`);
 }
 async function iniciarApp(){
+  w47Destino();
   aplicarTemaInterface();
   setInterval(atualizarCronometros,1000);
   if('serviceWorker' in navigator){

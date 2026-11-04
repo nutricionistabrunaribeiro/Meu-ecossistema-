@@ -1,6 +1,6 @@
-const CACHE_NAME = 'meu-ecossistema-v50-agenda-hoje-checklist-20261104';
+const CACHE_NAME = 'meu-ecossistema-v51-pagina-iniciar-atividade-20261104';
 const APP_SHELL = [
-  '/', '/index.html', '/widgets-v47.js', '/widgets-v47.css', '/Meu-Ecossistema-Widget.js', '/pessoal-v46.js', '/pessoal-v46.css', '/visual-v45.js', '/visual-v45.css', '/visual-v44.js', '/visual-v44.css', '/na-presenca.js', '/na-presenca.css', '/proximos-passos.js', '/offline-drafts.js',
+  '/', '/index.html', '/iniciar-atividade.html', '/widgets-v47.js', '/widgets-v47.css', '/Meu-Ecossistema-Widget.js', '/pessoal-v46.js', '/pessoal-v46.css', '/visual-v45.js', '/visual-v45.css', '/visual-v44.js', '/visual-v44.css', '/na-presenca.js', '/na-presenca.css', '/proximos-passos.js', '/offline-drafts.js',
   '/manifest.json', '/icon-192.png', '/icon-512.png',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
