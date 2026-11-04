@@ -1874,6 +1874,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <link rel="stylesheet" href="visual-v44.css">
 <link rel="stylesheet" href="visual-v45.css">
 <link rel="stylesheet" href="pessoal-v46.css">
+<link rel="stylesheet" href="widgets-v47.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1942,6 +1943,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <script src="/proximos-passos.js"></script>
 <script src="/offline-drafts.js"></script>
 <script src="pessoal-v46.js"></script>
+<script src="widgets-v47.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -2075,7 +2077,7 @@ const V12_FRASES=[
 ];
 const V13_REFERENCIAS=['Salmos 23:1','Provérbios 3:5','Filipenses 4:13','Isaías 41:10','Salmos 46:1','Mateus 6:34','Romanos 12:12','Jeremias 29:11','Salmos 121:2','Josué 1:9','1 Coríntios 13:4','Salmos 37:5','Provérbios 16:3','Mateus 11:28'];
 function lerInspiracao(){try{return JSON.parse(localStorage.getItem('me-inspiracao-v12')||'{}')}catch(e){return {}}}
-function salvarInspiracao(d){localStorage.setItem('me-inspiracao-v12',JSON.stringify(d));renderSidebar()}
+function salvarInspiracao(d){localStorage.setItem('me-inspiracao-v12',JSON.stringify(d));renderSidebar();w47AgendarPreferencias()}
 function diaInspiracao(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function referenciaDoDia(){const d=new Date();const n=Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000);return V13_REFERENCIAS[((n%V13_REFERENCIAS.length)+V13_REFERENCIAS.length)%V13_REFERENCIAS.length]}
 async function buscarTextoBiblico(referencia){
@@ -5384,20 +5386,21 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#271c27':'#f6f1ee';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});}
+function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
 // V35: um so acabamento de vidro, sem opcoes visuais concorrentes.
 const V25_ESTILOS=['liquidpremium'];
 function escolherDesignV25(){localStorage.setItem('me-design-v25','liquidpremium');document.documentElement.dataset.designV25='liquidpremium';if(telaAtual==='configuracoes')renderTela();}
 document.documentElement.dataset.designV25='liquidpremium';
 try{localStorage.setItem('me-design-v25','liquidpremium');}catch(e){}
-function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
+function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);w47AgendarPreferencias();if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
 consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
 
 function configuracoesHTML(){
   const abas = [
     {id:"tema", nome:"Tema / Marca"},
+    {id:"widgets", nome:"Widgets iPhone"},
     {id:"checklists", nome:"Modelos de checklist"},
     {id:"usuarios", nome:"Usuários"},
     {id:"backup", nome:"Backup"},
@@ -5406,7 +5409,8 @@ function configuracoesHTML(){
     {id:"sincronizacao", nome:"Sincronização"},
   ];
   let corpo = "";
-  if(abaConfigAtiva === "tema") corpo = configTemaHTML();
+  if(abaConfigAtiva === "widgets") corpo = widgetsIPhoneHTML();
+  else if(abaConfigAtiva === "tema") corpo = configTemaHTML();
   else if(abaConfigAtiva === "checklists") corpo = configChecklistsHTML();
   else if(abaConfigAtiva === "usuarios") corpo = configUsuariosHTML();
   else if(abaConfigAtiva === "backup") corpo = configBackupHTML();
@@ -6846,6 +6850,7 @@ function renderTela(){
       </div>`;
   }
   v45AplicarVisual();
+  w47DepoisRender();
   atualizarCronometros();
   salvarEstado();
 }
@@ -7196,6 +7201,7 @@ async function entrarNoApp(){
   await carregarAtivosSupabase();
   await carregarHabitosSupabase();
   await v46Carregar();
+  await w47Carregar();
   await carregarMetasPessoaisSupabase();
   await carregarContasPessoaisSupabase();
   await carregarComprasSupabase();
@@ -7219,6 +7225,7 @@ async function entrarNoApp(){
   await sincronizarRascunhos();
   await salvarCopiaChecklist();
   restaurarTelaAtualSessao();
+  w47Destino();
   renderSidebar();
   renderTela();
   setTimeout(verificarPendenciasAtrasadas, 2200);
@@ -7240,6 +7247,7 @@ function restaurarTelaAtualSessao(){
 async function sairDaConta(){
   if(Object.keys(lerRascunhos()).length){alert('Existem respostas aguardando sincronização neste aparelho. Sincronize antes de sair da conta.');return;}
   rascunhoUsuario=null;
+  clearTimeout(W47_TIMER);W47_CONEXOES=[];W47_USER=null;W47_LOADED=false;W47_TOKEN_TEMP='';W47_TOKEN_ID='';
   V46_ITENS=[];V46_USUARIO=null;V46_STATUS='Entre na sua conta para acessar os registros.';HABITOS=[];V46_HABITOS_OK=false;
   await supa.auth.signOut();
   document.getElementById('appRoot').classList.remove('ativo');
