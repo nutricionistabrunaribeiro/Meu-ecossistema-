@@ -6710,6 +6710,7 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
+ <button class="pv-launch" onclick="pvOpen()"><span><strong>Meu Plano de Vida</strong><small>Novembro e dezembro de 2026 · planejamento de 2027</small></span><span aria-hidden="true">→</span></button>
  ${v44ResumoCards()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
