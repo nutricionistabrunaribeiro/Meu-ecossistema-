@@ -657,6 +657,28 @@
   .pixel-produtivo{background:#C9A227;}
   .pixel-otimo{background:#5C2A38;}
 
+
+/* V42: Ano em Pixels compacto, preservando a lógica de marcação existente */
+.pixel-ano-lista{display:flex;flex-direction:column;gap:8px;width:100%;max-width:100%;}
+.pixel-mes-linha{display:grid;grid-template-columns:90px minmax(0,1fr);align-items:center;gap:8px;min-width:0;}
+.pixel-mes-linha .pixel-mes-nome{margin:0;font-size:11px;text-transform:none;letter-spacing:0;}
+.pixel-mes-linha .pixel-grid{display:grid;grid-template-columns:repeat(31,minmax(0,1fr));gap:2px;max-width:none;min-width:0;width:100%;}
+.pixel-mes-linha .pixel-dia{min-width:0;aspect-ratio:1;border-radius:3px;font-size:0;padding:0;border:0;}
+.pixel-mes-linha .pixel-dia:focus-visible{outline:2px solid var(--cor-primaria);outline-offset:1px;}
+.pixel-mes-linha .pixel-dia.vazio{visibility:hidden;pointer-events:none;}
+.pixel-ano-cabecalho{display:grid;grid-template-columns:90px minmax(0,1fr);gap:8px;margin-bottom:4px;}
+.pixel-ano-dias{display:grid;grid-template-columns:repeat(31,minmax(0,1fr));gap:2px;}
+.pixel-ano-dias span{font-size:8px;text-align:center;color:var(--cor-texto-suave);}
+@media(max-width:550px){.pixel-mes-linha,.pixel-ano-cabecalho{grid-template-columns:66px minmax(0,1fr);gap:5px}.pixel-mes-linha .pixel-mes-nome{font-size:9px}.pixel-mes-linha .pixel-grid,.pixel-ano-dias{gap:1px}.pixel-mes-linha .pixel-dia{border-radius:2px}.pixel-ano-dias span{font-size:7px}}
+/* V42: ajuste específico do editor de horas no iPhone */
+.system-modal:has(#horaEditInicio){width:min(480px,calc(100vw - 28px))!important;max-width:calc(100vw - 28px)!important;padding:clamp(14px,4vw,22px)!important;box-sizing:border-box;overflow-x:hidden;}
+.system-modal:has(#horaEditInicio) .form-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important;}
+.system-modal:has(#horaEditInicio) .form-field{min-width:0;max-width:100%;}
+.system-modal:has(#horaEditInicio) input[type=datetime-local]{display:block;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box;font-size:16px!important;padding:10px 8px!important;-webkit-appearance:none;appearance:none;}
+.system-modal:has(#horaEditInicio) textarea{width:100%;max-width:100%;box-sizing:border-box;}
+.system-modal:has(#horaEditInicio) .system-modal-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.system-modal:has(#horaEditInicio) .system-modal-actions button{min-width:0;white-space:normal;padding:11px 6px;}
+
   /* Jornada Bíblica */
   .biblia-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#D96825,#E9894E 58%,#72BD88 145%);color:#fff;border-radius:22px;padding:24px;margin-bottom:16px;box-shadow:0 16px 38px rgba(227,98,22,.17)}
   .biblia-hero:after{content:"";position:absolute;width:190px;height:190px;border:34px solid rgba(255,255,255,.09);border-radius:50%;right:-78px;top:-105px}.biblia-hero>*{position:relative;z-index:1}.biblia-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.biblia-hero h2{font-size:25px;margin:5px 0}.biblia-hero p{font-size:12px;opacity:.86;max-width:580px;line-height:1.5}.biblia-percent{font-family:'Fraunces',serif;font-size:35px;line-height:1}.biblia-bar{height:9px;background:rgba(255,255,255,.24);border-radius:10px;overflow:hidden;margin:20px 0 10px}.biblia-bar>div{height:100%;background:#fff;border-radius:10px}.biblia-resumo{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11.5px}.biblia-continuar{margin-top:16px;background:#fff;color:#C95318;padding:10px 14px;border-radius:11px;font-weight:800;font-size:11.5px}.biblia-tabs{display:flex;gap:8px;margin:0 0 14px;overflow:auto}.biblia-tabs button{white-space:nowrap;border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto);padding:9px 13px;border-radius:999px;font-size:11.5px}.biblia-tabs button.active{background:var(--cor-primaria);border-color:var(--cor-primaria);color:#fff}.biblia-livros{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.biblia-livro{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:15px;padding:14px;text-align:left;color:var(--cor-texto);transition:.18s}.biblia-livro:hover{transform:translateY(-1px);box-shadow:var(--sombra-hover)}.biblia-livro.concluido{border-color:var(--cor-acento);background:color-mix(in srgb,var(--cor-acento) 9%,var(--cor-superficie))}.biblia-livro-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.biblia-livro strong{font-size:13px}.biblia-livro small{font-size:10px;color:var(--cor-texto-suave)}.biblia-mini-bar{height:5px;background:var(--cor-borda);border-radius:5px;overflow:hidden;margin-top:10px}.biblia-mini-bar div{height:100%;background:linear-gradient(90deg,var(--cor-primaria),var(--cor-acento))}.biblia-capitulos{display:grid;grid-template-columns:repeat(auto-fill,minmax(43px,1fr));gap:8px;margin-top:17px}.biblia-capitulo{min-height:43px;border:1px solid var(--cor-borda);border-radius:11px;color:var(--cor-texto);font-weight:700;background:var(--cor-fundo)}.biblia-capitulo.lido{background:var(--cor-primaria);border-color:var(--cor-primaria);color:#fff}.biblia-modal-progresso{font-size:11px;color:var(--cor-texto-suave);margin-top:4px}
@@ -1870,11 +1892,6 @@ html[data-paleta-v04][data-tema-interface="escuro"] .v38-overlay .v37-posta-roda
 body.v38-sem-rolagem{overflow:hidden!important}
 @media(max-height:600px){.v38-overlay .v38-full-card{width:min(calc(100vw - 20px),calc((100dvh - 35px)*.8),640px)!important}}
 </style>
-<link rel="stylesheet" href="na-presenca.css">
-<link rel="stylesheet" href="visual-v44.css">
-<link rel="stylesheet" href="visual-v45.css">
-<link rel="stylesheet" href="pessoal-v46.css">
-<link rel="stylesheet" href="widgets-v47.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1937,13 +1954,8 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <div class="fab-wrap" id="fabWrap"><div class="fab-menu"><button onclick="acaoRapida('agenda')">📅 Novo compromisso</button><button onclick="acaoRapida('checklist')">✓ Iniciar checklist</button><button onclick="acaoRapida('entrega')">📦 Nova entrega</button><button onclick="acaoRapida('mercado')">🛒 Item de mercado</button></div><button class="fab-main" onclick="document.getElementById('fabWrap').classList.toggle('aberto')" aria-label="Criar novo">+</button></div>
 </div>
 
-<script src="visual-v45.js"></script>
-<script src="visual-v44.js"></script>
-<script src="na-presenca.js"></script>
 <script src="/proximos-passos.js"></script>
 <script src="/offline-drafts.js"></script>
-<script src="pessoal-v46.js"></script>
-<script src="widgets-v47.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -1977,9 +1989,6 @@ const MODULOS = {
       {id:"projetos", nome:"Projetos"},
       {id:"minha_clareza", nome:"Minha Clareza"},
       {id:"habitos", nome:"Hábitos"},
-      {id:"o_que_me_move", nome:"O que me move"},
-      {id:"diario_pessoal", nome:"Diário pessoal"},
-      {id:"humor_pessoal", nome:"Meu humor"},
       {id:"ciclo", nome:"Ciclo Menstrual"},
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
       {id:"ano_pixels", nome:"Meu Ano em Pixels"},
@@ -1988,13 +1997,13 @@ const MODULOS = {
       {id:"compras", nome:"Compras"},
       {id:"lista_dia", nome:"Lista do Dia"},
       {id:"rotina_casa", nome:"Rotina da Casa"},
+      {id:"jornada_biblica", nome:"Jornada Bíblica"},
       {id:"mercado", nome:"Lista de Mercado"},
       {id:"estudos", nome:"Estudos"},
     ]},
   ]
 };
 
-MODULOS.presenca=[{grupo:'Na Presença',itens:[{id:'na_presenca',nome:'Meu momento com Deus'},{id:'jornada_biblica',nome:'Jornada Bíblica'},{id:'painel_oracao',nome:'Painel de oração'},{id:'diario_deus',nome:'Diário e gratidão'},{id:'versiculos_guardados',nome:'Versículos para guardar'},{id:'propositos_oracao',nome:'Propósitos de oração'}]}];
 const TAB_PRINCIPAL = {
   trabalho: ["agenda","clientes","visitas","entregas"],
   pessoal: ["habitos","metas","contas","ideias_pessoais"]
@@ -2002,7 +2011,7 @@ const TAB_PRINCIPAL = {
 
 let espacoAtual = "geral";
 let telaAtual = "visao_geral";
-const ICONES_MODULO={o_que_me_move:'♡',diario_pessoal:'✍',humor_pessoal:'☺',na_presenca:'✧',painel_oracao:'♡',diario_deus:'▤',versiculos_guardados:'✝',propositos_oracao:'◷',visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
+const ICONES_MODULO={visao_geral:'◈',sono:'☾',minha_clareza:'✧',dashboard:'⌂',agenda:'▦',clientes:'♙',visitas:'✓',pendencias:'⚑',entregas:'▣',controle_horas:'◴',obrigacoes:'◷',planejamento:'◉',radar_recorrencias:'▥',lideranca:'♜',marketing:'◇',comercial:'↗',financeiro:'$',projetos:'◫',ativos:'◆',produtos_rotulagem:'▤',rotas_custos:'⌁',configuracoes:'⚙',habitos:'○',ciclo:'◌',ideias_pessoais:'✦',ano_pixels:'▦',metas:'◎',contas:'$',compras:'▧',lista_dia:'✓',rotina_casa:'⌂',jornada_biblica:'✝',mercado:'🛒',estudos:'◒'};
 function contadoresMenu(){
   return {
     pendencias:(PENDENCIAS_DB||[]).filter(p=>p.origem==='manual'&&p.status!=='concluida').length,
@@ -2044,7 +2053,6 @@ function renderSidebar(){
     <div class="space-switch">
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
       <button class="${espacoAtual==='pessoal'?'active':''}" onclick="trocarEspaco('pessoal')">Pessoal</button>
-      <button class="np-space ${espacoAtual==='presenca'?'active':''}" onclick="trocarEspaco('presenca')">✧ Na Presença</button>
     </div>
     <nav>`;
   (grupos||[]).forEach(g=>{
@@ -2077,40 +2085,54 @@ const V12_FRASES=[
 ];
 const V13_REFERENCIAS=['Salmos 23:1','Provérbios 3:5','Filipenses 4:13','Isaías 41:10','Salmos 46:1','Mateus 6:34','Romanos 12:12','Jeremias 29:11','Salmos 121:2','Josué 1:9','1 Coríntios 13:4','Salmos 37:5','Provérbios 16:3','Mateus 11:28'];
 function lerInspiracao(){try{return JSON.parse(localStorage.getItem('me-inspiracao-v12')||'{}')}catch(e){return {}}}
-function salvarInspiracao(d){localStorage.setItem('me-inspiracao-v12',JSON.stringify(d));renderSidebar();w47AgendarPreferencias()}
+function salvarInspiracao(d){localStorage.setItem('me-inspiracao-v12',JSON.stringify(d));renderSidebar()}
 function diaInspiracao(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function referenciaDoDia(){const d=new Date();const n=Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000);return V13_REFERENCIAS[((n%V13_REFERENCIAS.length)+V13_REFERENCIAS.length)%V13_REFERENCIAS.length]}
 async function buscarTextoBiblico(referencia){
- const r=await fetch('https://bible-api.com/'+encodeURIComponent(referencia)+'?translation=almeida',{headers:{Accept:'application/json'}});
- if(!r.ok)throw new Error('Passagem não encontrada');
- const d=await r.json();if(!d.text||!d.reference)throw new Error('Passagem não encontrada');
- return {versiculo:d.text.trim().slice(0,1200),referencia:d.reference,traducao:'Almeida (Bible API)'};
+ const url='https://bible-api.com/'+encodeURIComponent(referencia)+'?translation=almeida';
+ const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12000);
+ try{
+  const r=await fetch(url,{headers:{Accept:'application/json'},signal:controller.signal,cache:'no-store'});
+  if(!r.ok)throw new Error('Serviço bíblico indisponível (HTTP '+r.status+').');
+  const d=await r.json();
+  if(!d.text||!d.reference)throw new Error('A API não retornou o texto da passagem.');
+  return {versiculo:d.text.trim().slice(0,1200),referencia:d.reference,traducao:'Almeida (Bible API)'};
+ }finally{clearTimeout(timer)}
 }
 let v13BuscandoDia=false;
 function inspiracaoSidebarHTML(){
  const dados=lerInspiracao(),dia=diaInspiracao(),idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
  const frase=dados.frase||V12_FRASES[((idx%V12_FRASES.length)+V12_FRASES.length)%V12_FRASES.length];
  const diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
- if(diario&&!valido&&!v13BuscandoDia){setTimeout(atualizarVersiculoDoDia,100)}
- const verso=valido?dados.versiculo:'';
- const ref=valido?dados.referencia:referenciaDoDia();
+ if(diario&&!valido&&!dados.erroBusca&&!v13BuscandoDia){setTimeout(atualizarVersiculoDoDia,100)}
+ const verso=valido?dados.versiculo:(diario?dados.versiculo:'');
+ const ref=valido?dados.referencia:(diario&&dados.versiculo?dados.referencia:referenciaDoDia());
  const traducao=diario?'Almeida (Bible API)':(dados.traducao||'Tradução não informada');
  return `<div class="v12-insp-title">✦ Pausa para inspirar</div>
  <div class="v12-insp-label">${diario?'Versículo do dia':'Versículo escolhido'}</div>
  <p class="v12-insp-verse">${textoHTML(verso|| (diario?'Buscando passagem do dia…':'Escolha uma passagem para se inspirar.'))}</p>
- ${ref?`<small class="v12-insp-ref">${textoHTML(ref)} · ${textoHTML(traducao)}</small>`:''}
+ ${ref?`<small class="v12-insp-ref">${textoHTML(ref)} · ${textoHTML(traducao)}${diario&&!valido?' · Última passagem disponível':''}</small>`:''}
+ ${diario&&dados.erroBusca?`<small style="display:block;margin:8px 0;color:var(--cor-texto-suave)">Não foi possível atualizar: ${textoHTML(dados.erroBusca)}</small><button type="button" class="v12-insp-edit" onclick="atualizarVersiculoDoDia()">↻ Tentar novamente</button>`:''}
  <div class="v12-insp-label">Mensagem do dia</div><p class="v12-insp-frase">${textoHTML(frase)}</p>
  <button class="v12-insp-edit" onclick="editarInspiracao()">✎ Escolher versículo</button>`;
 }
 async function atualizarVersiculoDoDia(){
  if(v13BuscandoDia)return;v13BuscandoDia=true;
  const dia=diaInspiracao(),referencia=referenciaDoDia();
- try{const dados=lerInspiracao();if(dados.modo!=='diario'||dados.dia===dia)return;
- const passagem=await buscarTextoBiblico(referencia);
- const atual=lerInspiracao();if(atual.modo==='diario'){salvarInspiracao({...atual,...passagem,dia})}
- }catch(e){const atual=lerInspiracao();if(atual.modo==='diario'){
- salvarInspiracao({...atual,versiculo:'A passagem de hoje estará disponível quando houver conexão com a internet.',referencia,dia,traducao:'Almeida (Bible API)'});
- }}finally{v13BuscandoDia=false}
+ try{
+  const dados=lerInspiracao();if(dados.modo!=='diario'||(dados.dia===dia&&dados.versiculo&&!dados.erroBusca))return;
+  const passagem=await buscarTextoBiblico(referencia);
+  const atual=lerInspiracao();if(atual.modo==='diario')salvarInspiracao({...atual,...passagem,dia,erroBusca:''});
+ }catch(e){
+  const atual=lerInspiracao();
+  if(atual.modo==='diario'){
+   // Nunca substituir texto bíblico real por uma mensagem de erro, nem rotulá-la como Almeida.
+   const mensagem=e?.name==='AbortError'?'A consulta demorou demais.':(e?.message||'Falha no serviço bíblico.');
+   const textoAnterior=atual.versiculo||'';
+   const placeholder=textoAnterior.startsWith('A passagem de hoje estará disponível')?'':textoAnterior;
+   salvarInspiracao({...atual,versiculo:placeholder,erroBusca:mensagem,dia:placeholder?atual.dia:dia});
+  }
+ }finally{v13BuscandoDia=false}
 }
 function editarInspiracao(){
  const d=lerInspiracao();
@@ -2146,7 +2168,7 @@ function abrirDashboardGlobal(){espacoAtual="geral";document.body.setAttribute("
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
-  telaAtual = esp === 'trabalho' ? 'agenda' : esp === 'presenca' ? 'na_presenca' : 'menu_pessoal';
+  telaAtual = esp === 'trabalho' ? 'agenda' : 'menu_pessoal';
   salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -2202,7 +2224,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
+const NOMES_TELA = {
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -4543,7 +4565,7 @@ function cardProjetoTemporarioHTML(dataReferencia=null){
   const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length,total=itens.length,perc=total?Math.round(feitos/total*100):0,missao=missaoAtualProjeto(p,hoje),dias=diasCalendarioEntre(hoje,'2026-10-07');
   return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Projeto pessoal temporário</div><h2>Chegar leve aos 38</h2><div class="projeto-pessoal-contagem">${dias} ${dias===1?'dia':'dias'} para a folga</div><div class="projeto-pessoal-barra"><div style="width:${perc}%"></div></div><div class="projeto-pessoal-resumo"><span>${feitos} de ${total} etapas concluídas</span><strong>${perc}% concluído</strong></div><div class="projeto-pessoal-missao"><small>Missão de hoje</small><strong>${missao?textoHTML(missao.t):'Tudo concluído. Agora é só manter leve!'}</strong>${missao?`<div style="font-size:10px;opacity:.75;margin-top:3px">${textoHTML(missao.grupo)} · ${periodoItemProjeto(missao)}</div>`:''}</div><button class="projeto-pessoal-abrir" onclick="abrirProjetoPessoal('${p.id}')">Abrir projeto →</button></section>`;
 }
-function dashboardPessoalHTML(){return `${v44ResumoCards()}${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
+function dashboardPessoalHTML(){return `${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}${cardJornadaBiblicaHTML(true)}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
 
 function projetosHTML(){
   if(projetoSelecionadoId){
@@ -4881,9 +4903,9 @@ async function carregarHabitosSupabase(){
   if(error){ dispararAutomacao('Erro ao carregar hábitos', error.message); return; }
   const segunda = REF_INICIO_SEMANA;
   const datasSemana = Array.from({length:7}, (_,i)=> formatoISO(addDias(segunda,i)));
-  const anoHabitosV04=new Date().getFullYear();const {data:registros,error:erroRegistros}=await v46CarregarHistoricoHabitos(habitosRows||[]);if(erroRegistros){dispararAutomacao('Não foi possível atualizar o histórico dos hábitos','Tente novamente em Atualizar hábitos.');return;}
+  const anoHabitosV04=new Date().getFullYear();const {data:registros,error:erroRegistros}=await supa.from('habito_registros').select('*').gte('data',`${anoHabitosV04}-01-01`).lte('data',`${anoHabitosV04}-12-31`);if(erroRegistros)console.warn('Registros anuais indisponíveis',erroRegistros);
   HABITOS = (habitosRows||[]).map(h=>({
-    id: h.id, nome: h.nome, registrosHistorico:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido).map(r=>r.data), registrosAno:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido&&String(r.data).startsWith(String(anoHabitosV04))).map(r=>r.data),
+    id: h.id, nome: h.nome, registrosAno:(registros||[]).filter(r=>r.habito_id===h.id&&r.concluido).map(r=>r.data),
     semana: datasSemana.map(d => (registros||[]).some(r=>r.habito_id===h.id && r.data===d && r.concluido))
   }));
 }
@@ -4895,9 +4917,8 @@ async function registrarHabitoNaData(id,dataISO,forcar=null){
  const concluido=forcar===null?!existente?.concluido:!!forcar;
  const resposta=existente?await supa.from('habito_registros').update({concluido}).eq('id',existente.id):await supa.from('habito_registros').insert({habito_id:id,data:dataISO,concluido});
  if(resposta.error){dispararAutomacao('Erro ao salvar hábito',resposta.error.message);return false;}
- h.registrosHistorico=[...new Set([...(h.registrosHistorico||[]),...(h.registrosAno||[])])].filter(d=>d!==dataISO);if(concluido)h.registrosHistorico.push(dataISO);
- h.registrosAno=h.registrosHistorico.filter(d=>d.startsWith(String(new Date().getFullYear())));
- h.semana=Array.from({length:7},(_,i)=>h.registrosHistorico.includes(formatoISO(addDias(REF_INICIO_SEMANA,i))));renderTela();return true;
+ h.registrosAno=(h.registrosAno||[]).filter(d=>d!==dataISO);if(concluido)h.registrosAno.push(dataISO);
+ h.semana=Array.from({length:7},(_,i)=>h.registrosAno.includes(formatoISO(addDias(REF_INICIO_SEMANA,i))));renderTela();return true;
 }
 async function alternarHabitoDia(id,idx){await registrarHabitoNaData(id,formatoISO(addDias(REF_INICIO_SEMANA,idx)));}
 let V27_HISTORICO=null;
@@ -4964,19 +4985,18 @@ async function novoHabito(){
   dispararAutomacao('Hábito criado', `"${nome.trim()}" adicionado ao seu acompanhamento semanal.`);
   renderTela();
 }
-function habitosIndividuaisV46HTML(){
+function habitosHTML(){
   return `
     <div style="margin-bottom:14px;"><button class="btn-primario" onclick="novoHabito()">+ Novo hábito</button></div>
     ${HABITOS.map(h=>`
     <div class="habito-card">
       <div class="habito-topo">
-        <div class="habito-nome"><span class="v44-habit-icon" aria-hidden="true">🌱</span>${textoHTML(h.nome)}</div><button class="btn-secundario" onclick="editarHabitoRetroativo('${h.id}')">✎ Editar histórico</button>
-        <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias <span class="v44-habit-trail" aria-hidden="true">${h.semana.filter(Boolean).length===7?"✦":"♡"}</span></div>
+        <div class="habito-nome">${textoHTML(h.nome)}</div><button class="btn-secundario" onclick="editarHabitoRetroativo('${h.id}')">✎ Editar histórico</button>
+        <div class="peq" style="font-size:11px;color:var(--cor-texto-suave);">${h.semana.filter(Boolean).length}/7 dias</div>
       </div>
       <div class="habito-semana">
         ${h.semana.map((f,idx)=>`<div class="habito-dia ${f?'feito':''}" onclick="alternarHabitoDia('${h.id}',${idx})">${DIAS_CURTO[idx]}</div>`).join('')}
       </div>
-      ${v46ConstanciaHTML(h)}
       ${pixelsHabitoV04(h)}
     </div>
   `).join('')}`;
@@ -5011,7 +5031,7 @@ async function atualizarProgressoMeta(id){
   await supa.from('metas_pessoais').update({progresso:m.progresso}).eq('id', id);
 }
 function metasHTML(){
-  return `${v46Tabs('metas')}<div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaMetaPessoal()">+ Nova meta</button></div>` +
+  return `<div style="margin-bottom:14px;"><button class="btn-primario" onclick="novaMetaPessoal()">+ Nova meta</button></div>` +
   METAS_PESSOAIS.map(m=>`
     <div class="meta-pessoal" onclick="atualizarProgressoMeta('${m.id}')" style="cursor:pointer;">
       <div class="meta-pessoal-topo"><span class="meta-pessoal-titulo">${m.titulo}</span><span class="meta-pessoal-prazo">${m.prazo}</span></div>
@@ -5299,16 +5319,14 @@ function jornadaBiblicaHTML(){const livros=LIVROS_BIBLIA.filter(l=>filtroBiblia=
 let CONTROLE_HORAS=[],mesControleHoras=formatoISO(new Date()).slice(0,7);
 const ROTULOS_HORAS={visita:'Visita técnica',administrativo:'Administrativo',treinamento:'Treinamento',auditoria:'Auditoria',deslocamento:'Deslocamento'};
 const ROTULOS_CARTEIRA={bruna_ribeiro:'Bruna Ribeiro',saber_nutrir:'Saber Nutrir',pessoal:'Pessoal'};
-async function carregarControleHorasSupabase(){const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').select('*').eq('user_id',user.id).order('inicio',{ascending:false});if(error){dispararAutomacao('Erro ao carregar Controle de Horas',error.message);return false;}CONTROLE_HORAS=data||[];return true;}
+async function carregarControleHorasSupabase(){const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').select('*').eq('user_id',user.id).order('inicio',{ascending:false});if(error){dispararAutomacao('Erro ao carregar Controle de Horas',error.message);return;}CONTROLE_HORAS=data||[];}
 function atividadeHorasAtiva(){return CONTROLE_HORAS.find(x=>!x.fim)||null;}
 function duracaoHorasMs(registro,agora=Date.now()){return Math.max(0,(registro.fim?new Date(registro.fim).getTime():agora)-new Date(registro.inicio).getTime());}
 function formatarDuracao(ms,comSegundos=false){const total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}${comSegundos?':'+String(s).padStart(2,'0'):''}`;}
 function clienteRegistroHoras(r){return CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'';}
 function atualizarCronometros(){const ativo=atividadeHorasAtiva();if(!ativo)return;document.querySelectorAll('[data-cronometro]').forEach(el=>el.textContent=formatarDuracao(duracaoHorasMs(ativo),true));}
 function controleAtivoHTML({dashboard=false}={}){const a=atividadeHorasAtiva();if(!a)return `<div class="card ${dashboard?'horas-dashboard':''}" style="border-top:4px solid var(--cor-primaria)"><h3>Controle de horas <button onclick="irPara('controle_horas')">ver histórico</button></h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="pend-desc">Nenhuma atividade em andamento.</div></div><button class="btn-primario" onclick="abrirFormularioHoras()">▶ Iniciar atividade</button></div></div>`;const cliente=clienteRegistroHoras(a);return `<section class="horas-ativo ${dashboard?'horas-dashboard':''}"><div class="horas-ativo-top"><div><small>${dashboard?'Atividade em andamento':'Cronômetro ativo'}</small><h2>${textoHTML(ROTULOS_HORAS[a.tipo]||a.tipo)}</h2><div class="horas-ativo-meta">${cliente?textoHTML(cliente)+' · ':''}${textoHTML(ROTULOS_CARTEIRA[a.carteira]||a.carteira)} · iniciada às ${new Date(a.inicio).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="horas-cronometro" data-cronometro>${formatarDuracao(duracaoHorasMs(a),true)}</div></div><div class="horas-ativo-acoes"><button class="horas-finalizar" onclick="finalizarControleHoras('${a.id}')">■ Finalizar</button>${dashboard?`<button class="horas-abrir" onclick="irPara('controle_horas')">Abrir controle</button>`:''}</div></section>`;}
-function formularioHorasHTML(){return `<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37)).map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`;}
-function iniciarAtividadeHTML(){if(W51_HOURS_LOADING)return '<section class="card" role="status"><h3>Iniciar atividade</h3><p>Carregando clientes e conferindo o cronômetro…</p></section>';if(W51_HOURS_ERROR)return '<section class="card" role="alert"><h3>Não foi possível conferir o cronômetro</h3><p>Verifique sua conexão e tente novamente antes de iniciar uma atividade.</p><button class="btn-primario" onclick="location.reload()">Tentar novamente</button></section>';if(atividadeHorasAtiva())return controleAtivoHTML()+'<p>Já existe uma atividade em andamento. Finalize o registro atual antes de iniciar outro.</p>';return '<section class="card w51-inicio">'+formularioHorasHTML().replaceAll('onclick="fecharModalSistema()"','onclick="irPara(\'controle_horas\')"')+'</section>';}
-function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(formularioHorasHTML());}
+function abrirFormularioHoras(){if(atividadeHorasAtiva()){dispararAutomacao('Atividade já em andamento','Finalize o cronômetro atual antes de iniciar outro.');return;}abrirModalSistema(`<div class="system-modal-top"><div><h3>Iniciar atividade</h3><p>O horário inicial será registrado automaticamente.</p></div><button onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field"><label>Tipo de atividade</label><select id="horaTipo" onchange="document.getElementById('horaTrajetoCampos').style.display=this.value==='deslocamento'?'block':'none'"><option value="visita">Visita técnica</option><option value="administrativo">Administrativo</option><option value="treinamento">Treinamento</option><option value="auditoria">Auditoria</option><option value="deslocamento">Deslocamento</option></select></div><div class="form-field full" id="horaTrajetoCampos" style="display:none"><label>Origem</label><input id="horaOrigem" maxlength="160" placeholder="Local de partida"><label style="margin-top:10px">Destino</label><input id="horaDestino" maxlength="160" placeholder="Local de chegada"></div><div class="form-field"><label>Carteira</label><select id="horaCarteira"><option value="bruna_ribeiro">Bruna Ribeiro</option><option value="saber_nutrir">Saber Nutrir</option><option value="pessoal">Pessoal</option></select></div><div class="form-field full"><label>Cliente (opcional)</label><select id="horaCliente"><option value="">Sem cliente</option>${ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37)).map(c=>`<option value="${c.id}">${textoHTML(c.nome)}</option>`).join('')}</select></div><div class="form-field full"><label>Observação (opcional)</label><textarea id="horaObservacao" rows="3" placeholder="O que será realizado?"></textarea></div></div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="iniciarControleHoras()">▶ Iniciar agora</button></div>`);}
 async function iniciarControleHoras(){const tipo=document.getElementById('horaTipo')?.value,carteira=document.getElementById('horaCarteira')?.value,cliente_id=document.getElementById('horaCliente')?.value||null,observacao=document.getElementById('horaObservacao')?.value.trim()||null;if(tipo==='deslocamento'&&(!document.getElementById('horaOrigem')?.value.trim()||!document.getElementById('horaDestino')?.value.trim())){alert('Informe origem e destino.');return;}const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('controle_horas').insert({user_id:user.id,tipo,carteira,cliente_id,observacao,...(tipo==='deslocamento'?{origem_tipo:'outro',origem_texto:document.getElementById('horaOrigem').value.trim(),destino_tipo:'outro',destino_texto:document.getElementById('horaDestino').value.trim()}:{}),inicio:new Date().toISOString()}).select().single();if(error){dispararAutomacao('Erro ao iniciar atividade',error.message);return;}CONTROLE_HORAS.unshift(data);fecharModalSistema();dispararAutomacao('Cronômetro iniciado',ROTULOS_HORAS[tipo]);renderSidebar();renderTela();}
 async function finalizarControleHoras(id){const r=CONTROLE_HORAS.find(x=>x.id===id);if(!r||r.fim)return;if(!confirm(`Finalizar ${ROTULOS_HORAS[r.tipo]||'atividade'} agora?`))return;const fim=new Date().toISOString();const {error}=await supa.from('controle_horas').update({fim,atualizado_em:fim}).eq('id',id);if(error){dispararAutomacao('Erro ao finalizar atividade',error.message);return;}r.fim=fim;r.atualizado_em=fim;dispararAutomacao('Atividade finalizada',`Duração: ${formatarDuracao(duracaoHorasMs(r))}`);renderSidebar();renderTela();}
 function dataHoraLocalInput(iso){if(!iso)return '';const d=new Date(iso),off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
@@ -5388,21 +5406,20 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#271c27':'#f6f1ee';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
+function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
 // V35: um so acabamento de vidro, sem opcoes visuais concorrentes.
 const V25_ESTILOS=['liquidpremium'];
 function escolherDesignV25(){localStorage.setItem('me-design-v25','liquidpremium');document.documentElement.dataset.designV25='liquidpremium';if(telaAtual==='configuracoes')renderTela();}
 document.documentElement.dataset.designV25='liquidpremium';
 try{localStorage.setItem('me-design-v25','liquidpremium');}catch(e){}
-function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);w47AgendarPreferencias();if(telaAtual==='configuracoes')renderTela();}
+function definirTemaInterface(escolha){localStorage.setItem('me-tema-interface',escolha);aplicarTemaInterface(escolha);if(telaAtual==='configuracoes')renderTela();}
 function alternarTemaRapido(){definirTemaInterface(document.documentElement.dataset.temaInterface==='escuro'?'claro':'escuro');}
 consultaTemaSistema.addEventListener?.('change',()=>{if(preferenciaTemaInterface()==='automatico')aplicarTemaInterface('automatico');});
 
 function configuracoesHTML(){
   const abas = [
     {id:"tema", nome:"Tema / Marca"},
-    {id:"widgets", nome:"Widgets iPhone"},
     {id:"checklists", nome:"Modelos de checklist"},
     {id:"usuarios", nome:"Usuários"},
     {id:"backup", nome:"Backup"},
@@ -5411,8 +5428,7 @@ function configuracoesHTML(){
     {id:"sincronizacao", nome:"Sincronização"},
   ];
   let corpo = "";
-  if(abaConfigAtiva === "widgets") corpo = widgetsIPhoneHTML();
-  else if(abaConfigAtiva === "tema") corpo = configTemaHTML();
+  if(abaConfigAtiva === "tema") corpo = configTemaHTML();
   else if(abaConfigAtiva === "checklists") corpo = configChecklistsHTML();
   else if(abaConfigAtiva === "usuarios") corpo = configUsuariosHTML();
   else if(abaConfigAtiva === "backup") corpo = configBackupHTML();
@@ -5829,27 +5845,25 @@ async function marcarPixelDia(dataISO){
 
 function anoPixelsHTML(){
   const ano = HOJE_REAL.getFullYear();
-  let legenda = `<div class="pixel-legenda">` +
+  const legenda = `<div class="pixel-legenda">` +
     HUMORES_PIXEL.map(h=>`<div class="legenda-item"><span class="legenda-dot ${h.classe}"></span>${h.nome}</div>`).join('') +
     `<div class="legenda-item"><span class="legenda-dot" style="background:var(--cor-borda);"></span>Sem registro</div></div>`;
-
+  const cabecalho = `<div class="pixel-ano-cabecalho"><span></span><div class="pixel-ano-dias">${Array.from({length:31},(_,i)=>`<span>${[1,5,10,15,20,25,31].includes(i+1)?i+1:''}</span>`).join('')}</div></div>`;
   let meses = '';
   for(let m=0; m<12; m++){
     const diasNoMes = new Date(ano, m+1, 0).getDate();
-    const primeiroDiaSemana = new Date(ano, m, 1).getDay();
     let celulas = '';
-    for(let i=0;i<primeiroDiaSemana;i++) celulas += `<div class="pixel-dia vazio"></div>`;
-    for(let d=1; d<=diasNoMes; d++){
+    for(let d=1; d<=31; d++){
+      if(d>diasNoMes){celulas += `<span class="pixel-dia vazio" aria-hidden="true"></span>`;continue;}
       const dataISO = ano+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
       const humor = REGISTROS_PIXEL[dataISO];
-      const classeCor = humor ? HUMORES_PIXEL.find(h=>h.id===humor).classe : '';
-      celulas += `<div class="pixel-dia ${classeCor}" title="${d}/${m+1}" aria-label="Dia ${d} de ${MESES_NOME[m]}" onclick="marcarPixelDia('${dataISO}')">${d}</div>`;
+      const estado = HUMORES_PIXEL.find(h=>h.id===humor);
+      const classeCor = estado ? estado.classe : '';
+      celulas += `<button type="button" class="pixel-dia ${classeCor}" title="${d}/${m+1}/${ano}${estado?' · '+estado.nome:''}" aria-label="Dia ${d} de ${MESES_NOME[m]}: ${estado?estado.nome:'sem registro'}" onclick="marcarPixelDia('${dataISO}')"></button>`;
     }
-    meses += `<div class="pixel-mes"><div class="pixel-mes-nome">${MESES_NOME[m]}</div><div class="pixel-grid">${celulas}</div></div>`;
+    meses += `<div class="pixel-mes-linha"><div class="pixel-mes-nome">${MESES_NOME[m]}</div><div class="pixel-grid">${celulas}</div></div>`;
   }
-
-  return `${legenda}<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;">${meses}</div>
-    <div style="margin-top:10px;font-size:11.5px;color:var(--cor-texto-suave);">Toque num dia pra ir passando pelos humores (Tenso → Bom → Produtivo → Ótimo → sem registro). Ano de ${ano}.</div>`;
+  return `${legenda}${cabecalho}<div class="pixel-ano-lista">${meses}</div><div style="margin-top:14px;font-size:11.5px;color:var(--cor-texto-suave);">Toque em cada dia para alternar: Tenso → Bom → Produtivo → Ótimo → sem registro. Ano de ${ano}.</div>`;
 }
 
 /* ---------- MÓDULO ATIVOS (controle simples, estilo Projetos) ---------- */
@@ -6369,7 +6383,7 @@ function cardsSaudeV21(){
  <div class="v21-saude-grid">
  <article class="v21-health-card"><div class="v21-card-head"><span>💧 Hidratação de hoje</span><button class="v21-small-btn" onclick="mudarMetaAguaV21()">Alterar meta</button></div>
  <strong class="v21-number">${agua.toLocaleString('pt-BR')} <small>/ ${meta.toLocaleString('pt-BR')} mL</small></strong>
- <div class="v44-water-drops" aria-hidden="true">${Array.from({length:8},(_,i)=>`<span class="${agua/meta>i/8?'filled':''}">💧</span>`).join('')}</div><div class="v21-progress" role="progressbar" aria-label="Meta diária de água" aria-valuenow="${agua}" aria-valuemin="0" aria-valuemax="${meta}"><span style="width:${percent}%"></span></div>
+ <div class="v21-progress" role="progressbar" aria-label="Meta diária de água" aria-valuenow="${agua}" aria-valuemin="0" aria-valuemax="${meta}"><span style="width:${percent}%"></span></div>
  <p>${percent}% da meta diária · registre cada copo ou garrafa</p>
  <div class="v21-water-form"><input id="v21-agua-quantidade" type="number" inputmode="numeric" min="1" max="5000" step="50" value="250" aria-label="Quantidade de água em mililitros"><span>mL</span><button id="v21-salvar-agua" class="btn-primario" onclick="adicionarAguaV21()">+ Registrar</button></div>
  ${registros.length?`<div class="v21-agua-historico">${registros.map(r=>`<span>${Number(r.quantidade_ml)} mL <button aria-label="Excluir registro de ${Number(r.quantidade_ml)} mililitros" onclick="removerAguaV21('${r.id}')">×</button></span>`).join('')}</div>`:''}
@@ -6502,7 +6516,7 @@ function pausaInspirarV24(){
  const dados=lerInspiracao(),dia=diaInspiracao(),diario=dados.modo==='diario',valido=!diario||dados.dia===dia;
  const idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
  const frase=dados.frase||V12_FRASES[((idx%V12_FRASES.length)+V12_FRASES.length)%V12_FRASES.length];
- if(diario&&!valido&&!v13BuscandoDia)setTimeout(atualizarVersiculoDoDia,100);
+ if(diario&&!valido&&!dados.erroBusca&&!v13BuscandoDia)setTimeout(atualizarVersiculoDoDia,100);
  const verso=valido?dados.versiculo:'';
  const referencia=valido?dados.referencia:referenciaDoDia();
  return `<section class="v24-pausa"><div class="v24-pausa-header"><div><span class="v24-pausa-eyebrow">UM INSTANTE PARA VOCÊ</span><h3>✦ Pausa para Inspirar</h3><p>Quatro pequenos encontros com o dia. Um print de cada vez.</p></div><button class="btn-secundario" onclick="editarInspiracao()">Editar versículo</button></div>
@@ -6597,7 +6611,7 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
- ${v44ResumoCards()}
+ <header class="v11-welcome"><div><span class="v11-eyebrow">✦ MEU ECOSSISTEMA</span><h2>Minha Visão Geral</h2><p>Seu trabalho e sua vida pessoal, lado a lado.</p></div><span class="v11-date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</span></header>
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -6614,20 +6628,14 @@ function visaoGeralHTML(){
  </div></section>
  <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Vida Pessoal</h3><p>Rotina, cuidado e desenvolvimento</p></div></div><div class="v11-links">
  ${atalho('✧','Hábitos e consistência','Seu mapa de evolução','pessoal','habitos')}
- ${atalho('♡','O que me move','Motivações, valores e lembretes','pessoal','o_que_me_move')}
- ${atalho('✍','Diário e humor','Um encontro comigo','pessoal','diario_pessoal')}
  ${atalho('◒','Estudos e leitura','Aprendizado e progresso','pessoal','estudos')}
  ${atalho('☾','Sono e descanso','Diário e histórico','pessoal','sono')}
  ${atalho('⌂','Rotina da casa','Tarefas e organização','pessoal','rotina_casa')}
  ${atalho('◇','Contas e compras','Organização financeira','pessoal','contas')}
  ${atalho('◎','Metas e ideias','Seus próximos passos','pessoal','metas')}
-
+ ${atalho('✝','Jornada Bíblica','Leituras e capítulos','pessoal','jornada_biblica')}
  ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
  ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
- </div></section><section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">✧</span><div><h3>Na Presença</h3><p>Palavra, oração e gratidão</p></div></div><div class="v11-links">
- ${atalho('✧','Meu momento com Deus','Leitura, oração e gratidão','presenca','na_presenca')}
- ${atalho('✝','Jornada Bíblica','Continue de onde parou','presenca','jornada_biblica')}
- ${atalho('♡','Painel de oração',npLista('oracao').filter(r=>r.conteudo.semana===npSegunda()).map(r=>textoHTML(r.titulo)).slice(0,3).join(' · ')||'Por quem vou orar nesta semana','presenca','painel_oracao')}
  </div></section>${pausaInspirarV24()}${cardClarezaV23()}${cardsSaudeV21()}</div>`;
 }
 
@@ -6677,7 +6685,9 @@ function sonoHTML(){
  const media=lista.length?(lista.reduce((a,b)=>a+Number(b.horas||0),0)/lista.length).toFixed(1):'—';
  const ultima=lista[0];
  return `<div class="v11-sono">
- ${v44SonoPainel()}
+ <div class="v11-sono-intro"><div><span class="v11-eyebrow">☾ CUIDADO PESSOAL</span><h2>Meu Sono</h2><p>Acompanhe suas noites e seu descanso.</p></div><span class="v11-moon">☾</span></div>
+ <div class="v11-sono-stats"><div class="v11-sono-stat"><span>☾ Hora de dormir</span><strong>${ultima?textoHTML(ultima.dormir):'—'}</strong><small>Último registro</small></div><div class="v11-sono-stat"><span>☀ Hora de acordar</span><strong>${ultima?textoHTML(ultima.acordar):'—'}</strong><small>Último registro</small></div></div>
+ <div class="v11-sono-total"><span>✦ Média de descanso neste mês</span><strong>${media}${media==='—'?'':' h'}</strong><small>${lista.length} ${lista.length===1?'noite registrada':'noites registradas'}</small></div>
  <section class="card v11-sono-form"><h3>Registrar uma noite</h3><p>Preencha os horários para atualizar seu histórico.</p><div class="form-grid"><div class="form-field"><label>Data do despertar</label><input type="date" id="sonoData" value="${hoje}"></div><div class="form-field"><label>Qualidade percebida</label><select id="sonoQualidade"><option>Boa</option><option>Regular</option><option>Ruim</option></select></div><div class="form-field"><label>Hora de dormir</label><input type="time" id="sonoDormir" value="23:00"></div><div class="form-field"><label>Hora de acordar</label><input type="time" id="sonoAcordar" value="07:00"></div></div><button class="btn-primario" onclick="salvarSono()">Salvar noite</button><p class="v11-sono-note">${textoHTML(SONO_SYNC_STATUS)}</p></section>
  <section class="card v11-sono-history"><h3>Histórico de ${mes.split('-').reverse().join('/')}</h3>${lista.map(x=>`<div class="v11-noite"><span>☾ <strong>${x.data.split('-').reverse().join('/')}</strong><small>${textoHTML(x.dormir)} – ${textoHTML(x.acordar)} · ${textoHTML(x.qualidade)}</small></span><strong>${x.horas} h</strong></div>`).join('')||'<p>Sem registros neste mês.</p>'}</section></div>`;
 }
@@ -6751,8 +6761,8 @@ async function salvarNovoRadar(event){
 async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'))return;try{const {error}=await supa.from('radar_recorrencias').delete().eq('id',id);if(error)throw error;RADAR_RECORRENCIAS=RADAR_RECORRENCIAS.filter(r=>r.id!==id);renderTela();}catch(e){alert('Não foi possível excluir: '+e.message)}}
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='iniciar_atividade'?['Iniciar atividade','Escolha o tipo e o cliente para começar']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
-  if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho, Pessoal e Na Presença';}
+  const [titulo, sub] = telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
+  if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho e pessoal em um só lugar';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
     const hora = agora.getHours();
@@ -6768,15 +6778,7 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
-    document.getElementById('conteudoTela').innerHTML=({o_que_me_move:v46MoveHTML,diario_pessoal:v46DiarioHTML,humor_pessoal:v46HumorHTML})[telaAtual]();
-  }
-  else if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
-    const paginas={na_presenca:naPresencaHTML,painel_oracao:painelOracaoHTML,diario_deus:()=>npColecaoHTML(['diario','gratidao'],'Diário e gratidão','Reflexões, dúvidas, respostas e lembranças.'),versiculos_guardados:()=>npColecaoHTML(['versiculo'],'Versículos para guardar','Guarde a passagem, sua tradução e o tema.'),propositos_oracao:()=>npColecaoHTML(['proposito'],'Propósitos de oração','Escolha uma intenção e os horários que fazem sentido para você.')};
-    document.getElementById('conteudoTela').innerHTML=paginas[telaAtual]();
-  }
-  else if(telaAtual === 'iniciar_atividade'){document.getElementById('conteudoTela').innerHTML=iniciarAtividadeHTML();}
-  else if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
+  if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
   else if(telaAtual === 'dashboard'){
@@ -6852,8 +6854,6 @@ function renderTela(){
         <div>Este módulo será construído na próxima etapa da Fase 6, seguindo a ordem já aprovada no documento mestre.</div>
       </div>`;
   }
-  v45AplicarVisual();
-  w47DepoisRender();
   atualizarCronometros();
   salvarEstado();
 }
@@ -7188,17 +7188,10 @@ async function entrarNoApp(){
 
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').classList.add('ativo');
-  const entradaHoras=w51PedidoHoras();
-  if(entradaHoras){
-    w47Destino();renderSidebar();renderTela();
-    try{await carregarClientesSupabase();if(!await carregarControleHorasSupabase())throw Error('Cronômetro indisponível');W51_HOURS_LOADING=false;W51_HOURS_ERROR=false;}
-    catch(e){W51_HOURS_LOADING=false;W51_HOURS_ERROR=true;}
-    renderTela();
-  }
   await carregarPerfilSupabase();
   await sincronizarSono();
   await carregarTemaMarcaSupabase();
-  if(!entradaHoras)await carregarClientesSupabase();
+  await carregarClientesSupabase();
   await carregarRadarRecorrencias();
   await carregarEnviosMensaisSupabase();
   await carregarEntregasSupabase();
@@ -7210,15 +7203,12 @@ async function entrarNoApp(){
   await carregarLeadsSupabase();
   await carregarAtivosSupabase();
   await carregarHabitosSupabase();
-  await v46Carregar();
-  await w47Carregar();
   await carregarMetasPessoaisSupabase();
   await carregarContasPessoaisSupabase();
   await carregarComprasSupabase();
   await carregarListaDiaSupabase();
   await carregarBibliaSupabase();
-  await npCarregar();
-  if(!entradaHoras)await carregarControleHorasSupabase();
+  await carregarControleHorasSupabase();
   await carregarMercadoSupabase();
   await carregarIdeiasPessoaisSupabase();
   await carregarCicloSupabase();
@@ -7234,7 +7224,7 @@ async function entrarNoApp(){
   aplicarRascunhosLocais();
   await sincronizarRascunhos();
   await salvarCopiaChecklist();
-  if(!entradaHoras){restaurarTelaAtualSessao();w47Destino();}
+  restaurarTelaAtualSessao();
   renderSidebar();
   renderTela();
   setTimeout(verificarPendenciasAtrasadas, 2200);
@@ -7256,8 +7246,6 @@ function restaurarTelaAtualSessao(){
 async function sairDaConta(){
   if(Object.keys(lerRascunhos()).length){alert('Existem respostas aguardando sincronização neste aparelho. Sincronize antes de sair da conta.');return;}
   rascunhoUsuario=null;
-  clearTimeout(W47_TIMER);W47_CONEXOES=[];W47_USER=null;W47_LOADED=false;W47_TOKEN_TEMP='';W47_TOKEN_ID='';
-  V46_ITENS=[];V46_USUARIO=null;V46_STATUS='Entre na sua conta para acessar os registros.';HABITOS=[];V46_HABITOS_OK=false;
   await supa.auth.signOut();
   document.getElementById('appRoot').classList.remove('ativo');
   document.getElementById('telaLogin').style.display = 'flex';
@@ -7274,7 +7262,6 @@ async function instalarMeuEcossistema(){
   abrirModalSistema(`<div class="system-modal-top"><div><h3>Instalar Meu Ecossistema</h3><p>Coloque o ícone diretamente na tela do celular.</p></div><button onclick="fecharModalSistema()">✕</button></div><div style="font-size:13px;line-height:1.65"><p><strong>Se você abriu pelo WhatsApp:</strong></p><p>1. Toque nos três pontos do navegador.<br>2. Escolha <strong>Abrir no Chrome</strong>.<br>3. No Chrome, toque novamente nos três pontos.<br>4. Entre em <strong>Instalar e criar atalho</strong>.<br>5. Toque em <strong>Instalar</strong> ou <strong>Criar atalho</strong>.</p><p style="margin-top:12px;color:var(--cor-texto-suave)">O navegador interno do WhatsApp não oferece a instalação completa do aplicativo.</p></div>`);
 }
 async function iniciarApp(){
-  w47Destino();
   aplicarTemaInterface();
   setInterval(atualizarCronometros,1000);
   if('serviceWorker' in navigator){
