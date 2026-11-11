@@ -1,5 +1,6 @@
-const CACHE_NAME = 'meu-ecossistema-v51-pagina-iniciar-atividade-20261104';
+const CACHE_NAME = 'meu-ecossistema-v53-plano-vida-20261111';
 const APP_SHELL = [
+  '/plano-vida.js', '/plano-vida-dados.js', '/plano-vida.css',
   '/', '/index.html', '/iniciar-atividade.html', '/widgets-v47.js', '/widgets-v47.css', '/Meu-Ecossistema-Widget.js', '/pessoal-v46.js', '/pessoal-v46.css', '/visual-v45.js', '/visual-v45.css', '/visual-v44.js', '/visual-v44.css', '/na-presenca.js', '/na-presenca.css', '/proximos-passos.js', '/offline-drafts.js',
   '/manifest.json', '/icon-192.png', '/icon-512.png',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',

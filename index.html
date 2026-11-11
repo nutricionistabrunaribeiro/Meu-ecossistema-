@@ -1923,6 +1923,7 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <link rel="stylesheet" href="visual-v45.css">
 <link rel="stylesheet" href="pessoal-v46.css">
 <link rel="stylesheet" href="widgets-v47.css">
+<link rel="stylesheet" href="plano-vida.css">
 </head>
 <body data-espaco="trabalho">
 
@@ -1992,6 +1993,8 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <script src="/offline-drafts.js"></script>
 <script src="pessoal-v46.js"></script>
 <script src="widgets-v47.js"></script>
+<script src="plano-vida-dados.js"></script>
+<script src="plano-vida.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -2087,6 +2090,7 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
+    <div class="v40-global-dashboard"><button onclick="pvOpen()">◎ &nbsp; Meu Plano de Vida</button></div>
     <div class="v40-global-dashboard"><button class="${telaAtual==='dashboard'?'active':''}" onclick="abrirDashboardGlobal()">▥ &nbsp; Dashboard geral</button></div>
     <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
@@ -2317,7 +2321,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
+const NOMES_TELA = {plano_vida:["Meu Plano de Vida","Final de 2026 e ano de 2027"],o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -4658,7 +4662,8 @@ function cardProjetoTemporarioHTML(dataReferencia=null){
   const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length,total=itens.length,perc=total?Math.round(feitos/total*100):0,missao=missaoAtualProjeto(p,hoje),dias=diasCalendarioEntre(hoje,'2026-10-07');
   return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Projeto pessoal temporário</div><h2>Chegar leve aos 38</h2><div class="projeto-pessoal-contagem">${dias} ${dias===1?'dia':'dias'} para a folga</div><div class="projeto-pessoal-barra"><div style="width:${perc}%"></div></div><div class="projeto-pessoal-resumo"><span>${feitos} de ${total} etapas concluídas</span><strong>${perc}% concluído</strong></div><div class="projeto-pessoal-missao"><small>Missão de hoje</small><strong>${missao?textoHTML(missao.t):'Tudo concluído. Agora é só manter leve!'}</strong>${missao?`<div style="font-size:10px;opacity:.75;margin-top:3px">${textoHTML(missao.grupo)} · ${periodoItemProjeto(missao)}</div>`:''}</div><button class="projeto-pessoal-abrir" onclick="abrirProjetoPessoal('${p.id}')">Abrir projeto →</button></section>`;
 }
-function dashboardPessoalHTML(){return `${v44ResumoCards()}${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
+function dashboardPessoalHTML(){return `${v44ResumoCards()}
+ <button class="pv-launch" onclick="pvOpen()"><span><strong>Meu Plano de Vida</strong><small>Novembro e dezembro de 2026 · planejamento de 2027</small></span><span aria-hidden="true">→</span></button>${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
 
 function projetosHTML(){
   if(projetoSelecionadoId){
@@ -6876,7 +6881,8 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
+  if(telaAtual==='plano_vida'){document.getElementById('conteudoTela').innerHTML=pvHTML();}
+  else if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
     document.getElementById('conteudoTela').innerHTML=({o_que_me_move:v46MoveHTML,diario_pessoal:v46DiarioHTML,humor_pessoal:v46HumorHTML})[telaAtual]();
   }
   else if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
