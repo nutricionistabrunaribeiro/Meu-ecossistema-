@@ -1,0 +1,20 @@
+{
+  "version": "56",
+  "based_on": "52",
+  "built_at": "2026-11-12",
+  "index_sha256": "2813ef8427bd4f92cf6d0a9dd4466e6ea55deab801fce1e41f793ba327aafd1f",
+  "files_missing_in_distribution": [
+    "na-presenca.js",
+    "visual-v44.js",
+    "pessoal-v46.js",
+    "pessoal-v46.css",
+    "visual-v45.css",
+    "widgets-v47.js",
+    "proximos-passos.js",
+    "offline-drafts.js",
+    "service-worker.js",
+    "manifest.json",
+    "icon-192.png"
+  ],
+  "warning": "This is an incremental update, retain existing GitHub assets. No automatic database backup configured."
+}

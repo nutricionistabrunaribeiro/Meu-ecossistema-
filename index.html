@@ -1923,7 +1923,9 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <link rel="stylesheet" href="visual-v45.css">
 <link rel="stylesheet" href="pessoal-v46.css">
 <link rel="stylesheet" href="widgets-v47.css">
-<link rel="stylesheet" href="plano-vida.css">
+<style id="v56-estilos">
+.v56-config{display:grid;gap:12px}.v56-sub{font-size:12px;color:var(--cor-texto-suave);line-height:1.75}.v56-warning{padding:13px 15px;border-radius:13px;border:1px solid var(--cor-borda);font-size:12px;line-height:1.65;background:color-mix(in srgb,var(--cor-primaria) 6%,var(--cor-superficie))}.v56-actions{display:flex;gap:10px;flex-wrap:wrap}.v56-actions button{min-height:42px}.v56-result{padding:9px 12px;margin:5px 0;border-radius:10px;border:1px solid var(--cor-borda);font-size:12px;line-height:1.6}.v56-page{display:grid;gap:18px}.v56-hero{background:color-mix(in srgb,var(--cor-primaria) 11%,var(--cor-superficie));border:1px solid color-mix(in srgb,var(--cor-primaria) 24%,var(--cor-borda));border-radius:25px;padding:25px;overflow:hidden}.v56-hero .v56-eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:.12em;color:var(--cor-primaria);font-weight:750}.v56-hero h2{font:500 30px/1.2 'Fraunces',serif;margin:10px 0;color:var(--cor-texto)}.v56-hero p{font-size:12px;line-height:1.75;color:var(--cor-texto-suave);max-width:590px}.v56-progress{height:7px;overflow:hidden;background:color-mix(in srgb,var(--cor-primaria) 15%,var(--cor-superficie));border-radius:12px;margin:17px 0 8px}.v56-progress i{display:block;height:100%;border-radius:12px;background:var(--cor-primaria)}.v56-mission{padding:16px;border-radius:17px;background:color-mix(in srgb,var(--cor-superficie) 80%,transparent);border:1px solid var(--cor-borda);margin:17px 0}.v56-mission small{display:block;color:var(--cor-primaria);font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}.v56-mission strong{font-family:'Fraunces',serif;font-size:18px;font-weight:500}.v56-areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v56-area{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:19px;padding:17px;min-width:0}.v56-area h3{font:500 18px 'Fraunces',serif;margin-bottom:8px}.v56-area p{font-size:11px;color:var(--cor-texto-suave);line-height:1.6}.v56-task{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--cor-borda);padding:10px 0;text-align:left;width:100%;color:var(--cor-texto);font-size:12px;line-height:1.5}.v56-task i{width:21px;height:21px;flex:0 0 21px;border:1px solid var(--cor-borda);border-radius:8px;display:grid;place-items:center;font-style:normal;color:var(--cor-primaria)}.v56-task.done i{background:var(--cor-primaria);color:white;border-color:var(--cor-primaria)}.v56-task.done span{opacity:.65}.v56-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.v56-stat{padding:16px;border:1px solid var(--cor-borda);border-radius:17px;background:var(--cor-superficie)}.v56-stat strong{display:block;color:var(--cor-primaria);font:500 27px 'Fraunces',serif}.v56-stat small{font-size:11px;color:var(--cor-texto-suave)}.v56-table{width:100%;border-collapse:collapse;font-size:12px}.v56-table td,.v56-table th{padding:10px;border-bottom:1px solid var(--cor-borda);text-align:left}.v56-table td:last-child,.v56-table th:last-child{text-align:right}.v56-table th{color:var(--cor-texto-suave)}.v56-preview-row{display:grid;grid-template-columns:auto minmax(90px,1fr) minmax(115px,1fr);gap:7px;align-items:center;margin:10px 0}.v56-preview-row input[type=text],.v56-preview-row select,.v56-modal-input{min-width:0;width:100%;padding:10px;border:1px solid var(--cor-borda);border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto);font:inherit}.v56-note{font-size:11px;color:var(--cor-texto-suave);line-height:1.65}.v56-cta{padding:17px;background:color-mix(in srgb,var(--cor-primaria) 8%,var(--cor-superficie));border:1px solid var(--cor-borda);border-radius:20px;margin:15px 0}.v56-cta h3{font:500 20px 'Fraunces',serif;margin-bottom:7px}.v56-cta p{font-size:12px;color:var(--cor-texto-suave);margin-bottom:12px}@media(max-width:700px){.v56-areas{grid-template-columns:1fr}.v56-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.v56-hero{padding:20px}.v56-hero h2{font-size:25px}.v56-preview-row{grid-template-columns:auto 1fr}.v56-preview-row select{grid-column:2}.v56-actions button{width:100%}}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -1993,8 +1995,6 @@ body.v38-sem-rolagem{overflow:hidden!important}
 <script src="/offline-drafts.js"></script>
 <script src="pessoal-v46.js"></script>
 <script src="widgets-v47.js"></script>
-<script src="plano-vida-dados.js"></script>
-<script src="plano-vida.js"></script>
 <script>
 /* ---------- CONEXÃO COM O SUPABASE (banco de dados real) ---------- */
 const SUPABASE_URL = "https://laebprndhkckeauzgoxl.supabase.co";
@@ -2011,6 +2011,7 @@ const MODULOS = {
       {id:"controle_horas", nome:"Controle de Horas"},
       {id:"planejamento", nome:"Planejamento"},
       {id:"radar_recorrencias", nome:"Radar de Recorrências"},
+      {id:"resultados_consultoria", nome:"Resultados da Consultoria"},
       {id:"lideranca", nome:"Liderança"},
     ]},
     {grupo:"Crescimento", itens:[
@@ -2026,6 +2027,7 @@ const MODULOS = {
   pessoal: [
     {grupo:"Vida Pessoal", itens:[
       {id:"projetos", nome:"Projetos"},
+      {id:"plano_vida", nome:"Meu 2027 de forma leve"},
       {id:"minha_clareza", nome:"Minha Clareza"},
       {id:"habitos", nome:"Hábitos"},
       {id:"o_que_me_move", nome:"O que me move"},
@@ -2090,7 +2092,6 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
-    <div class="v40-global-dashboard"><button onclick="pvOpen()">◎ &nbsp; Meu Plano de Vida</button></div>
     <div class="v40-global-dashboard"><button class="${telaAtual==='dashboard'?'active':''}" onclick="abrirDashboardGlobal()">▥ &nbsp; Dashboard geral</button></div>
     <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
@@ -2321,7 +2322,7 @@ function acaoRapida(acao){
   if(acao==='mercado'){abrirListaMercado();setTimeout(()=>document.getElementById('novoItemMercado')?.focus(),0);}
 }
 
-const NOMES_TELA = {plano_vida:["Meu Plano de Vida","Final de 2026 e ano de 2027"],o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
+const NOMES_TELA = {o_que_me_move:['O que me move','Motivações, valores e lembretes'],diario_pessoal:['Meu diário pessoal','Um encontro comigo'],humor_pessoal:['Meu humor','Um registro de como me sinto'],sono:['Meu Sono','Suas noites e seu descanso'],na_presenca:['Na Presença','Sua caminhada com Deus'],painel_oracao:['Painel de oração','Uma semana de cada vez'],diario_deus:['Diário e gratidão','Reflexões e memórias'],versiculos_guardados:['Versículos para guardar','Palavras que acompanham você'],propositos_oracao:['Propósitos de oração','No seu tempo'],
   dashboard:["Bom dia, Bruna","Domingo, 2 de agosto"],
   agenda:["Agenda","Planner semanal"],
   clientes:["Clientes","3 clientes cadastrados"],
@@ -4662,8 +4663,7 @@ function cardProjetoTemporarioHTML(dataReferencia=null){
   const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length,total=itens.length,perc=total?Math.round(feitos/total*100):0,missao=missaoAtualProjeto(p,hoje),dias=diasCalendarioEntre(hoje,'2026-10-07');
   return `<section class="projeto-pessoal-hero"><div class="projeto-pessoal-eyebrow">Projeto pessoal temporário</div><h2>Chegar leve aos 38</h2><div class="projeto-pessoal-contagem">${dias} ${dias===1?'dia':'dias'} para a folga</div><div class="projeto-pessoal-barra"><div style="width:${perc}%"></div></div><div class="projeto-pessoal-resumo"><span>${feitos} de ${total} etapas concluídas</span><strong>${perc}% concluído</strong></div><div class="projeto-pessoal-missao"><small>Missão de hoje</small><strong>${missao?textoHTML(missao.t):'Tudo concluído. Agora é só manter leve!'}</strong>${missao?`<div style="font-size:10px;opacity:.75;margin-top:3px">${textoHTML(missao.grupo)} · ${periodoItemProjeto(missao)}</div>`:''}</div><button class="projeto-pessoal-abrir" onclick="abrirProjetoPessoal('${p.id}')">Abrir projeto →</button></section>`;
 }
-function dashboardPessoalHTML(){return `${v44ResumoCards()}
- <button class="pv-launch" onclick="pvOpen()"><span><strong>Meu Plano de Vida</strong><small>Novembro e dezembro de 2026 · planejamento de 2027</small></span><span aria-hidden="true">→</span></button>${cardProjetoTemporarioHTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
+function dashboardPessoalHTML(){return `${v44ResumoCards()}${cardProjetoTemporarioHTML()}${cardPlanoVidaV56HTML()}${cardRotinaCasaHTML()}<div class="grid">${MODULOS.pessoal[0].itens.map(i=>`<button class="card" style="text-align:left" onclick="irPara('${i.id}')"><h3 style="margin:0"><span><span class="nav-icon" style="display:inline-flex;margin-right:8px">${ICONES_MODULO[i.id]||'•'}</span>${i.nome}</span><span>→</span></h3></button>`).join('')}</div>`;}
 
 function projetosHTML(){
   if(projetoSelecionadoId){
@@ -5684,31 +5684,21 @@ function configUsuariosHTML(){
 }
 
 function configBackupHTML(){
-  return `
-    <div class="config-secao">
-      <div class="config-linha">
-        <div><div class="config-linha-label">Backup automático diário</div><div class="config-linha-desc">Último backup: hoje às 04:00</div></div>
-        <div class="toggle ${togglesConfig.backupAuto?'on':''}" onclick="alternarToggle('backupAuto')"><div class="toggle-bola"></div></div>
-      </div>
-      <div class="config-linha">
-        <div><div class="config-linha-label">Fazer backup manual agora</div></div>
-        <button class="btn-secundario" onclick="dispararAutomacao('Backup manual concluído', 'Todos os dados foram salvos com sucesso na nuvem.')">Fazer backup</button>
-      </div>
-    </div>`;
+  return `<div class="config-secao v56-config">
+    <h4>Meu Centro de Backup</h4>
+    <p class="v56-sub">Faça uma cópia real dos seus registros da conta. A exportação roda neste dispositivo e inclui apenas os dados que sua sessão tem permissão para ler.</p>
+    <div class="v56-warning"><strong>Importante:</strong> o arquivo JSON não é criptografado e pode conter informações pessoais e profissionais. Guarde em local seguro. Os arquivos anexados no Storage e tabelas administrativas sem vínculo direto não fazem parte desta exportação.</div>
+    <div class="v56-actions"><button class="btn-primario" onclick="exportarBackupV56()">↓ Exportar meus dados (JSON)</button><button class="btn-secundario" onclick="document.getElementById('v56-abrir-backup').click()">Conferir arquivo de backup</button><input type="file" id="v56-abrir-backup" accept=".json,application/json" style="display:none" onchange="validarBackupV56(this.files?.[0]);this.value=''" /></div>
+    <p id="v56-backup-status" class="v56-sub" role="status">Nenhuma exportação iniciada nesta sessão.</p>
+    <p class="v56-sub">Backup automático diário: <strong>não configurado</strong>. O sistema antigo mostrava uma confirmação simulada. Esta versão não declara backups automáticos sem uma tarefa real e verificada no servidor.</p>
+    <button class="btn-secundario" onclick="diagnosticarEcossistemaV56()">Verificar integridade do aplicativo</button><div id="v56-diagnostico" aria-live="polite"></div>
+    <p class="v56-sub">Restaurar dados é uma operação sensível; a validação do JSON não modifica o banco. Para restauração, use o guia do Pacote Mestre e uma cópia do banco feita pelo administrador do Supabase.</p>
+  </div>`;
 }
-
 function configSegurancaHTML(){
-  return `
-    <div class="config-secao">
-      <div class="config-linha">
-        <div><div class="config-linha-label">Login por biometria (celular/tablet)</div></div>
-        <div class="toggle ${togglesConfig.biometria?'on':''}" onclick="alternarToggle('biometria')"><div class="toggle-bola"></div></div>
-      </div>
-      <div class="config-linha">
-        <div><div class="config-linha-label">Alterar senha</div></div>
-        <button class="btn-secundario">Alterar</button>
-      </div>
-    </div>`;
+  return `<div class="config-secao v56-config"><h4>Segurança da conta</h4><div class="config-linha"><div><div class="config-linha-label">Alterar sua senha</div><div class="config-linha-desc">Solicita uma senha nova pelo Supabase Auth. Nenhuma senha é guardada no Meu Ecossistema.</div></div><button class="btn-secundario" onclick="abrirTrocaSenhaV56()">Alterar senha</button></div>
+  <div class="config-linha"><div><div class="config-linha-label">Login por biometria</div><div class="config-linha-desc">Não configurado. A opção anterior não ativava autenticação biométrica real.</div></div></div>
+  <div class="config-linha"><div><div class="config-linha-label">Verificar componentes</div><div class="config-linha-desc">Checa arquivos essenciais, sessão e leitura do Supabase.</div></div><button class="btn-secundario" onclick="abaConfigAtiva='backup';renderTela();diagnosticarEcossistemaV56()">Verificar</button></div></div>`;
 }
 
 function configNotificacoesHTML(){
@@ -6512,7 +6502,7 @@ function minhaClarezaHTML(){
  <button type="button" class="v23-microfone ${clarezaOuvindoV23?'gravando':''}" id="v23BotaoVoz" onclick="clarezaAlternarVozV23()" aria-label="${clarezaOuvindoV23?'Parar ditado':'Iniciar ditado'}">🎙️</button>
  <p id="v23VozStatus" aria-live="polite">${clarezaOuvindoV23?'Ouvindo... toque para parar':'Toque para falar'}</p>
  <label for="v23Texto" class="v23-label">Seu pensamento</label><textarea id="v23Texto" rows="5" placeholder="Pode falar ou escrever sem organizar nada..."></textarea>
- <div class="v23-acoes"><button class="btn-primario" onclick="clarezaSalvarV23()">Guardar pensamento</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
+ <div class="v23-acoes"><button class="btn-primario" onclick="clarezaPreviaV56()">Organizar e revisar</button><button class="btn-secundario" onclick="document.getElementById('v23Texto').value=''">Limpar</button></div>
  <small id="v23Sync">${textoHTML(clarezaSyncV23)}</small></section>
  <section class="card v23-lista"><div class="v23-lista-topo"><h3>Meus pensamentos</h3><span>${CLAREZA_ITENS_V23.filter(x=>x.status!=='resolvido').length} em aberto</span></div>
  ${CLAREZA_ITENS_V23.slice().sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em))).map(x=>`<article class="v23-registro ${x.status==='resolvido'?'resolvido':''}"><p>${textoHTML(x.texto)}</p><small>${new Date(x.criado_em).toLocaleDateString('pt-BR')} · ${grupos[x.categoria]||'Para organizar'}</small><div class="v23-registro-acoes"><label>Organizar como <select aria-label="Categoria do pensamento" onchange="clarezaAlterarV23('${x.id}','categoria',this.value)">${Object.entries(grupos).map(([k,v])=>`<option value="${k}" ${x.categoria===k?'selected':''}>${v}</option>`).join('')}</select></label><button class="btn-secundario" onclick="clarezaAlterarV23('${x.id}','status','${x.status==='resolvido'?'pendente':'resolvido'}')">${x.status==='resolvido'?'Reabrir':'Resolvido'}</button><button class="btn-secundario" onclick="clarezaExcluirV23('${x.id}')">Excluir</button></div></article>`).join('')||'<p>Este espaço está prontinho para receber seu primeiro pensamento. 💜</p>'}
@@ -6710,7 +6700,6 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
- <button class="pv-launch" onclick="pvOpen()"><span><strong>Meu Plano de Vida</strong><small>Novembro e dezembro de 2026 · planejamento de 2027</small></span><span aria-hidden="true">→</span></button>
  ${v44ResumoCards()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
@@ -6865,7 +6854,7 @@ async function salvarNovoRadar(event){
 async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'))return;try{const {error}=await supa.from('radar_recorrencias').delete().eq('id',id);if(error)throw error;RADAR_RECORRENCIAS=RADAR_RECORRENCIAS.filter(r=>r.id!==id);renderTela();}catch(e){alert('Não foi possível excluir: '+e.message)}}
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='iniciar_atividade'?['Iniciar atividade','Escolha o tipo e o cliente para começar']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']: (NOMES_TELA[telaAtual] || ["", ""]);
+  const [titulo, sub] = telaAtual==='iniciar_atividade'?['Iniciar atividade','Escolha o tipo e o cliente para começar']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']:telaAtual==='plano_vida'?['Meu 2027 de forma leve','Um projeto de vida, sem cobranças desnecessárias']:telaAtual==='resultados_consultoria'?['Resultados da Consultoria','Indicadores mensais de toda a operação']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho, Pessoal e Na Presença';}
   else if(telaAtual === 'dashboard'){
     const agora = new Date();
@@ -6882,8 +6871,7 @@ function renderTela(){
     document.getElementById('subtituloTela').innerText = sub;
   }
 
-  if(telaAtual==='plano_vida'){document.getElementById('conteudoTela').innerHTML=pvHTML();}
-  else if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
+  if(['o_que_me_move','diario_pessoal','humor_pessoal'].includes(telaAtual)){
     document.getElementById('conteudoTela').innerHTML=({o_que_me_move:v46MoveHTML,diario_pessoal:v46DiarioHTML,humor_pessoal:v46HumorHTML})[telaAtual]();
   }
   else if(['na_presenca','painel_oracao','diario_deus','versiculos_guardados','propositos_oracao'].includes(telaAtual)){
@@ -6893,6 +6881,8 @@ function renderTela(){
   else if(telaAtual === 'iniciar_atividade'){document.getElementById('conteudoTela').innerHTML=iniciarAtividadeHTML();}
   else if(telaAtual === 'visao_geral'){document.getElementById('conteudoTela').innerHTML=visaoGeralHTML();}
   else if(telaAtual === 'minha_clareza'){document.getElementById('conteudoTela').innerHTML=minhaClarezaHTML();}
+  else if(telaAtual === 'plano_vida'){document.getElementById('conteudoTela').innerHTML=planoVidaV56HTML();}
+  else if(telaAtual === 'resultados_consultoria'){document.getElementById('conteudoTela').innerHTML=resultadosV56HTML();}
   else if(telaAtual === 'sono'){document.getElementById('conteudoTela').innerHTML=sonoHTML();}
   else if(telaAtual === 'dashboard'){
     document.getElementById('conteudoTela').innerHTML = dashboardHTML();
@@ -7413,6 +7403,82 @@ function verificarPendenciasAtrasadas(){
     dispararAutomacao('Verificação financeira', `${atrasados} lançamento(s) financeiro(s) atrasado(s) — veja em Financeiro.`);
   }
 }
+
+/* V56 — Consolidação final sem substituir módulos ou dados antigos. */
+const V56_VERSAO='56',V56_PLANO='Meu 2027 • De forma leve';
+const V56_AREAS=[
+ {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
+ {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
+ {nome:'Casa e organização',icone:'⌂',itens:['Escolher um cantinho para cuidar com leveza','Revisar o que pode ser simplificado em casa']},
+ {nome:'Vida financeira',icone:'◈',itens:['Revisar entradas e compromissos sem adiar','Reconhecer cada avanço financeiro do trimestre']},
+ {nome:'Saúde e bem-estar',icone:'☼',itens:['Definir um cuidado possível para a semana','Reservar tempo de descanso sem culpa']},
+ {nome:'Na Presença',icone:'✧',itens:['Separar tempo para Palavra e oração','Registrar gratidão e respostas ao longo do caminho']}
+];
+function v56Plano(){return PROJETOS.find(p=>p.categoria==='pessoal'&&p.nome===V56_PLANO)||null;}
+function v56PlanoTotais(p){const itens=itensProjeto(p),feitos=itens.filter(i=>i.c).length;return {itens,feitos,total:itens.length,perc:itens.length?Math.round(feitos*100/itens.length):0};}
+function cardPlanoVidaV56HTML(){const p=v56Plano(),d=p?v56PlanoTotais(p):null;return `<section class="v56-cta"><h3>✧ Meu 2027 · De forma leve</h3><p>${p?`${d.feitos} de ${d.total} passos vividos · ${d.perc}% do projeto`:'Um projeto para viver o próximo ano com intenção, sem carregar uma lista infinita de cobranças.'}</p><button class="btn-primario" onclick="irPara('plano_vida')">${p?'Continuar meu projeto':'Conhecer meu projeto'} →</button></section>`;}
+function planoVidaV56HTML(){const p=v56Plano();if(!p)return `<main class="v56-page"><section class="v56-hero"><div class="v56-eyebrow">Meu próximo capítulo</div><h2>Meu 2027, de forma leve.</h2><p>Como no “Chegar leve aos 38”: pequenas missões, um caminho possível, etapas que você pode mudar e espaço para viver o que importa. Sem obrigação de preencher tudo de uma vez.</p><div class="v56-mission"><small>Primeiro passo</small><strong>Escolher por onde começar.</strong></div><button class="btn-primario" onclick="criarPlanoVidaV56(this)">Criar meu projeto 2027</button></section><div class="v56-areas">${V56_AREAS.map(a=>`<article class="v56-area"><h3>${a.icone} ${textoHTML(a.nome)}</h3><p>${textoHTML(a.itens[0])}</p></article>`).join('')}</div></main>`;
+const d=v56PlanoTotais(p),proxima=missaoAtualProjeto(p),areas=p.etapas.slice().sort((a,b)=>(a.ordem||0)-(b.ordem||0));return `<div class="v56-page"><section class="v56-hero"><div class="v56-eyebrow">Seu projeto pessoal · Novembro 2026 a dezembro 2027</div><h2>Meu 2027, de forma leve.</h2><p>Você não precisa fazer tudo hoje. Escolha um passo possível e volte quando quiser. Este projeto usa o mesmo salvamento e as mesmas marcações dos Projetos pessoais.</p><div class="v56-progress"><i style="width:${d.perc}%"></i></div><p>${d.feitos} de ${d.total} passos realizados · ${d.perc}% concluído</p><div class="v56-mission"><small>Missão de agora</small><strong>${textoHTML(proxima?.t||'Você concluiu todos os passos. Celebre!')}</strong><p>${proxima?textoHTML(proxima.grupo):'Seu próximo capítulo já começou.'}</p></div><button class="btn-primario" onclick="abrirProjetoPessoal('${p.id}')">Editar o projeto completo →</button></section><div class="v56-areas">${areas.map((et,idx)=>{const t=et.checklist.length,f=et.checklist.filter(x=>x.c).length;return `<article class="v56-area"><h3>${V56_AREAS.find(x=>x.nome===et.nome)?.icone||'✧'} ${textoHTML(et.nome)}</h3><p>${f} de ${t} passos realizados</p>${et.checklist.map((item,i)=>`<button class="v56-task ${item.c?'done':''}" onclick="alternarChecklistProjeto('${p.id}','${et.id}',${i})" title="Marcar ou desmarcar"><i>${item.c?'✓':''}</i><span>${textoHTML(item.t)}</span></button>`).join('')||'<p>Você pode acrescentar suas próprias missões.</p>'}</article>`}).join('')}</div></div>`;}
+async function criarPlanoVidaV56(btn){if(v56Plano()){renderTela();return;}if(btn)btn.disabled=true;
+ try{const {data:{user},error:authError}=await supa.auth.getUser();if(authError||!user)throw Error('Entre na sua conta antes de criar seu projeto.');
+ const {data:proj,error:erroP}=await supa.from('projetos').insert({user_id:user.id,nome:V56_PLANO,cliente_id:null,categoria:'pessoal',data_inicio:'2026-11-01',data_fim:'2027-12-31'}).select().single();if(erroP)throw erroP;
+ const etapasPayload=V56_AREAS.map((a,i)=>({user_id:user.id,projeto_id:proj.id,nome:a.nome,ordem:i+1}));
+ const {data:etapas,error:erroE}=await supa.from('etapas_projeto').insert(etapasPayload).select();if(erroE)throw new Error('Projeto criado, mas as etapas ainda não foram salvas: '+erroE.message);
+ const detalhes=(etapas||[]).flatMap(et=>(V56_AREAS.find(x=>x.nome===et.nome)?.itens||[]).map((item,i)=>({user_id:user.id,etapa_id:et.id,item,ordem:i+1,concluido:false})));
+ const {error:erroI}=await supa.from('checklist_etapa_projeto').insert(detalhes);if(erroI)throw new Error('Projeto e grupos criados. Confira as missões: '+erroI.message);
+ await carregarProjetosSupabase();renderTela();mostrarToast('Seu projeto 2027 está pronto para começar.');
+ }catch(e){alert('Não foi possível concluir a criação: '+(e.message||e));await carregarProjetosSupabase().catch(()=>{});renderTela()}finally{if(btn)btn.disabled=false;}
+}
+/* Indicadores mensais; valores vêm exclusivamente dos dados já carregados. */
+let v56MesResultado=formatoISO(new Date()).slice(0,7);
+function v56Indicadores(mes=v56MesResultado){const deMes=s=>String(s||'').slice(0,7)===mes;
+ const agenda=eventosSemana.filter(e=>deMes(e.dataISO));const concluidos=agenda.filter(e=>e.concluido).length;
+ const visitas=VISITAS.filter(v=>deMes(v.dataAplicacaoISO)),visitasConcluidas=visitas.filter(v=>v.status==='concluida');
+ const horas=CONTROLE_HORAS.filter(r=>r.fim&&deMes(dataHoraLocalInput(r.inicio)));const totalMs=horas.reduce((a,r)=>a+duracaoHorasMs(r),0);
+ const rad=RADAR_RECORRENCIAS.filter(r=>deMes(r.data)),totalOcorrencias=rad.reduce((a,r)=>a+(Number(r.quantidade)||1),0),assuntos={};rad.forEach(r=>{const k=r.assunto||'Outros';assuntos[k]=(assuntos[k]||0)+(Number(r.quantidade)||1)});
+ const porCliente={};horas.forEach(r=>{const nome=CLIENTES.find(c=>c.id===r.cliente_id)?.nome||'Sem cliente';porCliente[nome]=(porCliente[nome]||0)+duracaoHorasMs(r)});
+ const custos=(typeof ROTAS_CUSTOS!=='undefined'?ROTAS_CUSTOS:[]).filter(r=>deMes(r.data)).reduce((s,r)=>s+(typeof custoRota==='function'?custoRota(r):0),0);
+ return {mes,agenda,concluidos,visitas,visitasConcluidas,horas,totalMs,rad,totalOcorrencias,assuntos:Object.entries(assuntos).sort((a,b)=>b[1]-a[1]),porCliente:Object.entries(porCliente).sort((a,b)=>b[1]-a[1]),custos};}
+function v56TrocarMes(mes){if(!/^\d{4}-\d{2}$/.test(mes))return;v56MesResultado=mes;renderTela();}
+function resultadosV56HTML(){const d=v56Indicadores(),rotulo=new Date(d.mes+'-15T12:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}),totalClientes=new Set(d.visitas.map(x=>x.clienteId).filter(Boolean)).size;
+ const linha=(a,n,fmt=v=>v)=>`<tr><td>${textoHTML(a)}</td><td>${textoHTML(String(fmt(n)))}</td></tr>`;
+ return `<div class="v56-page"><section class="v56-hero"><div class="v56-eyebrow">Inteligência profissional</div><h2>O resultado de cada cuidado.</h2><p>Dados consolidados de todos os clientes. Os números consideram somente os registros já carregados no seu aplicativo; não confundem orientações com não conformidades.</p><div class="v56-actions" style="margin-top:14px"><label>Mês <input type="month" value="${d.mes}" onchange="v56TrocarMes(this.value)" class="v56-modal-input"></label><button class="btn-primario" onclick="gerarPDFResultadosV56()">Exportar relatório PDF</button></div></section>
+ <div class="v56-stats"><div class="v56-stat"><strong>${d.agenda.length}</strong><small>Compromissos · ${d.concluidos} concluídos</small></div><div class="v56-stat"><strong>${d.visitas.length}</strong><small>Checklists · ${d.visitasConcluidas.length} concluídos</small></div><div class="v56-stat"><strong>${Math.round(d.totalMs/3600000*10)/10}h</strong><small>Horas registradas</small></div><div class="v56-stat"><strong>${d.totalOcorrencias}</strong><small>Apontamentos do Radar</small></div></div>
+ <div class="v56-areas"><article class="v56-area"><h3>Assuntos que mais apareceram</h3><p>${textoHTML(rotulo)} · orientações, cobranças e não conformidades somadas</p><table class="v56-table"><thead><tr><th>Assunto</th><th>Quantidade</th></tr></thead><tbody>${d.assuntos.slice(0,12).map(([a,n])=>linha(a,n)).join('')||'<tr><td colspan="2">Sem ocorrências no mês.</td></tr>'}</tbody></table></article>
+ <article class="v56-area"><h3>Horas por cliente</h3><p>${totalClientes} estabelecimento(s) visitado(s) · custos de rota registrados ${moeda(d.custos)}</p><table class="v56-table"><thead><tr><th>Cliente</th><th>Horas</th></tr></thead><tbody>${d.porCliente.slice(0,15).map(([a,n])=>linha(a,n,x=>formatarDuracao(x))).join('')||'<tr><td colspan="2">Sem horas finalizadas no mês.</td></tr>'}</tbody></table></article></div>
+ <p class="v56-note">Este relatório mede registros existentes e não representa automaticamente a resolução de problemas ou o retorno financeiro por contrato. Para essa análise, os dados de custos e resultados precisam ser validados.</p></div>`;}
+function gerarPDFResultadosV56(){if(!window.jspdf?.jsPDF){alert('Gerador de PDF indisponível. Verifique sua conexão.');return;}const d=v56Indicadores(),doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});doc.setFillColor(143,65,88);doc.rect(0,0,210,32,'F');doc.setTextColor(255,255,255);doc.setFontSize(17);doc.text('Resultados da Consultoria',14,16);doc.setFontSize(10);doc.text('Meu Ecossistema - Bruna Ribeiro | '+d.mes,14,25);doc.setTextColor(49,41,45);doc.setFontSize(11);let y=43;const itens=[['Compromissos',d.agenda.length],['Compromissos concluidos',d.concluidos],['Checklists',d.visitas.length],['Checklists concluidos',d.visitasConcluidas.length],['Horas registradas',formatarDuracao(d.totalMs)],['Apontamentos no Radar',d.totalOcorrencias]];itens.forEach(([a,n])=>{doc.text(a+': '+n,14,y);y+=8});
+ if(typeof doc.autoTable==='function'){doc.autoTable({startY:y+4,head:[['Assunto recorrente','Quantidade']],body:d.assuntos.length?d.assuntos:[["Sem registros",0]],headStyles:{fillColor:[143,65,88]},styles:{fontSize:9},margin:{left:14,right:14}});doc.autoTable({startY:doc.lastAutoTable.finalY+10,head:[['Cliente','Horas']],body:d.porCliente.map(([a,n])=>[a,formatarDuracao(n)]).length?d.porCliente.map(([a,n])=>[a,formatarDuracao(n)]):[['Sem registros','0']],headStyles:{fillColor:[143,65,88]},margin:{left:14,right:14},styles:{fontSize:9}})}
+ doc.save(`resultados-consultoria-${d.mes}.pdf`);}
+/* Minha Clareza: prévia editável; nada é salvo até aprovação. */
+function v56SugerirCategoria(texto){const t=String(texto).toLocaleLowerCase('pt-BR');if(/delegar|pedir para|cobrar de|solicitar a|equipe|responsável/.test(t))return 'delegar';if(/ideia|criar|conteúdo|gravar|postar|pensar em/.test(t))return 'ideia';if(/preocup|receio|medo|ansied|insegur/.test(t))return 'preocupacao';if(/preciso|fazer|enviar|revisar|comprar|agendar|pagar|conferir|organizar|ligar/.test(t))return 'tarefa';return 'entrada'}
+function clarezaPreviaV56(){if(clarezaOuvindoV23)clarezaPararVozV23();const campo=document.getElementById('v23Texto'),t=campo?.value?.trim();if(!t){mostrarToast('Dite ou escreva um pensamento primeiro.');return;}
+ const partes=t.split(/\n+|;\s+/).map(x=>x.trim()).filter(Boolean).slice(0,20),cat={entrada:'Para organizar',tarefa:'Tarefa',ideia:'Ideia',preocupacao:'Preocupação',delegar:'Para delegar'};
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>Prévia da Minha Clareza</h2><p>Organização sugerida por palavras-chave. Revise e aprove antes de guardar.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><form id="v56-clareza-form" onsubmit="clarezaConfirmarV56(event)"><div class="v56-warning">Nada foi salvo ainda. Edite o texto, mude a categoria ou desmarque o que não deseja guardar.</div>${partes.map((p,i)=>`<div class="v56-preview-row"><input type="checkbox" name="ok${i}" checked aria-label="Incluir item ${i+1}"><input name="texto${i}" class="v56-modal-input" type="text" value="${textoHTML(p)}" maxlength="2000" required><select name="cat${i}" class="v56-modal-input">${Object.entries(cat).map(([k,v])=>`<option value="${k}" ${v56SugerirCategoria(p)===k?'selected':''}>${v}</option>`).join('')}</select></div>`).join('')}<p class="v56-note">O ditado do microfone é convertido em texto; depois você decide o que salvar. Confira nomes, datas e informações antes de confirmar.</p><div class="system-modal-actions"><button type="button" class="btn-secundario" onclick="fecharModalSistema()">Voltar</button><button type="submit" class="btn-primario">Aprovar e salvar</button></div></form>`);
+}
+async function clarezaConfirmarV56(event){event.preventDefault();const form=event.target,btn=form.querySelector('button[type=submit]');btn.disabled=true;const f=new FormData(form),indices=[...form.querySelectorAll('input[type=checkbox]')].map((x,i)=>i).filter(i=>f.get('ok'+i));if(!indices.length){alert('Escolha ao menos um pensamento.');btn.disabled=false;return;}const itens=indices.map(i=>({texto:String(f.get('texto'+i)||'').trim(),categoria:String(f.get('cat'+i)||'entrada')})).filter(x=>x.texto);if(!itens.length){btn.disabled=false;return;}
+ const aprovadosEm=new Date().toISOString();for(const item of itens){const registro={id:crypto.randomUUID(),texto:item.texto,categoria:item.categoria,status:'pendente',criado_em:aprovadosEm,origem:'texto',itens_sugeridos:[],aprovado_em:aprovadosEm,revisado_em:aprovadosEm};CLAREZA_ITENS_V23.push(registro);await clarezaEnviarV23(registro)}clarezaPersistirV23();fecharModalSistema();clarezaAtualizarTelaV23();mostrarToast(itens.length+' pensamento(s) aprovado(s) e guardado(s).');}
+/* Backup exporta dados que RLS permite ler, registra ausências e não faz promessa de backup automático. */
+const V56_TABELAS_USUARIO=['asseio_colaboradores','asseio_verificacoes','biblia_capitulos_lidos','carga_mental_registros','checklist_envios_mensais','checklist_etapa_projeto','contas_pessoais','conteudo_inteligente','controle_horas','datas_profissionais','entrega_clientes','entregas','etapas_projeto','eventos','fotos_checklist','habitos','hidratacao_registros','ideias_pessoais','lideranca_atualizacoes','lideranca_delegacoes','lideranca_responsaveis','linha_editorial','lista_compras','lista_dia','lista_mercado','metas_pessoais','minha_clareza','minha_clareza_itens','na_presenca_registros','obrigacoes_cliente','perfil_usuario','pessoal_reflexoes','produtos_rotulagem','projetos','proximos_passos_cliente','radar_recorrencias','registros_ciclo','registros_pixel','registros_sono','rotas_custos','rotina_execucoes','rotinas_recorrentes','treinamentos_cliente'];
+async function v56LerTabela(tabela,coluna,valores,usuarioId){if(valores?.length===0)return [];const linhas=[];for(let inicio=0;inicio<100000;inicio+=500){let q=supa.from(tabela).select('*').range(inicio,inicio+499);if(coluna==='user_id')q=q.eq('user_id',usuarioId);else if(coluna)q=q.in(coluna,valores);const {data,error}=await q;if(error)throw error;linhas.push(...(data||[]));if((data||[]).length<500)break;}return linhas;}
+function v56BaixarBlob(blob,nome){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),20000)}
+async function exportarBackupV56(){const el=document.getElementById('v56-backup-status'),set=t=>{if(el)el.textContent=t};set('Conferindo sua sessão…');const {data:{user},error:authError}=await supa.auth.getUser();if(authError||!user){set('Entre na sua conta para exportar.');return}
+ const exportado={formato:'meu-ecossistema-backup-v56',versaoApp:V56_VERSAO,geradoEm:new Date().toISOString(),proprietario:user.id,tabelas:{},erros:[],avisos:[],local:{}};
+ let concluidas=0;for(const tabela of V56_TABELAS_USUARIO){set(`Exportando ${++concluidas} de ${V56_TABELAS_USUARIO.length}: ${tabela}`);try{exportado.tabelas[tabela]=await v56LerTabela(tabela,'user_id',null,user.id)}catch(e){exportado.erros.push({tabela,mensagem:String(e.message||e)})}}
+ const dependencias=[['clientes','id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['visitas','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['documentacao_cliente','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['contatos_cliente','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['historico_cliente','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['pendencias','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['nao_conformidades','cliente_id',(typeof CLIENTES!=='undefined'?CLIENTES:[]).map(c=>c.id)],['habito_registros','habito_id',(exportado.tabelas.habitos||[]).map(h=>h.id)]];
+ for(const [tab,col,ids] of dependencias){set('Exportando registros vinculados: '+tab);try{exportado.tabelas[tab]=await v56LerTabela(tab,col,ids,user.id)}catch(e){exportado.erros.push({tabela:tab,mensagem:String(e.message||e)})}}
+ const idsVisita=(exportado.tabelas.visitas||[]).map(v=>v.id);for(const [tab,col] of [['checklist_respostas_itens','visita_id'],['assinaturas','visita_id']]){try{exportado.tabelas[tab]=await v56LerTabela(tab,col,idsVisita,user.id)}catch(e){exportado.erros.push({tabela:tab,mensagem:String(e.message||e)})}}
+ try{exportado.local.clareza=JSON.parse(localStorage.getItem('me_minha_clareza_v23')||'[]')}catch(e){}
+ try{exportado.local.tema=localStorage.getItem('me-tema-interface')||null}catch(e){}
+ exportado.avisos=['Este arquivo não contém documentos/fotos binários do Supabase Storage.','Não inclui credenciais, tokens de widgets nem sessão de login.','Tabelas sem permissão ou que não constam na exportação exigem backup administrativo no Supabase.','A restauração não é automática; não importe diretamente em produção sem revisão.'];
+ const bruto=JSON.stringify(exportado,null,2),arquivo=new Blob([bruto],{type:'application/json;charset=utf-8'});v56BaixarBlob(arquivo,'meu-ecossistema-backup-'+new Date().toISOString().slice(0,10)+'.json');
+ const total=Object.values(exportado.tabelas).reduce((s,a)=>s+(a?.length||0),0);set(`Arquivo gerado: ${total} registros em ${Object.keys(exportado.tabelas).length} tabelas. ${exportado.erros.length?'Atenção: '+exportado.erros.length+' tabela(s) com erro; cópia parcial.':'As tabelas consultadas foram exportadas.'} Confira o download e guarde com segurança.`);
+}
+async function validarBackupV56(arquivo){const el=document.getElementById('v56-backup-status'),set=s=>{if(el)el.textContent=s};if(!arquivo)return;if(arquivo.size>80*1024*1024){set('Arquivo acima de 80 MB; valide em um computador.');return}try{const obj=JSON.parse(await arquivo.text());if(obj.formato!=='meu-ecossistema-backup-v56'||!obj.geradoEm||!obj.tabelas||typeof obj.tabelas!=='object')throw Error('O arquivo não tem o formato esperado da versão 56.');const total=Object.values(obj.tabelas).reduce((s,a)=>s+(Array.isArray(a)?a.length:0),0);set(`Arquivo lido com sucesso: ${new Date(obj.geradoEm).toLocaleString('pt-BR')} · ${Object.keys(obj.tabelas).length} tabelas · ${total} registros. ${obj.erros?.length||0} erro(s) na exportação. Nenhum dado foi restaurado.`)}catch(e){set('Não foi possível validar: '+(e.message||e))}}
+async function diagnosticarEcossistemaV56(){const el=document.getElementById('v56-diagnostico');if(!el)return;el.textContent='Verificando arquivos e sessão…';const arquivos=['na-presenca.js','visual-v44.js','visual-v45.js','pessoal-v46.js','widgets-v47.js','proximos-passos.js','offline-drafts.js','na-presenca.css','visual-v44.css','visual-v45.css','pessoal-v46.css','widgets-v47.css'];const resultados=await Promise.all(arquivos.map(async nome=>{try{const r=await fetch('/'+nome,{method:'GET',cache:'no-store'});return {nome,ok:r.ok}}catch(e){return {nome,ok:false}}}));let auth='Não conectada';try{const r=await supa.auth.getUser();if(r.data?.user)auth='Sessão autenticada';else auth='Sessão ausente';}catch(e){auth='Erro de autenticação'}const falhas=resultados.filter(x=>!x.ok);el.innerHTML=`<div class="v56-result"><strong>${textoHTML(auth)}</strong><p>${falhas.length?`${falhas.length} arquivo(s) não responderam: ${falhas.map(x=>textoHTML(x.nome)).join(', ')}.`:'Todos os 12 arquivos auxiliares responderam nesta origem.'}</p><p class="v56-note">Esta é uma verificação de disponibilidade dos arquivos, não uma auditoria funcional completa, nem um teste de sincronização em dois aparelhos.</p></div>`;}
+function abrirTrocaSenhaV56(){abrirModalSistema(`<div class="system-modal-head"><div><h2>Alterar senha</h2><p>Atualização pela sua sessão autenticada do Supabase.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><form onsubmit="salvarSenhaV56(event)"><label class="form-field">Nova senha (mínimo 12 caracteres)<input id="v56-nova-senha" type="password" autocomplete="new-password" minlength="12" required class="v56-modal-input"></label><label class="form-field">Repita a nova senha<input id="v56-confirmar-senha" type="password" autocomplete="new-password" minlength="12" required class="v56-modal-input"></label><p class="v56-note">Use uma senha exclusiva e forte. Dependendo das configurações de segurança, o Supabase poderá solicitar autenticação recente.</p><p id="v56-senha-status" role="status"></p><div class="system-modal-actions"><button class="btn-secundario" type="button" onclick="fecharModalSistema()">Cancelar</button><button type="submit" class="btn-primario">Salvar nova senha</button></div></form>`)}
+async function salvarSenhaV56(event){event.preventDefault();const nova=document.getElementById('v56-nova-senha')?.value||'',conf=document.getElementById('v56-confirmar-senha')?.value||'',el=document.getElementById('v56-senha-status'),btn=event.target.querySelector('button[type=submit]');if(nova.length<12||nova!==conf){el.textContent='Use pelo menos 12 caracteres e confira se as senhas são iguais.';return;}btn.disabled=true;el.textContent='Atualizando…';try{const {error}=await supa.auth.updateUser({password:nova});if(error)throw error;el.textContent='Senha alterada com sucesso!';event.target.reset();setTimeout(fecharModalSistema,1000)}catch(e){el.textContent='Não foi possível atualizar: '+(e.message||e);btn.disabled=false;}}
+
 iniciarApp();
 </script>
 </body>
