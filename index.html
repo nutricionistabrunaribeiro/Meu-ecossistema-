@@ -1978,6 +1978,31 @@ body.v38-sem-rolagem{overflow:hidden!important}
 
 #appRoot .v57-evidence-link{display:inline-block;margin:8px 0;color:var(--cor-primaria);font-size:11px;text-decoration:underline;overflow-wrap:anywhere}
 </style>
+<style id="v59-datas-especiais-agenda">
+.eco-agenda-nota{font-size:10.5px;line-height:1.5;color:var(--cor-texto-suave);margin:9px 0 0}
+.agenda-faixa .prazo-chip.feriado{border-left-color:#B54E74;background:color-mix(in srgb,var(--cor-superficie) 80%,#B54E74)}
+.agenda-faixa .prazo-chip.ponto_facultativo{border-left-color:#C29251;background:color-mix(in srgb,var(--cor-superficie) 83%,#C29251)}
+.agenda-faixa .prazo-chip.data_comemorativa{border-left-color:#9473AF;background:color-mix(in srgb,var(--cor-superficie) 85%,#9473AF)}
+.eco-data-detalhe{display:block;font-size:10px;line-height:1.35;color:var(--cor-texto-suave);margin-top:3px}
+.eco-cal-dia{transition:border-color .15s,background .15s;min-width:0;overflow:hidden}
+.eco-cal-dia:hover,.eco-cal-dia:focus-visible{border-color:var(--cor-primaria)!important;outline-offset:1px}
+.eco-cal-feriado{background:color-mix(in srgb,var(--cor-superficie) 88%,#B54E74)}
+.eco-cal-data-label{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px;font-size:8.5px;line-height:1.2;color:var(--cor-primaria);font-weight:700;overflow-wrap:anywhere}
+.eco-agenda-especiais-mes{margin-top:14px}
+.eco-lista-datas-mes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.eco-data-mes-item{min-width:0;display:flex;align-items:center;gap:10px;text-align:left;padding:10px;border:1px solid var(--cor-borda);background:var(--cor-fundo);border-radius:10px;color:var(--cor-texto)}
+.eco-data-mes-item:hover,.eco-data-mes-item:focus-visible{border-color:var(--cor-primaria)}
+.eco-data-mes-dia{color:var(--cor-primaria);font-size:11px;font-weight:800;flex:0 0 auto}
+.eco-data-mes-texto{flex:1;min-width:0}.eco-data-mes-texto strong{display:block;font-size:11.5px;line-height:1.3;overflow-wrap:anywhere}
+.eco-data-mes-texto small{display:block;color:var(--cor-texto-suave);font-size:10px;margin-top:3px;line-height:1.4;overflow-wrap:anywhere}
+.eco-data-mes-ponto{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+@media(max-width:650px){
+ .eco-lista-datas-mes{grid-template-columns:1fr}
+ .eco-cal-data-label{font-size:7.5px;-webkit-line-clamp:2;line-height:1.15}
+ .eco-cal-dia{padding:4px!important;min-height:63px!important}
+ .eco-agenda-nota{font-size:10px}
+}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2478,11 +2503,92 @@ let semanaOffsetAtual = 0;
 let mesOffsetAtual = 0;
 let visaoAgenda = "semana"; // 'semana' | 'mes'
 let dataAgendaDiaria = formatoISO(new Date());
-const CAMADAS_AGENDA={prazo:true,vencimento:true,treinamento:true,conteudo:true,datas_profissionais:true};
-const CORES_CAMADAS={prazo:'#D9822B',vencimento:'#B0413E',treinamento:'#7398B2',conteudo:'#805A9B',datas_profissionais:'#72BD88'};
+const CAMADAS_AGENDA={prazo:true,vencimento:true,treinamento:true,conteudo:true,datas_profissionais:true,feriado:true,ponto_facultativo:true,data_comemorativa:true};
+const CORES_CAMADAS={prazo:'#D9822B',vencimento:'#B0413E',treinamento:'#7398B2',conteudo:'#805A9B',datas_profissionais:'#72BD88',feriado:'#B54E74',ponto_facultativo:'#C29251',data_comemorativa:'#9473AF'};
 function alternarCamadaAgenda(tipo){CAMADAS_AGENDA[tipo]=!CAMADAS_AGENDA[tipo];renderTela();}
+
+/* Datas públicas são exibidas como calendário de referência: não criam compromissos,
+   não escrevem no Supabase e não modificam os registros pessoais da Bruna. */
+function pascoaCalendario(ano){
+  // Algoritmo gregoriano de Meeus/Jones/Butcher.
+  const a=ano%19,b=Math.floor(ano/100),c=ano%100,d=Math.floor(b/4),e=b%4;
+  const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
+  const l=(32+2*e+2*i-h-k+7*1000)%7,m=Math.floor((a+11*h+22*l)/451);
+  const mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;
+  return new Date(ano,mes-1,dia,12);
+}
+function dataRelativaCalendario(data,delta){const d=new Date(data);d.setDate(d.getDate()+delta);return formatoISO(d);}
+function domingoDoMesCalendario(ano,mes,ordem){const d=new Date(ano,mes-1,1,12);return formatoISO(new Date(ano,mes-1,1+((7-d.getDay())%7)+(ordem-1)*7,12));}
+function sextaBlackFridayCalendario(ano){ // Dia seguinte ao quarto quinta-feira de novembro.
+  const primeiraQuinta=1+((4-new Date(ano,10,1,12).getDay()+7)%7);
+  return formatoISO(new Date(ano,10,primeiraQuinta+3*7+1,12));
+}
+function datasEspeciaisCalendario(ano){
+  const lista=[],fixa=(mes,dia,titulo,tipo,detalhe='')=>adicionar(formatoISO(new Date(ano,mes-1,dia,12)),titulo,tipo,detalhe);
+  const adicionar=(dataISO,titulo,tipo,detalhe='')=>lista.push({dataISO,titulo,tipo,detalhe});
+  const pascoa=pascoaCalendario(ano);
+  // Feriados nacionais. O feriado de 9 de julho é da legislação estadual de SP.
+  [
+    [1,1,'Confraternização Universal'],[4,21,'Tiradentes'],
+    [5,1,'Dia do Trabalho'],[9,7,'Independência do Brasil'],
+    [10,12,'Nossa Senhora Aparecida'],[11,2,'Finados'],
+    [11,15,'Proclamação da República'],[11,20,'Dia Nacional de Zumbi e da Consciência Negra'],
+    [12,25,'Natal']
+  ].forEach(([m,d,nome])=>fixa(m,d,nome,'feriado','Feriado nacional'));
+  adicionar(dataRelativaCalendario(pascoa,-2),'Paixão de Cristo (Sexta-feira Santa)','feriado','Feriado nacional');
+  fixa(7,9,'Revolução Constitucionalista de 1932','feriado','Feriado estadual de São Paulo');
+
+  // Ponto facultativo é uma regra do serviço público, não uma folga geral.
+  if(ano===2026){
+    [
+      [2,16,'Carnaval','Órgãos federais'],[2,17,'Carnaval','Órgãos federais'],
+      [2,18,'Quarta-feira de Cinzas','Órgãos federais: até as 14h'],
+      [4,20,'Véspera de Tiradentes','Órgãos federais'],
+      [6,4,'Corpus Christi','Órgãos federais'],
+      [6,5,'Após Corpus Christi','Órgãos federais'],
+      [7,10,'Após 9 de Julho','Órgãos estaduais de São Paulo'],
+      [10,28,'Dia do Servidor Público (estadual)','Órgãos estaduais de São Paulo'],
+      [10,30,'Dia do Servidor Público federal','Órgãos federais: transferido de 28/10 pela Portaria MGI 8.821/2026'],
+      [12,24,'Véspera de Natal','Órgãos federais: após as 13h; estaduais de SP: dia inteiro'],
+      [12,31,'Véspera de Ano-Novo','Órgãos federais: após as 13h; estaduais de SP: dia inteiro']
+    ].forEach(([mes,dia,nome,nota])=>fixa(mes,dia,nome,'ponto_facultativo',nota));
+  }else if(ano===2027){
+    [
+      [2,8,'Carnaval'],[2,9,'Carnaval'],[2,10,'Quarta-feira de Cinzas (até 14h)'],
+      [5,27,'Corpus Christi'],[10,28,'Dia do Servidor Público federal'],
+      [12,24,'Véspera de Natal (após 13h)'],[12,31,'Véspera de Ano-Novo (após 13h)']
+    ].forEach(([mes,dia,nome])=>fixa(mes,dia,nome+' · previsão','ponto_facultativo','Previsão para órgãos federais; aguarda portaria oficial de 2027'));
+  }
+
+  // Datas gerais e comerciais. Datas técnicas (Nutricionista, Alimentação,
+  // Higiene etc.) já constam da camada editável «Datas da área».
+  [
+    [1,6,'Dia de Reis'],[2,4,'Dia Mundial do Câncer'],
+    [3,8,'Dia Internacional da Mulher'],[3,15,'Dia do Consumidor'],
+    [3,22,'Dia Mundial da Água'],[4,7,'Dia Mundial da Saúde'],
+    [5,12,'Dia Internacional da Enfermagem'],[6,12,'Dia dos Namorados'],
+    [6,24,'Dia de São João'],[7,8,'Dia do Panificador'],
+    [7,20,'Dia do Amigo'],[8,11,'Dia do Estudante'],
+    [9,15,'Dia do Cliente'],[10,5,'Dia da Micro e Pequena Empresa'],
+    [10,12,'Dia das Crianças'],[10,15,'Dia dos Professores'],
+    [11,19,'Dia Mundial do Empreendedorismo Feminino']
+  ].filter(([, ,nome])=>!['Dia Mundial da Água','Dia Mundial da Saúde'].includes(nome))
+    .forEach(([mes,dia,nome])=>fixa(mes,dia,nome,'data_comemorativa','Data comemorativa'));
+  adicionar(formatoISO(pascoa),'Domingo de Páscoa','data_comemorativa','Data religiosa e familiar');
+  adicionar(domingoDoMesCalendario(ano,5,2),'Dia das Mães','data_comemorativa','Segundo domingo de maio');
+  adicionar(domingoDoMesCalendario(ano,8,2),'Dia dos Pais','data_comemorativa','Segundo domingo de agosto');
+  adicionar(sextaBlackFridayCalendario(ano),'Black Friday','data_comemorativa','Data comercial • oportunidade para planejamento de campanhas');
+  return lista.sort((a,b)=>a.dataISO.localeCompare(b.dataISO)||a.tipo.localeCompare(b.tipo));
+}
+function anosVisiveisDatasEspeciais(){
+  const atual=new Date().getFullYear();
+  const semana=addDias(REF_INICIO_SEMANA,semanaOffsetAtual*7);
+  const mes=new Date(HOJE_REAL.getFullYear(),HOJE_REAL.getMonth()+mesOffsetAtual,1);
+  return [...new Set([atual,atual+1,atual+2,Number(dataAgendaDiaria.slice(0,4)),semana.getFullYear(),addDias(semana,6).getFullYear(),mes.getFullYear()])];
+}
 function itensCalendarioInteligente(){
-  const itens=[];const add=(dataISO,titulo,tipo,clienteId=null)=>{dataISO=normalizarDataISO(dataISO);if(dataISO&&CAMADAS_AGENDA[tipo])itens.push({dataISO,titulo,tipo,clienteId})};
+  const itens=[];const add=(dataISO,titulo,tipo,clienteId=null,detalhe='')=>{dataISO=normalizarDataISO(dataISO);if(dataISO&&CAMADAS_AGENDA[tipo])itens.push({dataISO,titulo,tipo,clienteId,detalhe})};
   (ENTREGAS||[]).filter(e=>!entregaConcluida(e)).forEach(e=>{
     const abertos=ENTREGA_CLIENTES.filter(v=>v.entrega_id===e.id&&v.status!=='entregue');
     abertos.forEach(v=>add(e.prazo,'Entrega: '+e.titulo,'prazo',v.cliente_id));
@@ -2492,6 +2598,10 @@ function itensCalendarioInteligente(){
   (LIDERANCA_DELEGACOES||[]).filter(d=>d.status!=='concluida').forEach(d=>{add(d.prazo,'Delegação: '+d.titulo,'prazo',d.cliente_id);add(d.proximo_acompanhamento,'Acompanhar: '+d.titulo,'prazo',d.cliente_id)});
   (CONTEUDOS_MKT||[]).filter(c=>c.status!=='publicado').forEach(c=>add(c.dataISO,'Conteúdo: '+c.titulo,'conteudo'));
   if(CAMADAS_AGENDA.datas_profissionais){const anoBase=new Date().getFullYear(),anos=Array.from({length:31},(_,i)=>anoBase-10+i);(DATAS_PROFISSIONAIS||[]).filter(d=>d.ativo).forEach(d=>anos.forEach(a=>add(dataProfissionalISO(d,a),'Data da área: '+d.titulo,'datas_profissionais')));}
+  if(CAMADAS_AGENDA.feriado||CAMADAS_AGENDA.ponto_facultativo||CAMADAS_AGENDA.data_comemorativa){
+    anosVisiveisDatasEspeciais().forEach(ano=>datasEspeciaisCalendario(ano).forEach(item=>
+      add(item.dataISO,item.titulo,item.tipo,null,item.detalhe)));
+  }
   (CLIENTES||[]).forEach(c=>(c.documentacao||[]).filter(d=>d.aplicavel!==false).forEach(d=>{if(dataLocalDocumento(d.validade)&&statusAutomaticoDoc(d.validade)!=='Vigente')add(d.validade,'Documento: '+d.nome,'vencimento',c.id)}));
   return itens;
 }
@@ -2515,19 +2625,19 @@ function agendaHTML(){
   const legenda = `<div class="legenda">` +
     CATEGORIAS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot" style="background:${t.cor}"></span>${t.nome}</div>`).join('') +
     `</div>`;
-  const filtros=`<div class="agenda-filtros"><strong style="font-size:11px;padding:6px 2px">Exibir:</strong>${Object.entries({prazo:'Prazos',vencimento:'Vencimentos',treinamento:'Treinamentos',conteudo:'Conteúdo',datas_profissionais:'Datas da área'}).map(([id,nome])=>`<button class="agenda-filtro ${CAMADAS_AGENDA[id]?'':'off'}" onclick="alternarCamadaAgenda('${id}')"><span style="color:${CORES_CAMADAS[id]}">●</span> ${nome}</button>`).join('')}</div>`;
+  const filtros=`<div class="agenda-filtros"><strong style="font-size:11px;padding:6px 2px">Exibir:</strong>${Object.entries({prazo:'Prazos',vencimento:'Vencimentos',treinamento:'Treinamentos',conteudo:'Conteúdo',datas_profissionais:'Datas da área',feriado:'Feriados',ponto_facultativo:'Pontos facultativos',data_comemorativa:'Datas comemorativas'}).map(([id,nome])=>`<button class="agenda-filtro ${CAMADAS_AGENDA[id]?'':'off'}" aria-pressed="${CAMADAS_AGENDA[id]}" onclick="alternarCamadaAgenda('${id}')"><span style="color:${CORES_CAMADAS[id]}">●</span> ${nome}</button>`).join('')}</div>`;
   const abas = `<div class="agenda-view-switch">
       <button class="${visaoAgenda==='dia'?'active':''}" onclick="mudarVisaoAgenda('dia')">Dia</button>
       <button class="${visaoAgenda==='semana'?'active':''}" onclick="mudarVisaoAgenda('semana')">Semana</button>
       <button class="${visaoAgenda==='mes'?'active':''}" onclick="mudarVisaoAgenda('mes')">Mês / Calendário</button>
     </div>`;
-  return `<section class="agenda-hero"><div class="agenda-hero-top"><div class="agenda-hero-title"><div class="agenda-icon">▦</div><div><strong>Minha agenda</strong><span>Compromissos, prazos e vencimentos em um só lugar</span></div></div>${abas}</div><div class="agenda-hero-details"><div><div class="agenda-hero-label">Categorias</div>${legenda}</div><div><div class="agenda-hero-label">Camadas inteligentes</div>${filtros}</div></div></section>` + (visaoAgenda==='dia' ? agendaDiaHTML() : visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
+  return `<section class="agenda-hero"><div class="agenda-hero-top"><div class="agenda-hero-title"><div class="agenda-icon">▦</div><div><strong>Minha agenda</strong><span>Compromissos, datas importantes, prazos e vencimentos</span></div></div>${abas}</div><div class="agenda-hero-details"><div><div class="agenda-hero-label">Categorias</div>${legenda}</div><div><div class="agenda-hero-label">Camadas inteligentes</div>${filtros}<p class="eco-agenda-nota">Feriados nacionais + 9 de Julho (SP). Pontos facultativos referem-se ao serviço público; os de 2027 são previsões, sujeitas à confirmação.</p></div></div></section>` + (visaoAgenda==='dia' ? agendaDiaHTML() : visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
 }
 
 function agendaDiaHTML(){
   const d=new Date(dataAgendaDiaria+'T12:00:00'),eventos=eventosSemana.filter(e=>e.dataISO===dataAgendaDiaria).sort((a,b)=>a.hora-b.hora),avisos=itensCalendarioInteligente().filter(i=>i.dataISO===dataAgendaDiaria);
   return `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(-1)">‹</button><button class="agenda-hoje" onclick="irDiaHoje()">Hoje</button></div><div class="agenda-periodo-label">${DIAS_SEMANA[d.getDay()]}, ${isoParaBRCompleto(dataAgendaDiaria)}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(1)">›</button></div></div>
-  ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${i.titulo}</span>`).join('')}</section>`:''}
+  ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${textoHTML(i.titulo)}${i.detalhe?`<small class="eco-data-detalhe">${textoHTML(i.detalhe)}</small>`:''}</span>`).join('')}</section>`:''}
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-primario" onclick="abrirFormularioAgenda('${dataAgendaDiaria}',${Math.min(19,Math.max(7,new Date().getHours()))})">+ Novo compromisso</button></div>
   <div class="agenda-dia-cards v22-agenda-timeline">${eventos.map(e=>{const cat=CATEGORIAS_EVENTO.find(c=>c.id===e.categoria)||CATEGORIAS_EVENTO.at(-1);return `<div class="v22-agenda-linha"><div class="v22-agenda-hora">${String(e.hora).padStart(2,'0')}:00</div><button type="button" class="v22-agenda-item ${e.concluido?'concluido':''}" onclick="abrirDetalheAgendaV22('${e.id}')" aria-label="Abrir compromisso das ${String(e.hora).padStart(2,'0')} horas"><span class="v22-agenda-faixa" style="background:${cat.cor}"></span><span class="v22-agenda-conteudo">${eventoResumoHTML(e)}</span><span class="v22-agenda-seta">›</span></button></div>`}).join('')||'<div class="agenda-dia-vazio">Nenhum compromisso neste dia. Toque em “Novo compromisso” para adicionar.</div>'}</div>`;
 }
@@ -2542,7 +2652,7 @@ function agendaSemanaHTML(){
   const inteligentes=itensCalendarioInteligente();
   const diasComAvisos=diasDaSemana.map(d=>({data:d,itens:inteligentes.filter(i=>i.dataISO===formatoISO(d))})).filter(d=>d.itens.length);
   const totalAvisos=diasComAvisos.reduce((s,d)=>s+d.itens.length,0);
-  const faixa=totalAvisos?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do período</div><div class="agenda-faixa-contagem">${totalAvisos} ${totalAvisos===1?'item':'itens'} com data</div></div><div class="agenda-faixa-lista">${diasComAvisos.map(d=>`<div class="agenda-faixa-dia"><div class="agenda-faixa-data">${DIAS_SEMANA[d.data.getDay()]} · ${formatoBR(d.data)}</div>${d.itens.map(i=>`<span class="prazo-chip ${i.tipo}" title="Registro original — não é uma cópia">${i.titulo}${i.clienteId?' · '+(CLIENTES.find(c=>c.id===i.clienteId)?.nome||''):''}</span>`).join('')}</div>`).join('')}</div></section>`:'';
+  const faixa=totalAvisos?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do período</div><div class="agenda-faixa-contagem">${totalAvisos} ${totalAvisos===1?'item':'itens'} com data</div></div><div class="agenda-faixa-lista">${diasComAvisos.map(d=>`<div class="agenda-faixa-dia"><div class="agenda-faixa-data">${DIAS_SEMANA[d.data.getDay()]} · ${formatoBR(d.data)}</div>${d.itens.map(i=>`<span class="prazo-chip ${i.tipo}" title="${textoHTML(i.detalhe||'Aviso automático da agenda')}">${textoHTML(i.titulo)}${i.clienteId?' · '+textoHTML(CLIENTES.find(c=>c.id===i.clienteId)?.nome||''):''}${i.detalhe?`<small class="eco-data-detalhe">${textoHTML(i.detalhe)}</small>`:''}</span>`).join('')}</div>`).join('')}</div></section>`:'';
   let grid = `<div class="planner-scroll"><div class="planner-grid">`;
   grid += `<div class="canto"></div>`;
   diasDaSemana.forEach(d=>{
@@ -2578,21 +2688,26 @@ function agendaMesHTML(){
 
   let nav = `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irMes(-1)" title="Mês anterior">‹</button></div><div class="agenda-periodo-label">${nomeMes}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irMes(1)" title="Próximo mês">›</button></div></div>`;
 
+  const avisosMes=itensCalendarioInteligente();
+  const especiaisMes=avisosMes.filter(i=>['feriado','ponto_facultativo','data_comemorativa'].includes(i.tipo)&&i.dataISO.slice(0,7)===formatoISO(baseMes).slice(0,7)).sort((a,b)=>a.dataISO.localeCompare(b.dataISO));
   let celulas = '';
   for(let i=0;i<primeiroDiaSemana;i++) celulas += `<div></div>`;
   for(let dia=1; dia<=diasNoMes; dia++){
     const dataCel = new Date(baseMes.getFullYear(), baseMes.getMonth(), dia);
     const dataISO = formatoISO(dataCel);
     const eventosNoDia = eventosSemana.filter(e=>e.dataISO===dataISO);
-    const inteligentesNoDia=itensCalendarioInteligente().filter(i=>i.dataISO===dataISO);
+    const inteligentesNoDia=avisosMes.filter(i=>i.dataISO===dataISO);
+    const especiaisNoDia=inteligentesNoDia.filter(i=>['feriado','ponto_facultativo','data_comemorativa'].includes(i.tipo));
+    const temFeriado=especiaisNoDia.some(i=>i.tipo==='feriado');
     const ehHoje = dataISO===formatoISO(HOJE_REAL);
     const cores = [...new Set(eventosNoDia.map(e=>CATEGORIAS_EVENTO.find(x=>x.id===e.categoria)?.cor).filter(Boolean).concat(inteligentesNoDia.map(i=>CORES_CAMADAS[i.tipo])))];
     celulas += `
-      <div onclick="abrirSemanaDoDia('${dataISO}')" style="cursor:pointer;border:1px solid var(--cor-borda);border-radius:8px;min-height:64px;padding:6px;${ehHoje?'background:var(--cor-fundo);border-color:var(--cor-primaria);':''}">
+      <div class="eco-cal-dia ${temFeriado?'eco-cal-feriado':''}" role="button" tabindex="0" aria-label="${dia} de ${MESES_NOME[baseMes.getMonth()]}${especiaisNoDia.length?' · '+textoHTML(especiaisNoDia.map(i=>i.titulo).join(', ')):''}" title="${textoHTML(especiaisNoDia.map(i=>i.titulo).join(' • '))}" onclick="abrirSemanaDoDia('${dataISO}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirSemanaDoDia('${dataISO}')} " style="cursor:pointer;border:1px solid var(--cor-borda);border-radius:8px;min-height:64px;padding:6px;${ehHoje?'background:var(--cor-fundo);border-color:var(--cor-primaria);':''}">
         <div style="font-size:11.5px;font-weight:${ehHoje?'700':'500'};color:${ehHoje?'var(--cor-primaria)':'var(--cor-texto)'};">${dia}</div>
         <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;">
           ${cores.map(cor=>`<span style="width:7px;height:7px;border-radius:50%;background:${cor};display:inline-block;"></span>`).join('')}
         </div>
+        ${especiaisNoDia.length?`<span class="eco-cal-data-label">${textoHTML(especiaisNoDia[0].titulo)}</span>`:''}
       </div>`;
   }
 
@@ -2601,6 +2716,7 @@ function agendaMesHTML(){
       ${DIAS_SEMANA_CALENDARIO.map(d=>`<div style="text-align:center;font-size:10.5px;font-weight:700;color:var(--cor-texto-suave);">${d}</div>`).join('')}
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">${celulas}</div>
+    ${especiaisMes.length?`<section class="agenda-faixa eco-agenda-especiais-mes"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>✦</span>Datas importantes do mês</div><div class="agenda-faixa-contagem">${especiaisMes.length} datas</div></div><div class="eco-lista-datas-mes">${especiaisMes.map(i=>`<button type="button" class="eco-data-mes-item" onclick="abrirSemanaDoDia('${i.dataISO}')"><span class="eco-data-mes-dia">${i.dataISO.slice(8,10)}/${i.dataISO.slice(5,7)}</span><span class="eco-data-mes-texto"><strong>${textoHTML(i.titulo)}</strong><small>${textoHTML(i.detalhe)}</small></span><span class="eco-data-mes-ponto" style="background:${CORES_CAMADAS[i.tipo]}"></span></button>`).join('')}</div></section>`:''}
     <div class="peq" style="margin-top:12px;font-size:12px;color:var(--cor-texto-suave);">Toque num dia pra abrir a semana correspondente no planner.</div>`;
 }
 
