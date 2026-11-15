@@ -2003,6 +2003,70 @@ body.v38-sem-rolagem{overflow:hidden!important}
  .eco-agenda-nota{font-size:10px}
 }
 </style>
+<style id="v60-oracao-modal-mobile">
+/* v60 — formulário Na Presença: corrige largura intrínseca dos campos de data no Safari/iPhone. */
+#modalSistema:has(.np-form) .system-modal{
+  width:min(560px,100%);min-width:0;max-width:calc(100vw - 24px);
+  box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+}
+#modalSistema:has(.np-form) .np-form{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:13px;
+  min-width:0;max-width:100%;width:100%;box-sizing:border-box;
+}
+#modalSistema:has(.np-form) .np-form>*{
+  min-width:0;max-width:100%;box-sizing:border-box;
+}
+#modalSistema:has(.np-form) .np-form label{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:7px;
+  min-width:0;max-width:100%;overflow-wrap:anywhere;
+}
+#modalSistema:has(.np-form) .np-form input:not([type="checkbox"]),
+#modalSistema:has(.np-form) .np-form select,
+#modalSistema:has(.np-form) .np-form textarea{
+  display:block;width:100%!important;min-width:0!important;max-width:100%!important;
+  box-sizing:border-box!important;margin:0;
+}
+#modalSistema:has(.np-form) .np-form input[type="date"]{
+  -webkit-appearance:none;appearance:none;min-height:47px;
+  font-size:16px!important;line-height:1.35;text-align:left;
+  padding:10px 12px!important;overflow:hidden;
+}
+#modalSistema:has(.np-form) .np-form input[type="date"]::-webkit-date-and-time-value{
+  min-width:0;max-width:100%;width:100%;text-align:left;
+}
+#modalSistema:has(.np-form) .np-form input[type="date"]::-webkit-datetime-edit{
+  min-width:0;padding:0;text-align:left;
+}
+#modalSistema:has(.np-form) .np-form textarea{
+  min-height:110px;max-height:28dvh;resize:vertical;
+}
+#modalSistema:has(.np-form) .system-modal-head>div{flex:1;min-width:0}
+#modalSistema:has(.np-form) .system-modal-head h2{overflow-wrap:anywhere;line-height:1.17}
+#modalSistema:has(.np-form) .system-modal-close{flex:0 0 32px;color:var(--cor-primaria)}
+#modalSistema:has(.np-form) .np-form button[type="submit"],
+#modalSistema:has(.np-form) .np-form>.btn-primario{
+  width:100%;max-width:100%;min-height:46px;white-space:normal;
+}
+@media(max-width:680px){
+ #modalSistema:has(.np-form){padding:10px!important;align-items:center!important}
+ #modalSistema:has(.np-form) .system-modal{
+   width:100%!important;max-width:calc(100vw - 20px)!important;
+   max-height:calc(100dvh - 20px)!important;
+   margin:0 auto;padding:17px!important;border-radius:20px!important;
+   -webkit-overflow-scrolling:touch;
+ }
+ #modalSistema:has(.np-form) .system-modal-head{gap:10px;margin-bottom:15px}
+ #modalSistema:has(.np-form) .system-modal-head h2{font-size:clamp(19px,5.5vw,24px)!important}
+ #modalSistema:has(.np-form) .system-modal-head p{font-size:12px;line-height:1.45}
+ #modalSistema:has(.np-form) .np-form{gap:12px}
+ #modalSistema:has(.np-form) .np-form label{font-size:12px;line-height:1.45}
+ #modalSistema:has(.np-form) .np-form input:not([type="checkbox"]),
+ #modalSistema:has(.np-form) .np-form select,
+ #modalSistema:has(.np-form) .np-form textarea{font-size:16px!important}
+ #modalSistema:has(.np-form) .np-form textarea{min-height:105px;max-height:24dvh}
+ #modalSistema:has(.np-form) .np-form button[type="submit"]{min-height:46px}
+}
+</style>
 </head>
 <body data-espaco="trabalho">
 
