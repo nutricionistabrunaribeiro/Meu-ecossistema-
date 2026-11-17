@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v74</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v75</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2267,6 +2267,23 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v74-renovacao-line{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--cor-texto)}
 .v74-renovacao-line button{border:1px solid var(--cor-borda);border-radius:8px;padding:7px 9px;color:var(--cor-primaria)}
 @media(max-width:700px){.v74-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v74-supervisao{padding:16px;border-radius:22px}.v74-supervisao .v73-actions button{width:100%}#modalSistema:has(.v74-treino-form){padding:9px!important;align-items:center!important}#modalSistema:has(.v74-treino-form) .system-modal{max-height:calc(100dvh - 18px);padding:16px!important}#modalSistema:has(.v74-treino-form) .form-grid{grid-template-columns:minmax(0,1fr)!important}#modalSistema:has(.v74-treino-form) .form-field.full{grid-column:1!important}}
+</style>
+<style id="v75-supervisao-resumo">
+.v75-supervisao{gap:20px}
+.v75-supervisao .v74-supervisao-topo{gap:9px}
+.v75-supervisao .v73-metricas{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.v75-supervisao .v73-metrica{padding:20px 16px;min-height:132px;justify-content:center;align-items:center;text-align:center}
+.v75-supervisao .v73-metrica>span{font-size:12px;line-height:1.4}
+.v75-supervisao .v73-metrica>strong{font-size:clamp(34px,5vw,49px)}
+.v75-supervisao .v73-metrica>small{font-size:11px;line-height:1.4}
+.v75-escopo{display:flex;gap:6px;padding:6px;background:color-mix(in srgb,var(--cor-primaria) 7%,var(--cor-superficie));border:1px solid var(--cor-borda);border-radius:17px;max-width:100%;flex-wrap:wrap;justify-content:center}
+.v75-escopo button{border:1px solid transparent;background:transparent;color:var(--cor-texto);padding:10px 14px;font-size:12px;font-weight:650;border-radius:11px;cursor:pointer}
+.v75-escopo button.ativo{background:var(--cor-primaria);color:white;box-shadow:0 3px 9px rgba(30,15,25,.1)}
+.v75-supervisao .v73-actions{padding-top:4px}
+.v75-supervisao .v73-actions button{min-width:160px}
+.v75-supervisao .v75-info{font-size:11px;color:var(--cor-texto-suave);line-height:1.55;text-align:center;max-width:570px;margin:0 auto}
+@media(max-width:850px){.v75-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:470px){.v75-escopo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;box-sizing:border-box;gap:4px;padding:5px}.v75-escopo button{padding:10px 3px;font-size:10.5px}.v75-supervisao .v73-metrica{padding:14px 8px;min-height:132px}.v75-supervisao .v73-metrica>span{font-size:11px}.v75-supervisao .v73-metrica>strong{font-size:39px}.v75-supervisao .v73-actions button{width:100%}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7177,6 +7194,49 @@ function v74OcultarResumoLegado(){
   if(secao&&!secao.closest('.v74-supervisao')&&secao.textContent.length<1600&&/em aberto|atrasad|entregas conclu[ií]das/i.test(secao.textContent)){secao.hidden=true;secao.style.display='none';}
  });
 }
+/* V75 - Supervisão: quatro indicadores, sem histórico rolável na tela. */
+let V75_ESCOPO_SUPERVISAO='todos';
+function v75GrupoClienteRegistro(registro){
+ const id=registro?.cliente_id||registro?.clienteId||null;
+ const cliente=CLIENTES.find(c=>String(c.id)===String(id));
+ if(cliente){
+  const root=CLIENTES.find(c=>String(c.nome||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,'').includes('sabernutrir'));
+  if((root&&String(cliente.id)===String(root.id))||(root&&String(cliente.contratanteId)===String(root.id))||cliente.tipoCliente==='vinculado')return 'saber';
+  return 'bruna';
+ }
+ const evento=registro?.evento_id?eventosSemana.find(e=>String(e.id)===String(registro.evento_id)):registro;
+ return evento?.categoria==='saber_nutrir'?'saber':evento?.categoria==='brc'?'bruna':'sem_cliente';
+}
+function v75DadosSupervisao(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
+ const anoTexto=String(ano),inclui=r=>escopo==='todos'||v75GrupoClienteRegistro(r)===escopo;
+ const visitasRealizadas=eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido&&String(e.dataISO||'').startsWith(anoTexto)&&inclui(e));
+ const visitasProgramadas=eventosSemana.filter(e=>e.tipo==='visita'&&!e.concluido&&String(e.dataISO||'').startsWith(anoTexto)&&inclui(e));
+ const treinamentosRealizados=v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(anoTexto)&&inclui(t));
+ const treinamentosProgramados=v73AlertasTreino().programados.filter(t=>String(t.data||'').startsWith(anoTexto)&&inclui(t));
+ return {ano,escopo,visitasRealizadas,visitasProgramadas,treinamentosRealizados,treinamentosProgramados};
+}
+function v75NomeEscopo(escopo=V75_ESCOPO_SUPERVISAO){return {todos:'Todas as carteiras',saber:'Saber Nutrir',bruna:'Bruna Ribeiro'}[escopo]||'Todas as carteiras';}
+function v75NomeCliente(registro){
+ const id=registro?.cliente_id||registro?.clienteId||null;
+ const nome=CLIENTES.find(c=>String(c.id)===String(id))?.nome||registro?.clienteNomeVinculado||registro?.clienteExterno;
+ return String(nome||'Sem cliente vinculado');
+}
+function v75PainelSupervisaoHTML(){
+ const d=v75DadosSupervisao(),cards=[
+  ['Treinamentos realizados',d.treinamentosRealizados.length,'Concluídos no ano'],
+  ['Treinamentos programados',d.treinamentosProgramados.length,'Ainda não realizados'],
+  ['Visitas realizadas',d.visitasRealizadas.length,'Concluídas na Agenda'],
+  ['Visitas programadas',d.visitasProgramadas.length,'Ainda não realizadas'],
+ ];
+ return `<section class="v74-supervisao v75-supervisao" aria-label="Supervisão em números">
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Visitas e treinamentos em números, com os registros organizados no relatório anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
+ <div class="v73-metricas">${cards.map(([nome,total,descricao])=>`<article class="v73-metrica"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
+ <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
+ <p class="v75-info">Exibindo: ${v75NomeEscopo()}. O PDF utilizará exatamente esta carteira e este ano, sem incluir clientes de outra carteira.</p>
+ </section>`;
+}
+function entregasHTML(){return v75PainelSupervisaoHTML();}
 function abrirFormularioTreinamentoV73(clienteId='',id=''){
  const treino=TREINAMENTOS.find(t=>String(t.id)===String(id)),agenda=v74TreinamentosConsolidados().find(t=>String(t.id)===String(id)&&t.origem==='agenda');
  if(agenda){abrirDetalheAgendaV22(String(agenda.evento_id));return;}
@@ -7266,6 +7326,109 @@ function gerarResumoAnualV73(){
  treinos.slice().sort((a,b)=>String(a.data).localeCompare(String(b.data))).forEach(t=>linha(`${dataBR(t.data)} · ${CLIENTES.find(c=>c.id===t.cliente_id)?.nome||'Cliente'} · ${t.tema} · ${t.participantes||0} participante(s)`));
  if(!treinos.length)linha('Nenhum treinamento realizado neste ano.');
  doc.save(`meu-ecossistema-entregas-${ano}.pdf`);
+}
+
+/* V75 - PDF de gestão com carteira selecionada, quatro indicadores e histórico. */
+function v75GerarRelatorioPDF(){
+ if(!window.jspdf?.jsPDF){alert('O gerador de PDF ainda não carregou. Verifique a conexão e tente novamente.');return;}
+ const d=v75DadosSupervisao(),scope=v75NomeEscopo(d.escopo),doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+ const C={marsala:[142,94,105],rosa:[199,166,167],fundo:[249,244,241],tinta:[57,43,47],suave:[119,99,105],borda:[228,212,207],branco:[255,255,255]};
+ const rgb=(tipo,cor)=>doc[tipo](...cor),hojeISO=formatoISO(new Date()),emissao=dataBR(hojeISO),W=210,H=297;
+ const limpar=s=>String(s??'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\r\n\t]+/g,' ').trim();
+ let y=42,pagina=0;
+ const novaPagina=(subtitulo='Visão executiva',nova=true)=>{
+  if(nova)doc.addPage();pagina++;y=45;
+  rgb('setFillColor',C.marsala);doc.rect(0,0,W,34,'F');
+  rgb('setFillColor',C.branco);doc.roundedRect(15,8,16,16,4,4,'F');
+  rgb('setTextColor',C.marsala);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('BR',23,18.5,{align:'center'});
+  rgb('setTextColor',C.branco);doc.setFontSize(13);doc.text('RELATÓRIO ANUAL DE SUPERVISÃO',37,15);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.text(limpar(scope)+'  |  '+d.ano,37,23);
+  rgb('setTextColor',C.tinta);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(subtitulo,16,y);
+  y+=9;
+ };
+ const faixa=(titulo,descricao='')=>{
+  if(y>259)novaPagina(titulo);
+  rgb('setFillColor',C.fundo);doc.roundedRect(15,y,180,descricao?22:16,3,3,'F');
+  rgb('setTextColor',C.marsala);doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.text(limpar(titulo),20,y+7);
+  if(descricao){rgb('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text(limpar(descricao),20,y+15);}
+  y+=descricao?27:20;
+ };
+ const cards=[
+  ['Treinamentos realizados',d.treinamentosRealizados.length],
+  ['Treinamentos programados',d.treinamentosProgramados.length],
+  ['Visitas realizadas',d.visitasRealizadas.length],
+  ['Visitas programadas',d.visitasProgramadas.length],
+ ];
+ const celula=(x,yy,largura,rotulo,numero)=>{
+  rgb('setFillColor',C.fundo);rgb('setDrawColor',C.borda);doc.roundedRect(x,yy,largura,37,4,4,'FD');
+  rgb('setTextColor',C.suave);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text(limpar(rotulo),x+6,yy+10,{maxWidth:largura-11});
+  rgb('setTextColor',C.marsala);doc.setFont('helvetica','bold');doc.setFontSize(22);doc.text(String(numero),x+6,yy+28);
+ };
+ const resumoCliente=new Map(),linhaCliente=registro=>{
+  const id=String(registro?.cliente_id||registro?.clienteId||registro?.clienteNomeVinculado||registro?.clienteExterno||'sem-cliente');
+  if(!resumoCliente.has(id))resumoCliente.set(id,{nome:v75NomeCliente(registro),visitasRealizadas:0,visitasProgramadas:0,treinamentosRealizados:0,treinamentosProgramados:0});
+  return resumoCliente.get(id);
+ };
+ for(const tipo of ['visitasRealizadas','visitasProgramadas','treinamentosRealizados','treinamentosProgramados'])for(const registro of d[tipo])linhaCliente(registro)[tipo]++;
+ const clientes=[...resumoCliente.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+ function tabela(titulo,colunas,linhas,{descricao='',iniciarPagina=false}={}){
+  if(iniciarPagina)novaPagina(titulo);else if(y>244)novaPagina(titulo);
+  faixa(titulo,descricao);
+  const xInicio=16,total=178,larguras=colunas.map(c=>c.largura),soma=larguras.reduce((a,b)=>a+b,0);
+  if(Math.abs(soma-total)>0.01)throw Error('As colunas do relatório precisam somar 178 mm.');
+  const cabecalho=()=>{
+   if(y>263)novaPagina(titulo+' - continuação');
+   rgb('setFillColor',C.marsala);doc.roundedRect(xInicio,y,total,12,2,2,'F');
+   rgb('setTextColor',C.branco);doc.setFont('helvetica','bold');doc.setFontSize(7.8);let x=xInicio;
+   colunas.forEach((c,i)=>{doc.text(limpar(c.rotulo),x+3,y+7.5,{maxWidth:larguras[i]-6});x+=larguras[i];});y+=12;
+  };
+  cabecalho();
+  if(!linhas.length){
+   rgb('setTextColor',C.suave);doc.setFont('helvetica','italic');doc.setFontSize(9);
+   doc.text('Nenhum registro nesta categoria para o ano e a carteira escolhidos.',20,y+10);y+=18;return;
+  }
+  linhas.forEach((linha,indice)=>{
+   const textos=colunas.map((c,i)=>doc.splitTextToSize(limpar(linha[c.chave]||''),larguras[i]-6).slice(0,4));
+   const altura=Math.max(11,Math.max(...textos.map(t=>t.length))*4.2+5);
+   if(y+altura>272){novaPagina(titulo+' - continuação');cabecalho();}
+   rgb('setFillColor',indice%2===0?C.branco:C.fundo);doc.rect(xInicio,y,total,altura,'F');
+   rgb('setDrawColor',C.borda);doc.setLineWidth(.2);doc.line(xInicio,y+altura,xInicio+total,y+altura);
+   let x=xInicio;rgb('setTextColor',C.tinta);doc.setFont('helvetica','normal');doc.setFontSize(8.1);
+   textos.forEach((t,i)=>{doc.text(t,x+3,y+5.5,{lineHeightFactor:1.18});x+=larguras[i];});y+=altura;
+  });
+  y+=5;
+ }
+ novaPagina('Visão executiva',false);
+ rgb('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(9);
+ doc.text('Período: 1º de janeiro a 31 de dezembro de '+d.ano+'  |  Emitido em '+emissao,16,y);y+=11;
+ celula(16,y,86,cards[0][0],cards[0][1]);celula(108,y,86,cards[1][0],cards[1][1]);y+=43;
+ celula(16,y,86,cards[2][0],cards[2][1]);celula(108,y,86,cards[3][0],cards[3][1]);y+=48;
+ tabela('Resultados por cliente',[
+  {chave:'nome',rotulo:'Cliente',largura:74},
+  {chave:'vr',rotulo:'Vis. feitas',largura:26},
+  {chave:'vp',rotulo:'Vis. prog.',largura:26},
+  {chave:'tr',rotulo:'Trein. feitos',largura:26},
+  {chave:'tp',rotulo:'Trein. prog.',largura:26},
+ ],clientes.map(c=>({nome:c.nome,vr:String(c.visitasRealizadas),vp:String(c.visitasProgramadas),tr:String(c.treinamentosRealizados),tp:String(c.treinamentosProgramados)})),{descricao:'Consolidado por estabelecimento/cliente. Os totais correspondem à carteira selecionada.'});
+ const tabelaVisitas=(titulo,registros,descricao)=>tabela(titulo,[
+  {chave:'data',rotulo:'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:67},{chave:'atividade',rotulo:'Atividade',largura:84},
+ ],registros.slice().sort((a,b)=>String(a.dataISO||'').localeCompare(String(b.dataISO||''))).map(e=>({data:dataBR(e.dataISO)+(Number.isInteger(Number(e.hora))?' '+String(e.hora).padStart(2,'0')+'h':''),cliente:v75NomeCliente(e),atividade:e.titulo||'Visita de supervisão'})),{descricao,iniciarPagina:true});
+ const tabelaTreinos=(titulo,registros,descricao,realizados=false)=>tabela(titulo,[
+  {chave:'data',rotulo:'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:55},{chave:'tema',rotulo:'Tema',largura:68},{chave:'status',rotulo:'Situação',largura:28},
+ ],registros.slice().sort((a,b)=>String(a.data||'').localeCompare(String(b.data||''))).map(t=>({data:dataBR(t.data),cliente:v75NomeCliente(t),tema:t.tema||'Treinamento',status:realizados?v73SituacaoTreino(t).rotulo:'Programado'})),{descricao,iniciarPagina:true});
+ tabelaVisitas('Visitas realizadas',d.visitasRealizadas,'Visitas de supervisão marcadas como concluídas na Agenda.');
+ tabelaVisitas('Visitas programadas',d.visitasProgramadas,'Compromissos de visita ainda não marcados como concluídos.');
+ tabelaTreinos('Treinamentos realizados',d.treinamentosRealizados,'Histórico de treinamentos e reciclagens, inclusive os já renovados.',true);
+ tabelaTreinos('Treinamentos programados',d.treinamentosProgramados,'Treinamentos com data prevista e ainda não concluídos.');
+ const totalPaginas=doc.internal.getNumberOfPages();
+ for(let i=1;i<=totalPaginas;i++){
+  doc.setPage(i);rgb('setDrawColor',C.borda);doc.setLineWidth(.35);doc.line(15,282,195,282);
+  rgb('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(8);
+  doc.text('Meu Ecossistema | Bruna Ribeiro · Consultoria e Supervisão',16,288);
+  doc.text('Página '+i+' de '+totalPaginas,194,288,{align:'right'});
+ }
+ const nomeArquivo={todos:'todas-as-carteiras',saber:'saber-nutrir',bruna:'bruna-ribeiro'}[d.escopo]||'todas-as-carteiras';
+ doc.save(`supervisao-${nomeArquivo}-${d.ano}.pdf`);
 }
 
 /* ---------- PLANEJAMENTO, DATAS DA ÁREA E FECHAMENTO MENSAL ---------- */
@@ -8350,7 +8513,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='74',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='75',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
