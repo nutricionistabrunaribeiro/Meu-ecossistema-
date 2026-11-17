@@ -2687,7 +2687,7 @@ function trocarEspaco(esp){
   salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
-  if(esp==='pessoal' && window.innerWidth<=900) abrirMenuMobile();
+  if(window.innerWidth<=900) abrirMenuMobile();
   else fecharMenuMobile();
 }
 
@@ -7361,49 +7361,13 @@ async function baixarPausaPostagemV37(tipo){
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
 }
 function visaoGeralHTML(){
- const hoje=new Date().toLocaleDateString('sv-SE');
- const tarefas=(typeof LISTA_DIA!=='undefined'?LISTA_DIA:[])||[];
- const pend=(typeof PENDENCIAS_DB!=='undefined'?PENDENCIAS_DB:[])||[];
- const projetos=(typeof PROJETOS!=='undefined'?PROJETOS:[])||[];
- const registros=lerSono().filter(x=>x.data.startsWith(hoje.slice(0,7)));
- const media=registros.length?(registros.reduce((a,b)=>a+Number(b.horas||0),0)/registros.length).toFixed(1)+' h':'—';
- const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
- const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
  ${v44ResumoCards()}
  ${v69VisaoDiaHTML()}
- <div class="v11-kpis">
- ${resumo('▣','Projetos ativos',projetos.filter(p=>p.status!=='finalizado').length,"trocarEspaco('trabalho');irPara('projetos')")}
- ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
- ${resumo('◷','Pendências',pend.filter(t=>t.status!=='concluida').length,"trocarEspaco('trabalho');irPara('pendencias')")}
- ${resumo('☾','Média de sono',media,"trocarEspaco('pessoal');irPara('sono')")}
- </div>
- <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">▣</span><div><h3>Trabalho</h3><p>Gestão, atendimentos e entregas</p></div></div><div class="v11-links">
- ${atalho('◈','Central de Comando','Atividades e indicadores','trabalho','dashboard')}
- ${atalho('♙','Clientes e visitas','Acompanhamento profissional','trabalho','clientes')}
- ${atalho('☑','Checklists e auditorias','Inspeções e registros','trabalho','visitas')}
- ${atalho('◴','Horas e deslocamentos','Controle das atividades','trabalho','controle_horas')}
- ${atalho('▦','Agenda profissional','Compromissos e planejamento','trabalho','agenda')}
- ${atalho('▤','Entregas e documentos','Relatórios e obrigações','trabalho','entregas')}
- </div></section>
- <section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">♡</span><div><h3>Vida Pessoal</h3><p>Rotina, cuidado e desenvolvimento</p></div></div><div class="v11-links">
- ${atalho('✧','Hábitos e consistência','Seu mapa de evolução','pessoal','habitos')}
- ${atalho('♡','O que me move','Motivações, valores e lembretes','pessoal','o_que_me_move')}
- ${atalho('✍','Diário e humor','Um encontro comigo','pessoal','diario_pessoal')}
- ${atalho('◒','Estudos e leitura','Aprendizado e progresso','pessoal','estudos')}
- ${atalho('☾','Sono e descanso','Diário e histórico','pessoal','sono')}
- ${atalho('⌂','Rotina da casa','Tarefas e organização','pessoal','rotina_casa')}
- ${atalho('◇','Contas e compras','Organização financeira','pessoal','contas')}
- ${atalho('◎','Metas e ideias','Seus próximos passos','pessoal','metas')}
-
- ${atalho('▦','Meu Ano em Pixels','Visão do seu ano','pessoal','ano_pixels')}
- ${atalho('◌','Ciclo Menstrual','Acompanhamento pessoal','pessoal','ciclo')}
- </div></section><section class="v11-section"><div class="v11-section-head"><span class="v11-section-icon">✧</span><div><h3>Na Presença</h3><p>Palavra, oração e gratidão</p></div></div><div class="v11-links">
- ${atalho('✧','Meu momento com Deus','Leitura, oração e gratidão','presenca','na_presenca')}
- ${atalho('✧','Devocionais de dezembro','Edições anuais, leituras, jejuns e artes','presenca','devocional_dezembro')}
- ${atalho('✝','Jornada Bíblica','Continue de onde parou','presenca','jornada_biblica')}
- ${atalho('♡','Painel de oração',npLista('oracao').filter(r=>r.conteudo.semana===npSegunda()).map(r=>textoHTML(r.titulo)).slice(0,3).join(' · ')||'Por quem vou orar nesta semana','presenca','painel_oracao')}
- </div></section>${pausaInspirarV24()}${cardClarezaV23()}${cardsSaudeV21()}</div>`;
+ ${cardsSaudeV21()}
+ ${cardClarezaV23()}
+ ${pausaInspirarV24()}
+ </div>`;
 }
 
 let SONO_SYNC_STATUS='Aguardando sincronização';
@@ -7649,9 +7613,6 @@ function dashboardHTML(){
   const eventosHoje = eventosSemana.filter(e=>e.dataISO===hoje).sort((a,b)=>a.hora-b.hora);
   const totalHoje = eventosHoje.length;
   const concluidosHoje = eventosHoje.filter(e=>e.concluido).length;
-  const percArco = totalHoje>0 ? Math.round((concluidosHoje/totalHoje)*100) : 0;
-  const circunf = 276;
-  const offset = totalHoje>0 ? Math.round(circunf * (1 - percArco/100)) : circunf;
   const proximoEvento = eventosHoje.find(e=>!e.concluido);
 
   const entregasAbertas=ENTREGAS.filter(e=>!entregaConcluida(e)).sort((a,b)=>a.prazo.localeCompare(b.prazo));
@@ -7680,24 +7641,6 @@ function dashboardHTML(){
   <div class="v09-atividade-destaque">${controleHorasDashboardHTML()}</div>
   ${calendarioDocumentacoesDashboardHTML()}
   <div class="grid dashboard-grid">
-    <div class="card card-destaque dash-arco">
-      <h3>Arco do dia</h3>
-      <div class="arco-wrap">
-        <div class="arco">
-          <svg width="104" height="104">
-            <circle cx="52" cy="52" r="44" stroke="#E4DED3" stroke-width="9" fill="none"/>
-            <circle cx="52" cy="52" r="44" stroke="var(--cor-acento)" stroke-width="9" fill="none"
-              stroke-dasharray="${circunf}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
-          </svg>
-          <div class="arco-label"><div class="num">${percArco}%</div><div class="txt">cumprido</div></div>
-        </div>
-        <div class="arco-info">
-          <div class="grande">${concluidosHoje} de ${totalHoje} concluídos</div>
-          <div class="peq">${proximoEvento ? 'Próximo: '+proximoEvento.titulo+' às '+proximoEvento.hora+'h' : (totalHoje===0 ? 'Nada agendado hoje' : 'Tudo concluído hoje 🎉')}</div>
-        </div>
-      </div>
-    </div>
-
     <div class="card card-destaque dash-agenda">
       <h3>Agenda de hoje <button onclick="irPara('agenda')">ver tudo</button></h3>
       ${eventosHoje.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nada agendado para hoje.</div>` :
@@ -8080,7 +8023,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='71',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='72',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
