@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v73</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v74</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2227,6 +2227,47 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 @media(max-width:960px){.v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v73-cols{grid-template-columns:1fr}}
 @media(max-width:440px){.v73-metrica{padding:14px}.v73-metrica>strong{font-size:32px}.v73-actions button{width:100%}.v73-prof-card{padding:14px}}
 </style>
+<style id="v74-supervisao-e-treinamentos">
+/* A Supervisão reúne métricas, histórico e programação em um único painel. */
+.v74-supervisao{padding:clamp(16px,3.5vw,25px);border:1px solid var(--cor-borda);border-radius:27px;background:var(--cor-superficie);box-shadow:0 10px 32px rgba(60,35,39,.045);display:grid;gap:18px;margin-bottom:20px;min-width:0}
+.v74-supervisao-topo{text-align:center;display:grid;gap:7px;justify-items:center}
+.v74-supervisao-topo h2{font-family:Georgia,serif;font-size:clamp(25px,4vw,34px);margin:0;color:var(--cor-texto)}
+.v74-supervisao-topo p{margin:0;font-size:13px;color:var(--cor-texto-suave);line-height:1.5}
+.v74-supervisao .v73-year{margin-top:6px}
+.v74-supervisao .v73-metricas{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.v74-supervisao .v73-metrica{padding:13px;box-shadow:none;border-radius:16px;gap:5px;min-width:0}
+.v74-supervisao .v73-metrica>strong{font-size:clamp(25px,4vw,36px)}
+.v74-supervisao .v73-metrica>span{font-size:11px}
+.v74-supervisao .v73-metrica>small{font-size:10px}
+.v74-supervisao .v73-actions{justify-content:center}
+.v74-supervisao .v73-actions button{font-size:12px}
+.v74-supervisao details{border-top:1px solid var(--cor-borda);padding-top:10px}
+.v74-supervisao summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--cor-texto);padding:8px 0;display:flex;justify-content:space-between;gap:8px;list-style:none}
+.v74-supervisao summary::-webkit-details-marker{display:none}
+.v74-supervisao summary:after{content:'⌄';color:var(--cor-primaria);font-size:20px;line-height:1}
+.v74-supervisao details[open] summary:after{transform:rotate(180deg)}
+.v74-supervisao .v73-prof-row,.v74-supervisao .v73-treino-row{font-size:12px}
+.v74-treino-data{display:flex;align-items:stretch;gap:7px;min-width:0}
+.v74-treino-data input{min-width:0;flex:1;width:100%;height:49px!important;min-height:49px!important;max-height:49px!important;padding:10px 12px!important;font-size:16px!important;color:var(--cor-texto)!important;background:var(--cor-superficie)!important;border:1px solid var(--cor-borda)!important;border-radius:13px!important;box-sizing:border-box!important;-webkit-text-fill-color:var(--cor-texto)!important}
+.v74-treino-data button{flex:0 0 auto;min-width:50px;border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-primaria);border-radius:13px;font-size:17px;cursor:pointer}
+#modalSistema:has(.v74-treino-form) .system-modal{box-sizing:border-box;width:min(620px,100%);max-height:calc(100dvh - 20px);overflow-y:auto;overscroll-behavior:contain}
+#modalSistema:has(.v74-treino-form) .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+#modalSistema:has(.v74-treino-form) .form-field{min-width:0}
+#modalSistema:has(.v74-treino-form) .form-field select,#modalSistema:has(.v74-treino-form) .form-field input{box-sizing:border-box;min-width:0;width:100%;font-size:16px}
+#modalSistema:has(.v74-treino-form) .system-modal-actions{position:sticky!important;bottom:-1px;z-index:2;display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 max(10px,env(safe-area-inset-bottom));background:var(--cor-superficie);border-top:1px solid var(--cor-borda)}
+#modalSistema:has(.v74-treino-form) .system-modal-actions button{min-height:44px}
+.v74-avisos{font-size:12px;color:var(--cor-texto-suave);line-height:1.5}
+.v74-inteligente{margin:12px 0;padding:14px;border:1px solid var(--cor-borda);border-radius:18px;background:var(--cor-superficie);color:var(--cor-texto)}
+.v74-inteligente h3{margin:0 0 6px;font-size:14px}
+.v74-inteligente p{font-size:12px;color:var(--cor-texto-suave);margin:0 0 10px}
+.v74-inteligente-lista{display:grid;gap:8px}
+.v74-inteligente-item{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;padding:8px 0;border-top:1px solid var(--cor-borda)}
+.v74-renovacao{padding:10px 12px;margin:10px 0;border-radius:14px;border:1px solid var(--cor-borda);background:var(--cor-superficie)}
+.v74-renovacao h3{font-size:13px;margin:0 0 7px;color:var(--cor-texto)}
+.v74-renovacao-line{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--cor-texto)}
+.v74-renovacao-line button{border:1px solid var(--cor-borda);border-radius:8px;padding:7px 9px;color:var(--cor-primaria)}
+@media(max-width:700px){.v74-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v74-supervisao{padding:16px;border-radius:22px}.v74-supervisao .v73-actions button{width:100%}#modalSistema:has(.v74-treino-form){padding:9px!important;align-items:center!important}#modalSistema:has(.v74-treino-form) .system-modal{max-height:calc(100dvh - 18px);padding:16px!important}#modalSistema:has(.v74-treino-form) .form-grid{grid-template-columns:minmax(0,1fr)!important}#modalSistema:has(.v74-treino-form) .form-field.full{grid-column:1!important}}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -2471,7 +2512,7 @@ const MODULOS = {
       {id:"agenda", nome:"Agenda"},
       {id:"clientes", nome:"Clientes"},
       {id:"visitas", nome:"Checklists"},
-      {id:"entregas", nome:"Entregas"},
+      {id:"entregas", nome:"Supervisão"},
       {id:"controle_horas", nome:"Controle de Horas"},
       {id:"planejamento", nome:"Planejamento"},
       {id:"radar_recorrencias", nome:"Radar de Recorrências"},
@@ -2794,7 +2835,7 @@ const NOMES_TELA = {devocional_dezembro:['Meus devocionais','Biblioteca anual de
   clientes:["Clientes","3 clientes cadastrados"],
   visitas:["Checklists","Inicie um checklist e arquive no cliente"],
   biblioteca:["Biblioteca","8 documentos"],
-  entregas:["Entregas","Prazos e clientes envolvidos"],
+  entregas:["Supervisão","Visitas, treinamentos e resultados por cliente"],
   planejamento:["Planejamento","Radar, datas, rotinas e fechamento mensal"],
   radar_recorrencias:["Radar de Recorrências","Orientações, cobranças e não conformidades ao longo do ano"],
   lideranca:["Liderança","Delegações e acompanhamento"],
@@ -3009,7 +3050,7 @@ function abrirSemanaDoDia(dataISO){
   renderTela();
 }
 
-function agendaHTML(){
+function agendaHTMLBaseV74(){
   const legenda = `<div class="legenda">` +
     CATEGORIAS_EVENTO.map(t=>`<div class="legenda-item"><span class="legenda-dot" style="background:${t.cor}"></span>${t.nome}</div>`).join('') +
     `</div>`;
@@ -3021,6 +3062,20 @@ function agendaHTML(){
     </div>`;
   return `<section class="agenda-hero"><div class="agenda-hero-top"><div class="agenda-hero-title"><div class="agenda-icon">▦</div><div><strong>Minha agenda</strong><span>Compromissos, datas importantes, prazos e vencimentos</span></div></div>${abas}</div><div class="agenda-hero-details"><div><div class="agenda-hero-label">Categorias</div>${legenda}</div><div><div class="agenda-hero-label">Camadas inteligentes</div>${filtros}<p class="eco-agenda-nota">Feriados nacionais + 9 de Julho (SP). Pontos facultativos referem-se ao serviço público; os de 2027 são previsões, sujeitas à confirmação.</p></div></div></section>` + (visaoAgenda==='dia' ? agendaDiaHTML() : visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
 }
+
+/* Sugestões facultativas: considera a frequência do cadastro e compromissos já existentes. */
+function v74AgendaInteligenteHTML(){
+ const mes=formatoISO(new Date()).slice(0,7),total=new Map();
+ eventosSemana.filter(e=>e.tipo==='visita'&&String(e.dataISO||'').startsWith(mes)&&e.clienteId).forEach(e=>total.set(String(e.clienteId),(total.get(String(e.clienteId))||0)+1));
+ const sugestoes=CLIENTES.filter(c=>String(c.status||'ativo').toLowerCase()!=='inativo').map(c=>({c,meta:Number(c.visitasPrevistasMes||0)||Number(c.visitasPrevistasSemana||0)*4,agendadas:total.get(String(c.id))||0})).filter(x=>x.meta>x.agendadas).sort((a,b)=>(b.meta-b.agendadas)-(a.meta-a.agendadas)||a.c.nome.localeCompare(b.c.nome,'pt-BR'));
+ return `<section class="v74-inteligente"><h3>✧ Agenda inteligente</h3><p>${sugestoes.length?'Sugestões para completar as visitas do mês, sem criar compromissos automaticamente.':'As visitas previstas para este mês estão cobertas, ou não há frequência definida nos clientes.'}</p><div class="v74-inteligente-lista">${sugestoes.slice(0,4).map(x=>`<div class="v74-inteligente-item"><span><strong>${textoHTML(x.c.nome)}</strong><br>${x.agendadas} de ${x.meta} visitas no mês</span><button class="btn-secundario" onclick="v74AgendarVisita('${x.c.id}')">Agendar</button></div>`).join('')}</div></section>`;
+}
+function v74AgendarVisita(clienteId){
+ const data=visaoAgenda==='dia'?dataAgendaDiaria:formatoISO(new Date());abrirFormularioAgenda(data,9);
+ const selecao=document.getElementById('agendaCliente'),tipo=document.getElementById('agendaTipo');
+ if(selecao)selecao.value=String(clienteId);if(tipo)tipo.value='visita';atualizarFormularioAgenda();
+}
+function agendaHTML(){return v74AgendaInteligenteHTML()+agendaHTMLBaseV74();}
 
 function agendaDiaHTML(){
   const d=new Date(dataAgendaDiaria+'T12:00:00'),eventos=eventosSemana.filter(e=>e.dataISO===dataAgendaDiaria).sort((a,b)=>a.hora-b.hora),avisos=itensCalendarioInteligente().filter(i=>i.dataISO===dataAgendaDiaria);
@@ -5071,6 +5126,7 @@ async function excluirLead(id){
 
 function comercialHTML(){
   return `
+    ${v74RenovacoesComerciaisHTML()}
     <div class="pipeline-topo">
       <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${LEADS.length} leads no pipeline</div>
       <button class="btn-novo-lead" onclick="novoLead()">+ Novo lead</button>
@@ -5096,6 +5152,31 @@ function comercialHTML(){
         `).join('')}
       </div>
     </div>`;
+}
+
+/* Prospecção: renovação é opcional e usa a vigência já existente no cadastro,
+   sem adicionar tabela ou modificar os contratos sem data determinada. */
+function v74RenovacaoCliente(c){
+ const campo=String(c.contrato?.vigencia||''),achou=campo.match(/Renovação prevista:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+ return achou?`${achou[3]}-${achou[2]}-${achou[1]}`:null;
+}
+function v74RenovacoesComerciaisHTML(){
+ const hoje=formatoISO(new Date()),limite=formatoISO(addDias(new Date(),60));
+ const clientes=CLIENTES.filter(c=>String(c.status||'ativo').toLowerCase()!=='inativo'&&v74RenovacaoCliente(c)).map(c=>({c,data:v74RenovacaoCliente(c)})).sort((a,b)=>a.data.localeCompare(b.data));
+ return `<section class="v74-renovacao"><div class="v73-section-title"><div><h3>Renovação de contratos · opcional</h3><p>Uma sugestão comercial apenas para clientes com prazo informado.</p></div><button class="btn-secundario" onclick="v74ConfigurarRenovacao()">+ Definir prazo</button></div>${clientes.length?clientes.map(({c,data})=>`<div class="v74-renovacao-line"><span><strong>${textoHTML(c.nome)}</strong> · ${dataBR(data)} <small>${data<hoje?'· prazo encerrado':data<=limite?'· sugerir renovação':'· programado'}</small></span><button onclick="v74ConfigurarRenovacao('${c.id}')">Ajustar</button></div>`).join(''):'<p class="v73-vazio">Nenhuma renovação configurada. Clientes sem data não recebem recomendações.</p>'}</section>`;
+}
+async function v74ConfigurarRenovacao(clienteId=''){
+ const c=clienteId?CLIENTES.find(x=>String(x.id)===String(clienteId)):await selecionarClientesVisual({titulo:'Renovação · escolher cliente'});
+ if(!c)return;
+ const atual=v74RenovacaoCliente(c),data=await selecionarDataVisual({titulo:'Prazo de renovação · '+c.nome,valor:atual,opcional:true});
+ if(data===null)return;
+ if(!data&&atual&&!confirm('Remover a recomendação de renovação deste cliente?'))return;
+ const vigencia=String(c.contrato?.vigencia||'').replace(/\s*\|?\s*Renovação prevista:\s*\d{2}\/\d{2}\/\d{4}/ig,'').trim();
+ const novo=[vigencia,data?'Renovação prevista: '+dataBR(data):''].filter(Boolean).join(' | ');
+ const {data:alterado,error}=await supa.from('clientes').update({contrato_vigencia:novo}).eq('id',c.id).select('id,contrato_vigencia').single();
+ if(error){dispararAutomacao('Não foi possível atualizar a renovação',error.message);return;}
+ if(!c.contrato)c.contrato={};c.contrato.vigencia=alterado.contrato_vigencia;
+ renderTela();
 }
 
 /* ---------- MÓDULO PROJETOS ---------- */
@@ -5235,7 +5316,7 @@ async function editarItemProjeto(projId,etapaId,itemId){
 async function vincularEntregaItemProjeto(projId,etapaId,itemId){
   const p=PROJETOS.find(x=>x.id===projId),et=p?.etapas.find(e=>e.id===etapaId),item=et?.checklist.find(i=>i.id===itemId);if(!item)return;
   if(item.entregaId&&confirm('Remover o vínculo atual com a entrega?')){const {error}=await supa.from('checklist_etapa_projeto').update({entrega_id:null,atualizado_em:new Date().toISOString()}).eq('id',itemId);if(!error){item.entregaId=null;renderTela();}return;}
-  if(!ENTREGAS.length){alert('Ainda não há entregas cadastradas. Crie a entrega primeiro no módulo Entregas.');return;}
+  if(!ENTREGAS.length){alert('Ainda não há entregas cadastradas. Crie a entrega primeiro no módulo Supervisão.');return;}
   const escolha=prompt(`Vincular a qual entrega?\n${ENTREGAS.map((e,i)=>`${i+1}. ${e.titulo} · ${dataBR(e.prazo)}`).join('\n')}\n\nDigite o número:`);const entrega=ENTREGAS[parseInt(escolha)-1];if(!entrega)return;
   const {error}=await supa.from('checklist_etapa_projeto').update({entrega_id:entrega.id,atualizado_em:new Date().toISOString()}).eq('id',itemId);if(error){dispararAutomacao('Erro ao vincular entrega',error.message);return;}item.entregaId=entrega.id;renderTela();
 }
@@ -6815,7 +6896,7 @@ function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizad
 async function novoTreinamento(clienteId){abrirFormularioTreinamentoV73(clienteId);}
 async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);if(!t)return;abrirFormularioTreinamentoV73(t.cliente_id,id);}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
-function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Programar treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${textoHTML(t.tema)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''} · ${textoHTML(t.status||'planejado')}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">Editar</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
+function treinamentosClienteHTML(c){const itens=v74TreinamentosConsolidados().filter(t=>String(t.cliente_id)===String(c.id));return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Programar treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>{const situacao=v73SituacaoTreino(t);return `<div class="item-lista-simples"><div><strong>${textoHTML(t.tema)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · reciclagem '+dataBR(t.validade):''}</div><span class="v73-status ${situacao.classe}">${situacao.rotulo}</span></div><div><button class="tag" onclick="abrirFormularioTreinamentoV73('${c.id}','${t.id}')">${t.origem==='agenda'?'Agenda':'Editar'}</button>${t.origem!=='agenda'?` <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button>`:''}</div></div>`}).join(''):semRegistro()}</div>`;}
 async function novaRota(){const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');const escolhaCliente=await selecionarClientesVisual({titulo:'Cliente visitado',clientes:operacionais,opcional:true});if(escolhaCliente===null)return;const c=escolhaCliente||null;const dataR=await selecionarDataVisual({titulo:'Data do deslocamento',valor:formatoISO(new Date()),opcional:false});if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
 async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
 function custoRota(r){return Number(r.custo_passagens||0)+Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
@@ -6993,12 +7074,40 @@ function entregasHTML(){const hoje=formatoISO(new Date()),lista=ENTREGAS.filter(
 
 /* V73 — Entregas profissionais: visitas e treinamentos sem duplicar registros */
 let V73_ANO=new Date().getFullYear(),V73_FILTRO_TREINO='pendentes';
+/* V74 — Agenda e Supervisão usam os MESMOS registros; não cria uma segunda tabela. */
+function v74MaisSeisMeses(iso){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(String(iso||'')))return '';
+ const [ano,mes,dia]=iso.split('-').map(Number),m=mes-1+6,anoFinal=ano+Math.floor(m/12),mesFinal=m%12;
+ const ultimoDia=new Date(anoFinal,mesFinal+1,0).getDate();
+ return `${anoFinal}-${String(mesFinal+1).padStart(2,'0')}-${String(Math.min(dia,ultimoDia)).padStart(2,'0')}`;
+}
+function v74TemaChave(tema){
+ const normal=String(tema||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\b(treinamento|treino|reciclagem|capacitacao|curso|sobre|de|da|do|dos|das|para|em)\b/g,' ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+ return normal.replace(/\b(bpm|bpf)\b/g,'boas praticas manipulacao')||'geral';
+}
+function v74ChaveTreinamento(t){
+ const linha=String(t.observacoes||'').match(/\[linha:([^\]]+)\]/i)?.[1];
+ return String(t.cliente_id||'sem-cliente')+'|'+v74TemaChave(linha||t.tema);
+}
+function v74TreinamentosConsolidados(){
+ const registros=TREINAMENTOS.map(t=>({...t,validade:t.validade||(t.status==='realizado'?v74MaisSeisMeses(t.data):null),origem:'supervisao'}));
+ const agenda=eventosSemana.filter(e=>(e.tipo==='treinamento'||(!e.tipo&&e.categoria==='treinamento'))&&e.dataISO);
+ for(const evento of agenda){
+  const cliente_id=evento.clienteId||null,tema=String(evento.titulo||'Treinamento').trim()||'Treinamento';
+  const realizado=!!evento.concluido&&evento.dataISO<=formatoISO(new Date());
+  const normTema=v74TemaChave(tema),generico=normTema==='geral';
+  const coincidente=registros.find(t=>String(t.cliente_id||'')===String(cliente_id||'')&&t.data===evento.dataISO&&(generico||v74TemaChave(t.tema)==='geral'||v74TemaChave(t.tema)===normTema));
+  if(coincidente){if(realizado&&coincidente.status!=='cancelado'){coincidente.status='realizado';coincidente.validade=coincidente.validade||v74MaisSeisMeses(coincidente.data);}continue;}
+  registros.push({id:'agenda:'+evento.id,evento_id:evento.id,cliente_id,tema,data:evento.dataISO,validade:realizado?v74MaisSeisMeses(evento.dataISO):null,status:realizado?'realizado':'planejado',participantes:null,observacoes:'Registrado na Agenda',origem:'agenda'});
+ }
+ return registros;
+}
 function v73VisitasAno(ano=V73_ANO){return eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido&&String(e.dataISO||'').startsWith(String(ano)));}
-function v73TreinosRealizadosAno(ano=V73_ANO){return TREINAMENTOS.filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(String(ano)));}
+function v73TreinosRealizadosAno(ano=V73_ANO){return v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(String(ano)));}
 function v73TreinosAtuais(){
  const mapa=new Map();
- TREINAMENTOS.filter(t=>t.status==='realizado').sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))).forEach(t=>{
-  const chave=String(t.cliente_id)+'|'+String(t.tema||'').trim().toLocaleLowerCase('pt-BR');
+ v74TreinamentosConsolidados().filter(t=>t.status==='realizado').sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))).forEach(t=>{
+  const chave=v74ChaveTreinamento(t);
   if(!mapa.has(chave))mapa.set(chave,t);
  });
  return [...mapa.values()];
@@ -7009,21 +7118,22 @@ function v73AlertasTreino(){
  const atuais=v73TreinosAtuais().filter(t=>ativo(t.cliente_id));
  const vencidos=atuais.filter(t=>t.validade&&t.validade<hoje);
  const aVencer=atuais.filter(t=>t.validade&&t.validade>=hoje&&t.validade<=limite);
- const programados=TREINAMENTOS.filter(t=>(t.status||'planejado')==='planejado'&&ativo(t.cliente_id));
+ const programados=v74TreinamentosConsolidados().filter(t=>(t.status||'planejado')==='planejado'&&ativo(t.cliente_id)&&!atuais.some(a=>v74ChaveTreinamento(a)===v74ChaveTreinamento(t)&&a.data>=t.data));
  return {vencidos,aVencer,programados};
 }
 function v73SituacaoTreino(t){
  const hoje=formatoISO(new Date()),estado=t.status||'planejado';
  if(estado==='cancelado')return {rotulo:'Cancelado',classe:'neutro'};
+ if(estado==='realizado'&&v73TreinosAtuais().some(atual=>v74ChaveTreinamento(atual)===v74ChaveTreinamento(t)&&String(atual.id)!==String(t.id)&&String(atual.data)>String(t.data)))return {rotulo:'Histórico · renovado',classe:'neutro'};
  if(estado==='realizado')return t.validade&&t.validade<hoje?{rotulo:'Vencido',classe:'vencido'}:t.validade&&t.validade<=formatoISO(addDias(new Date(),30))?{rotulo:'Vence em breve',classe:'atencao'}:{rotulo:'Realizado',classe:'feito'};
  if(t.data&&t.data<hoje)return {rotulo:'Programação atrasada',classe:'vencido'};
  return {rotulo:t.data?'Programado':'A programar',classe:'atencao'};
 }
-function v73PainelEntregasHTML(){
+function v73PainelEntregasHTMLLegado(){
  const visitas=v73VisitasAno(),treinos=v73TreinosRealizadosAno(),alertas=v73AlertasTreino(),mes=formatoISO(new Date()).slice(0,7),anoAtual=V73_ANO===new Date().getFullYear();
  const visitasPorCliente=new Map();visitas.forEach(e=>{const chave=String(e.clienteId||e.clienteNomeVinculado||e.clienteExterno||'sem-cliente');visitasPorCliente.set(chave,(visitasPorCliente.get(chave)||0)+1);});
  const linhasVisitas=[...visitasPorCliente].map(([id,total])=>({nome:CLIENTES.find(c=>String(c.id)===id)?.nome||visitas.find(e=>String(e.clienteId||e.clienteNomeVinculado||e.clienteExterno||'sem-cliente')===id)?.clienteNomeVinculado||'Cliente não identificado',total})).sort((a,b)=>b.total-a.total||a.nome.localeCompare(b.nome,'pt-BR'));
- const lista=TREINAMENTOS.filter(t=>V73_FILTRO_TREINO==='realizados'?t.status==='realizado'&&String(t.data||'').startsWith(String(V73_ANO)):V73_FILTRO_TREINO==='vencidos'?alertas.vencidos.some(a=>a.id===t.id):V73_FILTRO_TREINO==='todos'?t.status!=='cancelado':t.status!=='cancelado'&&(t.status!=='realizado'||alertas.vencidos.some(a=>a.id===t.id)||alertas.aVencer.some(a=>a.id===t.id)));
+ const lista=v74TreinamentosConsolidados().filter(t=>V73_FILTRO_TREINO==='realizados'?t.status==='realizado'&&String(t.data||'').startsWith(String(V73_ANO)):V73_FILTRO_TREINO==='vencidos'?alertas.vencidos.some(a=>a.id===t.id):V73_FILTRO_TREINO==='todos'?t.status!=='cancelado':t.status!=='cancelado'&&(t.status!=='realizado'||alertas.vencidos.some(a=>a.id===t.id)||alertas.aVencer.some(a=>a.id===t.id)));
  lista.sort((a,b)=>String(a.status==='realizado'?a.validade||a.data:a.data||'9999').localeCompare(String(b.status==='realizado'?b.validade||b.data:b.data||'9999')));
  return `<section class="v73-entregas"><div class="v73-section-title"><div><span class="v73-kicker">ACOMPANHAMENTO PROFISSIONAL</span><h2>Minhas entregas em números</h2><p>Visitas concluídas na Agenda e treinamentos registrados por cliente.</p></div><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${V73_ANO}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v73-metricas"><article class="v73-metrica"><span>Visitas realizadas</span><strong>${visitas.length}</strong><small>${anoAtual?visitas.filter(e=>String(e.dataISO).startsWith(mes)).length+' neste mês':linhasVisitas.length+' clientes atendidos'}</small></article><article class="v73-metrica"><span>Treinamentos realizados</span><strong>${treinos.length}</strong><small>${treinos.reduce((s,t)=>s+Number(t.participantes||0),0)} participantes</small></article><article class="v73-metrica v73-alerta"><span>Treinamentos vencidos</span><strong>${alertas.vencidos.length}</strong><small>${alertas.aVencer.length} vencem em até 30 dias · hoje</small></article><article class="v73-metrica"><span>Treinamentos programados</span><strong>${alertas.programados.length}</strong><small>Programação atual</small></article></div>
@@ -7031,21 +7141,75 @@ function v73PainelEntregasHTML(){
  <div class="v73-cols"><div class="card v73-prof-card"><h3>Visitas por cliente <small>${V73_ANO}</small></h3><p class="v73-helper">Entram aqui as visitas marcadas como concluídas na Agenda. Não é preciso lançar duas vezes.</p>${linhasVisitas.length?linhasVisitas.map(v=>`<div class="v73-prof-row"><span>${textoHTML(v.nome)}</span><strong>${v.total}</strong></div>`).join(''):'<p class="v73-vazio">Nenhuma visita concluída registrada para este ano.</p>'}</div>
  <div class="card v73-prof-card"><h3>Treinamentos e reciclagens</h3><p class="v73-helper">Acompanhe a programação e as validades de cada cliente.</p><div class="v73-filtros">${[['pendentes','Acompanhar'],['vencidos','Vencidos'],['realizados','Realizados'],['todos','Todos']].map(([id,titulo])=>`<button class="${V73_FILTRO_TREINO===id?'ativo':''}" onclick="V73_FILTRO_TREINO='${id}';renderTela()">${titulo}</button>`).join('')}</div>${lista.length?lista.map(t=>{const c=CLIENTES.find(x=>x.id===t.cliente_id),s=v73SituacaoTreino(t);return `<div class="v73-treino-row"><div><strong>${textoHTML(t.tema)}</strong><small>${textoHTML(c?.nome||'Cliente preservado')} · ${t.data?dataBR(t.data):'Data a definir'}${t.validade?' · Validade '+dataBR(t.validade):''}</small><span class="v73-status ${s.classe}">${s.rotulo}</span></div><button class="btn-secundario" onclick="abrirFormularioTreinamentoV73('${t.cliente_id}','${t.id}')">Editar</button></div>`}).join(''):'<p class="v73-vazio">Nenhum treinamento nesta seleção.</p>'}</div></div></section>`;
 }
+function v73PainelEntregasHTML(){
+ if(typeof window!=='undefined'&&typeof document!=='undefined')setTimeout(v74OcultarResumoLegado,0);
+ const ano=V73_ANO,visitas=v73VisitasAno(ano),treinos=v73TreinosRealizadosAno(ano),alertas=v73AlertasTreino(),hoje=formatoISO(new Date());
+ const outras=ENTREGA_CLIENTES.filter(v=>v.status==='entregue'&&String(v.concluido_em||'').startsWith(String(ano)));
+ const porCliente=new Map();
+ for(const e of visitas){const id=String(e.clienteId||e.clienteNomeVinculado||e.clienteExterno||'sem cliente');const nome=CLIENTES.find(c=>String(c.id)===id)?.nome||e.clienteNomeVinculado||e.clienteExterno||'Sem cliente vinculado';const linha=porCliente.get(id)||{nome,visitas:0,treinos:0};linha.visitas++;porCliente.set(id,linha);}
+ for(const t of treinos){const id=String(t.cliente_id||'sem cliente'),nome=CLIENTES.find(c=>String(c.id)===id)?.nome||'Sem cliente vinculado',linha=porCliente.get(id)||{nome,visitas:0,treinos:0};linha.treinos++;porCliente.set(id,linha);}
+ const agrupados=[...porCliente.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+ const registros=v74TreinamentosConsolidados().filter(t=>{
+  if(t.status==='cancelado')return false;
+  if(V73_FILTRO_TREINO==='realizados')return t.status==='realizado'&&String(t.data||'').startsWith(String(ano));
+  if(V73_FILTRO_TREINO==='vencidos')return alertas.vencidos.some(a=>String(a.id)===String(t.id));
+  if(V73_FILTRO_TREINO==='todos')return true;
+  return alertas.programados.some(a=>String(a.id)===String(t.id))||alertas.vencidos.some(a=>String(a.id)===String(t.id))||alertas.aVencer.some(a=>String(a.id)===String(t.id));
+ }).sort((a,b)=>String(a.data||'').localeCompare(String(b.data||'')));
+ const linhasTreino=registros.map(t=>{
+  const c=CLIENTES.find(x=>String(x.id)===String(t.cliente_id)),s=v73SituacaoTreino(t);
+  return `<div class="v73-treino-row"><div><strong>${textoHTML(t.tema)}</strong><small>${textoHTML(c?.nome||'Cliente não identificado')} · ${t.data?dataBR(t.data):'Sem data'}${t.validade?' · Próxima reciclagem '+dataBR(t.validade):''}</small><span class="v73-status ${s.classe}">${s.rotulo}</span></div><button class="btn-secundario" onclick="abrirFormularioTreinamentoV73('${t.cliente_id||''}','${t.id}')">${t.origem==='agenda'?'Agenda':'Editar'}</button></div>`;
+ }).join('');
+ return `<section class="v74-supervisao" aria-label="Resumo da Supervisão">
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Uma visão das visitas e dos treinamentos realmente realizados. Sem lançamentos repetidos.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Ano seguinte">›</button></div></div>
+ <div class="v73-metricas"><article class="v73-metrica"><span>Visitas concluídas</span><strong>${visitas.length}</strong><small>Agenda</small></article><article class="v73-metrica"><span>Treinamentos realizados</span><strong>${treinos.length}</strong><small>${treinos.reduce((n,t)=>n+Number(t.participantes||0),0)} participantes informados</small></article><article class="v73-metrica v73-alerta"><span>Reciclagens vencidas</span><strong>${alertas.vencidos.length}</strong><small>${alertas.aVencer.length} a vencer em 30 dias</small></article><article class="v73-metrica"><span>Outras entregas</span><strong>${outras.length}</strong><small>${alertas.programados.length} treinamento(s) programado(s)</small></article></div>
+ <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="gerarResumoAnualV73()">↓ Resumo anual</button></div>
+ <details><summary>Visitas e treinamentos por cliente <span>${agrupados.length} cliente(s)</span></summary>${agrupados.length?agrupados.map(c=>`<div class="v73-prof-row"><span>${textoHTML(c.nome)}</span><small>${c.visitas} visita(s) · ${c.treinos} treinamento(s)</small></div>`).join(''):'<p class="v73-vazio">Ainda não há visitas ou treinamentos concluídos neste ano.</p>'}</details>
+ <details open><summary>Treinamentos e próximas reciclagens <span>${alertas.vencidos.length+alertas.aVencer.length} atenção</span></summary><div class="v73-filtros">${[['pendentes','Acompanhar'],['vencidos','Vencidos'],['realizados','Realizados'],['todos','Histórico']].map(([id,nome])=>`<button class="${V73_FILTRO_TREINO===id?'ativo':''}" onclick="V73_FILTRO_TREINO='${id}';renderTela()">${nome}</button>`).join('')}</div>${linhasTreino||'<p class="v73-vazio">Nenhum treinamento nesta seleção.</p>'}<p class="v74-avisos">A validade é do último treinamento realizado do mesmo tema para cada cliente. Os anteriores permanecem no histórico.</p></details>
+ </section>`;
+}
+function v74OcultarResumoLegado(){
+ if(typeof telaAtual==='undefined'||telaAtual!=='entregas')return;
+ const raiz=document.getElementById('conteudoTela');if(!raiz)return;
+ raiz.querySelectorAll('h1,h2,h3').forEach(titulo=>{
+  if(!/do planejamento à entrega/i.test(titulo.textContent||''))return;
+  const secao=titulo.closest('article,section,.card');
+  if(secao&&!secao.closest('.v74-supervisao')&&secao.textContent.length<1600&&/em aberto|atrasad|entregas conclu[ií]das/i.test(secao.textContent)){secao.hidden=true;secao.style.display='none';}
+ });
+}
 function abrirFormularioTreinamentoV73(clienteId='',id=''){
- const treino=TREINAMENTOS.find(t=>String(t.id)===String(id)),cId=treino?.cliente_id||clienteId||'',clientes=ordenarClientesAZ(CLIENTES.filter(c=>String(c.id)===String(cId)||String(c.status||'ativo').toLowerCase()!=='inativo'));
+ const treino=TREINAMENTOS.find(t=>String(t.id)===String(id)),agenda=v74TreinamentosConsolidados().find(t=>String(t.id)===String(id)&&t.origem==='agenda');
+ if(agenda){abrirDetalheAgendaV22(String(agenda.evento_id));return;}
+ const cId=treino?.cliente_id||clienteId||'',clientes=ordenarClientesAZ(CLIENTES.filter(c=>String(c.id)===String(cId)||String(c.status||'ativo').toLowerCase()!=='inativo'));
  const opcoes=clientes.map(c=>`<option value="${c.id}" ${String(c.id)===String(cId)?'selected':''}>${textoHTML(rotuloClienteEntrega(c))}</option>`).join('');
- abrirModalSistema(`<div class="system-modal-head"><div><h2>${treino?'Editar':'Programar'} treinamento</h2><p>O registro entrará automaticamente nos indicadores de entregas.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+ const data=treino?.data||'',validade=treino?.validade||(treino?.status==='realizado'?v74MaisSeisMeses(data):''),manual=!!(treino?.validade&&treino.validade!==v74MaisSeisMeses(data));
+ abrirModalSistema(`<div class="v74-treino-form"><div class="system-modal-head"><div><h2>${treino?'Editar':'Programar'} treinamento</h2><p>Uma entrega por realização. A reciclagem vale por 6 meses após o último treinamento.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
  <div class="form-field full"><label>Cliente *</label><select id="v73TreinoCliente"><option value="">Selecione um cliente</option>${opcoes}</select></div>
  <div class="form-field full"><label>Tema do treinamento *</label><input id="v73TreinoTema" maxlength="150" value="${textoHTML(treino?.tema||'')}" placeholder="Ex.: Boas práticas de manipulação"></div>
- <div class="form-field"><label>Data programada ou realizada</label><input id="v73TreinoData" type="date" value="${treino?.data||''}"></div>
- <div class="form-field"><label>Validade / próxima reciclagem</label><input id="v73TreinoValidade" type="date" value="${treino?.validade||''}"></div>
- <div class="form-field"><label>Situação</label><select id="v73TreinoStatus">${[['planejado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']].map(([v,n])=>`<option value="${v}" ${v===(treino?.status||'planejado')?'selected':''}>${n}</option>`).join('')}</select></div>
+ <div class="form-field"><label>Data programada ou realizada</label><div class="v74-treino-data"><input id="v74TreinoDataExibida" type="text" readonly value="${data?dataBR(data):''}" placeholder="Escolher data" onclick="v74EscolherDataTreino('Data')"><input id="v73TreinoData" type="hidden" value="${data}"><button type="button" onclick="v74EscolherDataTreino('Data')" aria-label="Escolher data">▦</button></div></div>
+ <div class="form-field"><label>Próxima reciclagem</label><div class="v74-treino-data"><input id="v74TreinoValidadeExibida" type="text" readonly value="${validade?dataBR(validade):''}" placeholder="Automática · 6 meses" onclick="v74EscolherDataTreino('Validade')"><input id="v73TreinoValidade" type="hidden" value="${validade}"><button type="button" onclick="v74EscolherDataTreino('Validade')" aria-label="Alterar validade">▦</button></div><label style="font-size:11px;font-weight:400;display:flex;gap:6px;align-items:center;margin-top:5px"><input id="v74ValidadeManual" type="checkbox" style="width:auto" ${manual?'checked':''} onchange="v74AtualizarValidadeTreino()"> Alterar prazo de 6 meses manualmente</label></div>
+ <div class="form-field"><label>Situação</label><select id="v73TreinoStatus" onchange="v74AtualizarValidadeTreino()">${[['planejado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']].map(([v,n])=>`<option value="${v}" ${v===(treino?.status||'planejado')?'selected':''}>${n}</option>`).join('')}</select></div>
  <div class="form-field"><label>Participantes</label><input id="v73TreinoParticipantes" type="number" min="0" step="1" value="${treino?.participantes??''}" placeholder="Opcional"></div>
  <div class="form-field full"><label>Observações</label><textarea id="v73TreinoObs" rows="3" placeholder="Conteúdo, público, responsável…">${textoHTML(treino?.observacoes||'')}</textarea></div></div>
- <p class="v73-helper">A data do treinamento realizado será usada no fechamento mensal e anual. A validade alimenta os alertas de reciclagem.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button>${treino?`<button class="btn-secundario" onclick="excluirTreinamentoV73('${treino.id}')">Excluir</button>`:''}<button class="btn-primario" onclick="salvarTreinamentoV73('${treino?.id||''}')">Salvar treinamento</button></div>`);
+ <p class="v74-avisos">A Agenda e a Supervisão entram na mesma contagem. Um treinamento novo do mesmo tema renova o prazo do cliente; os anteriores ficam no histórico.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button>${treino?`<button class="btn-secundario" onclick="excluirTreinamentoV73('${treino.id}')">Excluir</button>`:''}<button class="btn-primario" onclick="salvarTreinamentoV73('${treino?.id||''}')">Salvar treinamento</button></div></div>`);
+ v74AtualizarValidadeTreino();
+}
+async function v74EscolherDataTreino(campo){
+ const input=document.getElementById('v73Treino'+campo),exibido=document.getElementById('v74Treino'+campo+'Exibida');if(!input||!exibido)return;
+ const data=await selecionarDataVisual({titulo:campo==='Data'?'Data do treinamento':'Validade da reciclagem',valor:input.value||null,opcional:true});
+ if(data===null||!document.getElementById('v73Treino'+campo))return;
+ input.value=data;exibido.value=data?dataBR(data):'';
+ if(campo==='Validade'){const manual=document.getElementById('v74ValidadeManual');if(manual)manual.checked=true;}
+ if(campo==='Data')v74AtualizarValidadeTreino();
+}
+function v74AtualizarValidadeTreino(){
+ const data=document.getElementById('v73TreinoData')?.value,validade=document.getElementById('v73TreinoValidade'),exibido=document.getElementById('v74TreinoValidadeExibida'),manual=document.getElementById('v74ValidadeManual');
+ if(!validade||!exibido||manual?.checked)return;
+ const calculada=data?v74MaisSeisMeses(data):'';validade.value=calculada;exibido.value=calculada?dataBR(calculada):'';
 }
 async function salvarTreinamentoV73(id=''){
- const campo=n=>document.getElementById('v73Treino'+n),cliente_id=campo('Cliente')?.value,tema=campo('Tema')?.value.trim(),data=campo('Data')?.value||null,validade=campo('Validade')?.value||null,status=campo('Status')?.value,participantesTxt=campo('Participantes')?.value,observacoes=campo('Obs')?.value.trim()||null;
+ const campo=n=>document.getElementById('v73Treino'+n),cliente_id=campo('Cliente')?.value,tema=campo('Tema')?.value.trim(),data=campo('Data')?.value||null,status=campo('Status')?.value,participantesTxt=campo('Participantes')?.value,observacoes=campo('Obs')?.value.trim()||null;
+ const validade=document.getElementById('v74ValidadeManual')?.checked?(campo('Validade')?.value||null):(data?v74MaisSeisMeses(data):null);
  if(!cliente_id||!tema){alert('Informe o cliente e o tema do treinamento.');return;}
  if(status==='realizado'&&!data){alert('Para contabilizar um treinamento realizado, informe sua data.');return;}
  if(status==='realizado'&&data>formatoISO(new Date())){alert('A data de um treinamento realizado não pode estar no futuro. Mantenha como Programado até a execução.');return;}
@@ -7056,6 +7220,9 @@ async function salvarTreinamentoV73(id=''){
  else{const {data:{user}}=await supa.auth.getUser();if(!user){alert('Entre na sua conta para salvar o treinamento.');return;}resultado=await supa.from('treinamentos_cliente').insert({...valores,user_id:user.id}).select().single();}
  if(resultado.error){dispararAutomacao('Não foi possível salvar treinamento',resultado.error.message);return;}
  if(atual)Object.assign(atual,resultado.data);else TREINAMENTOS.unshift(resultado.data);
+ // Se existir um compromisso correspondente na Agenda, atualizar sua conclusão.
+ const evento=eventosSemana.find(e=>(e.tipo==='treinamento'||(!e.tipo&&e.categoria==='treinamento'))&&String(e.clienteId||'')===String(cliente_id)&&e.dataISO===data&&(v74TemaChave(e.titulo)==='geral'||v74TemaChave(e.titulo)===v74TemaChave(tema)));
+ if(evento){const concluido=status==='realizado';if(evento.concluido!==concluido){const {error:erroAgenda}=await supa.from('eventos').update({concluido}).eq('id',evento.id);if(!erroAgenda)evento.concluido=concluido;else dispararAutomacao('Treinamento salvo, mas não foi possível sincronizar a Agenda',erroAgenda.message);}}
  fecharModalSistema();renderTela();
 }
 async function excluirTreinamentoV73(id){
@@ -7176,7 +7343,7 @@ function metricasFechamento(){
   const feitos=vinc.filter(v=>v.status==='entregue'),noPrazo=feitos.filter(v=>{const ent=entregas.find(e=>e.id===v.entrega_id);return !ent?.prazo||String(v.concluido_em||'').slice(0,10)<=ent.prazo;}).length;
   const prev=lancamentos.filter(l=>l.tipo==='receita'&&String(l.vencimentoISO||'').startsWith(pref)).reduce((s,l)=>s+Number(l.valor||0),0);
   const efet=lancamentos.filter(l=>l.tipo==='receita'&&l.status==='pago'&&String(l.dataPagamentoISO||l.vencimentoISO||'').startsWith(pref)).reduce((s,l)=>s+Number(l.valor||0),0);
-  const treinosMes=TREINAMENTOS.filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(pref));
+ const treinosMes=v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(pref));
   return {pref,eventosMes,brc:eventosMes.filter(e=>e.categoria==='brc').length,snVisitas:eventosMes.filter(e=>e.categoria==='saber_nutrir').length,treinosMes,check,vinc,feitos,noPrazo,prev,efet};
 }
 function cabecalhoMesPlanejamento(){const d=referenciaPlanejamento();return `<div class="plan-mes"><button onclick="planejamentoMesOffset--;renderTela()">←</button><strong>${MESES_NOME[d.getMonth()]} ${d.getFullYear()}</strong><button onclick="planejamentoMesOffset++;renderTela()">→</button></div>`;}
@@ -7814,7 +7981,7 @@ function dashboardHTML(){
     ${contasPagarDashboardHTML()}
 
     <div class="card dash-entregas">
-      <h3>Entregas <button onclick="irPara('entregas')">ver tudo</button></h3>
+      <h3>Supervisão <button onclick="irPara('entregas')">ver tudo</button></h3>
       <div class="pend-num">${entregasAbertas.length}</div>
       <div class="pend-desc">tipos de entrega em aberto · ${clientesEntregaPendentes} cliente(s) pendente(s)${entregasAtrasadas?' · '+entregasAtrasadas+' atrasada(s)':''}</div>
       <ul class="pend-list">${entregasAbertas.slice(0,3).map(e=>`<li>${e.titulo} <span class="tag" style="color:${e.prazo<hoje?'#B0413E':'var(--cor-texto-suave)'}">${dataBR(e.prazo)}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhuma entrega pendente.</li>'}</ul>
@@ -8183,7 +8350,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='73',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='74',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
