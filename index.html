@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v76</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v77</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2297,6 +2297,27 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v76-supervisao .v73-actions{margin-top:8px}
 @media(max-width:720px){.v76-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:470px){.v76-supervisao{padding:17px 13px}.v76-supervisao .v73-metricas{gap:9px}.v76-supervisao .v73-metrica{min-height:117px;padding:13px 7px}.v76-supervisao .v73-metrica>span{font-size:11px}.v76-supervisao .v73-metrica>small{font-size:9.5px}.v76-supervisao .v73-metrica>strong{font-size:36px}}
+ </style>
+<style id="v77-equipe-cronograma">
+.v77-equipe{margin-top:16px;padding:15px;border:1px solid var(--cor-borda);border-radius:20px;background:color-mix(in srgb,var(--cor-superficie) 92%,var(--cor-primaria) 8%)}
+.v77-equipe>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;color:var(--cor-texto);font-weight:750;font-size:14px}
+.v77-equipe>summary::-webkit-details-marker{display:none}
+.v77-equipe>summary small{font-weight:550;color:var(--cor-texto-suave);font-size:11px}
+.v77-equipe-mes{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:15px 0 10px}
+.v77-equipe-mes>strong{font-size:13px;color:var(--cor-texto)}
+.v77-equipe-mes button{border:1px solid var(--cor-borda);border-radius:10px;padding:7px 11px;background:var(--cor-superficie);color:var(--cor-texto);cursor:pointer}
+.v77-equipe-lista{display:grid;gap:8px}
+.v77-equipe-linha{display:flex;gap:11px;align-items:center;justify-content:space-between;padding:12px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:13px}
+.v77-equipe-linha strong{font-size:12.5px;color:var(--cor-texto)}
+.v77-equipe-linha small{font-size:11px;color:var(--cor-texto-suave);display:block;line-height:1.5;margin-top:4px}
+.v77-equipe-linha .v77-acoes{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.v77-equipe-linha button{border:1px solid var(--cor-borda);background:transparent;border-radius:9px;padding:7px 9px;color:var(--cor-texto);font-size:11px;cursor:pointer}
+.v77-equipe-linha .v77-estado{color:var(--cor-primaria);font-weight:750}
+.v77-equipe-vazio{font-size:12px;color:var(--cor-texto-suave);text-align:center;padding:16px 5px}
+.v77-equipe .v77-adicionar{display:block;width:100%;margin-top:10px;border:0;border-radius:13px;background:var(--cor-primaria);color:white;padding:12px;font-weight:700;cursor:pointer}
+.v77-inteligente-info{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:7px 0 12px;font-size:12px;color:var(--cor-texto-suave)}
+.v77-inteligente-info button{border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto);padding:9px 11px;border-radius:11px;cursor:pointer;font-weight:650}
+@media(max-width:550px){.v77-equipe{padding:12px}.v77-equipe-linha{align-items:flex-start;flex-direction:column}.v77-equipe-linha .v77-acoes{justify-content:flex-start}.v77-inteligente-info button{width:100%}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -3093,12 +3114,49 @@ function agendaHTMLBaseV74(){
   return `<section class="agenda-hero"><div class="agenda-hero-top"><div class="agenda-hero-title"><div class="agenda-icon">▦</div><div><strong>Minha agenda</strong><span>Compromissos, datas importantes, prazos e vencimentos</span></div></div>${abas}</div><div class="agenda-hero-details"><div><div class="agenda-hero-label">Categorias</div>${legenda}</div><div><div class="agenda-hero-label">Camadas inteligentes</div>${filtros}<p class="eco-agenda-nota">Feriados nacionais + 9 de Julho (SP). Pontos facultativos referem-se ao serviço público; os de 2027 são previsões, sujeitas à confirmação.</p></div></div></section>` + (visaoAgenda==='dia' ? agendaDiaHTML() : visaoAgenda==='semana' ? agendaSemanaHTML() : agendaMesHTML());
 }
 
-/* Sugestões facultativas: considera a frequência do cadastro e compromissos já existentes. */
+/* V77 — Visitas das supervisoras são eventos sincronizados, marcados no título.
+   Assim o cronograma persiste no banco já existente, sem criar uma segunda agenda. */
+function v77EhVisitaEquipe(e){return e?.tipo==='visita'&&/^\[EQUIPE:[^\]]+\]\s*/i.test(String(e.titulo||''));}
+function v77PessoaEquipe(e){
+ const cod=String(e?.titulo||'').match(/^\[EQUIPE:([^\]]+)\]\s*/i)?.[1];
+ if(!cod)return null;
+ try{return decodeURIComponent(cod)}catch(_){return cod;}
+}
+function v77TituloEquipe(e){return String(e?.titulo||'').replace(/^\[EQUIPE:[^\]]+\]\s*/i,'').trim()||'Visita de supervisão';}
+function v77VisitasEfetivas(){
+ const visitas=eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido),proprias=new Set(visitas.filter(e=>!v77EhVisitaEquipe(e)).map(e=>String(e.clienteId||'')+'|'+e.dataISO));
+ const treinamentoContado=new Set(),extras=[];
+ for(const t of v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&t.cliente_id&&t.data)){
+  const chave=String(t.cliente_id)+'|'+t.data;
+  if(proprias.has(chave)||treinamentoContado.has(chave))continue;
+  treinamentoContado.add(chave);
+  extras.push({id:'treino-visita:'+chave,tipo:'visita',clienteId:t.cliente_id,dataISO:t.data,hora:null,titulo:'Visita técnica · treinamento realizado',concluido:true,origemTreinamento:true});
+ }
+ return visitas.concat(extras);
+}
+/* Cobertura: a programação da Bruna, da equipe e dos treinamentos divide a meta
+   do cliente; um treinamento no mesmo dia de visita própria não duplica cobertura. */
+function v77CoberturaMensal(mes=formatoISO(new Date()).slice(0,7)){
+ const hoje=formatoISO(new Date()),total=new Map(),visitas=eventosSemana.filter(e=>e.tipo==='visita'&&e.clienteId&&String(e.dataISO||'').startsWith(mes)&&(e.concluido||e.dataISO>=hoje));
+ const agendados=new Set();
+ for(const e of visitas){
+  const id=String(e.clienteId);total.set(id,(total.get(id)||0)+1);
+  if(!v77EhVisitaEquipe(e))agendados.add(id+'|'+e.dataISO);
+ }
+ const treinos=new Set();
+ for(const t of v74TreinamentosConsolidados().filter(t=>t.status!=='cancelado'&&t.cliente_id&&String(t.data||'').startsWith(mes)&&(t.status==='realizado'||t.data>=hoje))){
+  const id=String(t.cliente_id),chave=id+'|'+t.data;
+  if(agendados.has(chave)||treinos.has(chave))continue;
+  treinos.add(chave);total.set(id,(total.get(id)||0)+1);
+ }
+ return total;
+}
 function v74AgendaInteligenteHTML(){
- const mes=formatoISO(new Date()).slice(0,7),total=new Map();
- eventosSemana.filter(e=>e.tipo==='visita'&&String(e.dataISO||'').startsWith(mes)&&e.clienteId).forEach(e=>total.set(String(e.clienteId),(total.get(String(e.clienteId))||0)+1));
- const sugestoes=CLIENTES.filter(c=>String(c.status||'ativo').toLowerCase()!=='inativo').map(c=>({c,meta:Number(c.visitasPrevistasMes||0)||Number(c.visitasPrevistasSemana||0)*4,agendadas:total.get(String(c.id))||0})).filter(x=>x.meta>x.agendadas).sort((a,b)=>(b.meta-b.agendadas)-(a.meta-a.agendadas)||a.c.nome.localeCompare(b.c.nome,'pt-BR'));
- return `<section class="v74-inteligente"><h3>✧ Agenda inteligente</h3><p>${sugestoes.length?'Sugestões para completar as visitas do mês, sem criar compromissos automaticamente.':'As visitas previstas para este mês estão cobertas, ou não há frequência definida nos clientes.'}</p><div class="v74-inteligente-lista">${sugestoes.slice(0,4).map(x=>`<div class="v74-inteligente-item"><span><strong>${textoHTML(x.c.nome)}</strong><br>${x.agendadas} de ${x.meta} visitas no mês</span><button class="btn-secundario" onclick="v74AgendarVisita('${x.c.id}')">Agendar</button></div>`).join('')}</div></section>`;
+ const mes=formatoISO(new Date()).slice(0,7),total=v77CoberturaMensal(mes);
+ const sugestoes=CLIENTES.filter(c=>clienteAtivoV37(c)&&c.tipoCliente!=='contratante').map(c=>({c,meta:Number(c.visitasPrevistasMes||0)||Number(c.visitasPrevistasSemana||0)*4,cobertas:total.get(String(c.id))||0})).filter(x=>x.meta>x.cobertas).sort((a,b)=>(b.meta-b.cobertas)-(a.meta-a.cobertas)||a.c.nome.localeCompare(b.c.nome,'pt-BR'));
+ return `<section class="v74-inteligente"><h3>✧ Agenda inteligente · cobertura da equipe</h3><p>${sugestoes.length?'Clientes que ainda não atingiram a programação mensal de visitas.':'As visitas previstas do mês estão cobertas, ou não há frequência definida para os clientes.'}</p>
+ <div class="v77-inteligente-info"><span>${sugestoes.length} cliente(s) com visita(s) por programar · considera Bruna, Mari, Gleice, Ana Cristina e treinamentos.</span><button onclick="v77AbrirCronograma()">+ Cronograma da equipe</button></div>
+ <div class="v74-inteligente-lista">${sugestoes.map(x=>`<div class="v74-inteligente-item"><span><strong>${textoHTML(x.c.nome)}</strong><br>${x.cobertas} de ${x.meta} visitas cobertas no mês</span><button class="btn-secundario" onclick="v77AbrirCronograma('${x.c.id}')">Programar</button></div>`).join('')}</div></section>`;
 }
 function v74AgendarVisita(clienteId){
  const data=visaoAgenda==='dia'?dataAgendaDiaria:formatoISO(new Date());abrirFormularioAgenda(data,9);
@@ -3108,7 +3166,7 @@ function v74AgendarVisita(clienteId){
 function agendaHTML(){return v74AgendaInteligenteHTML()+agendaHTMLBaseV74();}
 
 function agendaDiaHTML(){
-  const d=new Date(dataAgendaDiaria+'T12:00:00'),eventos=eventosSemana.filter(e=>e.dataISO===dataAgendaDiaria).sort((a,b)=>a.hora-b.hora),avisos=itensCalendarioInteligente().filter(i=>i.dataISO===dataAgendaDiaria);
+  const d=new Date(dataAgendaDiaria+'T12:00:00'),eventos=eventosSemana.filter(e=>e.dataISO===dataAgendaDiaria&&!v77EhVisitaEquipe(e)).sort((a,b)=>a.hora-b.hora),avisos=itensCalendarioInteligente().filter(i=>i.dataISO===dataAgendaDiaria);
   return `<div class="agenda-periodo"><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(-1)">‹</button><button class="agenda-hoje" onclick="irDiaHoje()">Hoje</button></div><div class="agenda-periodo-label">${DIAS_SEMANA[d.getDay()]}, ${isoParaBRCompleto(dataAgendaDiaria)}</div><div class="agenda-periodo-nav"><button class="agenda-nav-icon" onclick="irDiaAgenda(1)">›</button></div></div>
   ${avisos.length?`<section class="agenda-faixa"><div class="agenda-faixa-topo"><div class="agenda-faixa-titulo"><span>☀</span>Avisos do dia</div><div class="agenda-faixa-contagem">${avisos.length} com data</div></div>${avisos.map(i=>`<span class="prazo-chip ${i.tipo}">${textoHTML(i.titulo)}${i.detalhe?`<small class="eco-data-detalhe">${textoHTML(i.detalhe)}</small>`:''}</span>`).join('')}</section>`:''}
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-primario" onclick="abrirFormularioAgenda('${dataAgendaDiaria}',${Math.min(19,Math.max(7,new Date().getHours()))})">+ Novo compromisso</button></div>
@@ -3138,7 +3196,7 @@ function agendaSemanaHTML(){
     diasDaSemana.forEach(d=>{
       const dataISO = formatoISO(d);
       const idCel = `cel-${dataISO}-${hora}`;
-      const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora);
+      const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora&&!v77EhVisitaEquipe(e));
       let chips = eventos.map(e=>
         `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
       ).join('');
@@ -3168,7 +3226,7 @@ function agendaMesHTML(){
   for(let dia=1; dia<=diasNoMes; dia++){
     const dataCel = new Date(baseMes.getFullYear(), baseMes.getMonth(), dia);
     const dataISO = formatoISO(dataCel);
-    const eventosNoDia = eventosSemana.filter(e=>e.dataISO===dataISO);
+    const eventosNoDia = eventosSemana.filter(e=>e.dataISO===dataISO&&!v77EhVisitaEquipe(e));
     const inteligentesNoDia=avisosMes.filter(i=>i.dataISO===dataISO);
     const especiaisNoDia=inteligentesNoDia.filter(i=>['feriado','ponto_facultativo','data_comemorativa'].includes(i.tipo));
     const temFeriado=especiaisNoDia.some(i=>i.tipo==='feriado');
@@ -3235,7 +3293,7 @@ function abrirFormularioAgenda(dataISO,hora){
 function atualizarFormularioAgenda(){
   const tipo=document.getElementById('agendaTipo')?.value||'visita',clienteId=document.getElementById('agendaCliente')?.value||null,cat=categoriaPorTipo(tipo,clienteId),def=CATEGORIAS_EVENTO.find(c=>c.id===cat)||CATEGORIAS_EVENTO.at(-1),select=document.getElementById('agendaCliente'),hint=document.getElementById('agendaClienteHint');
   if(select){select.disabled=tipo==='pessoal';if(tipo==='pessoal')select.value='';}
-  if(hint)hint.textContent=tipo==='visita'?'Obrigatório para visitas.':'Opcional para este tipo de compromisso.';
+  if(hint)hint.textContent=tipo==='visita'?'Obrigatório para visitas.':tipo==='treinamento'?'Informe o cliente para contabilizar o treinamento também como visita.':'Opcional para este tipo de compromisso.';
   const bolinha=document.getElementById('agendaCorPreview'),texto=document.getElementById('agendaCorTexto');if(bolinha)bolinha.style.background=def.cor;if(texto)texto.textContent=def.nome+' · cor aplicada pelo sistema';
 }
 async function confirmarNovoEvento(){
@@ -3470,7 +3528,7 @@ function clienteEventoResolvido(evento){
   const alvo=aliases[titulo]||titulo,candidatos=CLIENTES.filter(c=>{const nome=normalizarNomeAgenda(c.nome);return nome===alvo||nome.endsWith(' '+alvo)||alvo.endsWith(' '+nome)});
   return candidatos.length===1?candidatos[0]:null;
 }
-function visitasRealizadasMes(clienteId){const mes=formatoISO(new Date()).slice(0,7);return eventosSemana.filter(e=>String(clienteEventoResolvido(e)?.id||'')===String(clienteId)&&e.concluido&&e.tipo==='visita'&&e.dataISO?.startsWith(mes)).length;}
+function visitasRealizadasMes(clienteId){const mes=formatoISO(new Date()).slice(0,7);return v77VisitasEfetivas().filter(e=>String(clienteEventoResolvido(e)?.id||'')===String(clienteId)&&e.dataISO?.startsWith(mes)).length;}
 function numerosVisitasCliente(c){if(c.tipoCliente==='contratante'){const filhos=ordenarClientesAZ(CLIENTES.filter(x=>x.contratanteId===c.id));return {prev:c.visitasPrevistasMes||((c.visitasPrevistasSemana||0)*4),real:filhos.reduce((s,x)=>s+visitasRealizadasMes(x.id),0),filhos:filhos.length};}return {prev:c.visitasPrevistasMes,real:visitasRealizadasMes(c.id),filhos:0};}
 function resumoVisitasClienteHTML(c){const n=numerosVisitasCliente(c);return `<div style="font-size:11px;color:var(--cor-texto-suave)">${n.real}/${n.prev||0} visitas no mês${c.visitasPrevistasSemana?' · meta '+c.visitasPrevistasSemana+'/semana':''}${n.filhos?' · '+n.filhos+' vinculados':''}</div>`;}
 function ordenarClientesAZ(lista){return [...lista].sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base',numeric:true}));}
@@ -7255,7 +7313,8 @@ function v76AlertasTreinoPorAno(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
 }
 function v76DadosSupervisao(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
  const base=v75DadosSupervisao(ano,escopo),alertas=v76AlertasTreinoPorAno(ano,escopo);
- return {...base,visitasTecnicas:base.visitasRealizadas.filter(e=>!v76EhVisitaSupervisao(e)),visitasSupervisao:base.visitasRealizadas.filter(v76EhVisitaSupervisao),treinamentosVencidos:alertas.vencidos,treinamentosAVencer:alertas.aVencer};
+ const visitasRealizadas=v77VisitasEfetivas().filter(e=>String(e.dataISO||'').startsWith(String(ano))&&(escopo==='todos'||v75GrupoClienteRegistro(e)===escopo));
+ return {...base,visitasRealizadas,visitasTecnicas:visitasRealizadas.filter(e=>!v76EhVisitaSupervisao(e)),visitasSupervisao:visitasRealizadas.filter(v76EhVisitaSupervisao),visitasEquipe:visitasRealizadas.filter(v77EhVisitaEquipe),treinamentosVencidos:alertas.vencidos,treinamentosAVencer:alertas.aVencer};
 }
 function v75PainelSupervisaoHTML(){
  const d=v76DadosSupervisao(),cards=[
@@ -7263,8 +7322,8 @@ function v75PainelSupervisaoHTML(){
   ['Treinamentos programados',d.treinamentosProgramados.length,'A realizar'],
   ['Treinamentos vencidos',d.treinamentosVencidos.length,'Última reciclagem por cliente e tema','v76-vencidos'],
   ['A vencer em 30 dias',d.treinamentosAVencer.length,'Reciclagens próximas','v76-a-vencer'],
-  ['Visitas técnicas',d.visitasTecnicas.length,'Realizadas na Agenda'],
-  ['Visitas de supervisão',d.visitasSupervisao.length,'Realizadas no período'],
+  ['Visitas técnicas',d.visitasTecnicas.length,'Inclui treinamentos aplicados'],
+  ['Visitas de supervisão',d.visitasSupervisao.length,`${d.visitasEquipe.length} feita(s) pela equipe`],
  ];
  if(typeof document!=='undefined'&&typeof setTimeout==='function'){
   setTimeout(v76OcultarResumoLegado,0);
@@ -7274,8 +7333,10 @@ function v75PainelSupervisaoHTML(){
  <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Os detalhes ficam no resumo anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
+ <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · ${d.visitasEquipe.length} pela equipe · treinamentos aplicados também contam como visita.</p>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
- <p class="v75-info">${v75NomeEscopo()} · ${d.ano} · Histórico completo apenas no PDF, sem duplicar lançamentos.</p>
+ ${v77CronogramaEquipeHTML()}
+ <p class="v75-info">${v75NomeEscopo()} · ${d.ano} · Uma visita por treinamento aplicado, sem contar duas vezes a visita própria no mesmo cliente e dia.</p>
  </section>`;
 }
 function v76OcultarResumoLegado(){
@@ -7293,6 +7354,79 @@ function v76OcultarResumoLegado(){
    el=el.parentElement;
   }
  }
+}
+/* V77 — O cronograma das supervisoras usa a própria tabela de eventos já
+   sincronizada entre aparelhos. A identificação fica no título do evento. */
+let V77_MES_EQUIPE=formatoISO(new Date()).slice(0,7),V77_EQUIPE_ABERTO=false;
+function v77RegistrosEquipe(mes=V77_MES_EQUIPE,escopo=V75_ESCOPO_SUPERVISAO){
+ return eventosSemana.filter(e=>v77EhVisitaEquipe(e)&&String(e.dataISO||'').startsWith(mes)&&(escopo==='todos'||v75GrupoClienteRegistro(e)===escopo))
+  .sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO))||Number(a.hora||0)-Number(b.hora||0)||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
+}
+function v77MudarMesEquipe(delta){
+ const [ano,mes]=V77_MES_EQUIPE.split('-').map(Number),d=new Date(ano,mes-1+delta,1,12);
+ V77_MES_EQUIPE=formatoISO(d).slice(0,7);V77_EQUIPE_ABERTO=true;renderTela();
+}
+function v77CronogramaEquipeHTML(){
+ const itens=v77RegistrosEquipe(),feitas=itens.filter(e=>e.concluido).length,mesLegivel=new Date(V77_MES_EQUIPE+'-15T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+ return `<details class="v77-equipe" ${V77_EQUIPE_ABERTO?'open':''} ontoggle="V77_EQUIPE_ABERTO=this.open">
+ <summary><span>☷ Cronograma da equipe</span><small>${itens.length} visita(s) · ${feitas} realizada(s) neste mês</small></summary>
+ <div class="v77-equipe-mes"><button onclick="v77MudarMesEquipe(-1)" aria-label="Mês anterior">‹</button><strong>${textoHTML(mesLegivel)}</strong><button onclick="v77MudarMesEquipe(1)" aria-label="Mês seguinte">›</button></div>
+ <div class="v77-equipe-lista">${itens.map(e=>`<article class="v77-equipe-linha"><div><strong>${textoHTML(v75NomeCliente(e))}</strong><small>${dataBR(e.dataISO)} · ${String(e.hora||0).padStart(2,'0')}h · ${textoHTML(v77PessoaEquipe(e))} · <span class="v77-estado">${e.concluido?'Realizada':'Programada'}</span></small>${v77TituloEquipe(e)==='Visita de supervisão'?'':`<small>${textoHTML(v77TituloEquipe(e))}</small>`}</div><div class="v77-acoes"><button onclick="v77AlternarSituacaoEquipe('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button><button onclick="v77FormularioVisitaEquipe('', '${e.id}')">Editar</button><button onclick="v77ExcluirVisitaEquipe('${e.id}')" aria-label="Excluir visita da equipe">✕</button></div></article>`).join('')||'<p class="v77-equipe-vazio">Nenhuma visita da equipe registrada para este mês e carteira.</p>'}</div>
+ <button class="v77-adicionar" onclick="v77FormularioVisitaEquipe()">+ Programar visita da equipe</button>
+ </details>`;
+}
+function v77AbrirCronograma(clienteId=''){
+ espacoAtual='trabalho';document.body.setAttribute('data-espaco','trabalho');telaAtual='entregas';V77_EQUIPE_ABERTO=true;
+ if(clienteId){const grupo=v75GrupoClienteRegistro({cliente_id:clienteId});V75_ESCOPO_SUPERVISAO=grupo==='sem_cliente'?'todos':grupo;}
+ V77_MES_EQUIPE=formatoISO(new Date()).slice(0,7);
+ renderSidebar();renderTela();salvarTelaAtualSessao();
+ if(typeof fecharMenuMobile==='function')fecharMenuMobile();
+ setTimeout(()=>v77FormularioVisitaEquipe(clienteId),0);
+}
+function v77FormularioVisitaEquipe(clienteId='',id=''){
+ const e=id?eventosSemana.find(x=>String(x.id)===String(id)&&v77EhVisitaEquipe(x)):null;
+ if(id&&!e){alert('Não foi possível localizar esta visita da equipe.');return;}
+ const escolhido=e?.clienteId||clienteId||'',pessoa=v77PessoaEquipe(e)||'Mari',data=e?.dataISO||formatoISO(new Date()),hora=Number(e?.hora??9),concluido=!!e?.concluido;
+ const assunto=e?v77TituloEquipe(e).replace(/^Visita de supervisão\s*[·—-]?\s*/i,''):'';
+ const clientes=ordenarClientesAZ(CLIENTES.filter(c=>clienteAtivoV37(c)||String(c.id)===String(escolhido)));
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>${e?'Editar':'Programar'} visita da equipe</h2><p>Este cronograma alimenta a cobertura dos clientes sem criar compromisso na sua agenda.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>
+ <div class="form-grid"><div class="form-field full"><label>Cliente *</label><select id="v77EquipeCliente"><option value="">Selecione o cliente</option>${clientes.map(c=>`<option value="${c.id}" ${String(c.id)===String(escolhido)?'selected':''}>${textoHTML(c.nome)}</option>`).join('')}</select></div>
+ <div class="form-field full"><label>Responsável pela visita *</label><input id="v77EquipePessoa" list="v77PessoasEquipe" maxlength="55" value="${textoHTML(pessoa)}" placeholder="Mari, Gleice, Ana Cristina..."><datalist id="v77PessoasEquipe"><option value="Mari"><option value="Gleice"><option value="Ana Cristina"></datalist></div>
+ <div class="form-field"><label>Data da visita *</label><input id="v77EquipeData" type="date" value="${data}" required></div>
+ <div class="form-field"><label>Horário *</label><select id="v77EquipeHora">${HORAS_PLANNER.map(h=>`<option value="${h}" ${h===hora?'selected':''}>${String(h).padStart(2,'0')}:00</option>`).join('')}</select></div>
+ <div class="form-field full"><label>Situação</label><select id="v77EquipeStatus"><option value="programada" ${!concluido?'selected':''}>Programada</option><option value="realizada" ${concluido?'selected':''}>Realizada</option></select></div>
+ <div class="form-field full"><label>Observação / assunto (opcional)</label><input id="v77EquipeAssunto" maxlength="110" value="${textoHTML(assunto)}" placeholder="Ex.: Acompanhamento da operação"></div></div>
+ <div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="v77SalvarVisitaEquipe('${e?.id||''}')">Salvar visita</button></div>`);
+}
+async function v77SalvarVisitaEquipe(id=''){
+ const clienteId=document.getElementById('v77EquipeCliente')?.value||'',pessoa=document.getElementById('v77EquipePessoa')?.value.trim()||'',dataISO=document.getElementById('v77EquipeData')?.value||'',hora=Number(document.getElementById('v77EquipeHora')?.value),status=document.getElementById('v77EquipeStatus')?.value,assunto=document.getElementById('v77EquipeAssunto')?.value.trim()||'';
+ if(!clienteId||!pessoa||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(dataISO)||!Number.isInteger(hora)||hora<0||hora>23){alert('Informe cliente, responsável, data e horário da visita.');return;}
+ if(status==='realizada'&&dataISO>formatoISO(new Date())){alert('Uma visita futura deve ficar como programada até ser realizada.');return;}
+ const titulo=`[EQUIPE:${encodeURIComponent(pessoa)}] Visita de supervisão${assunto?' · '+assunto:''}`,concluido=status==='realizada';
+ const duplicada=eventosSemana.some(e=>v77EhVisitaEquipe(e)&&String(e.id)!==String(id)&&String(e.clienteId)===String(clienteId)&&e.dataISO===dataISO&&Number(e.hora)===hora&&v77PessoaEquipe(e).toLowerCase()===pessoa.toLowerCase());
+ if(duplicada){alert('Esta supervisora já tem uma visita para o mesmo cliente, data e horário.');return;}
+ const payload={titulo,categoria:categoriaPorTipo('visita',clienteId),tipo:'visita',data:dataISO,hora,cliente_id:clienteId,cliente_externo:null,concluido};
+ const consulta=id?supa.from('eventos').update(payload).eq('id',id):supa.from('eventos').insert(payload);
+ const {data,error}=await consulta.select('*, clientes(nome)').single();
+ if(error){dispararAutomacao('Não foi possível salvar a visita da equipe',error.message);return;}
+ const registro={id:data.id,dataISO,hora,titulo,categoria:data.categoria,tipo:'visita',concluido,clienteId,clienteNomeVinculado:data.clientes?.nome||CLIENTES.find(c=>String(c.id)===String(clienteId))?.nome||null,clienteExterno:null};
+ if(id){const indice=eventosSemana.findIndex(e=>String(e.id)===String(id));if(indice>=0)eventosSemana[indice]=registro;}
+ else eventosSemana.push(registro);
+ V77_MES_EQUIPE=dataISO.slice(0,7);V77_EQUIPE_ABERTO=true;fecharModalSistema();renderTela();
+}
+async function v77AlternarSituacaoEquipe(id){
+ const e=eventosSemana.find(x=>String(x.id)===String(id)&&v77EhVisitaEquipe(x));if(!e)return;
+ if(!e.concluido&&e.dataISO>formatoISO(new Date())){alert('Esta visita ainda está no futuro.');return;}
+ const novo=!e.concluido,{error}=await supa.from('eventos').update({concluido:novo}).eq('id',e.id);
+ if(error){dispararAutomacao('Não foi possível atualizar a visita',error.message);return;}
+ e.concluido=novo;V77_EQUIPE_ABERTO=true;renderTela();
+}
+async function v77ExcluirVisitaEquipe(id){
+ const e=eventosSemana.find(x=>String(x.id)===String(id)&&v77EhVisitaEquipe(x));if(!e)return;
+ if(!confirm(`Excluir a visita de ${v77PessoaEquipe(e)} em ${dataBR(e.dataISO)} para ${v75NomeCliente(e)}?`))return;
+ const {error}=await supa.from('eventos').delete().eq('id',e.id);
+ if(error){dispararAutomacao('Não foi possível excluir a visita',error.message);return;}
+ eventosSemana=eventosSemana.filter(x=>String(x.id)!==String(id));V77_EQUIPE_ABERTO=true;renderTela();
 }
 function entregasHTML(){return v75PainelSupervisaoHTML();}
 function abrirFormularioTreinamentoV73(clienteId='',id=''){
@@ -7472,10 +7606,10 @@ function v75GerarRelatorioPDF(){
   {chave:'vs',rotulo:'Supervisão',largura:26},
   {chave:'tr',rotulo:'Trein. feitos',largura:26},
   {chave:'tp',rotulo:'Trein. prog.',largura:26},
- ],clientes.map(c=>({nome:c.nome,vt:String(c.visitasTecnicas),vs:String(c.visitasSupervisao),tr:String(c.treinamentosRealizados),tp:String(c.treinamentosProgramados)})),{descricao:'Visitas técnicas apenas em totais. Supervisões e treinamentos detalhados nas seções seguintes.',iniciarPagina:true});
+ ],clientes.map(c=>({nome:c.nome,vt:String(c.visitasTecnicas),vs:String(c.visitasSupervisao),tr:String(c.treinamentosRealizados),tp:String(c.treinamentosProgramados)})),{descricao:'Totais por cliente. Treinamento realizado também conta como uma visita, sem duplicidade.',iniciarPagina:true});
  const tabelaSupervisao=()=>tabela('Visitas de supervisão realizadas',[
-  {chave:'data',rotulo:'Data',largura:35},{chave:'cliente',rotulo:'Cliente',largura:86},{chave:'atividade',rotulo:'Registro',largura:57},
- ],d.visitasSupervisao.slice().sort((a,b)=>String(a.dataISO||'').localeCompare(String(b.dataISO||''))).map(e=>({data:dataBR(e.dataISO),cliente:v75NomeCliente(e),atividade:e.titulo||'Supervisão'})),{descricao:'Data e cliente de cada supervisão. Visitas técnicas comuns não são listadas individualmente.'});
+  {chave:'data',rotulo:'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:59},{chave:'responsavel',rotulo:'Responsável',largura:34},{chave:'atividade',rotulo:'Atividade',largura:58},
+ ],d.visitasSupervisao.slice().sort((a,b)=>String(a.dataISO||'').localeCompare(String(b.dataISO||''))).map(e=>({data:dataBR(e.dataISO),cliente:v75NomeCliente(e),responsavel:v77PessoaEquipe(e)||'Bruna Ribeiro',atividade:v77TituloEquipe(e)})),{descricao:'Supervisões próprias e da equipe, com identificação da responsável.'});
  const tabelaTreinos=(titulo,registros,descricao,modo='historico')=>tabela(titulo,[
   {chave:'data',rotulo:modo==='alerta'?'Vencimento':'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:55},{chave:'tema',rotulo:'Tema',largura:68},{chave:'status',rotulo:'Situação',largura:28},
  ],registros.slice().sort((a,b)=>String(a.data||'').localeCompare(String(b.data||''))).map(t=>({data:dataBR(modo==='alerta'?t.validade:t.data),cliente:v75NomeCliente(t),tema:t.tema||'Treinamento',status:modo==='alerta'?(t.validade<formatoISO(new Date())?'Vencido':'A vencer'):modo==='programado'?'Programado':v73SituacaoTreino(t).rotulo})),{descricao});
@@ -8162,7 +8296,7 @@ function dashboardHTML(){
   const hora = agora.getHours();
   const saudacao = hora<12 ? 'Bom dia' : hora<18 ? 'Boa tarde' : 'Boa noite';
 
-  const eventosHoje = eventosSemana.filter(e=>e.dataISO===hoje).sort((a,b)=>a.hora-b.hora);
+  const eventosHoje = eventosSemana.filter(e=>e.dataISO===hoje&&!v77EhVisitaEquipe(e)).sort((a,b)=>a.hora-b.hora);
   const totalHoje = eventosHoje.length;
   const concluidosHoje = eventosHoje.filter(e=>e.concluido).length;
   const proximoEvento = eventosHoje.find(e=>!e.concluido);
@@ -8175,7 +8309,7 @@ function dashboardHTML(){
 
   const conteudoHoje = CONTEUDOS_MKT.filter(c=>c.status!=='publicado').slice(0,3);
   const mesAtual=hoje.slice(0,7),anoAtual=hoje.slice(0,4);
-  const visitasConcluidas=eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido);
+  const visitasConcluidas=v77VisitasEfetivas();
   const realizadasBRC=visitasConcluidas.filter(e=>e.categoria==='brc'&&e.dataISO?.startsWith(mesAtual)).length;
   const realizadasSN=visitasConcluidas.filter(e=>e.categoria==='saber_nutrir'&&e.dataISO?.startsWith(mesAtual)).length;
   const metaBRC=CLIENTES.filter(c=>c.tipoCliente==='direto').reduce((s,c)=>s+c.visitasPrevistasMes,0);
@@ -8576,7 +8710,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='76',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='77',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -8603,7 +8737,7 @@ async function criarPlanoVidaV56(btn){if(v56Plano()){renderTela();return;}if(btn
 /* Indicadores mensais; valores vêm exclusivamente dos dados já carregados. */
 let v56MesResultado=formatoISO(new Date()).slice(0,7);
 function v56Indicadores(mes=v56MesResultado){const deMes=s=>String(s||'').slice(0,7)===mes;
- const agenda=eventosSemana.filter(e=>deMes(e.dataISO)&&v58ClienteAtivo(e.clienteId));const concluidos=agenda.filter(e=>e.concluido).length;
+ const agenda=eventosSemana.filter(e=>deMes(e.dataISO)&&v58ClienteAtivo(e.clienteId)&&!v77EhVisitaEquipe(e));const concluidos=agenda.filter(e=>e.concluido).length;
  const visitas=VISITAS.filter(v=>deMes(v.dataAplicacaoISO)&&v58ClienteAtivo(v.clienteId)),visitasConcluidas=visitas.filter(v=>v.status==='concluida');
  const horas=CONTROLE_HORAS.filter(r=>r.fim&&deMes(dataHoraLocalInput(r.inicio))&&v58ClienteAtivo(r.cliente_id));const totalMs=horas.reduce((a,r)=>a+duracaoHorasMs(r),0);
  const rad=RADAR_RECORRENCIAS.filter(r=>deMes(r.data)&&v58ClienteAtivo(r.cliente_id)),totalOcorrencias=rad.reduce((a,r)=>a+(Number(r.quantidade)||1),0),assuntos={};rad.forEach(r=>{const k=r.assunto||'Outros';assuntos[k]=(assuntos[k]||0)+(Number(r.quantidade)||1)});
@@ -8855,7 +8989,7 @@ function v68ItensDia(){
     itens.push({grupo,titulo:String(titulo),detalhe:String(detalhe||''),iso,dias,destino,clienteId});
   }
   for(const e of eventosSemana||[]){
-    if(e.dataISO!==hoje||e.concluido)continue;
+    if(e.dataISO!==hoje||e.concluido||v77EhVisitaEquipe(e))continue;
     const hora=e.hora?String(e.hora).slice(0,5):'Horário não definido';
     add('agenda',e.titulo,`${hora} · ${e.clienteNomeVinculado||e.clienteExterno||nomeCliente(e.clienteId)||'Compromisso'}`,hoje,'agenda',e.clienteId);
   }
@@ -8935,7 +9069,7 @@ function v68SecaoHTML(titulo,lista,vazia,limite=10){
 }
 function v68HojeHTML(){
   const itens=v68ItensDia(),atrasados=itens.filter(r=>r.dias<0),hoje=itens.filter(r=>r.dias===0),proximos=itens.filter(r=>r.dias>0);
-  const dia=v66Hoje(),concluidos=[...eventosSemana.filter(e=>e.dataISO===dia&&e.concluido).map(e=>({titulo:e.titulo,detalhe:'Agenda · concluído'})),...LISTA_DIA.filter(l=>l.concluido&&String(l.concluido_em||'').slice(0,10)===dia).map(l=>({titulo:l.item,detalhe:'Lista do Dia · concluído'}))];
+  const dia=v66Hoje(),concluidos=[...eventosSemana.filter(e=>e.dataISO===dia&&e.concluido&&!v77EhVisitaEquipe(e)).map(e=>({titulo:e.titulo,detalhe:'Agenda · concluído'})),...LISTA_DIA.filter(l=>l.concluido&&String(l.concluido_em||'').slice(0,10)===dia).map(l=>({titulo:l.item,detalhe:'Lista do Dia · concluído'}))];
   const data=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
   return `<div class="v66-intro"><div class="v66-muted">${v66Esc(data)}</div><h2>Seu dia, em um só lugar</h2><p class="v66-muted">Compromissos, tarefas, documentos e pagamentos vêm automaticamente das áreas do Meu Ecossistema. Nenhuma pesquisa é necessária.</p><div class="v68-daily-summary"><span>Hoje: <strong>${hoje.length}</strong></span><span>Itens atrasados: <strong>${atrasados.length}</strong></span><span>Próximos 7 dias: <strong>${proximos.length}</strong></span><span>Concluídos: <strong>${concluidos.length}</strong></span></div><div class="v66-actions"><button class="primary" onclick="v68RecarregarDados(this)">↻ Atualizar meu dia</button><button onclick="irPara('agenda')">Abrir Agenda</button><button onclick="abrirListaDia()">Lista do Dia</button></div><p id="v68-atualizacao" class="v66-muted" role="status">Informações da sua última sincronização.</p></div>
   ${v68SecaoHTML('Para fazer hoje',hoje,'Nenhum compromisso ou tarefa em aberto para hoje.')}
@@ -8948,7 +9082,7 @@ function v69VisaoDiaHTML(){
   const agenda=itens.filter(r=>r.grupo==='agenda'&&r.dias===0).length;
   const tarefas=itens.filter(r=>r.dias===0&&r.grupo==='lista').length;
   const atencao=itens.filter(r=>r.dias<0).length;
-  const proximo=eventosSemana.filter(e=>e.dataISO===dia&&!e.concluido).sort((a,b)=>String(a.hora||'').localeCompare(String(b.hora||'')))[0];
+  const proximo=eventosSemana.filter(e=>e.dataISO===dia&&!e.concluido&&!v77EhVisitaEquipe(e)).sort((a,b)=>String(a.hora||'').localeCompare(String(b.hora||'')))[0];
   const data=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
   const indicador=(icone,rotulo,numero,acao)=>`<button class="v70-dia-atalho" onclick="${acao}"><span aria-hidden="true">${icone}</span><strong>${numero}</strong><small>${rotulo}</small><span class="v70-dia-seta" aria-hidden="true">↗</span></button>`;
   return `<section class="v70-dia card" aria-label="Resumo automático de hoje"><div class="v70-dia-cabecalho"><div><div class="v70-dia-data">${v66Esc(data)}</div><h3>✦ Meu dia <span>· em um olhar</span></h3><p>${proximo?'Próximo compromisso: '+v66Esc(proximo.titulo):atencao?'Há assuntos que merecem sua atenção.':'Seu dia, do seu jeito. Tudo em um só lugar.'}</p></div><button class="v70-dia-atualizar" onclick="v68RecarregarDados(this)" aria-label="Atualizar resumo do dia">↻</button></div><div class="v70-dia-grid">${indicador('▦','Agenda',agenda,"irPara('agenda')")}${indicador('✓','Tarefas',tarefas,"abrirListaDia()")}${indicador('◈','Atenção',atencao,"abrirDashboardGlobal()")}</div><span class="v70-dia-nota" id="v68-atualizacao" role="status">Os números vêm dos registros do seu Ecossistema.</span></section>`;
