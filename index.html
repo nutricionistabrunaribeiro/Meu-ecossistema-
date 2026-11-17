@@ -2162,6 +2162,17 @@ html[data-paleta-v04="nude"][data-tema-interface="claro"]{--tema-fundo:#fcf5f0;-
 html[data-paleta-v04="ardosia"][data-tema-interface="claro"]{--tema-fundo:#f1f4f8;--tema-superficie:#e6ebf1;--tema-borda:#c8d3df;--tema-primaria:#526b88;--tema-clara:#a8bacf;--tema-acento:#6b6e86;--tema-texto:#263545;--tema-suave:#5d6c7d}
 html[data-paleta-v04="perola"][data-tema-interface="claro"]{--tema-fundo:#faf8fa;--tema-superficie:#f0ebf1;--tema-borda:#ded2e0;--tema-primaria:#806b87;--tema-clara:#d2bfd2;--tema-acento:#806f7b;--tema-texto:#342e3b;--tema-suave:#6a5f70}
 html[data-paleta-v04="grafite"][data-tema-interface="claro"]{--tema-fundo:#f4f3f6;--tema-superficie:#e8e6eb;--tema-borda:#d1cbd4;--tema-primaria:#77617e;--tema-clara:#c1b4c5;--tema-acento:#806c79;--tema-texto:#302c35;--tema-suave:#69616e}
+/* V71 — Familias cromaticas distintas, sem variacoes quase iguais. */
+html[data-paleta-v04="grafite"]{--tema-fundo:#1c2026;--tema-superficie:#30343b;--tema-borda:#54565e;--tema-primaria:#e5a7b7;--tema-clara:#f2cbd3;--tema-acento:#e2adbc;--tema-texto:#f9f3f5;--tema-suave:#d8cbd0;--v35-primaria-clara:#ae566e}
+html[data-paleta-v04="grafite"][data-tema-interface="claro"]{--tema-fundo:#f1f2f3;--tema-superficie:#e5e6e8;--tema-borda:#c4c7cc;--tema-primaria:#ab536b;--tema-clara:#e2b7c2;--tema-acento:#9d495f;--tema-texto:#252b32;--tema-suave:#5f6269}
+html[data-paleta-v04="marinho"]{--tema-fundo:#0e2238;--tema-superficie:#193552;--tema-borda:#35516f;--tema-primaria:#98bbd7;--tema-clara:#c7d9ea;--tema-acento:#b6cad7;--tema-texto:#f2f6fb;--tema-suave:#c1d0df;--v35-primaria-clara:#245b87}
+html[data-paleta-v04="marinho"][data-tema-interface="claro"]{--tema-fundo:#eff4f8;--tema-superficie:#dde9f2;--tema-borda:#bdcddd;--tema-primaria:#20527b;--tema-clara:#a5c2d9;--tema-acento:#285978;--tema-texto:#1b354b;--tema-suave:#536a7d}
+html[data-paleta-v04="laranja"]{--tema-fundo:#2e211c;--tema-superficie:#483025;--tema-borda:#78503b;--tema-primaria:#ec9860;--tema-clara:#f5c399;--tema-acento:#dcb99d;--tema-texto:#fff3e8;--tema-suave:#e4c6b1;--v35-primaria-clara:#b54e27}
+html[data-paleta-v04="laranja"][data-tema-interface="claro"]{--tema-fundo:#fff6ee;--tema-superficie:#f5e7da;--tema-borda:#e2c9b5;--tema-primaria:#ad4b24;--tema-clara:#eeb98e;--tema-acento:#925029;--tema-texto:#3e2b20;--tema-suave:#765f51}
+html[data-paleta-v04="floresta"]{--tema-fundo:#102d29;--tema-superficie:#21463d;--tema-borda:#3b6b5b;--tema-primaria:#a8cbb4;--tema-clara:#d0e1d2;--tema-acento:#d5c2a0;--tema-texto:#eff8f2;--tema-suave:#c2dacb;--v35-primaria-clara:#276750}
+html[data-paleta-v04="floresta"][data-tema-interface="claro"]{--tema-fundo:#eef5ef;--tema-superficie:#dcebe0;--tema-borda:#bbd5c4;--tema-primaria:#23694f;--tema-clara:#b2d5bd;--tema-acento:#4e7158;--tema-texto:#203d31;--tema-suave:#537365}
+html[data-paleta-v04="br"]{--tema-fundo:#142d28;--tema-superficie:#24423a;--tema-borda:#506957;--tema-primaria:#e28c4d;--tema-clara:#f6c294;--tema-acento:#afcdac;--tema-texto:#fff7ec;--tema-suave:#d0ddc6;--v35-primaria-clara:#a44d26}
+html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--tema-superficie:#e8ebdf;--tema-borda:#c5d0ba;--tema-primaria:#9f471f;--tema-clara:#edb588;--tema-acento:#215f4c;--tema-texto:#273a30;--tema-suave:#60715f}
 .v68-empty{padding:15px;background:var(--cor-superficie);border:1px dashed var(--cor-borda);border-radius:12px;font-size:12px;color:var(--cor-texto-suave)}
 .v68-urgent{border-left:4px solid #A54A55}
 .v68-today{border-left:4px solid var(--cor-primaria)}
@@ -6152,8 +6163,23 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#271c27':'#f6f1ee';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala','vinho','nude','ardosia','perola','grafite'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
-document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
+const V71_PALETAS=[
+ ['marsala','Marsala · Champagne · Rosa Seco',['#93435d','#e6d2bb','#c89bab']],
+ ['nude','Nude Elegante',['#976b70','#dbb5aa','#f3e9e3']],
+ ['lavanda','Lavanda Noturna',['#79609c','#d5c3e7','#292035']],
+ ['grafite','Grafite Rosé',['#252b32','#e5a7b7','#adb0b6']],
+ ['oceano','Oceano',['#477e8b','#badfe0','#e0d7ca']],
+ ['terra','Terra Dourada',['#886443','#e7cca6','#eadbc9']],
+ ['marinho','Azul-Marinho',['#102b49','#326991','#b9d6e9']],
+ ['laranja','Laranja Queimado',['#ad4b24','#ec9860','#fff0dc']],
+ ['floresta','Verde Floresta',['#194b3c','#a8cbb4','#e5eddc']],
+ ['br','Verde & Terracota · BR',['#194b3c','#c66932','#f2e5cf']]
+];
+function normalizarPaletaV71(id){const trocas={vinho:'marsala',rose:'nude',ametista:'lavanda',perola:'grafite',ardosia:'marinho',aurora:'marinho',jardim:'floresta'};const atual=trocas[id]||id;return V71_PALETAS.some(p=>p[0]===atual)?atual:'marsala';}
+function selecionarPaletaV04(id){if(!V71_PALETAS.some(p=>p[0]===id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
+const paletaV71=normalizarPaletaV71(localStorage.getItem('me-paleta-v04')||'marsala');
+document.documentElement.dataset.paletaV04=paletaV71;
+try{localStorage.setItem('me-paleta-v04',paletaV71);}catch(e){}
 // V35: um so acabamento de vidro, sem opcoes visuais concorrentes.
 const V25_ESTILOS=['liquidpremium'];
 function escolherDesignV25(){localStorage.setItem('me-design-v25','liquidpremium');document.documentElement.dataset.designV25='liquidpremium';if(telaAtual==='configuracoes')renderTela();}
@@ -6248,7 +6274,7 @@ function configChecklistsHTML(){
 function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
-    <div class="config-secao"><h4>Suas paletas</h4><div class="config-linha-desc">Escolha a cor que combina com seu momento. Todas utilizam o mesmo Liquid Glass e funcionam em modo claro e escuro.</div><div class="temas-v04 v35-paletas">${[['marsala','Marsala · Champagne · Rosa seco',['#93435d','#e6d2bb','#c89bab']],['lavanda','Lavanda Noturna',['#8d72b3','#d5c3e7','#e4d2bc']],['aurora','Aurora',['#6099b7','#b7d6ea','#e5d7ca']],['jardim','Jardim Secreto',['#548c70','#b8dcc6','#e3d6bb']],['rose','Rosé',['#b36987','#ebc0cd','#e8d7cb']],['oceano','Oceano',['#4c8c9c','#badfe0','#e0d7ca']],['ametista','Ametista',['#8362b2','#dbc8ec','#e6d4c8']],['terra','Terra Dourada',['#9a7450','#e7cca6','#eadbc9']],['vinho','Vinho & Blush',['#8e405d','#c99cab','#e9d7dc']],['nude','Nude Elegante',['#976b70','#dbb5aa','#f3e9e3']],['ardosia','Azul Ardósia',['#526b88','#a8bacf','#e6ebf1']],['perola','Pérola Lilás',['#806b87','#d2bfd2','#f0ebf1']],['grafite','Grafite Rosé',['#77617e','#c1b4c5','#e8e6eb']]].map(([id,nome,cores])=>`<button type="button" class="tema-v04 ${document.documentElement.dataset.paletaV04===id?'ativo':''}" aria-pressed="${document.documentElement.dataset.paletaV04===id}" onclick="selecionarPaletaV04('${id}')"><span class="v35-amostras">${cores.map(c=>`<i style="background:${c}"></i>`).join('')}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Suas paletas</h4><div class="config-linha-desc">Paletas com identidades diferentes, incluindo azul-marinho, laranja queimado e verde profundo. Todas mantêm Liquid Glass nos modos claro e escuro.</div><div class="temas-v04 v35-paletas">${V71_PALETAS.map(([id,nome,cores])=>`<button type="button" class="tema-v04 ${document.documentElement.dataset.paletaV04===id?'ativo':''}" aria-pressed="${document.documentElement.dataset.paletaV04===id}" onclick="selecionarPaletaV04('${id}')"><span class="v35-amostras">${cores.map(c=>`<i style="background:${c}"></i>`).join('')}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Modo de exibição</h4><div class="config-linha-desc">Claro e Escuro são duas versões reais de cada paleta. O modo Automático segue a aparência do seu dispositivo.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button type="button" class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao v35-estilo-unico"><h4>Liquid Glass</h4><div class="config-linha-desc">Estilo único, com transparência intensa e bordas delicadas em todas as telas. Para renovar o visual, troque a paleta ou alterne entre Claro e Escuro.</div><div class="v35-vidro-selo"><span class="v35-vidro-icone">✧</span><div><strong>Liquid Glass Premium</strong><small>Ativo em todas as paletas</small></div><span class="v35-vidro-check" aria-label="Ativo">✓</span></div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
@@ -8054,7 +8080,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='70',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='71',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
