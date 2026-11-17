@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v52</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v73</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2178,6 +2178,54 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v68-today{border-left:4px solid var(--cor-primaria)}
 .v68-action-pill{margin:0 0 0 5px;border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto);border-radius:9px;padding:9px 11px;font-size:11px;cursor:pointer}
 @media(max-width:650px){.v66-intro,.v66-panel{padding:14px}.v66-kpis{grid-template-columns:1fr 1fr}.v66-entry{align-items:flex-start}.v66-entry button{font-size:11px}}
+ </style>
+<style id="v73-entregas-profissionais">
+.v73-entregas{display:grid;gap:16px;margin:0 0 30px;min-width:0}
+.v73-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 4px}
+.v73-section-title h2,.v73-section-title h3{margin:0;color:var(--cor-texto)}
+.v73-section-title h2{font-family:Georgia,serif;font-size:clamp(23px,3vw,30px)}
+.v73-section-title p,.v73-section-title>span{font-size:12px;color:var(--cor-texto-suave);margin:5px 0 0}
+.v73-kicker{display:block;color:var(--cor-primaria);font-size:10px;font-weight:750;letter-spacing:.12em;margin-bottom:8px}
+.v73-year{display:flex;align-items:center;gap:12px;padding:5px 8px;border:1px solid var(--cor-borda);border-radius:14px;background:var(--cor-superficie)}
+.v73-year button{border:0;background:transparent;color:var(--cor-texto);font-size:22px;cursor:pointer;width:32px;height:32px}
+.v73-year strong{min-width:40px;text-align:center;font-size:14px}
+.v73-metricas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.v73-metrica{padding:18px;border:1px solid var(--cor-borda);border-radius:20px;background:var(--cor-superficie);box-shadow:0 8px 25px rgba(58,32,38,.055);display:flex;flex-direction:column;gap:7px}
+.v73-metrica>span{font-size:12px;color:var(--cor-texto-suave);font-weight:650}
+.v73-metrica>strong{font-family:Georgia,serif;font-size:37px;line-height:1;color:var(--cor-primaria)}
+.v73-metrica>small{font-size:11px;line-height:1.5;color:var(--cor-texto-suave)}
+.v73-metrica.v73-alerta>strong{color:#A24E5C}
+.v73-actions{display:flex;gap:8px;flex-wrap:wrap}
+.v73-actions button{min-height:40px}
+.v73-cols{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;align-items:start;min-width:0}
+.v73-prof-card{min-width:0;padding:18px}
+.v73-prof-card h3{margin:0 0 8px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.v73-prof-card h3 small{font-family:Arial,sans-serif;font-size:12px;color:var(--cor-texto-suave)}
+.v73-helper{font-size:12px;color:var(--cor-texto-suave);line-height:1.55;margin:4px 0 13px}
+.v73-prof-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--cor-borda);font-size:12px}
+.v73-prof-row:last-child{border-bottom:0}
+.v73-prof-row span{overflow-wrap:anywhere;color:var(--cor-texto)}
+.v73-prof-row strong{font-size:14px;color:var(--cor-primaria)}
+.v73-prof-row small{white-space:nowrap;color:var(--cor-texto-suave)}
+.v73-vazio{font-size:12px;color:var(--cor-texto-suave);padding:14px 0;margin:0}
+.v73-filtros{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.v73-filtros button{border:1px solid var(--cor-borda);border-radius:11px;padding:7px 9px;color:var(--cor-texto);background:transparent;font-size:11px;cursor:pointer}
+.v73-filtros button.ativo{background:var(--cor-primaria);color:white;border-color:var(--cor-primaria)}
+.v73-treino-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--cor-borda);padding:13px 0}
+.v73-treino-row>div{min-width:0;display:flex;align-items:flex-start;flex-direction:column;gap:5px}
+.v73-treino-row strong{font-size:12px;color:var(--cor-texto);overflow-wrap:anywhere}
+.v73-treino-row small{font-size:11px;color:var(--cor-texto-suave);line-height:1.5;overflow-wrap:anywhere}
+.v73-status{padding:4px 8px;border-radius:100px;background:color-mix(in srgb,var(--cor-primaria) 12%,transparent);color:var(--cor-primaria);font-size:10px;font-weight:700}
+.v73-status.vencido{background:rgba(170,56,70,.12);color:#B0413E}
+.v73-status.atencao{background:rgba(193,120,50,.12);color:#A16A31}
+.v73-status.feito{background:rgba(53,118,81,.12);color:#408257}
+.v73-status.neutro{background:rgba(120,120,120,.1);color:var(--cor-texto-suave)}
+.v73-dashboard-treinos{margin:0 0 18px}
+.v73-dashboard-counts{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.v73-dashboard-counts span{background:color-mix(in srgb,var(--cor-primaria) 9%,var(--cor-superficie));padding:9px 12px;border-radius:11px;font-size:11px;color:var(--cor-texto)}
+.v73-dashboard-counts strong{font-size:17px;color:var(--cor-primaria)}
+@media(max-width:960px){.v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}.v73-cols{grid-template-columns:1fr}}
+@media(max-width:440px){.v73-metrica{padding:14px}.v73-metrica>strong{font-size:32px}.v73-actions button{width:100%}.v73-prof-card{padding:14px}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -6764,10 +6812,10 @@ async function excluirObrigacao(id){if(!confirm('Excluir esta obrigação?'))ret
 function cardObrigacao(o){const c=CLIENTES.find(x=>x.id===o.cliente_id);const dias=diasAte(o.vencimento);const alerta=o.status!=='realizada'&&dias<=30;return `<div class="item-lista-simples" style="${alerta?'border-left:4px solid '+(dias<=15?'#B0413E':'#E36216')+';padding-left:10px':''}"><div><strong>${o.titulo}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${c?.nome||'Cliente'} · ${o.categoria||'Geral'} · ${dataBR(o.vencimento)}${alerta?` · ${dias<0?'Vencida há '+Math.abs(dias)+' dias':'vence em '+dias+' dias'}`:''}</div></div><div style="display:flex;gap:6px"><button class="tag" onclick="statusObrigacao('${o.id}')">${o.status.replace('_',' ')}</button><button onclick="excluirObrigacao('${o.id}')" style="color:#B0413E">✕</button></div></div>`;}
 function obrigacoesClienteHTML(c){const itens=OBRIGACOES.filter(o=>o.cliente_id===c.id);return `<div class="module-explainer"><strong>Obrigação é aquilo que precisa acontecer ou ser renovado.</strong> Use esta área para programar ações recorrentes, prazos e o próximo vencimento do cliente.</div><button class="btn-primario" onclick="novaObrigacao('${c.id}')">+ Nova obrigação</button><div style="margin-top:12px">${itens.length?itens.map(cardObrigacao).join(''):semRegistro()}</div>`;}
 function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizada');return `<div class="module-explainer"><strong>Obrigação é aquilo que precisa acontecer ou ser renovado.</strong> Exemplos: realizar controle de pragas, renovar licença ou programar treinamento. O comprovante gerado pertence ao Controle de Documentação.</div><div style="margin-bottom:14px"><button class="btn-primario" onclick="novaObrigacao()">+ Nova obrigação</button></div><div class="card"><h3>Programação geral</h3>${ativas.length?ativas.map(cardObrigacao).join(''):semRegistro()}</div>`;}
-async function novoTreinamento(clienteId){const c=CLIENTES.find(x=>x.id===clienteId);const tema=prompt('Tema do treinamento:');if(!tema?.trim())return;const dataT=await selecionarDataVisual({titulo:'Data prevista ou realizada',opcional:true});if(dataT===null)return;const validade=await selecionarDataVisual({titulo:'Validade ou reciclagem',opcional:true});if(validade===null)return;const participantes=parseInt(prompt('Quantidade de participantes:',''))||null;const obs=prompt('Observações:','')||'';const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('treinamentos_cliente').insert({user_id:user.id,cliente_id:c.id,tema:tema.trim(),data:dataT||null,validade:validade||null,participantes,observacoes:obs||null}).select().single();if(error){dispararAutomacao('Erro ao criar treinamento',error.message);return;}TREINAMENTOS.unshift(data);renderTela();}
-async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);const ordem=['planejado','realizado','cancelado'];const status=ordem[(ordem.indexOf(t.status)+1)%3];const {error}=await supa.from('treinamentos_cliente').update({status}).eq('id',id);if(!error){t.status=status;renderTela();}}
+async function novoTreinamento(clienteId){abrirFormularioTreinamentoV73(clienteId);}
+async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);if(!t)return;abrirFormularioTreinamentoV73(t.cliente_id,id);}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
-function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Novo treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${t.tema}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">${t.status}</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
+function treinamentosClienteHTML(c){const itens=TREINAMENTOS.filter(t=>t.cliente_id===c.id);return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Programar treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>`<div class="item-lista-simples"><div><strong>${textoHTML(t.tema)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · validade '+dataBR(t.validade):''} · ${textoHTML(t.status||'planejado')}</div></div><div><button class="tag" onclick="statusTreinamento('${t.id}')">Editar</button> <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button></div></div>`).join(''):semRegistro()}</div>`;}
 async function novaRota(){const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');const escolhaCliente=await selecionarClientesVisual({titulo:'Cliente visitado',clientes:operacionais,opcional:true});if(escolhaCliente===null)return;const c=escolhaCliente||null;const dataR=await selecionarDataVisual({titulo:'Data do deslocamento',valor:formatoISO(new Date()),opcional:false});if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
 async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
 function custoRota(r){return Number(r.custo_passagens||0)+Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
@@ -6941,7 +6989,117 @@ async function editarClientesEntrega(id){
 async function alternarClienteEntrega(id){const v=ENTREGA_CLIENTES.find(x=>x.id===id);if(!v)return;if(v.status!=='entregue'&&PROXIMOS_PASSOS_CLIENTE.some(p=>p.entrega_id===v.entrega_id&&p.cliente_id===v.cliente_id&&p.status!=='concluido')){alert('Conclua os tópicos desta entrega antes de marcar o cliente como entregue.');return;}const status=v.status==='entregue'?'pendente':'entregue',concluido_em=status==='entregue'?new Date().toISOString():null;const {error}=await supa.from('entrega_clientes').update({status,concluido_em}).eq('id',id);if(error){dispararAutomacao('Erro ao atualizar entrega',error.message);return;}Object.assign(v,{status,concluido_em});renderTela();}
 async function excluirEntrega(id){const e=ENTREGAS.find(x=>x.id===id);if(!e||!confirm(`Excluir a entrega “${e.titulo}”?`))return;const {error}=await supa.from('entregas').delete().eq('id',id);if(error){dispararAutomacao('Erro ao excluir entrega',error.message);return;}ENTREGAS=ENTREGAS.filter(x=>x.id!==id);ENTREGA_CLIENTES=ENTREGA_CLIENTES.filter(x=>x.entrega_id!==id);PROXIMOS_PASSOS_CLIENTE.filter(p=>p.entrega_id===id).forEach(p=>p.entrega_id=null);renderTela();}
 function entregaConcluida(e){const vs=ENTREGA_CLIENTES.filter(v=>v.entrega_id===e.id);return vs.length>0&&vs.every(v=>v.status==='entregue');}
-function entregasHTML(){const hoje=formatoISO(new Date()),lista=ENTREGAS.filter(e=>filtroEntregas==='concluidas'?entregaConcluida(e):!entregaConcluida(e));return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"><button class="btn-primario" onclick="novaEntrega()">+ Nova entrega</button><button class="btn-secundario" onclick="filtroEntregas='abertas';renderTela()">Em aberto</button><button class="btn-secundario" onclick="filtroEntregas='concluidas';renderTela()">Concluídas</button></div>${lista.map(e=>{const vs=ENTREGA_CLIENTES.filter(v=>v.entrega_id===e.id),feitos=vs.filter(v=>v.status==='entregue').length,atrasada=!entregaConcluida(e)&&e.prazo<hoje;return `<div class="card" style="margin-bottom:14px;border-left:4px solid ${atrasada?'#B0413E':'var(--cor-primaria)'}"><h3>${textoHTML(e.titulo)}<span class="tag" style="color:${atrasada?'#B0413E':'var(--cor-texto-suave)'}">${atrasada?'Atrasada · ':''}${dataBR(e.prazo)}</span></h3>${ppTopicosEntregaHTML(e)}<div style="font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px">${feitos} de ${vs.length} clientes concluídos</div>${vs.map(v=>{const c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${c?rotuloClienteEntrega(c):'Cliente preservado no histórico'}</span><button class="tag" onclick="alternarClienteEntrega('${v.id}')" style="color:${v.status==='entregue'?'#2F6B4A':'#B0413E'}">${v.status==='entregue'?'Entregue ✓':'Pendente'}</button></div>`}).join('')}<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px"><button class="btn-secundario" onclick="editarEntrega('${e.id}')">Editar entrega</button><button class="btn-secundario" onclick="editarClientesEntrega('${e.id}')">Editar clientes</button><button class="btn-secundario" style="color:#B0413E" onclick="excluirEntrega('${e.id}')">Excluir</button></div></div>`}).join('')||'<div class="placeholder">Nenhuma entrega nesta lista.</div>'}`;}
+function entregasHTML(){const hoje=formatoISO(new Date()),lista=ENTREGAS.filter(e=>filtroEntregas==='concluidas'?entregaConcluida(e):!entregaConcluida(e));return `${v73PainelEntregasHTML()}<section class="v73-outras-entregas"><div class="v73-section-title"><h3>Outras entregas por cliente</h3><span>Documentos, relatórios e atividades</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"><button class="btn-primario" onclick="novaEntrega()">+ Nova entrega</button><button class="btn-secundario" onclick="filtroEntregas='abertas';renderTela()">Em aberto</button><button class="btn-secundario" onclick="filtroEntregas='concluidas';renderTela()">Concluídas</button></div>${lista.map(e=>{const vs=ENTREGA_CLIENTES.filter(v=>v.entrega_id===e.id),feitos=vs.filter(v=>v.status==='entregue').length,atrasada=!entregaConcluida(e)&&e.prazo<hoje;return `<div class="card" style="margin-bottom:14px;border-left:4px solid ${atrasada?'#B0413E':'var(--cor-primaria)'}"><h3>${textoHTML(e.titulo)}<span class="tag" style="color:${atrasada?'#B0413E':'var(--cor-texto-suave)'}">${atrasada?'Atrasada · ':''}${dataBR(e.prazo)}</span></h3>${ppTopicosEntregaHTML(e)}<div style="font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px">${feitos} de ${vs.length} clientes concluídos</div>${vs.map(v=>{const c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${c?rotuloClienteEntrega(c):'Cliente preservado no histórico'}</span><button class="tag" onclick="alternarClienteEntrega('${v.id}')" style="color:${v.status==='entregue'?'#2F6B4A':'#B0413E'}">${v.status==='entregue'?'Entregue ✓':'Pendente'}</button></div>`}).join('')}<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px"><button class="btn-secundario" onclick="editarEntrega('${e.id}')">Editar entrega</button><button class="btn-secundario" onclick="editarClientesEntrega('${e.id}')">Editar clientes</button><button class="btn-secundario" style="color:#B0413E" onclick="excluirEntrega('${e.id}')">Excluir</button></div></div>`}).join('')||'<div class="placeholder">Nenhuma entrega nesta lista.</div>'}</section>`;}
+
+/* V73 — Entregas profissionais: visitas e treinamentos sem duplicar registros */
+let V73_ANO=new Date().getFullYear(),V73_FILTRO_TREINO='pendentes';
+function v73VisitasAno(ano=V73_ANO){return eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido&&String(e.dataISO||'').startsWith(String(ano)));}
+function v73TreinosRealizadosAno(ano=V73_ANO){return TREINAMENTOS.filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(String(ano)));}
+function v73TreinosAtuais(){
+ const mapa=new Map();
+ TREINAMENTOS.filter(t=>t.status==='realizado').sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))).forEach(t=>{
+  const chave=String(t.cliente_id)+'|'+String(t.tema||'').trim().toLocaleLowerCase('pt-BR');
+  if(!mapa.has(chave))mapa.set(chave,t);
+ });
+ return [...mapa.values()];
+}
+function v73AlertasTreino(){
+ const hoje=formatoISO(new Date()),limite=formatoISO(addDias(new Date(),30));
+ const ativo=id=>String(CLIENTES.find(c=>String(c.id)===String(id))?.status||'Ativo').toLowerCase()!=='inativo';
+ const atuais=v73TreinosAtuais().filter(t=>ativo(t.cliente_id));
+ const vencidos=atuais.filter(t=>t.validade&&t.validade<hoje);
+ const aVencer=atuais.filter(t=>t.validade&&t.validade>=hoje&&t.validade<=limite);
+ const programados=TREINAMENTOS.filter(t=>(t.status||'planejado')==='planejado'&&ativo(t.cliente_id));
+ return {vencidos,aVencer,programados};
+}
+function v73SituacaoTreino(t){
+ const hoje=formatoISO(new Date()),estado=t.status||'planejado';
+ if(estado==='cancelado')return {rotulo:'Cancelado',classe:'neutro'};
+ if(estado==='realizado')return t.validade&&t.validade<hoje?{rotulo:'Vencido',classe:'vencido'}:t.validade&&t.validade<=formatoISO(addDias(new Date(),30))?{rotulo:'Vence em breve',classe:'atencao'}:{rotulo:'Realizado',classe:'feito'};
+ if(t.data&&t.data<hoje)return {rotulo:'Programação atrasada',classe:'vencido'};
+ return {rotulo:t.data?'Programado':'A programar',classe:'atencao'};
+}
+function v73PainelEntregasHTML(){
+ const visitas=v73VisitasAno(),treinos=v73TreinosRealizadosAno(),alertas=v73AlertasTreino(),mes=formatoISO(new Date()).slice(0,7),anoAtual=V73_ANO===new Date().getFullYear();
+ const visitasPorCliente=new Map();visitas.forEach(e=>{const chave=String(e.clienteId||e.clienteNomeVinculado||e.clienteExterno||'sem-cliente');visitasPorCliente.set(chave,(visitasPorCliente.get(chave)||0)+1);});
+ const linhasVisitas=[...visitasPorCliente].map(([id,total])=>({nome:CLIENTES.find(c=>String(c.id)===id)?.nome||visitas.find(e=>String(e.clienteId||e.clienteNomeVinculado||e.clienteExterno||'sem-cliente')===id)?.clienteNomeVinculado||'Cliente não identificado',total})).sort((a,b)=>b.total-a.total||a.nome.localeCompare(b.nome,'pt-BR'));
+ const lista=TREINAMENTOS.filter(t=>V73_FILTRO_TREINO==='realizados'?t.status==='realizado'&&String(t.data||'').startsWith(String(V73_ANO)):V73_FILTRO_TREINO==='vencidos'?alertas.vencidos.some(a=>a.id===t.id):V73_FILTRO_TREINO==='todos'?t.status!=='cancelado':t.status!=='cancelado'&&(t.status!=='realizado'||alertas.vencidos.some(a=>a.id===t.id)||alertas.aVencer.some(a=>a.id===t.id)));
+ lista.sort((a,b)=>String(a.status==='realizado'?a.validade||a.data:a.data||'9999').localeCompare(String(b.status==='realizado'?b.validade||b.data:b.data||'9999')));
+ return `<section class="v73-entregas"><div class="v73-section-title"><div><span class="v73-kicker">ACOMPANHAMENTO PROFISSIONAL</span><h2>Minhas entregas em números</h2><p>Visitas concluídas na Agenda e treinamentos registrados por cliente.</p></div><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${V73_ANO}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v73-metricas"><article class="v73-metrica"><span>Visitas realizadas</span><strong>${visitas.length}</strong><small>${anoAtual?visitas.filter(e=>String(e.dataISO).startsWith(mes)).length+' neste mês':linhasVisitas.length+' clientes atendidos'}</small></article><article class="v73-metrica"><span>Treinamentos realizados</span><strong>${treinos.length}</strong><small>${treinos.reduce((s,t)=>s+Number(t.participantes||0),0)} participantes</small></article><article class="v73-metrica v73-alerta"><span>Treinamentos vencidos</span><strong>${alertas.vencidos.length}</strong><small>${alertas.aVencer.length} vencem em até 30 dias · hoje</small></article><article class="v73-metrica"><span>Treinamentos programados</span><strong>${alertas.programados.length}</strong><small>Programação atual</small></article></div>
+ <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Programar treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Registrar visita de supervisão</button><button class="btn-secundario" onclick="gerarResumoAnualV73()">↓ Resumo anual em PDF</button></div>
+ <div class="v73-cols"><div class="card v73-prof-card"><h3>Visitas por cliente <small>${V73_ANO}</small></h3><p class="v73-helper">Entram aqui as visitas marcadas como concluídas na Agenda. Não é preciso lançar duas vezes.</p>${linhasVisitas.length?linhasVisitas.map(v=>`<div class="v73-prof-row"><span>${textoHTML(v.nome)}</span><strong>${v.total}</strong></div>`).join(''):'<p class="v73-vazio">Nenhuma visita concluída registrada para este ano.</p>'}</div>
+ <div class="card v73-prof-card"><h3>Treinamentos e reciclagens</h3><p class="v73-helper">Acompanhe a programação e as validades de cada cliente.</p><div class="v73-filtros">${[['pendentes','Acompanhar'],['vencidos','Vencidos'],['realizados','Realizados'],['todos','Todos']].map(([id,titulo])=>`<button class="${V73_FILTRO_TREINO===id?'ativo':''}" onclick="V73_FILTRO_TREINO='${id}';renderTela()">${titulo}</button>`).join('')}</div>${lista.length?lista.map(t=>{const c=CLIENTES.find(x=>x.id===t.cliente_id),s=v73SituacaoTreino(t);return `<div class="v73-treino-row"><div><strong>${textoHTML(t.tema)}</strong><small>${textoHTML(c?.nome||'Cliente preservado')} · ${t.data?dataBR(t.data):'Data a definir'}${t.validade?' · Validade '+dataBR(t.validade):''}</small><span class="v73-status ${s.classe}">${s.rotulo}</span></div><button class="btn-secundario" onclick="abrirFormularioTreinamentoV73('${t.cliente_id}','${t.id}')">Editar</button></div>`}).join(''):'<p class="v73-vazio">Nenhum treinamento nesta seleção.</p>'}</div></div></section>`;
+}
+function abrirFormularioTreinamentoV73(clienteId='',id=''){
+ const treino=TREINAMENTOS.find(t=>String(t.id)===String(id)),cId=treino?.cliente_id||clienteId||'',clientes=ordenarClientesAZ(CLIENTES.filter(c=>String(c.id)===String(cId)||String(c.status||'ativo').toLowerCase()!=='inativo'));
+ const opcoes=clientes.map(c=>`<option value="${c.id}" ${String(c.id)===String(cId)?'selected':''}>${textoHTML(rotuloClienteEntrega(c))}</option>`).join('');
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>${treino?'Editar':'Programar'} treinamento</h2><p>O registro entrará automaticamente nos indicadores de entregas.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+ <div class="form-field full"><label>Cliente *</label><select id="v73TreinoCliente"><option value="">Selecione um cliente</option>${opcoes}</select></div>
+ <div class="form-field full"><label>Tema do treinamento *</label><input id="v73TreinoTema" maxlength="150" value="${textoHTML(treino?.tema||'')}" placeholder="Ex.: Boas práticas de manipulação"></div>
+ <div class="form-field"><label>Data programada ou realizada</label><input id="v73TreinoData" type="date" value="${treino?.data||''}"></div>
+ <div class="form-field"><label>Validade / próxima reciclagem</label><input id="v73TreinoValidade" type="date" value="${treino?.validade||''}"></div>
+ <div class="form-field"><label>Situação</label><select id="v73TreinoStatus">${[['planejado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']].map(([v,n])=>`<option value="${v}" ${v===(treino?.status||'planejado')?'selected':''}>${n}</option>`).join('')}</select></div>
+ <div class="form-field"><label>Participantes</label><input id="v73TreinoParticipantes" type="number" min="0" step="1" value="${treino?.participantes??''}" placeholder="Opcional"></div>
+ <div class="form-field full"><label>Observações</label><textarea id="v73TreinoObs" rows="3" placeholder="Conteúdo, público, responsável…">${textoHTML(treino?.observacoes||'')}</textarea></div></div>
+ <p class="v73-helper">A data do treinamento realizado será usada no fechamento mensal e anual. A validade alimenta os alertas de reciclagem.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button>${treino?`<button class="btn-secundario" onclick="excluirTreinamentoV73('${treino.id}')">Excluir</button>`:''}<button class="btn-primario" onclick="salvarTreinamentoV73('${treino?.id||''}')">Salvar treinamento</button></div>`);
+}
+async function salvarTreinamentoV73(id=''){
+ const campo=n=>document.getElementById('v73Treino'+n),cliente_id=campo('Cliente')?.value,tema=campo('Tema')?.value.trim(),data=campo('Data')?.value||null,validade=campo('Validade')?.value||null,status=campo('Status')?.value,participantesTxt=campo('Participantes')?.value,observacoes=campo('Obs')?.value.trim()||null;
+ if(!cliente_id||!tema){alert('Informe o cliente e o tema do treinamento.');return;}
+ if(status==='realizado'&&!data){alert('Para contabilizar um treinamento realizado, informe sua data.');return;}
+ if(status==='realizado'&&data>formatoISO(new Date())){alert('A data de um treinamento realizado não pode estar no futuro. Mantenha como Programado até a execução.');return;}
+ if(validade&&data&&validade<data){alert('A validade não pode ser anterior à data do treinamento.');return;}
+ const valores={cliente_id,tema,data,validade,status,participantes:participantesTxt!==''?Number(participantesTxt):null,observacoes};
+ const atual=TREINAMENTOS.find(t=>String(t.id)===String(id));let resultado;
+ if(atual){resultado=await supa.from('treinamentos_cliente').update(valores).eq('id',id).select().single();}
+ else{const {data:{user}}=await supa.auth.getUser();if(!user){alert('Entre na sua conta para salvar o treinamento.');return;}resultado=await supa.from('treinamentos_cliente').insert({...valores,user_id:user.id}).select().single();}
+ if(resultado.error){dispararAutomacao('Não foi possível salvar treinamento',resultado.error.message);return;}
+ if(atual)Object.assign(atual,resultado.data);else TREINAMENTOS.unshift(resultado.data);
+ fecharModalSistema();renderTela();
+}
+async function excluirTreinamentoV73(id){
+ if(!confirm('Excluir definitivamente este treinamento?'))return;
+ const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);
+ if(error){dispararAutomacao('Erro ao excluir treinamento',error.message);return;}
+ TREINAMENTOS=TREINAMENTOS.filter(t=>String(t.id)!==String(id));fecharModalSistema();renderTela();
+}
+function abrirFormularioVisitaV73(){
+ const clientes=ordenarClientesAZ(CLIENTES.filter(c=>String(c.status||'ativo').toLowerCase()!=='inativo'));
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>Registrar visita de supervisão</h2><p>Uma visita concluída será contabilizada na Agenda e nas Entregas.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field full"><label>Cliente *</label><select id="v73VisitaCliente"><option value="">Selecione o cliente</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(rotuloClienteEntrega(c))}</option>`).join('')}</select></div><div class="form-field"><label>Data *</label><input id="v73VisitaData" type="date" value="${formatoISO(new Date())}"></div><div class="form-field"><label>Horário</label><input id="v73VisitaHora" type="number" min="0" max="23" value="8"></div><div class="form-field full"><label>Descrição</label><input id="v73VisitaTitulo" value="Visita de supervisão" maxlength="150"></div></div><p class="v73-helper">Se a visita já está na Agenda, basta marcá-la como concluída. Não registre novamente aqui.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarVisitaV73()">Registrar visita realizada</button></div>`);
+}
+async function salvarVisitaV73(){
+ const cliente_id=document.getElementById('v73VisitaCliente')?.value,dataISO=document.getElementById('v73VisitaData')?.value,hora=Number(document.getElementById('v73VisitaHora')?.value),titulo=document.getElementById('v73VisitaTitulo')?.value.trim()||'Visita de supervisão';
+ if(!cliente_id||!dataISO||!Number.isInteger(hora)||hora<0||hora>23){alert('Informe o cliente, a data e um horário válido.');return;}
+ if(dataISO>formatoISO(new Date())){alert('Esta opção registra visitas já realizadas. Para uma visita futura, use a Agenda.');return;}
+  if(eventosSemana.some(e=>e.tipo==='visita'&&String(e.clienteId)===String(cliente_id)&&e.dataISO===dataISO&&Number.parseInt(e.hora,10)===hora)){
+    alert('Já existe uma visita desse cliente no mesmo dia e horário na Agenda. Confira o registro antes de criar outro.');return;
+  }
+ const {data,error}=await supa.from('eventos').insert({titulo,categoria:categoriaPorTipo('visita',cliente_id),tipo:'visita',data:dataISO,hora,cliente_id,cliente_externo:null,concluido:true}).select('*, clientes(nome)').single();
+ if(error){dispararAutomacao('Não foi possível registrar a visita',error.message);return;}
+ eventosSemana.push({id:data.id,dataISO,hora,titulo,categoria:data.categoria,tipo:'visita',concluido:true,clienteId:cliente_id,clienteNomeVinculado:data.clientes?.nome||CLIENTES.find(c=>String(c.id)===String(cliente_id))?.nome||null,clienteExterno:null});
+ fecharModalSistema();renderTela();
+}
+function v73TreinamentosDashboardHTML(){
+ const {vencidos,aVencer,programados}=v73AlertasTreino(),proximos=[...programados].filter(t=>t.data).sort((a,b)=>String(a.data).localeCompare(String(b.data))).slice(0,3);
+ return `<section class="card v73-dashboard-treinos"><h3>Treinamentos <button onclick="irPara('entregas')">abrir controle</button></h3><div class="v73-dashboard-counts"><span><strong>${vencidos.length}</strong> vencido(s)</span><span><strong>${aVencer.length}</strong> a vencer</span><span><strong>${programados.length}</strong> programado(s)</span></div>${vencidos.slice(0,2).map(t=>`<div class="v73-prof-row"><span>⚠ ${textoHTML(CLIENTES.find(c=>c.id===t.cliente_id)?.nome||'Cliente')} · ${textoHTML(t.tema)}</span><small>${dataBR(t.validade)}</small></div>`).join('')}${proximos.map(t=>`<div class="v73-prof-row"><span>${textoHTML(CLIENTES.find(c=>c.id===t.cliente_id)?.nome||'Cliente')} · ${textoHTML(t.tema)}</span><small>${dataBR(t.data)}</small></div>`).join('')}${!vencidos.length&&!proximos.length?'<p class="v73-vazio">Sem reciclagens vencidas ou treinamentos programados.</p>':''}</section>`;
+}
+function gerarResumoAnualV73(){
+ if(!window.jspdf?.jsPDF){alert('Aguarde o carregamento do gerador de PDF e tente novamente.');return;}
+ const doc=new window.jspdf.jsPDF(),ano=V73_ANO,visitas=v73VisitasAno(ano),treinos=v73TreinosRealizadosAno(ano),concluidas=ENTREGA_CLIENTES.filter(v=>v.status==='entregue'&&String(v.concluido_em||'').startsWith(String(ano)));
+ const porCliente=new Map(),registrar=(id,tipo)=>{const chave=String(id||'sem-cliente'),r=porCliente.get(chave)||{nome:CLIENTES.find(c=>String(c.id)===chave)?.nome||'Cliente não identificado',visitas:0,treinos:0,outras:0};r[tipo]++;porCliente.set(chave,r);};
+ visitas.forEach(e=>registrar(e.clienteId,'visitas'));treinos.forEach(t=>registrar(t.cliente_id,'treinos'));concluidas.forEach(v=>registrar(v.cliente_id,'outras'));
+ let y=20;const novaPagina=()=>{doc.addPage();y=20;},linha=(texto,altura=7)=>{const partes=doc.splitTextToSize(String(texto),174);if(y+partes.length*altura>275)novaPagina();doc.text(partes,18,y);y+=partes.length*altura;};
+ doc.setFont('helvetica','bold');doc.setFontSize(18);linha('Meu Ecossistema · Resumo anual '+ano,10);doc.setFont('helvetica','normal');doc.setFontSize(10);linha('Bruna Ribeiro · Entregas profissionais');y+=5;
+ doc.setFont('helvetica','bold');doc.setFontSize(12);linha('Visitas realizadas: '+visitas.length);linha('Treinamentos realizados: '+treinos.length);linha('Participantes em treinamentos: '+treinos.reduce((s,t)=>s+Number(t.participantes||0),0));linha('Outras entregas concluídas por cliente: '+concluidas.length);y+=7;
+ linha('Resultados por cliente');doc.setFont('helvetica','normal');doc.setFontSize(10);
+ [...porCliente.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).forEach(c=>linha(`${c.nome} · ${c.visitas} visita(s), ${c.treinos} treinamento(s), ${c.outras} outra(s) entrega(s)`));
+ if(!porCliente.size)linha('Nenhuma entrega profissional concluída registrada neste ano.');y+=8;
+ doc.setFont('helvetica','bold');doc.setFontSize(12);linha('Treinamentos realizados · cliente e data');doc.setFont('helvetica','normal');doc.setFontSize(9);
+ treinos.slice().sort((a,b)=>String(a.data).localeCompare(String(b.data))).forEach(t=>linha(`${dataBR(t.data)} · ${CLIENTES.find(c=>c.id===t.cliente_id)?.nome||'Cliente'} · ${t.tema} · ${t.participantes||0} participante(s)`));
+ if(!treinos.length)linha('Nenhum treinamento realizado neste ano.');
+ doc.save(`meu-ecossistema-entregas-${ano}.pdf`);
+}
 
 /* ---------- PLANEJAMENTO, DATAS DA ÁREA E FECHAMENTO MENSAL ---------- */
 let DATAS_PROFISSIONAIS=[],ROTINAS_RECORRENTES=[],ROTINA_EXECUCOES=[],abaPlanejamento='radar',planejamentoMesOffset=0;
@@ -7018,7 +7176,8 @@ function metricasFechamento(){
   const feitos=vinc.filter(v=>v.status==='entregue'),noPrazo=feitos.filter(v=>{const ent=entregas.find(e=>e.id===v.entrega_id);return !ent?.prazo||String(v.concluido_em||'').slice(0,10)<=ent.prazo;}).length;
   const prev=lancamentos.filter(l=>l.tipo==='receita'&&String(l.vencimentoISO||'').startsWith(pref)).reduce((s,l)=>s+Number(l.valor||0),0);
   const efet=lancamentos.filter(l=>l.tipo==='receita'&&l.status==='pago'&&String(l.dataPagamentoISO||l.vencimentoISO||'').startsWith(pref)).reduce((s,l)=>s+Number(l.valor||0),0);
-  return {pref,eventosMes,brc:eventosMes.filter(e=>e.categoria==='brc').length,snVisitas:eventosMes.filter(e=>e.categoria==='saber_nutrir').length,check,vinc,feitos,noPrazo,prev,efet};
+  const treinosMes=TREINAMENTOS.filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(pref));
+  return {pref,eventosMes,brc:eventosMes.filter(e=>e.categoria==='brc').length,snVisitas:eventosMes.filter(e=>e.categoria==='saber_nutrir').length,treinosMes,check,vinc,feitos,noPrazo,prev,efet};
 }
 function cabecalhoMesPlanejamento(){const d=referenciaPlanejamento();return `<div class="plan-mes"><button onclick="planejamentoMesOffset--;renderTela()">←</button><strong>${MESES_NOME[d.getMonth()]} ${d.getFullYear()}</strong><button onclick="planejamentoMesOffset++;renderTela()">→</button></div>`;}
 function abrirPendenciasRadarMes(){
@@ -7056,7 +7215,7 @@ function rotinasPlanejamentoHTML(){
   const automaticas=[['Visitas Saber Nutrir',`${m.snVisitas}/${metaSN}`,'meta mensal alimentada pela Agenda',m.snVisitas>=metaSN&&metaSN>0],['Envio de checklists Saber Nutrir',`${m.check.enviados}/${m.check.total}`,`${m.check.pendentes} pendente(s) no mês`,m.check.total>0&&m.check.pendentes===0],['Entregas com prazo no mês',`${entregasFeitas}/${entregasMes.length}`,`${Math.max(0,entregasMes.length-entregasFeitas)} pendente(s)`,entregasMes.length>0&&entregasFeitas===entregasMes.length]];
   return `<div class="plan-actions"><button class="btn-primario" onclick="novaRotina()">+ Nova rotina</button><span>As rotinas automáticas aproveitam o que já está alimentado no sistema.</span></div><div class="card" style="margin-bottom:14px"><h3>Rotinas automáticas do sistema</h3>${automaticas.map(x=>`<div class="item-lista-simples"><div><strong>${x[0]}</strong><div style="font-size:10.5px;color:var(--cor-texto-suave)">${x[2]}</div></div><span class="tag" style="color:${x[3]?'#2F6B4A':'var(--cor-acento)'}">${x[1]} ${x[3]?'✓':''}</span></div>`).join('')}</div><h3 style="margin:18px 0 10px">Rotinas criadas por você</h3>${linhas.sort((a,b)=>a.data.localeCompare(b.data)).map(x=>`<div class="plan-row"><button class="plan-check ${x.ok?'ok':''}" onclick="alternarExecucaoRotina('${x.r.id}','${x.data}')">${x.ok?'✓':''}</button><div><strong>${x.r.titulo}</strong><small>${dataBR(x.data)} · ${x.r.categoria} · ${x.r.frequencia}</small></div><div class="plan-row-actions"><button onclick="excluirRotina('${x.r.id}')">Excluir rotina</button></div></div>`).join('')||'<div class="placeholder">Nenhuma rotina manual prevista neste mês.</div>'}`;
 }
-function fechamentoPlanejamentoHTML(){const m=metricasFechamento(),pct=m.feitos.length?Math.round(m.noPrazo/m.feitos.length*100):0,pend=m.vinc.filter(v=>v.status!=='entregue');return `<div class="plan-actions"><button class="btn-primario" onclick="gerarPDFFechamentoMensal()">Baixar PDF do fechamento</button><span>Inclui todas as entregas Saber Nutrir, mesmo sem visita.</span></div><div class="plan-grid">${[['Visitas BRC',m.brc,'realizadas'],['Visitas Saber Nutrir',m.snVisitas,'realizadas'],['Checklists enviados',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas concluídas',m.feitos.length+'/'+m.vinc.length,pct+'% no prazo'],['Receita prevista',moeda(m.prev),'competência do mês'],['Receita efetivada',moeda(m.efet),'recebida no mês']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div><div class="card" style="margin-top:16px"><h3>Entregas em aberto — Saber Nutrir</h3>${pend.map(v=>{const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${e?.titulo||'Entrega'} · ${c?.nome||'Cliente'}</span><span class="tag">${dataBR(e?.prazo)}</span></div>`}).join('')||semRegistro()}</div>`;}
+function fechamentoPlanejamentoHTML(){const m=metricasFechamento(),pct=m.feitos.length?Math.round(m.noPrazo/m.feitos.length*100):0,pend=m.vinc.filter(v=>v.status!=='entregue');return `<div class="plan-actions"><button class="btn-primario" onclick="gerarPDFFechamentoMensal()">Baixar PDF do fechamento</button><span>Inclui visitas e treinamentos realizados, além das entregas Saber Nutrir.</span></div><div class="plan-grid">${[['Visitas BRC',m.brc,'realizadas'],['Visitas Saber Nutrir',m.snVisitas,'realizadas'],['Treinamentos realizados',m.treinosMes.length,m.treinosMes.reduce((s,t)=>s+Number(t.participantes||0),0)+' participantes'],['Checklists enviados',m.check.enviados+'/'+m.check.total,m.check.pendentes+' pendentes'],['Entregas concluídas',m.feitos.length+'/'+m.vinc.length,pct+'% no prazo'],['Receita prevista',moeda(m.prev),'competência do mês'],['Receita efetivada',moeda(m.efet),'recebida no mês']].map(x=>`<div class="plan-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')}</div><div class="card" style="margin-top:16px"><h3>Treinamentos realizados neste mês</h3>${m.treinosMes.map(t=>{const c=CLIENTES.find(x=>x.id===t.cliente_id);return `<div class="item-lista-simples"><span>${textoHTML(t.tema)} · ${textoHTML(c?.nome||'Cliente')}</span><span class="tag">${dataBR(t.data)}</span></div>`}).join('')||semRegistro()}</div><div class="card" style="margin-top:16px"><h3>Entregas em aberto — Saber Nutrir</h3>${pend.map(v=>{const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);return `<div class="item-lista-simples"><span>${e?.titulo||'Entrega'} · ${c?.nome||'Cliente'}</span><span class="tag">${dataBR(e?.prazo)}</span></div>`}).join('')||semRegistro()}</div>`;}
 function planejamentoHTML(){
   const d=referenciaPlanejamento();
   return `<div class="plan-mes"><button onclick="planejamentoMesOffset--;abrirConteudoPlanejamento()">←</button><strong>${MESES_NOME[d.getMonth()]} ${d.getFullYear()}</strong><button onclick="planejamentoMesOffset++;abrirConteudoPlanejamento()">→</button></div>
@@ -7078,7 +7237,7 @@ async function abrirConteudoPlanejamento(dadosAtualizados=false){
   try{raiz.innerHTML=abaPlanejamento==='radar'?radarPlanejamentoHTML():abaPlanejamento==='datas'?datasPlanejamentoHTML():abaPlanejamento==='rotinas'?rotinasPlanejamentoHTML():fechamentoPlanejamentoHTML();}
   catch(e){console.error('Erro na aba do Planejamento',e);raiz.innerHTML=`<div class="card" style="border-top:4px solid var(--cor-acento)"><h3>Não consegui carregar esta parte</h3><p style="font-size:12px;color:var(--cor-texto-suave);line-height:1.5">As outras áreas continuam disponíveis. Atualize os dados ou escolha outra aba.</p><div class="tag" style="margin-top:8px">Código: ${String(e?.message||'erro desconhecido').replace(/[<>]/g,'')}</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn-primario" onclick="abrirConteudoPlanejamento(false)">Atualizar dados</button><button class="btn-secundario" onclick="selecionarAbaPlanejamento('datas')">Abrir Datas da área</button></div></div>`;}
 }
-function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(14);doc.text('Entregas em aberto — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,18,y);y+=7;});doc.save(`fechamento-${m.pref}.pdf`);}
+function gerarPDFFechamentoMensal(){const m=metricasFechamento(),ref=referenciaPlanejamento(),doc=new window.jspdf.jsPDF();doc.setFillColor(114,189,136);doc.rect(0,0,210,34,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('Fechamento mensal',16,17);doc.setFontSize(10);doc.text(`${MESES_NOME[ref.getMonth()]} de ${ref.getFullYear()} · Bruna Ribeiro Consultoria`,16,25);doc.setTextColor(31,58,45);doc.setFontSize(12);let y=48;[['Visitas BRC',m.brc],['Visitas Saber Nutrir',m.snVisitas],['Treinamentos realizados',m.treinosMes.length],['Participantes treinados',m.treinosMes.reduce((s,t)=>s+Number(t.participantes||0),0)],['Checklists Saber Nutrir',`${m.check.enviados}/${m.check.total} enviados`],['Entregas Saber Nutrir',`${m.feitos.length}/${m.vinc.length} concluídas`],['Receita prevista',moeda(m.prev)],['Receita efetivada',moeda(m.efet)]].forEach(x=>{doc.setFillColor(246,248,244);doc.roundedRect(16,y-7,178,14,3,3,'F');doc.text(String(x[0]),21,y+1);doc.setTextColor(227,98,22);doc.text(String(x[1]),188,y+1,{align:'right'});doc.setTextColor(31,58,45);y+=18;});doc.setFontSize(13);doc.text('Treinamentos realizados — por cliente',16,y+6);y+=15;m.treinosMes.forEach(t=>{if(y>278){doc.addPage();y=20;}const c=CLIENTES.find(x=>x.id===t.cliente_id);doc.setFontSize(9);doc.text(doc.splitTextToSize(`${dataBR(t.data)} · ${c?.nome||'Cliente'} · ${t.tema}`,174),18,y);y+=12;});if(y>262){doc.addPage();y=20;}doc.setFontSize(13);doc.text('Entregas em aberto — Saber Nutrir',16,y+6);y+=15;m.vinc.filter(v=>v.status!=='entregue').forEach(v=>{if(y>278){doc.addPage();y=20;}const e=ENTREGAS.find(x=>x.id===v.entrega_id),c=CLIENTES.find(x=>x.id===v.cliente_id);doc.setFontSize(9);doc.text(doc.splitTextToSize(`• ${e?.titulo||'Entrega'} — ${c?.nome||'Cliente'} — ${dataBR(e?.prazo)}`,174),18,y);y+=11;});doc.save(`fechamento-${m.pref}.pdf`);}
 
 
 
@@ -7640,6 +7799,7 @@ function dashboardHTML(){
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${entregasAtrasadas}</strong><span>entregas atrasadas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
   <div class="v09-atividade-destaque">${controleHorasDashboardHTML()}</div>
   ${calendarioDocumentacoesDashboardHTML()}
+  ${v73TreinamentosDashboardHTML()}
   <div class="grid dashboard-grid">
     <div class="card card-destaque dash-agenda">
       <h3>Agenda de hoje <button onclick="irPara('agenda')">ver tudo</button></h3>
@@ -8023,7 +8183,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='72',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='73',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -8340,7 +8500,13 @@ function v68ItensDia(){
   }
   for(const t of TREINAMENTOS||[]){
     if(!ativo(t.cliente_id)||t.status==='cancelado'||t.status==='realizado')continue;
-    if(v66DataISO(t.data)===hoje)add('treinamento',t.tema,`Treinamento · ${nomeCliente(t.cliente_id)}`,t.data,'clientes',t.cliente_id,'treinamento|'+t.id);
+    const dias=v66Diferenca(t.data);
+    if(dias!==null&&dias<=7)add('treinamento',t.tema,`Treinamento programado · ${nomeCliente(t.cliente_id)}`,t.data,'entregas',t.cliente_id,'treinamento|'+t.id);
+  }
+  for(const t of v73TreinosAtuais()){
+    if(!ativo(t.cliente_id)||!t.validade)continue;
+    const dias=v66Diferenca(t.validade);
+    if(dias!==null&&dias<=7)add('treinamento','Reciclagem: '+t.tema,`Validade do treinamento · ${nomeCliente(t.cliente_id)}`,t.validade,'entregas',t.cliente_id,'reciclagem|'+t.id);
   }
   for(const p of PRODUTOS_ROTULAGEM||[]){
     if(p.status==='concluido'||!ativo(p.cliente_id))continue;
