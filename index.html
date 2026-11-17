@@ -3434,6 +3434,14 @@ const MODELO_DOCUMENTACAO=[
   {id:'transporte',nome:'Transporte',icone:'⌁',servico:true,itens:[['documentacao_veiculo','Documentação do veículo e motorista'],['contrato_transportadora','Regularidade da transportadora'],['higienizacao_veiculo','Higienização do veículo'],['temperatura_transporte','Controle de temperatura no transporte']]},
   {id:'registros',nome:'Registros operacionais',icone:'▦',itens:[['controle_temperatura','Controle de temperatura'],['controle_recebimento','Controle de recebimento'],['registros_higienizacao','Registros de higienização'],['controle_oleo','Controle de qualidade e troca do óleo'],['coleta_amostras','Controle de coleta de amostras'],['asseio_pessoal','Registros de asseio pessoal']]}
 ];
+// V67: o checklist de documentação é a referência da lista principal.
+// Mantemos MODELO_DOCUMENTACAO original para compatibilidade com registros anteriores.
+const MODELO_DOCUMENTACAO_CHECKLIST=[
+  {id:'procedimentos',nome:'Boas Práticas',itens:[['manual_boas_praticas','Manual de Boas Práticas e POPs']]},
+  {id:'equipe',nome:'Equipe e saúde ocupacional',itens:[['treinamento_bpf','Registros de treinamento dos manipuladores'],['asos','Atestados de Saúde Ocupacional (ASOs)'],['pgr','PCMSO, PGR e LTCAT']]},
+  {id:'servicos',nome:'Serviços e controles periódicos',itens:[['controle_pragas','Controle integrado de pragas'],['caixa_agua','Higienização da caixa-d’água'],['potabilidade','Análise de potabilidade da água'],['filtro','Troca da vela do filtro'],['coifas_dutos','Limpeza da coifa'],['extintores_validade','Validade dos extintores de incêndio'],['calibracao_termometros','Calibração de termômetros'],['pmoc','Limpeza do ar-condicionado'],['caixa_gordura','Limpeza da caixa de gordura'],['coleta_oleo','Coleta de óleo residual']]},
+  {id:'licencas',nome:'Licenças e autorizações',itens:[['alvara_funcionamento','Licença de funcionamento'],['licenca_sanitaria','Cadastro Municipal de Vigilância Sanitária (CMVS)'],['avcb_clcb','AVCB / CLCB']]}
+];
 function normalizarDocumento(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
 const ALIASES_DOCUMENTOS={licenca_sanitaria:['licenca sanitaria'],alvara_funcionamento:['licenca de funcionamento','alvara de funcionamento'],avcb_clcb:['avcb','clcb'],manual_boas_praticas:['manual de boas praticas'],pops:['pops'],asos:['asos','aso nutri'],treinamento_bpf:['treinamento'],controle_pragas:['dedetizacao','documentacao da trully nollen'],caixa_agua:["higienizacao caixa d agua","higienizacao de caixa d agua"],potabilidade:['potabilidade agua','analise de potabilidade','potabilidade responsabilidade do einstein'],filtro:['troca da vela do filtro'],coleta_oleo:['certificado de troca de oleo'],calibracao_termometros:['calibracao termometro','termometro'],coifas_dutos:['manutencao coifa','manutencao da coifa','manutencao coifa fritadeiras'],documentacao_veiculo:['dedetizacao carro de transporte']};
 function documentoModelo(c,chave){const porChave=(c.documentacao||[]).find(d=>d.modeloChave===chave);if(porChave)return porChave;const nomes=ALIASES_DOCUMENTOS[chave]||[];return (c.documentacao||[]).find(d=>!d.modeloChave&&nomes.includes(normalizarDocumento(d.nome)))||null;}
@@ -3539,10 +3547,45 @@ function checklistDocumentacaoHTML(c){
 
 // V65: atalho para registrar extintores individualmente, preservando o controle geral.
 const checklistDocumentacaoBaseV65=checklistDocumentacaoHTML;
+// Sinônimos equivalentes exibidos em um único item; todos os registros permanecem salvos.
+const V67_EQUIVALENTES={
+  manual_boas_praticas:['manual_boas_praticas','pops'],
+  pgr:['pgr','pcmso','ltcat'],
+  alvara_funcionamento:['alvara_funcionamento','inscricao_municipal'],
+  licenca_sanitaria:['licenca_sanitaria','cmvs'],
+  pmoc:['pmoc','limpeza_ar_condicionado'],
+  extintores_validade:['extintores_validade']
+};
+function v67DocumentoChecklist(c,chave){
+  const equivalentes=V67_EQUIVALENTES[chave]||[chave];
+  for(const k of equivalentes){const d=documentoModelo(c,k);if(d)return d;}
+  return null;
+}
+function v67LinhaDocumento(c,l){
+  const d=l.d,st=statusValidadeV19(d),chaveEdicao=d?.modeloChave||l.chave||'';
+  const acao=d?`abrirDocumentoModelo('${c.id}','${chaveEdicao}','','${d.id}')`:`abrirDocumentoModelo('${c.id}','${l.chave}','')`;
+  return `<tr><td><strong>${textoHTML(l.nome)}</strong><small>${textoHTML(l.grupo)}</small></td><td>${d?.emissao?textoHTML(d.emissao):'—'}</td><td>${d?.validade?textoHTML(d.validade):'—'}</td><td><span class="v19-situacao ${st.cor}">${st.nome}</span></td><td><button class="v19-editar" onclick="${acao}">${d?'Editar':'Preencher'}</button></td></tr>`;
+}
 checklistDocumentacaoHTML=function(c){
-  const html=checklistDocumentacaoBaseV65(c);
-  const acao=`<div style="margin:10px 0 12px"><button class="btn-secundario" onclick="novoExtintorCliente('${c.id}')">+ Cadastrar extintor individual</button><small style="display:block;margin-top:5px">Identifique cada extintor e acompanhe sua própria data de validade, inspeção ou manutenção.</small></div>`;
-  return html.replace('<div class="v19-legenda">',acao+'<div class="v19-legenda">');
+  const docs=c.documentacao||[],utilizados=new Set(),linhas=[];
+  MODELO_DOCUMENTACAO_CHECKLIST.forEach(grupo=>grupo.itens.forEach(([chave,nome])=>{
+    const d=v67DocumentoChecklist(c,chave);if(d)utilizados.add(d.id);
+    linhas.push({grupo:grupo.nome,chave,nome,d});
+  }));
+  const extintores=docs.filter(d=>!utilizados.has(d.id)&&/^extintor(?:es)?\b/i.test(d.nome||''));
+  extintores.forEach(d=>utilizados.add(d.id));
+  const anteriores=docs.filter(d=>!utilizados.has(d.id));
+  const contagens={verde:0,laranja:0,vermelho:0,neutro:0};
+  linhas.forEach(l=>contagens[statusValidadeV19(l.d).cor]++);
+  const exibidas=linhas.filter(l=>FILTRO_DOC_V19==='todos'||statusValidadeV19(l.d).cor===FILTRO_DOC_V19);
+  const extrasHTML=(itens,rotulo)=>itens.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12px;font-weight:650;padding:10px 0">${rotulo} (${itens.length})</summary><div class="v19-table-wrap" tabindex="0"><table class="v19-doc-table"><thead><tr><th>Registro</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${itens.map(d=>v67LinhaDocumento(c,{grupo:d.categoria==='incendio'?'Extintores':'Cadastro anterior',chave:'',nome:d.nome,d})).join('')}</tbody></table></div></details>`:'';
+  return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação</h3><p>17 itens essenciais, conforme o checklist de documentação. Dados anteriores preservados.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div>
+    <div style="margin:10px 0 12px"><button class="btn-secundario" onclick="novoExtintorCliente('${c.id}')">+ Cadastrar extintor individual</button></div>
+    <div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div>
+    <div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os itens</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div>
+    <div class="v36-table-hint">Deslize para ver datas, situação e edição.</div><div class="v19-table-wrap" tabindex="0" aria-label="Controle simplificado de documentação"><table class="v19-doc-table"><thead><tr><th>Item do checklist</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${exibidas.map(l=>v67LinhaDocumento(c,l)).join('')||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div>
+    ${extrasHTML(extintores,'Extintores individuais')}${extrasHTML(anteriores,'Outros registros já cadastrados')}
+    <p style="font-size:11px;color:var(--cor-texto-suave);margin-top:12px">Os registros não foram apagados ou combinados no banco. Itens com mais de um documento podem ter outras datas em “Outros registros já cadastrados”.</p></section>`;
 };
 async function editarCampoCliente(clienteId, campoDb, rotulo){
   const c = CLIENTES.find(x=>x.id===clienteId);
@@ -7962,7 +8005,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='66',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='67',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
