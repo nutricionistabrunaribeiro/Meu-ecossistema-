@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v79</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v80</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2431,6 +2431,32 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
  #modalSistema:has(#v77EquipeCliente) :is(.form-field input,.form-field select){min-height:44px;font-size:14px}
  #modalSistema:has(#v73VisitaCliente) .system-modal-actions,
  #modalSistema:has(#v77EquipeCliente) .system-modal-actions{position:sticky;bottom:-16px;z-index:2;background:var(--cor-superficie);padding-bottom:max(10px,env(safe-area-inset-bottom))}
+}
+</style>
+<style id="v80-equipe-gerenciamento-rolagem">
+/* A grade semanal continua inteira no telefone, sem alargar a tela da Supervisão. */
+#conteudoTela .v76-supervisao .v78-rolagem{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.v80-nutri-lista{display:grid;gap:8px;max-height:min(42dvh,360px);overflow-y:auto;margin:14px 0 10px;padding:1px}
+.v80-nutri-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:12px;color:var(--cor-texto)}
+.v80-nutri-item strong{font-size:13px;overflow-wrap:anywhere;min-width:0}
+.v80-nutri-item button{flex-shrink:0;min-height:37px;padding:7px 12px;background:transparent;border:1px solid var(--cor-borda);border-radius:9px;color:var(--cor-texto);font-size:11px;font-weight:650;cursor:pointer}
+.v80-nutri-incluir{display:flex;gap:8px;align-items:stretch;min-width:0}
+.v80-nutri-incluir input{flex:1;min-width:0;min-height:44px;border:1px solid var(--cor-borda);border-radius:11px;padding:10px 12px;background:var(--cor-superficie);color:var(--cor-texto);font-family:inherit;font-size:14px}
+.v80-nutri-incluir button{flex-shrink:0;min-width:90px;border:none;border-radius:11px;padding:10px 13px;background:var(--cor-primaria);color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.v80-nutri-ajuda{font-size:11px;line-height:1.55;color:var(--cor-texto-suave);margin:10px 0}
+#modalSistema:has(#v80NomeNutricionista) .system-modal{box-sizing:border-box;width:min(540px,100%);max-height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden}
+#modalSistema:has(#v80NomeNutricionista) .system-modal-actions{position:sticky;bottom:-18px;z-index:2;background:var(--cor-superficie);padding-top:10px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+@media(max-width:700px){
+ #conteudoTela .v76-supervisao .v78-rolagem{overflow-x:auto!important;overflow-y:hidden!important;max-width:100%!important;scrollbar-width:thin}
+ #conteudoTela .v76-supervisao .v78-grade{display:grid!important;grid-template-columns:105px repeat(7,145px)!important;width:max-content!important;min-width:1120px!important;max-width:none!important}
+ #conteudoTela .v76-supervisao .v78-grade .v78-dia-titulo,#conteudoTela .v76-supervisao .v78-grade .v78-celula{display:flex!important}
+ #conteudoTela .v76-supervisao .v78-grade .v78-canto,#conteudoTela .v76-supervisao .v78-grade .v78-nome{position:sticky!important;left:0!important;z-index:3!important;background:var(--cor-superficie)!important}
+ #conteudoTela .v76-supervisao .v78-grade .v78-canto{z-index:4!important}
+ #conteudoTela .v76-supervisao .v78-grade .v78-dia-titulo{flex-direction:column;align-items:center;justify-content:center}
+ #conteudoTela .v76-supervisao .v78-grade .v78-celula{min-height:82px}
+ #modalSistema:has(#v80NomeNutricionista) .system-modal{width:100%!important;max-width:calc(100vw - 20px)!important;padding:16px!important}
+ .v80-nutri-incluir{flex-direction:column}
+ .v80-nutri-incluir button{min-height:43px;width:100%}
 }
 </style>
 </head>
@@ -7512,17 +7538,55 @@ function v79EscolherDia(indice){
 function v78PessoasExtras(){
  try{const itens=JSON.parse(localStorage.getItem('eco_v78_nutricionistas')||'[]');return Array.isArray(itens)?itens.filter(x=>typeof x==='string'):[];}catch(_){return [];}
 }
+function v80ChaveNutri(nome){return String(nome||'').trim().replace(/\s+/g,' ').toLocaleLowerCase('pt-BR');}
+function v80NutricionistasExcluidas(){
+ try{const itens=JSON.parse(localStorage.getItem('eco_v80_nutricionistas_excluidas')||'[]');return Array.isArray(itens)?itens.filter(x=>typeof x==='string'):[];}catch(_){return [];}
+}
 function v78PessoasEquipe(){
  const nomes=['Mari','Gleice','Meire','Ana Cristina',...v78PessoasExtras(),...eventosSemana.filter(v77EhVisitaEquipe).map(v77PessoaEquipe)];
- const unicos=new Set();return nomes.filter(n=>{const chave=String(n||'').trim().toLocaleLowerCase('pt-BR');if(!chave||chave==='bruna' || chave==='bruna ribeiro'||unicos.has(chave))return false;unicos.add(chave);return true;});
+ const unicos=new Set(),excluidas=new Set(v80NutricionistasExcluidas());
+ return nomes.filter(n=>{const chave=v80ChaveNutri(n);if(!chave||chave==='bruna'||chave==='bruna ribeiro'||unicos.has(chave)||excluidas.has(chave))return false;unicos.add(chave);return true;});
 }
-function v78AdicionarNutricionista(){
- const nome=String(prompt('Nome da nutricionista para incluir no planner:')||'').trim();if(!nome)return;
+function v80SalvarListaNutris(extras,excluidas){
+ try{
+  localStorage.setItem('eco_v78_nutricionistas',JSON.stringify(extras));
+  localStorage.setItem('eco_v80_nutricionistas_excluidas',JSON.stringify(excluidas));
+  return true;
+ }catch(_){alert('Não foi possível salvar o cadastro das nutricionistas neste aparelho.');return false;}
+}
+function v80GerenciarNutricionistas(){
+ const nomes=v78PessoasEquipe();
+ const lista=nomes.map(nome=>{
+  const cod=encodeURIComponent(nome).replace(/'/g,'%27');
+  return `<div class="v80-nutri-item"><strong>${textoHTML(nome)}</strong><button type="button" aria-label="Excluir ${textoHTML(nome)} do planner" onclick="v80ExcluirNutricionista(decodeURIComponent('${cod}'))">Excluir</button></div>`;
+ }).join('');
+ abrirModalSistema(`<div class="system-modal-head"><div><h2>Nutricionistas da equipe</h2><p>Cadastre ou retire nomes do planner semanal.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>
+ <div class="form-field full"><label for="v80NomeNutricionista">Nova nutricionista</label><div class="v80-nutri-incluir"><input id="v80NomeNutricionista" type="text" maxlength="55" autocomplete="off" placeholder="Digite o nome" onkeydown="if(event.key==='Enter'){event.preventDefault();v80AdicionarNutricionista()}"><button type="button" onclick="v80AdicionarNutricionista()">+ Adicionar</button></div></div>
+ <div class="v80-nutri-lista">${lista||'<p class="v80-nutri-ajuda">Ainda não há nutricionistas cadastradas na equipe.</p>'}</div>
+ <p class="v80-nutri-ajuda">Ao adicionar, o nome aparece no planner. Excluir retira apenas a linha da profissional; visitas registradas e indicadores continuam preservados. O seu próprio nome permanece fixo.</p>
+ <div class="system-modal-actions"><button class="btn-primario" type="button" onclick="fecharModalSistema()">Concluir</button></div>`);
+}
+function v80AdicionarNutricionista(){
+ const campo=document.getElementById('v80NomeNutricionista'),nome=String(campo?.value||'').trim().replace(/\s+/g,' '),chave=v80ChaveNutri(nome);
+ if(!nome){alert('Informe o nome da nutricionista.');campo?.focus();return;}
  if(nome.length>55){alert('Use um nome com até 55 caracteres.');return;}
- if(v78PessoasEquipe().some(n=>n.toLocaleLowerCase('pt-BR')===nome.toLocaleLowerCase('pt-BR'))){alert('Esta nutricionista já está no planner.');return;}
- try{localStorage.setItem('eco_v78_nutricionistas',JSON.stringify([...v78PessoasExtras(),nome]));}catch(_){alert('Não foi possível guardar o nome neste aparelho.');return;}
- V77_EQUIPE_ABERTO=true;renderTela();
+ if(chave==='bruna'||chave==='bruna ribeiro'){alert('Bruna Ribeiro já está na primeira linha do planner.');return;}
+ if(v78PessoasEquipe().some(n=>v80ChaveNutri(n)===chave)){alert('Esta nutricionista já aparece no planner.');return;}
+ const extras=v78PessoasExtras(),excluidas=v80NutricionistasExcluidas().filter(n=>n!==chave);
+ const novos=extras.some(n=>v80ChaveNutri(n)===chave)?extras:[...extras,nome];
+ if(!v80SalvarListaNutris(novos,excluidas))return;
+ V77_EQUIPE_ABERTO=true;renderTela();v80GerenciarNutricionistas();
 }
+function v80ExcluirNutricionista(nome){
+ const chave=v80ChaveNutri(nome);
+ if(!chave||chave==='bruna'||chave==='bruna ribeiro')return;
+ if(!confirm(`Excluir ${nome} do planner? As visitas e treinamentos já registrados NÃO serão apagados.`))return;
+ const extras=v78PessoasExtras().filter(n=>v80ChaveNutri(n)!==chave);
+ const excluidas=[...new Set([...v80NutricionistasExcluidas(),chave])];
+ if(!v80SalvarListaNutris(extras,excluidas))return;
+ V77_EQUIPE_ABERTO=true;renderTela();v80GerenciarNutricionistas();
+}
+function v78AdicionarNutricionista(){v80GerenciarNutricionistas();}
 function v78NoEscopo(registro){return V75_ESCOPO_SUPERVISAO==='todos'||v75GrupoClienteRegistro(registro)===V75_ESCOPO_SUPERVISAO;}
 function v78ClientesDisponiveis(){
  return ordenarClientesAZ(CLIENTES.filter(c=>{
@@ -7562,11 +7626,10 @@ function v78PlannerEquipeHTML(){
  }).join('');
  const preferido=CLIENTES.find(c=>String(c.id)===String(V78_CLIENTE_PREFERIDO));
  return `<details class="v78-planner" ${V77_EQUIPE_ABERTO?'open':''} ontoggle="V77_EQUIPE_ABERTO=this.open"><summary><span>▦ Planner semanal das nutricionistas</span><small>${semana.length} visita(s) e treinamento(s) · ${feitos} realizado(s)</small></summary>
- <div class="v78-controles"><div class="v78-navegacao"><button type="button" onclick="v78MudarSemana(-1)" aria-label="Semana anterior">‹</button><strong>${inicioLegivel} — ${fimLegivel}</strong><button type="button" onclick="v78MudarSemana(1)" aria-label="Semana seguinte">›</button><button type="button" onclick="v78IrHoje()">Hoje</button></div><button type="button" class="v78-add-nutri" onclick="v78AdicionarNutricionista()">+ Nutricionista</button></div>
- <p class="v78-info">Escolha o dia da semana e toque no espaço da nutricionista para selecionar clientes. ✓ indica visita realizada; sem marca indica programada. Sem horários ou clientes fixos.</p>
+ <div class="v78-controles"><div class="v78-navegacao"><button type="button" onclick="v78MudarSemana(-1)" aria-label="Semana anterior">‹</button><strong>${inicioLegivel} — ${fimLegivel}</strong><button type="button" onclick="v78MudarSemana(1)" aria-label="Semana seguinte">›</button><button type="button" onclick="v78IrHoje()">Hoje</button></div><button type="button" class="v78-add-nutri" onclick="v80GerenciarNutricionistas()">＋ Gerenciar nutricionistas</button></div>
+ <p class="v78-info">Arraste o planner para os lados para ver toda a semana. Toque na célula de uma nutricionista para selecionar clientes. ✓ indica visita realizada; sem marca indica programada.</p>
  ${preferido?`<p class="v78-cliente-preferido">Sugestão da Agenda Inteligente: <strong>${textoHTML(preferido.nome)}</strong>. Toque no dia e na profissional desejados para programar a visita.</p>`:''}
- <div class="v79-dias-tabs" role="group" aria-label="Dia da semana">${dias.map((d,i)=>`<button type="button" class="v79-dia-tab ${V79_DIA_ATIVO===i?'ativo':''}" aria-pressed="${V79_DIA_ATIVO===i}" onclick="v79EscolherDia(${i})">${diasNome[i]}<small>${d.slice(8)}</small></button>`).join('')}</div>
- <div class="v78-rolagem" aria-label="Cronograma semanal"><div class="v78-grade" data-dia-ativo="${V79_DIA_ATIVO}">${cabecalho}${linhas}</div></div>
+ <div class="v78-rolagem" aria-label="Cronograma semanal, arraste horizontalmente para ver os sete dias" tabindex="0"><div class="v78-grade">${cabecalho}${linhas}</div></div>
  <p class="v78-info" style="margin:10px 0 0">As visitas da equipe alimentam a cobertura mensal e a Supervisão. A primeira linha mostra os compromissos da sua própria Agenda.</p>
  </details>`;
 }
@@ -8960,7 +9023,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='79',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='80',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
