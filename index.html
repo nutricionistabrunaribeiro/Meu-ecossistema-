@@ -3407,6 +3407,7 @@ const MODELO_DOCUMENTACAO=[
   {id:'agua',nome:'Água e caixa-d’água',icone:'◇',servico:true,itens:[['caixa_agua','Higienização da caixa-d’água'],['potabilidade','Laudo de potabilidade da água'],['filtro','Troca da vela do filtro']]},
   {id:'residuos',nome:'Resíduos e coleta de óleo',icone:'♻',servico:true,itens:[['coleta_residuos','Gestão da coleta de resíduos'],['coleta_oleo','Gestão da coleta de óleo'],['pgrs','PGRS, quando aplicável']]},
   {id:'equipamentos',nome:'Equipamentos, calibração e manutenção',icone:'⚙',servico:true,itens:[['calibracao_termometros','Calibração de termômetros'],['calibracao_balancas','Calibração de balanças'],['manutencao_equipamentos','Manutenção preventiva de equipamentos']]},
+  {id:'incendio',nome:'Segurança contra incêndio',icone:'◈',itens:[['extintores_validade','Extintores — controle geral de validade / inspeção']]},
   {id:'estrutura',nome:'Coifas, dutos e climatização',icone:'⌂',servico:true,itens:[['coifas_dutos','Limpeza e manutenção de coifas e dutos'],['pmoc','PMOC, quando aplicável'],['instalacao_gas','Inspeção da instalação de gás']]},
   {id:'fornecedores',nome:'Fornecedores, produtos e rotulagem',icone:'▤',itens:[['fornecedores_aprovados','Relação de fornecedores aprovados'],['licencas_fornecedores','Regularidade dos fornecedores'],['fichas_tecnicas','Fichas técnicas dos produtos'],['fds_produtos','FDS dos produtos químicos'],['rotulagem','Documentação de rotulagem e alergênicos']]},
   {id:'transporte',nome:'Transporte',icone:'⌁',servico:true,itens:[['documentacao_veiculo','Documentação do veículo e motorista'],['contrato_transportadora','Regularidade da transportadora'],['higienizacao_veiculo','Higienização do veículo'],['temperatura_transporte','Controle de temperatura no transporte']]},
@@ -3443,13 +3444,15 @@ function nomeDocumentoPorChave(chave){
 function abrirDocumentoModelo(clienteId,chave,nome=null,docId=null){
   const c=CLIENTES.find(x=>x.id===clienteId);if(!c)return;
   const d=docId?(c.documentacao||[]).find(x=>x.id===docId):(chave?documentoModelo(c,chave):null);
-  const grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||categoriaDocumento(chave)));
   const nomeResolvido=d?.nome||nome||nomeDocumentoPorChave(chave)||'';
+  const ehExtintor=chave==='extintores_validade'||/^extintor(?:es)?\b/i.test(nomeResolvido);
+  const grupo=MODELO_DOCUMENTACAO.find(g=>g.id===(d?.categoria||(ehExtintor?'incendio':categoriaDocumento(chave))));
   
   abrirModalSistema(`<div class="doc-form-modal"><div class="system-modal-head"><div><h2>${d?'Atualizar':'Preencher'} documentação</h2><p>O sistema acompanha os dados; o arquivo permanece no seu computador.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
     <div class="form-field full"><label>Documento</label>${chave?`<div class="v26-doc-title">${textoHTML(nomeResolvido)}</div><input type="hidden" id="docNome" value="${textoHTML(nomeResolvido)}">`:`<input id="docNome" value="${textoHTML(nomeResolvido)}" placeholder="Digite o nome do documento">`}</div>
     ${campoDataDocumentoHTML('docEmissao','Data de emissão/elaboração',d?.emissao)}
-    ${campoDataDocumentoHTML('docValidade','Data de validade/próxima execução',d?.validade)}
+    ${campoDataDocumentoHTML('docValidade',ehExtintor?'Validade / próxima inspeção ou manutenção':'Data de validade/próxima execução',d?.validade)}
+    ${ehExtintor?'<div class="form-field full"><small>Para acompanhar cada unidade, use “+ Extintor” e identifique-a pelo número, tipo ou localização. Informe a data do registro de inspeção/manutenção correspondente.</small></div>':''}
     <div class="form-field"><label>Status</label><select id="docStatusOperacional"><option value="pendente" ${d?.statusOperacional==='pendente'||!d?'selected':''}>Pendente</option><option value="arquivado" ${d?.statusOperacional==='arquivado'?'selected':''}>Arquivado</option><option value="implantado" ${d?.statusOperacional==='implantado'?'selected':''}>Implantado</option></select></div>
     ${grupo?.servico?`<div class="form-field"><label>Empresa responsável</label><input id="docEmpresa" value="${textoHTML(d?.empresaResponsavel||'')}" placeholder="Nome da empresa ou prestador"></div><div class="form-field full"><div class="doc-toggle-row"><label><input type="checkbox" id="docContrato" ${d?.possuiContrato===true?'checked':''}> Possui contrato vigente</label><label><input type="checkbox" id="docCompleta" ${d?.documentacaoCompleta===true?'checked':''}> Documentação da empresa completa</label></div></div>`:''}
     <div class="form-field full"><label>Observações</label><textarea id="docObservacoes" rows="3" placeholder="Responsável, particularidades, pendências...">${textoHTML(d?.observacoes||'')}</textarea></div>
@@ -3461,7 +3464,8 @@ async function salvarDocumentoPainel(clienteId,chave,docId){
   const emissaoISO=document.getElementById('docEmissao').value,validadeISO=document.getElementById('docValidade').value,aplicavel=document.getElementById('docAplicavel').checked;
   const emissao=emissaoISO?isoParaBRCompleto(emissaoISO):null,validade=validadeISO?isoParaBRCompleto(validadeISO):null,statusTela=aplicavel?statusAutomaticoDoc(validade):'Sem validade',status=statusTela==='Vigente'?'Válido':statusTela==='Próximo do vencimento'?'Vencendo':statusTela==='Vencido'?'Vencido':'Em revisão';
   const statusOperacional=document.getElementById('docStatusOperacional').value;
-  const payload={cliente_id:clienteId,nome,tipo:'Documento',emissao,validade,status,status_operacional:statusOperacional,categoria:chave?categoriaDocumento(chave):'personalizados',modelo_chave:chave||null,observacoes:document.getElementById('docObservacoes').value.trim(),empresa_responsavel:document.getElementById('docEmpresa')?.value.trim()||null,possui_contrato:document.getElementById('docContrato')?.checked??null,documentacao_completa:document.getElementById('docCompleta')?.checked??null,aplicavel};
+  const categoriaPersonalizada=/^extintor(?:es)?\b/i.test(nome)?'incendio':'personalizados';
+  const payload={cliente_id:clienteId,nome,tipo:'Documento',emissao,validade,status,status_operacional:statusOperacional,categoria:chave?categoriaDocumento(chave):categoriaPersonalizada,modelo_chave:chave||null,observacoes:document.getElementById('docObservacoes').value.trim(),empresa_responsavel:document.getElementById('docEmpresa')?.value.trim()||null,possui_contrato:document.getElementById('docContrato')?.checked??null,documentacao_completa:document.getElementById('docCompleta')?.checked??null,aplicavel};
   const existente=docId||(chave?documentoModelo(c,chave)?.id:null);let resposta;
   if(existente)resposta=await supa.from('documentacao_cliente').update(payload).eq('id',existente).select().single();else resposta=await supa.from('documentacao_cliente').insert(payload).select().single();
   if(resposta.error){dispararAutomacao('Erro ao salvar documentação',resposta.error.message);return;}
@@ -3470,6 +3474,7 @@ async function salvarDocumentoPainel(clienteId,chave,docId){
   const idx=c.documentacao.findIndex(x=>x.id===salvo.id);if(idx>=0)c.documentacao[idx]=salvo;else c.documentacao.push(salvo);fecharModalSistema();dispararAutomacao('Documentação atualizada',`${nome} — ${c.nome}`);renderTela();
 }
 function novoDocumentoCliente(clienteId){abrirDocumentoModelo(clienteId,'','');}
+function novoExtintorCliente(clienteId){abrirDocumentoModelo(clienteId,'','Extintor — nº / local: ');}
 async function removerDocumentoCliente(clienteId, docId){
   const c = CLIENTES.find(x=>x.id===clienteId);
   const doc = c.documentacao.find(d=>d.id===docId);
@@ -3499,7 +3504,7 @@ function checklistDocumentacaoHTML(c){
    const d=documentoModelo(c,chave);if(d)usados.add(d.id);
    linhas.push({grupo:g.nome,chave,nome,d});
  }));
- docs.filter(d=>!usados.has(d.id)).forEach(d=>linhas.push({grupo:'Personalizados',chave:'',nome:d.nome,d}));
+ docs.filter(d=>!usados.has(d.id)).forEach(d=>linhas.push({grupo:d.categoria==='incendio'?'Segurança contra incêndio':'Personalizados',chave:'',nome:d.nome,d}));
  const contagens={verde:0,laranja:0,vermelho:0,neutro:0};
  linhas.forEach(l=>contagens[statusValidadeV19(l.d).cor]++);
  const exibidas=linhas.filter(l=>FILTRO_DOC_V19==='todos'||statusValidadeV19(l.d).cor===FILTRO_DOC_V19);
@@ -3511,6 +3516,13 @@ function checklistDocumentacaoHTML(c){
  return `<section class="v19-documentos"><div class="v19-doc-top"><div><h3>Controle de documentação</h3><p>Documentos, colaboradores e treinamentos em um só lugar.</p></div><button class="btn-primario" onclick="novoDocumentoCliente('${c.id}')">+ Novo documento</button></div><div class="v19-legenda"><span class="v19-situacao verde">● Em dia ${contagens.verde}</span><span class="v19-situacao laranja">● Vence em breve ${contagens.laranja}</span><span class="v19-situacao vermelho">● Vencido ${contagens.vermelho}</span><span class="v19-situacao neutro">● Outros ${contagens.neutro}</span></div><div class="v19-filtro"><label for="v19-status">Visualizar</label><select id="v19-status" onchange="filtrarDocumentosV19(this.value)"><option value="todos" ${FILTRO_DOC_V19==='todos'?'selected':''}>Todos os registros</option><option value="verde" ${FILTRO_DOC_V19==='verde'?'selected':''}>Em dia</option><option value="laranja" ${FILTRO_DOC_V19==='laranja'?'selected':''}>Vencimento próximo</option><option value="vermelho" ${FILTRO_DOC_V19==='vermelho'?'selected':''}>Vencidos</option><option value="neutro" ${FILTRO_DOC_V19==='neutro'?'selected':''}>Sem validade / pendentes</option></select></div><div class="v36-table-hint">Deslize para o lado para ver as datas, a situação e as ações.</div><div class="v19-table-wrap" tabindex="0" aria-label="Tabela de documentos com rolagem horizontal"><table class="v19-doc-table"><thead><tr><th>Documento / Categoria</th><th>Emissão</th><th>Validade</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${linhasHTML||'<tr><td colspan="5">Nenhum registro neste filtro.</td></tr>'}</tbody></table></div></section>`;
 }
 
+// V65: atalho para registrar extintores individualmente, preservando o controle geral.
+const checklistDocumentacaoBaseV65=checklistDocumentacaoHTML;
+checklistDocumentacaoHTML=function(c){
+  const html=checklistDocumentacaoBaseV65(c);
+  const acao=`<div style="margin:10px 0 12px"><button class="btn-secundario" onclick="novoExtintorCliente('${c.id}')">+ Cadastrar extintor individual</button><small style="display:block;margin-top:5px">Identifique cada extintor e acompanhe sua própria data de validade, inspeção ou manutenção.</small></div>`;
+  return html.replace('<div class="v19-legenda">',acao+'<div class="v19-legenda">');
+};
 async function editarCampoCliente(clienteId, campoDb, rotulo){
   const c = CLIENTES.find(x=>x.id===clienteId);
   const mapaLocal = {nome:'nome', cnpj_cpf:'cnpj', status:'status', prioridade:'prioridade', responsavel:'responsavel', inicio:'inicio', frequencia_visitas:'frequenciaVisitas'};
@@ -7927,7 +7939,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='58',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='65',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -7981,7 +7993,7 @@ function clarezaPreviaV56(){if(clarezaOuvindoV23)clarezaPararVozV23();const camp
 async function clarezaConfirmarV56(event){event.preventDefault();const form=event.target,btn=form.querySelector('button[type=submit]');btn.disabled=true;const f=new FormData(form),indices=[...form.querySelectorAll('input[type=checkbox]')].map((x,i)=>i).filter(i=>f.get('ok'+i));if(!indices.length){alert('Escolha ao menos um pensamento.');btn.disabled=false;return;}const itens=indices.map(i=>({texto:String(f.get('texto'+i)||'').trim(),categoria:String(f.get('cat'+i)||'entrada')})).filter(x=>x.texto);if(!itens.length){btn.disabled=false;return;}
  const aprovadosEm=new Date().toISOString();for(const item of itens){const registro={id:crypto.randomUUID(),texto:item.texto,categoria:item.categoria,status:'pendente',criado_em:aprovadosEm,origem:'texto',itens_sugeridos:[],aprovado_em:aprovadosEm,revisado_em:aprovadosEm};CLAREZA_ITENS_V23.push(registro);await clarezaEnviarV23(registro)}clarezaPersistirV23();fecharModalSistema();clarezaAtualizarTelaV23();mostrarToast(itens.length+' pensamento(s) aprovado(s) e guardado(s).');}
 /* Backup exporta dados que RLS permite ler, registra ausências e não faz promessa de backup automático. */
-const V56_TABELAS_USUARIO=['adequacoes_acompanhamento','adequacoes_historico','asseio_colaboradores','asseio_verificacoes','biblia_capitulos_lidos','carga_mental_registros','checklist_envios_mensais','checklist_etapa_projeto','contas_pessoais','conteudo_inteligente','controle_horas','datas_profissionais','entrega_clientes','entregas','etapas_projeto','eventos','fotos_checklist','habitos','hidratacao_registros','ideias_pessoais','lideranca_atualizacoes','lideranca_delegacoes','lideranca_responsaveis','linha_editorial','lista_compras','lista_dia','lista_mercado','metas_pessoais','minha_clareza','minha_clareza_itens','na_presenca_registros','obrigacoes_cliente','perfil_usuario','pessoal_reflexoes','produtos_rotulagem','projetos','proximos_passos_cliente','radar_recorrencias','registros_ciclo','registros_pixel','registros_sono','rotas_custos','rotina_execucoes','rotinas_recorrentes','treinamentos_cliente'];
+const V56_TABELAS_USUARIO=['adequacoes_acompanhamento','adequacoes_historico','asseio_colaboradores','asseio_verificacoes','biblia_capitulos_lidos','biblia_jornada_estado','carga_mental_registros','checklist_envios_mensais','checklist_etapa_projeto','contas_pessoais','conteudo_inteligente','controle_horas','datas_profissionais','entrega_clientes','entregas','etapas_projeto','eventos','fotos_checklist','habitos','hidratacao_registros','ideias_pessoais','lideranca_atualizacoes','lideranca_delegacoes','lideranca_responsaveis','linha_editorial','lista_compras','lista_dia','lista_mercado','metas_pessoais','minha_clareza','minha_clareza_itens','na_presenca_registros','obrigacoes_cliente','perfil_usuario','pessoal_reflexoes','produtos_rotulagem','projetos','proximos_passos_cliente','radar_recorrencias','registros_ciclo','registros_pixel','registros_sono','rotas_custos','rotina_execucoes','rotinas_recorrentes','treinamentos_cliente'];
 async function v56LerTabela(tabela,coluna,valores,usuarioId){if(valores?.length===0)return [];const linhas=[];for(let inicio=0;inicio<100000;inicio+=500){let q=supa.from(tabela).select('*').range(inicio,inicio+499);if(coluna==='user_id')q=q.eq('user_id',usuarioId);else if(coluna)q=q.in(coluna,valores);const {data,error}=await q;if(error)throw error;linhas.push(...(data||[]));if((data||[]).length<500)break;}return linhas;}
 function v56BaixarBlob(blob,nome){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),20000)}
 async function exportarBackupV56(){const el=document.getElementById('v56-backup-status'),set=t=>{if(el)el.textContent=t};set('Conferindo sua sessão…');const {data:{user},error:authError}=await supa.auth.getUser();if(authError||!user){set('Entre na sua conta para exportar.');return}
