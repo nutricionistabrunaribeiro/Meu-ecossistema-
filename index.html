@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v75</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v76</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2284,6 +2284,19 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v75-supervisao .v75-info{font-size:11px;color:var(--cor-texto-suave);line-height:1.55;text-align:center;max-width:570px;margin:0 auto}
 @media(max-width:850px){.v75-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:470px){.v75-escopo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;box-sizing:border-box;gap:4px;padding:5px}.v75-escopo button{padding:10px 3px;font-size:10.5px}.v75-supervisao .v73-metrica{padding:14px 8px;min-height:132px}.v75-supervisao .v73-metrica>span{font-size:11px}.v75-supervisao .v73-metrica>strong{font-size:39px}.v75-supervisao .v73-actions button{width:100%}}
+</style>
+<style id="v76-supervisao-unificada">
+.v76-supervisao{max-width:1050px;margin:0 auto;padding:clamp(18px,4vw,32px);border-radius:26px}
+.v76-supervisao .v73-metricas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:8px}
+.v76-supervisao .v73-metrica{min-height:120px;padding:17px 13px;align-items:center;justify-content:center;text-align:center;gap:5px}
+.v76-supervisao .v73-metrica>span{font-size:12px;line-height:1.3;max-width:170px}
+.v76-supervisao .v73-metrica>strong{font-size:clamp(32px,4vw,45px);line-height:1.1}
+.v76-supervisao .v73-metrica>small{font-size:10px;line-height:1.35}
+.v76-supervisao .v73-metrica.v76-vencidos>strong{color:#a14352}
+.v76-supervisao .v73-metrica.v76-a-vencer>strong{color:var(--cor-primaria)}
+.v76-supervisao .v73-actions{margin-top:8px}
+@media(max-width:720px){.v76-supervisao .v73-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:470px){.v76-supervisao{padding:17px 13px}.v76-supervisao .v73-metricas{gap:9px}.v76-supervisao .v73-metrica{min-height:117px;padding:13px 7px}.v76-supervisao .v73-metrica>span{font-size:11px}.v76-supervisao .v73-metrica>small{font-size:9.5px}.v76-supervisao .v73-metrica>strong{font-size:36px}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7221,20 +7234,65 @@ function v75NomeCliente(registro){
  const nome=CLIENTES.find(c=>String(c.id)===String(id))?.nome||registro?.clienteNomeVinculado||registro?.clienteExterno;
  return String(nome||'Sem cliente vinculado');
 }
+/* V76: cada visita conta somente no seu tipo. Visitas sem identificação específica
+   continuam como técnicas; a visita lançada pelo formulário próprio é supervisão. */
+function v76EhVisitaSupervisao(e){
+ const texto=String(e.titulo||e.descricao||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ return /supervisao|supervisoria/.test(texto);
+}
+function v76AlertasTreinoPorAno(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
+ const hoje=formatoISO(new Date()),fimDoAno=String(ano)+'-12-31',referencia=hoje<fimDoAno?hoje:fimDoAno;
+ const limite=formatoISO(addDias(new Date(referencia+'T12:00:00'),30));
+ const maisRecentes=new Map();
+ v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&t.data&&t.data<=referencia&&(escopo==='todos'||v75GrupoClienteRegistro(t)===escopo)).sort((a,b)=>String(b.data).localeCompare(String(a.data))).forEach(t=>{
+  const cliente=CLIENTES.find(c=>String(c.id)===String(t.cliente_id));
+  if(String(cliente?.status||'ativo').toLowerCase()==='inativo')return;
+  const chave=v74ChaveTreinamento(t);
+  if(!maisRecentes.has(chave))maisRecentes.set(chave,t);
+ });
+ const atuais=[...maisRecentes.values()];
+ return {vencidos:atuais.filter(t=>t.validade&&t.validade<referencia),aVencer:atuais.filter(t=>t.validade&&t.validade>=referencia&&t.validade<=limite)};
+}
+function v76DadosSupervisao(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
+ const base=v75DadosSupervisao(ano,escopo),alertas=v76AlertasTreinoPorAno(ano,escopo);
+ return {...base,visitasTecnicas:base.visitasRealizadas.filter(e=>!v76EhVisitaSupervisao(e)),visitasSupervisao:base.visitasRealizadas.filter(v76EhVisitaSupervisao),treinamentosVencidos:alertas.vencidos,treinamentosAVencer:alertas.aVencer};
+}
 function v75PainelSupervisaoHTML(){
- const d=v75DadosSupervisao(),cards=[
-  ['Treinamentos realizados',d.treinamentosRealizados.length,'Concluídos no ano'],
-  ['Treinamentos programados',d.treinamentosProgramados.length,'Ainda não realizados'],
-  ['Visitas realizadas',d.visitasRealizadas.length,'Concluídas na Agenda'],
-  ['Visitas programadas',d.visitasProgramadas.length,'Ainda não realizadas'],
+ const d=v76DadosSupervisao(),cards=[
+  ['Treinamentos realizados',d.treinamentosRealizados.length,'No período'],
+  ['Treinamentos programados',d.treinamentosProgramados.length,'A realizar'],
+  ['Treinamentos vencidos',d.treinamentosVencidos.length,'Última reciclagem por cliente e tema','v76-vencidos'],
+  ['A vencer em 30 dias',d.treinamentosAVencer.length,'Reciclagens próximas','v76-a-vencer'],
+  ['Visitas técnicas',d.visitasTecnicas.length,'Realizadas na Agenda'],
+  ['Visitas de supervisão',d.visitasSupervisao.length,'Realizadas no período'],
  ];
- return `<section class="v74-supervisao v75-supervisao" aria-label="Supervisão em números">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Visitas e treinamentos em números, com os registros organizados no relatório anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ if(typeof document!=='undefined'&&typeof setTimeout==='function'){
+  setTimeout(v76OcultarResumoLegado,0);
+  setTimeout(v76OcultarResumoLegado,250);
+ }
+ return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Os detalhes ficam no resumo anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
- <div class="v73-metricas">${cards.map(([nome,total,descricao])=>`<article class="v73-metrica"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
+ <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
- <p class="v75-info">Exibindo: ${v75NomeEscopo()}. O PDF utilizará exatamente esta carteira e este ano, sem incluir clientes de outra carteira.</p>
+ <p class="v75-info">${v75NomeEscopo()} · ${d.ano} · Histórico completo apenas no PDF, sem duplicar lançamentos.</p>
  </section>`;
+}
+function v76OcultarResumoLegado(){
+ if(typeof telaAtual==='undefined'||telaAtual!=='entregas'||typeof document==='undefined')return;
+ const raiz=document.getElementById('conteudoTela');if(!raiz)return;
+ const normalizar=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ for(const titulo of raiz.querySelectorAll('h1,h2,h3,h4')){
+  if(!normalizar(titulo.textContent).includes('do planejamento a entrega'))continue;
+  let el=titulo.parentElement;
+  while(el&&el!==raiz){
+   const conteudo=normalizar(el.textContent);
+   if(!el.querySelector('.v76-supervisao')&&conteudo.includes('entregas concluidas')&&conteudo.includes('em aberto')&&conteudo.includes('atrasad')){
+    el.hidden=true;el.style.setProperty('display','none','important');break;
+   }
+   el=el.parentElement;
+  }
+ }
 }
 function entregasHTML(){return v75PainelSupervisaoHTML();}
 function abrirFormularioTreinamentoV73(clienteId='',id=''){
@@ -7296,7 +7354,8 @@ function abrirFormularioVisitaV73(){
  abrirModalSistema(`<div class="system-modal-head"><div><h2>Registrar visita de supervisão</h2><p>Uma visita concluída será contabilizada na Agenda e nas Entregas.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid"><div class="form-field full"><label>Cliente *</label><select id="v73VisitaCliente"><option value="">Selecione o cliente</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(rotuloClienteEntrega(c))}</option>`).join('')}</select></div><div class="form-field"><label>Data *</label><input id="v73VisitaData" type="date" value="${formatoISO(new Date())}"></div><div class="form-field"><label>Horário</label><input id="v73VisitaHora" type="number" min="0" max="23" value="8"></div><div class="form-field full"><label>Descrição</label><input id="v73VisitaTitulo" value="Visita de supervisão" maxlength="150"></div></div><p class="v73-helper">Se a visita já está na Agenda, basta marcá-la como concluída. Não registre novamente aqui.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button class="btn-primario" onclick="salvarVisitaV73()">Registrar visita realizada</button></div>`);
 }
 async function salvarVisitaV73(){
- const cliente_id=document.getElementById('v73VisitaCliente')?.value,dataISO=document.getElementById('v73VisitaData')?.value,hora=Number(document.getElementById('v73VisitaHora')?.value),titulo=document.getElementById('v73VisitaTitulo')?.value.trim()||'Visita de supervisão';
+ const cliente_id=document.getElementById('v73VisitaCliente')?.value,dataISO=document.getElementById('v73VisitaData')?.value,hora=Number(document.getElementById('v73VisitaHora')?.value),nomeInformado=document.getElementById('v73VisitaTitulo')?.value.trim()||'Visita de supervisão';
+ const titulo=v76EhVisitaSupervisao({titulo:nomeInformado})?nomeInformado:'Supervisão · '+nomeInformado;
  if(!cliente_id||!dataISO||!Number.isInteger(hora)||hora<0||hora>23){alert('Informe o cliente, a data e um horário válido.');return;}
  if(dataISO>formatoISO(new Date())){alert('Esta opção registra visitas já realizadas. Para uma visita futura, use a Agenda.');return;}
   if(eventosSemana.some(e=>e.tipo==='visita'&&String(e.clienteId)===String(cliente_id)&&e.dataISO===dataISO&&Number.parseInt(e.hora,10)===hora)){
@@ -7328,10 +7387,10 @@ function gerarResumoAnualV73(){
  doc.save(`meu-ecossistema-entregas-${ano}.pdf`);
 }
 
-/* V75 - PDF de gestão com carteira selecionada, quatro indicadores e histórico. */
+/* V76 - PDF gerencial: totais de visitas técnicas e detalhes somente dos atos de supervisão/treinamento. */
 function v75GerarRelatorioPDF(){
  if(!window.jspdf?.jsPDF){alert('O gerador de PDF ainda não carregou. Verifique a conexão e tente novamente.');return;}
- const d=v75DadosSupervisao(),scope=v75NomeEscopo(d.escopo),doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+ const d=v76DadosSupervisao(),scope=v75NomeEscopo(d.escopo),doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
  const C={marsala:[142,94,105],rosa:[199,166,167],fundo:[249,244,241],tinta:[57,43,47],suave:[119,99,105],borda:[228,212,207],branco:[255,255,255]};
  const rgb=(tipo,cor)=>doc[tipo](...cor),hojeISO=formatoISO(new Date()),emissao=dataBR(hojeISO),W=210,H=297;
  const limpar=s=>String(s??'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\r\n\t]+/g,' ').trim();
@@ -7356,8 +7415,10 @@ function v75GerarRelatorioPDF(){
  const cards=[
   ['Treinamentos realizados',d.treinamentosRealizados.length],
   ['Treinamentos programados',d.treinamentosProgramados.length],
-  ['Visitas realizadas',d.visitasRealizadas.length],
-  ['Visitas programadas',d.visitasProgramadas.length],
+  ['Treinamentos vencidos',d.treinamentosVencidos.length],
+  ['A vencer em 30 dias',d.treinamentosAVencer.length],
+  ['Visitas técnicas',d.visitasTecnicas.length],
+  ['Visitas de supervisão',d.visitasSupervisao.length],
  ];
  const celula=(x,yy,largura,rotulo,numero)=>{
   rgb('setFillColor',C.fundo);rgb('setDrawColor',C.borda);doc.roundedRect(x,yy,largura,37,4,4,'FD');
@@ -7366,13 +7427,14 @@ function v75GerarRelatorioPDF(){
  };
  const resumoCliente=new Map(),linhaCliente=registro=>{
   const id=String(registro?.cliente_id||registro?.clienteId||registro?.clienteNomeVinculado||registro?.clienteExterno||'sem-cliente');
-  if(!resumoCliente.has(id))resumoCliente.set(id,{nome:v75NomeCliente(registro),visitasRealizadas:0,visitasProgramadas:0,treinamentosRealizados:0,treinamentosProgramados:0});
+  if(!resumoCliente.has(id))resumoCliente.set(id,{nome:v75NomeCliente(registro),visitasTecnicas:0,visitasSupervisao:0,treinamentosRealizados:0,treinamentosProgramados:0});
   return resumoCliente.get(id);
  };
- for(const tipo of ['visitasRealizadas','visitasProgramadas','treinamentosRealizados','treinamentosProgramados'])for(const registro of d[tipo])linhaCliente(registro)[tipo]++;
+ for(const tipo of ['visitasTecnicas','visitasSupervisao','treinamentosRealizados','treinamentosProgramados'])for(const registro of d[tipo])linhaCliente(registro)[tipo]++;
  const clientes=[...resumoCliente.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
  function tabela(titulo,colunas,linhas,{descricao='',iniciarPagina=false}={}){
-  if(iniciarPagina)novaPagina(titulo);else if(y>244)novaPagina(titulo);
+  // Reserva espaço para título, cabeçalho e pelo menos uma linha sem deixar cabeçalhos órfãos.
+  if(iniciarPagina)novaPagina(titulo);else if(y>216)novaPagina(titulo);
   faixa(titulo,descricao);
   const xInicio=16,total=178,larguras=colunas.map(c=>c.largura),soma=larguras.reduce((a,b)=>a+b,0);
   if(Math.abs(soma-total)>0.01)throw Error('As colunas do relatório precisam somar 178 mm.');
@@ -7402,24 +7464,25 @@ function v75GerarRelatorioPDF(){
  rgb('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(9);
  doc.text('Período: 1º de janeiro a 31 de dezembro de '+d.ano+'  |  Emitido em '+emissao,16,y);y+=11;
  celula(16,y,86,cards[0][0],cards[0][1]);celula(108,y,86,cards[1][0],cards[1][1]);y+=43;
- celula(16,y,86,cards[2][0],cards[2][1]);celula(108,y,86,cards[3][0],cards[3][1]);y+=48;
+ celula(16,y,86,cards[2][0],cards[2][1]);celula(108,y,86,cards[3][0],cards[3][1]);y+=43;
+ celula(16,y,86,cards[4][0],cards[4][1]);celula(108,y,86,cards[5][0],cards[5][1]);y+=48;
  tabela('Resultados por cliente',[
   {chave:'nome',rotulo:'Cliente',largura:74},
-  {chave:'vr',rotulo:'Vis. feitas',largura:26},
-  {chave:'vp',rotulo:'Vis. prog.',largura:26},
+  {chave:'vt',rotulo:'Vis. técnicas',largura:26},
+  {chave:'vs',rotulo:'Supervisão',largura:26},
   {chave:'tr',rotulo:'Trein. feitos',largura:26},
   {chave:'tp',rotulo:'Trein. prog.',largura:26},
- ],clientes.map(c=>({nome:c.nome,vr:String(c.visitasRealizadas),vp:String(c.visitasProgramadas),tr:String(c.treinamentosRealizados),tp:String(c.treinamentosProgramados)})),{descricao:'Consolidado por estabelecimento/cliente. Os totais correspondem à carteira selecionada.'});
- const tabelaVisitas=(titulo,registros,descricao)=>tabela(titulo,[
-  {chave:'data',rotulo:'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:67},{chave:'atividade',rotulo:'Atividade',largura:84},
- ],registros.slice().sort((a,b)=>String(a.dataISO||'').localeCompare(String(b.dataISO||''))).map(e=>({data:dataBR(e.dataISO)+(Number.isInteger(Number(e.hora))?' '+String(e.hora).padStart(2,'0')+'h':''),cliente:v75NomeCliente(e),atividade:e.titulo||'Visita de supervisão'})),{descricao,iniciarPagina:true});
- const tabelaTreinos=(titulo,registros,descricao,realizados=false)=>tabela(titulo,[
-  {chave:'data',rotulo:'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:55},{chave:'tema',rotulo:'Tema',largura:68},{chave:'status',rotulo:'Situação',largura:28},
- ],registros.slice().sort((a,b)=>String(a.data||'').localeCompare(String(b.data||''))).map(t=>({data:dataBR(t.data),cliente:v75NomeCliente(t),tema:t.tema||'Treinamento',status:realizados?v73SituacaoTreino(t).rotulo:'Programado'})),{descricao,iniciarPagina:true});
- tabelaVisitas('Visitas realizadas',d.visitasRealizadas,'Visitas de supervisão marcadas como concluídas na Agenda.');
- tabelaVisitas('Visitas programadas',d.visitasProgramadas,'Compromissos de visita ainda não marcados como concluídos.');
- tabelaTreinos('Treinamentos realizados',d.treinamentosRealizados,'Histórico de treinamentos e reciclagens, inclusive os já renovados.',true);
- tabelaTreinos('Treinamentos programados',d.treinamentosProgramados,'Treinamentos com data prevista e ainda não concluídos.');
+ ],clientes.map(c=>({nome:c.nome,vt:String(c.visitasTecnicas),vs:String(c.visitasSupervisao),tr:String(c.treinamentosRealizados),tp:String(c.treinamentosProgramados)})),{descricao:'Visitas técnicas apenas em totais. Supervisões e treinamentos detalhados nas seções seguintes.',iniciarPagina:true});
+ const tabelaSupervisao=()=>tabela('Visitas de supervisão realizadas',[
+  {chave:'data',rotulo:'Data',largura:35},{chave:'cliente',rotulo:'Cliente',largura:86},{chave:'atividade',rotulo:'Registro',largura:57},
+ ],d.visitasSupervisao.slice().sort((a,b)=>String(a.dataISO||'').localeCompare(String(b.dataISO||''))).map(e=>({data:dataBR(e.dataISO),cliente:v75NomeCliente(e),atividade:e.titulo||'Supervisão'})),{descricao:'Data e cliente de cada supervisão. Visitas técnicas comuns não são listadas individualmente.'});
+ const tabelaTreinos=(titulo,registros,descricao,modo='historico')=>tabela(titulo,[
+  {chave:'data',rotulo:modo==='alerta'?'Vencimento':'Data',largura:27},{chave:'cliente',rotulo:'Cliente',largura:55},{chave:'tema',rotulo:'Tema',largura:68},{chave:'status',rotulo:'Situação',largura:28},
+ ],registros.slice().sort((a,b)=>String(a.data||'').localeCompare(String(b.data||''))).map(t=>({data:dataBR(modo==='alerta'?t.validade:t.data),cliente:v75NomeCliente(t),tema:t.tema||'Treinamento',status:modo==='alerta'?(t.validade<formatoISO(new Date())?'Vencido':'A vencer'):modo==='programado'?'Programado':v73SituacaoTreino(t).rotulo})),{descricao});
+ tabelaSupervisao();
+ tabelaTreinos('Treinamentos realizados',d.treinamentosRealizados,'Data e cliente de cada treinamento concluído, incluindo reciclagens renovadas.');
+ tabelaTreinos('Treinamentos programados',d.treinamentosProgramados,'Próximos treinamentos por cliente.','programado');
+ tabelaTreinos('Reciclagens vencidas ou a vencer',[...d.treinamentosVencidos,...d.treinamentosAVencer],'Somente o registro mais recente de cada tema por cliente.','alerta');
  const totalPaginas=doc.internal.getNumberOfPages();
  for(let i=1;i<=totalPaginas;i++){
   doc.setPage(i);rgb('setDrawColor',C.borda);doc.setLineWidth(.35);doc.line(15,282,195,282);
@@ -8513,7 +8576,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='75',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='76',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
