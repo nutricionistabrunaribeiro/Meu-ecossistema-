@@ -2121,6 +2121,15 @@ body.v38-sem-rolagem{overflow:hidden!important}
 .v66-warning{padding:12px;border:1px solid var(--cor-borda);border-radius:12px;line-height:1.7;font-size:12px}
 .v66-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v66-actions button{min-height:43px;padding:9px 14px;border:1px solid var(--cor-borda);border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto);font:inherit}
 .v66-actions button.primary{background:var(--cor-primaria);color:white}
+.v68-daily-summary{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.v68-daily-summary span{border:1px solid var(--cor-borda);border-radius:999px;padding:7px 11px;font-size:11px;background:var(--cor-superficie)}
+.v68-section{margin-top:14px}
+.v68-section h3{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 9px;font-size:15px}
+.v68-section h3 span{font-family:inherit;font-size:11px;color:var(--cor-texto-suave);font-weight:500}
+.v68-empty{padding:15px;background:var(--cor-superficie);border:1px dashed var(--cor-borda);border-radius:12px;font-size:12px;color:var(--cor-texto-suave)}
+.v68-urgent{border-left:4px solid #A54A55}
+.v68-today{border-left:4px solid var(--cor-primaria)}
+.v68-action-pill{margin:0 0 0 5px;border:1px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto);border-radius:9px;padding:9px 11px;font-size:11px;cursor:pointer}
 @media(max-width:650px){.v66-intro,.v66-panel{padding:14px}.v66-kpis{grid-template-columns:1fr 1fr}.v66-entry{align-items:flex-start}.v66-entry button{font-size:11px}}
 </style>
 </head>
@@ -2453,7 +2462,7 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
-    <div class="v40-global-dashboard"><button class="${telaAtual==='central_integrada'?'active':''}" onclick="irPara('central_integrada')">⌕ &nbsp; Central Integrada</button></div>
+    <div class="v40-global-dashboard"><button class="${telaAtual==='central_integrada'?'active':''}" onclick="irPara('central_integrada')">☷ &nbsp; Meu dia · automático</button></div>
     <div class="v40-global-dashboard"><button class="${telaAtual==='dashboard'?'active':''}" onclick="abrirDashboardGlobal()">▥ &nbsp; Dashboard geral</button></div>
     <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
@@ -2638,6 +2647,7 @@ function trocarEspaco(esp){
 
 function irPara(id){
   if(['pendencias','obrigacoes'].includes(id)) id='dashboard';
+  if(id==='central_integrada') V66_TAB='hoje';
   if(id==='dashboard'){abrirDashboardGlobal();return;}
   if(modoConsultaOffline&&id!=='visitas'){alert('Sem conexão, continue os checklists já preparados neste aparelho. As outras áreas precisam de internet.');return;}
   telaAtual = id;
@@ -7450,7 +7460,7 @@ async function salvarNovoRadar(event){
 async function excluirRadar(id){if(!confirm('Excluir esta ocorrência do Radar?'))return;try{const {error}=await supa.from('radar_recorrencias').delete().eq('id',id);if(error)throw error;RADAR_RECORRENCIAS=RADAR_RECORRENCIAS.filter(r=>r.id!==id);renderTela();}catch(e){alert('Não foi possível excluir: '+e.message)}}
 
 function renderTela(){
-  const [titulo, sub] = telaAtual==='central_integrada'?['Central Integrada','Busca, prazos, previsões e segurança']:
+  const [titulo, sub] = telaAtual==='central_integrada'?['Central do meu dia','Compromissos e prioridades atualizados']:
   telaAtual==='iniciar_atividade'?['Iniciar atividade','Escolha o tipo e o cliente para começar']:telaAtual==='minha_clareza'?['Minha Clareza','Fale, escreva e organize seus pensamentos']:telaAtual==='plano_vida'?['Meu 2027 de forma leve','Um projeto de vida, sem cobranças desnecessárias']:telaAtual==='resultados_consultoria'?['Resultados da Consultoria','Indicadores mensais de toda a operação']:telaAtual==='gestao_adequacoes'?['Gestão de Adequações','Acompanhe, verifique e comprove os resultados']: (NOMES_TELA[telaAtual] || ["", ""]);
   if(telaAtual === 'visao_geral'){document.getElementById('tituloTela').innerText='Visão Geral';document.getElementById('subtituloTela').innerText='Trabalho, Pessoal e Na Presença';}
   else if(telaAtual === 'dashboard'){
@@ -8005,7 +8015,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='67',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='68',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -8186,8 +8196,8 @@ function v57GerarPDF(){if(!window.jspdf?.jsPDF){alert('Biblioteca PDF indisponí
 /* v66 — Camada integrada, sem escrita direta nas tabelas anteriores.
    Busca e avisos usam registros já carregados (sujeitos a RLS da sessão).
    Não é um serviço de alertas push nem substitui um backup administrativo. */
-const V66_TABS={busca:'Busca geral',prazos:'Vencimentos',financas:'Previsão financeira',seguranca:'Segurança'};
-let V66_TAB='busca',V66_TERMO='',V66_DIAS=Number(localStorage.getItem('eco-v66-alerta-dias')||30);
+const V66_TABS={hoje:'Meu dia',prazos:'Vencimentos',busca:'Buscar',financas:'Previsão financeira',seguranca:'Segurança'};
+let V66_TAB='hoje',V66_TERMO='',V66_DIAS=Number(localStorage.getItem('eco-v66-alerta-dias')||30);
 function v66Esc(x){return String(x??'').replace(/[&<>"']/g,a=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[a]));}
 function v66DataISO(v){if(typeof v!=='string')return '';if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
  const a=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return a?`${a[3]}-${a[2]}-${a[1]}`:'';}
@@ -8203,7 +8213,7 @@ function v66Index(){
   add('Cliente',c.nome,'Cliente ativo · '+(c.responsavel||''),'clientes',c.id);
   for(const d of (c.documentacao||[])){
    if(d.aplicavel===false)continue;
-   add('Documento',d.nome,`${c.nome} · ${d.validade&&d.validade!=='—'?'Vencimento '+d.validade:'Sem validade informada'}`,'clientes',c.id);
+   add('Documento',d.nome,`${c.nome} · ${d.validade&&d.validade!=='—'?'Vencimento '+d.validade:'Sem validade informada'}`,'documentacao',c.id);
   }
  }
  for(const e of (typeof eventosSemana==='undefined'?[]:eventosSemana)){
@@ -8230,12 +8240,12 @@ function v66BuscaResultados(rows,buscou){if(!buscou)return '<p class="v66-muted"
  if(!rows.length)return '<p class="v66-muted">Não há resultados neste conjunto de dados. Confira se a sincronização terminou.</p>';
  return `<p class="v66-muted">${rows.length} resultado(s)${rows.length>60?' · mostrando os primeiros 60':''}</p>`+rows.slice(0,60).map(r=>`<div class="v66-entry"><div><strong>${v66Esc(r.titulo)}</strong><small>${v66Esc(r.tipo)} · ${v66Esc(r.descricao)}</small></div><button onclick="v66Abrir('${r.destino}','${v66Esc(r.clienteId||'')}')">Abrir</button></div>`).join('');}
 function v66Digitar(x){V66_TERMO=x;let el=document.getElementById('v66-resultados');if(!el)return;const term=v66Normal(x.trim());el.innerHTML=v66BuscaResultados(term?v66Index().filter(r=>v66Normal([r.titulo,r.descricao,r.tipo].join(' ')).includes(term)):[],!!term);}
-function v66Abrir(destino,clienteId){if(destino==='clientes'&&clienteId){irPara('clientes');abrirCliente(clienteId)}else irPara(destino);}
+function v66Abrir(destino,clienteId){if(destino==='documentacao'&&clienteId){abrirControleDocumento(clienteId)}else if(destino==='clientes'&&clienteId){irPara('clientes');abrirCliente(clienteId)}else irPara(destino);}
 function v66Alertas(){const rows=[];
  function add(tipo,titulo,cliente,iso,destino,clienteId){const dias=v66Diferenca(iso);if(dias===null||dias>V66_DIAS)return;rows.push({tipo,titulo,cliente,iso,dias,destino,clienteId});}
  for(const c of CLIENTES.filter(clienteAtivoV37))for(const d of c.documentacao||[]){
   if(d.aplicavel===false)continue;
-  const data=v66DataISO(d.validade);if(data)add('Documento',d.nome,c.nome,data,'clientes',c.id);
+  const data=v66DataISO(d.validade);if(data)add('Documento',d.nome,c.nome,data,'documentacao',c.id);
  }
  for(const o of (typeof OBRIGACOES==='undefined'?[]:OBRIGACOES)){
   if(!v66ClienteAtivo(o.cliente_id)||o.status==='realizada')continue;
@@ -8271,7 +8281,114 @@ function v66SegurancaHTML(){let x=[];
  <div class="v66-actions"><button class="primary" onclick="abrirConfiguracoesGlobais()">Abrir Centro de Backup</button><button onclick="v66ConferirConexao()">Testar conexão</button></div><p class="v66-muted" id="v66-diagnostico"></p></section>`;}
 async function v66ConferirConexao(){const el=document.getElementById('v66-diagnostico');if(!el)return;el.textContent='Verificando sessão e consulta de leitura…';try{const {data:{user},error:e}=await supa.auth.getUser();if(e||!user)throw Error('Sessão expirada');let r=await supa.from('biblia_capitulos_lidos').select('id',{count:'exact',head:true}).eq('user_id',user.id);if(r.error)throw r.error;el.textContent=`Sessão autenticada e consulta de leitura disponível (${r.count??'sem contagem'} registro(s) de capítulos). Isso não substitui o teste de gravação nem confirma um backup.`;}catch(e){el.textContent='A consulta falhou: '+String(e.message||e);}}
 function v66TrocarAba(tab){if(!V66_TABS[tab])return;V66_TAB=tab;renderTela();if(tab==='busca'){const el=document.getElementById('v66-busca');el?.focus();}}
-function v66CentralHTML(){return `<div class="v66-wrap"><div class="v66-intro"><h2>Seu Ecossistema, conectado</h2><p class="v66-muted">Busque informações, acompanhe prazos e antecipe decisões usando registros já existentes. Dados somente da sessão atual.</p></div><div class="v66-tabs" role="tablist" aria-label="Central integrada">${Object.entries(V66_TABS).map(([k,v])=>`<button role="tab" aria-selected="${V66_TAB===k}" onclick="v66TrocarAba('${k}')">${v}</button>`).join('')}</div>${({busca:v66BuscaHTML,prazos:v66PrazosHTML,financas:v66FinancasHTML,seguranca:v66SegurancaHTML})[V66_TAB]()}</div>`;}
+// V68: a primeira tela é um resumo real da rotina, sem exigir pesquisa.
+function v68ItensDia(){
+  const hoje=v66Hoje(),itens=[],vistos=new Set();
+  const ativo=id=>!id||v66ClienteAtivo(id);
+  const nomeCliente=id=>CLIENTES.find(c=>String(c.id)===String(id))?.nome||'';
+  function add(grupo,titulo,detalhe,data,destino,clienteId=null,identidade=''){
+    if(!titulo||!ativo(clienteId))return;
+    const iso=v66DataISO(data),dias=iso?v66Diferenca(iso):null;
+    const chave=identidade||[grupo,v66Normal(titulo),clienteId||'',iso||''].join('|');
+    if(vistos.has(chave))return;vistos.add(chave);
+    itens.push({grupo,titulo:String(titulo),detalhe:String(detalhe||''),iso,dias,destino,clienteId});
+  }
+  for(const e of eventosSemana||[]){
+    if(e.dataISO!==hoje||e.concluido)continue;
+    const hora=e.hora?String(e.hora).slice(0,5):'Horário não definido';
+    add('agenda',e.titulo,`${hora} · ${e.clienteNomeVinculado||e.clienteExterno||nomeCliente(e.clienteId)||'Compromisso'}`,hoje,'agenda',e.clienteId);
+  }
+  for(const l of LISTA_DIA||[]){if(!l.concluido)add('lista',l.item,'Sua Lista do Dia',hoje,'lista_dia',null,'lista|'+l.id);}
+  for(const h of HABITOS||[]){
+    if(!(h.registrosHistorico||h.registrosAno||[]).includes(hoje))add('habito',h.nome,'Hábito ainda não marcado hoje',hoje,'habitos',null,'habito|'+h.id);
+  }
+  for(const v of VISITAS||[]){
+    if(v.status==='concluida'||!ativo(v.clienteId))continue;
+    if(v66DataISO(v.dataAplicacaoISO)!==hoje)continue;
+    add('checklist','Checklist em andamento',`Cliente: ${v.clienteNome||nomeCliente(v.clienteId)}`,hoje,'visitas',v.clienteId,'checklist|'+v.id);
+  }
+  for(const e of ENTREGAS||[]){
+    if(entregaConcluida(e))continue;
+    const d=v66Diferenca(e.prazo);if(d===null||d>7)continue;
+    const vinculados=ENTREGA_CLIENTES.filter(v=>v.entrega_id===e.id&&v.status!=='entregue');
+    for(const v of vinculados){if(ativo(v.cliente_id))add('entrega',e.titulo,`Entrega · ${nomeCliente(v.cliente_id)}`,e.prazo,'entregas',v.cliente_id,'entrega|'+e.id+'|'+v.cliente_id);}
+  }
+  for(const p of PENDENCIAS_DB||[]){
+    if(p.status==='concluida'||!ativo(p.clienteId))continue;
+    const d=v66Diferenca(p.prazo);if(d!==null&&d<=7)add('pendencia',p.titulo,`Pendência · ${p.cliente||nomeCliente(p.clienteId)}`,p.prazo,'dashboard',p.clienteId,'pendencia|'+p.id);
+  }
+  for(const p of (typeof PROXIMOS_PASSOS_CLIENTE==='undefined'?[]:PROXIMOS_PASSOS_CLIENTE)){
+    if(p.status==='concluido'||!ativo(p.cliente_id))continue;
+    const prazo=v66Diferenca(p.prazo);if(prazo!==null&&prazo<=7)add('proximo_passo',p.titulo||p.descricao||'Próximo passo',`Acompanhamento · ${nomeCliente(p.cliente_id)}`,p.prazo,'clientes',p.cliente_id,'passo|'+p.id);
+  }
+  for(const o of OBRIGACOES||[]){
+    if(o.status==='realizada'||!ativo(o.cliente_id))continue;
+    const d=v66Diferenca(o.vencimento);if(d!==null&&d<=7)add('obrigacao',o.titulo,`Obrigação · ${nomeCliente(o.cliente_id)}`,o.vencimento,'dashboard',o.cliente_id,'obrigacao|'+o.id);
+  }
+  for(const c of CLIENTES.filter(clienteAtivoV37))for(const d of c.documentacao||[]){
+    if(d.aplicavel===false)continue;
+    const prazo=v66Diferenca(d.validade);if(prazo===null||prazo>7)continue;
+    add('documento',d.nome,`Documento · ${c.nome}`,d.validade,'documentacao',c.id,'documento|'+(d.id||d.nome+'|'+c.id));
+  }
+  for(const t of TREINAMENTOS||[]){
+    if(!ativo(t.cliente_id)||t.status==='cancelado'||t.status==='realizado')continue;
+    if(v66DataISO(t.data)===hoje)add('treinamento',t.tema,`Treinamento · ${nomeCliente(t.cliente_id)}`,t.data,'clientes',t.cliente_id,'treinamento|'+t.id);
+  }
+  for(const p of PRODUTOS_ROTULAGEM||[]){
+    if(p.status==='concluido'||!ativo(p.cliente_id))continue;
+    const d=v66Diferenca(p.prazo);if(d!==null&&d<=7)add('producao',p.produto,`Produto/rotulagem · ${nomeCliente(p.cliente_id)}`,p.prazo,'produtos_rotulagem',p.cliente_id,'produto|'+p.id);
+  }
+  for(const d of LIDERANCA_DELEGACOES||[]){
+    if(d.status==='concluida'||!ativo(d.cliente_id))continue;
+    const prazo=v66Diferenca(d.prazo);if(prazo!==null&&prazo<=7)add('delegacao',d.titulo,`Delegação · ${nomeCliente(d.cliente_id)}`,d.prazo,'lideranca',d.cliente_id,'delegacao|'+d.id);
+  }
+  for(const r of ROTINAS_RECORRENTES||[]){
+    if(!r.ativo||r.excluido_em)continue;
+    try{
+      const ref=new Date();ref.setDate(1);
+      if(!ocorrenciasRotina(r,ref).includes(hoje)||execucaoRotina(r.id,hoje)?.concluida)continue;
+      add('rotina',r.titulo,r.escopo==='casa'?'Rotina da casa':'Rotina planejada',hoje,r.escopo==='casa'?'rotina_casa':'planejamento',null,'rotina|'+r.id);
+    }catch(e){/* ignora uma rotina inválida; as demais continuam acessíveis */}
+  }
+  for(const l of LANCAMENTOS||[]){
+    if(l.status==='pago'||l.status==='cancelado'||l.tipo!=='despesa')continue;
+    const prazo=v66Diferenca(l.vencimentoISO);if(prazo!==null&&prazo<=0)add('financas',l.desc,`Trabalho · ${v66Dinheiro(l.valor)}`,l.vencimentoISO,'financeiro',null,'financeiro|'+l.id);
+  }
+  for(const l of CONTAS_PESSOAIS||[]){
+    if(l.status==='pago'||l.status==='cancelado'||l.tipo!=='despesa')continue;
+    const prazo=v66Diferenca(l.vencimentoISO);if(prazo!==null&&prazo<=0)add('financas',l.desc,`Pessoal · ${v66Dinheiro(l.valor)}`,l.vencimentoISO,'contas',null,'conta|'+l.id);
+  }
+  return itens;
+}
+function v68SecaoHTML(titulo,lista,vazia,limite=10){
+  const prioridade={agenda:0,checklist:1,lista:2,proximo_passo:3,entrega:4,treinamento:5,pendencia:6,obrigacao:7,documento:8,financas:9,rotina:10,habito:11};
+  const ordenados=[...lista].sort((a,b)=>(a.iso||'').localeCompare(b.iso||'')||(prioridade[a.grupo]??20)-(prioridade[b.grupo]??20)||(a.grupo==='agenda'?a.detalhe.localeCompare(b.detalhe,'pt-BR'):a.titulo.localeCompare(b.titulo,'pt-BR')));
+  const linha=r=>`<div class="v66-entry ${r.dias<0?'v68-urgent':'v68-today'}"><div><strong>${v66Esc(r.titulo)}</strong><small>${v66Esc(r.detalhe)}${r.dias<0?' · Atrasado '+(-r.dias)+' dia(s)':r.dias>0?' · '+v66Dia(r.iso):''}</small></div><button onclick="v66Abrir('${r.destino}','${v66Esc(r.clienteId||'')}')">Abrir</button></div>`;
+  return `<section class="v66-panel v68-section"><h3>${v66Esc(titulo)} <span>${lista.length} item(ns)</span></h3>${ordenados.length?ordenados.slice(0,limite).map(linha).join('')+(ordenados.length>limite?`<details><summary style="cursor:pointer;padding:11px">Ver mais ${ordenados.length-limite} item(ns)</summary>${ordenados.slice(limite).map(linha).join('')}</details>`:''):`<div class="v68-empty">${v66Esc(vazia)}</div>`}</section>`;
+}
+function v68HojeHTML(){
+  const itens=v68ItensDia(),atrasados=itens.filter(r=>r.dias<0),hoje=itens.filter(r=>r.dias===0),proximos=itens.filter(r=>r.dias>0);
+  const dia=v66Hoje(),concluidos=[...eventosSemana.filter(e=>e.dataISO===dia&&e.concluido).map(e=>({titulo:e.titulo,detalhe:'Agenda · concluído'})),...LISTA_DIA.filter(l=>l.concluido&&String(l.concluido_em||'').slice(0,10)===dia).map(l=>({titulo:l.item,detalhe:'Lista do Dia · concluído'}))];
+  const data=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  return `<div class="v66-intro"><div class="v66-muted">${v66Esc(data)}</div><h2>Seu dia, em um só lugar</h2><p class="v66-muted">Compromissos, tarefas, documentos e pagamentos vêm automaticamente das áreas do Meu Ecossistema. Nenhuma pesquisa é necessária.</p><div class="v68-daily-summary"><span>Hoje: <strong>${hoje.length}</strong></span><span>Itens atrasados: <strong>${atrasados.length}</strong></span><span>Próximos 7 dias: <strong>${proximos.length}</strong></span><span>Concluídos: <strong>${concluidos.length}</strong></span></div><div class="v66-actions"><button class="primary" onclick="v68RecarregarDados(this)">↻ Atualizar meu dia</button><button onclick="irPara('agenda')">Abrir Agenda</button><button onclick="abrirListaDia()">Lista do Dia</button></div><p id="v68-atualizacao" class="v66-muted" role="status">Informações da sua última sincronização.</p></div>
+  ${v68SecaoHTML('Para fazer hoje',hoje,'Nenhum compromisso ou tarefa em aberto para hoje.')}
+  ${atrasados.length?v68SecaoHTML('Precisa de atenção · atrasados',atrasados,'Sem pendências atrasadas.'):''}
+  ${proximos.length?v68SecaoHTML('Nos próximos 7 dias',proximos,'Sem novos vencimentos nos próximos dias.',8):''}
+  ${concluidos.length?`<details class="v66-panel"><summary style="cursor:pointer;font-size:13px;font-weight:650">Concluídos no dia (${concluidos.length})</summary>${concluidos.map(x=>`<div class="v66-entry"><div><strong>✓ ${v66Esc(x.titulo)}</strong><small>${v66Esc(x.detalhe)}</small></div></div>`).join('')}</details>`:''}`;
+}
+let V68_RECARREGANDO=false;
+async function v68RecarregarDados(botao){
+  if(V68_RECARREGANDO)return;V68_RECARREGANDO=true;if(botao)botao.disabled=true;
+  const aviso=document.getElementById('v68-atualizacao');if(aviso)aviso.textContent='Lendo novamente seus registros…';
+  const funcoes=[carregarClientesSupabase,carregarEventosSupabase,carregarListaDiaSupabase,carregarHabitosSupabase,carregarVisitasSupabase,carregarEntregasSupabase,carregarPendenciasSupabase,carregarCentralComandoSupabase,carregarProximosPassosSupabase,carregarLancamentosSupabase,carregarContasPessoaisSupabase,carregarLiderancaSupabase,carregarPlanejamentoSupabase];
+  try{
+    const respostas=await Promise.allSettled(funcoes.map(f=>f()));
+    if(telaAtual==='central_integrada')renderTela();
+    const info=document.getElementById('v68-atualizacao');if(info)info.textContent=`Consulta concluída às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. ${respostas.some(r=>r.status==='rejected')?'Algumas áreas não responderam. Verifique sua conexão.':'Se houver dados ausentes, confira o login e as áreas de origem.'}`;
+  }catch(e){const info=document.getElementById('v68-atualizacao');if(info)info.textContent='Não foi possível atualizar. Verifique a conexão.';}
+  finally{V68_RECARREGANDO=false;if(botao)botao.disabled=false;}
+}
+function v66CentralHTML(){return `<div class="v66-wrap">${V66_TAB==='hoje'?'':`<div class="v66-intro"><h2>Central do meu dia</h2><p class="v66-muted">Abra “Meu dia” para ver tudo automaticamente. Use as outras abas apenas quando precisar de detalhes.</p></div>`}<div class="v66-tabs" role="tablist" aria-label="Central do dia">${Object.entries(V66_TABS).map(([k,v])=>`<button role="tab" aria-selected="${V66_TAB===k}" onclick="v66TrocarAba('${k}')">${v}</button>`).join('')}</div>${({hoje:v68HojeHTML,busca:v66BuscaHTML,prazos:v66PrazosHTML,financas:v66FinancasHTML,seguranca:v66SegurancaHTML})[V66_TAB]()}</div>`;}
 
 iniciarApp();
 </script>
