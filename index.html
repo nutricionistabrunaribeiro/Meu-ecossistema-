@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v80</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v81</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2459,6 +2459,37 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
  .v80-nutri-incluir button{min-height:43px;width:100%}
 }
 </style>
+<style id="v81-agenda-inteligente-compacta">
+.v74-inteligente.v81-inteligente{margin:10px 0 14px;padding:12px 14px;border-radius:17px;box-sizing:border-box;min-width:0;max-width:100%}
+.v81-inteligente .v81-topo{display:flex;align-items:center;gap:10px;min-width:0}
+.v81-inteligente .v81-icone{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--cor-primaria) 12%,var(--cor-superficie));color:var(--cor-primaria);font-size:20px}
+.v81-inteligente .v81-titulo{flex:1;min-width:0;display:grid;gap:3px}
+.v81-inteligente .v81-titulo strong{color:var(--cor-texto);font-size:13px;line-height:1.3}
+.v81-inteligente .v81-titulo span{font-size:11px;color:var(--cor-texto-suave);line-height:1.35;overflow-wrap:anywhere}
+.v81-inteligente .v81-abrir-planner{flex-shrink:0;border:1px solid var(--cor-borda);border-radius:10px;padding:8px 10px;background:var(--cor-superficie);color:var(--cor-primaria);font-size:11px;font-weight:750;cursor:pointer}
+.v81-inteligente .v81-resumo{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 0;padding:9px 11px;background:color-mix(in srgb,var(--cor-primaria) 6%,var(--cor-superficie));border-radius:10px;color:var(--cor-texto);font-size:11px;line-height:1.4}
+.v81-inteligente .v81-resumo strong{font-size:11.5px}
+.v81-inteligente .v81-resumo small{color:var(--cor-texto-suave);font-size:10px}
+.v81-inteligente .v81-detalhes{margin-top:9px;border-top:1px solid var(--cor-borda);padding-top:8px}
+.v81-inteligente .v81-detalhes>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;font-size:11.5px;font-weight:700;color:var(--cor-primaria);padding:3px 0}
+.v81-inteligente .v81-detalhes>summary::-webkit-details-marker{display:none}
+.v81-inteligente .v81-detalhes>summary::after{content:'⌄';font-size:17px;line-height:1;transition:transform .15s}
+.v81-inteligente .v81-detalhes[open]>summary::after{transform:rotate(180deg)}
+.v81-inteligente .v74-inteligente-lista{max-height:min(52dvh,440px);overflow-y:auto;overscroll-behavior:contain;margin-top:7px;padding:0 2px}
+.v81-inteligente .v74-inteligente-item{min-width:0;gap:8px;line-height:1.45}
+.v81-inteligente .v74-inteligente-item>span{min-width:0;overflow-wrap:anywhere}
+.v81-inteligente .v74-inteligente-item button{flex-shrink:0}
+@media(max-width:540px){
+ .v74-inteligente.v81-inteligente{padding:11px 10px}
+ .v81-inteligente .v81-icone{width:31px;height:31px;flex-basis:31px}
+ .v81-inteligente .v81-topo{gap:8px}
+ .v81-inteligente .v81-titulo strong{font-size:12px}
+ .v81-inteligente .v81-titulo span{font-size:10px}
+ .v81-inteligente .v81-abrir-planner{padding:8px 7px;font-size:10px}
+ .v81-inteligente .v81-resumo{padding:8px;margin-top:9px}
+ .v81-inteligente .v74-inteligente-item{font-size:11px}
+}
+</style>
 </head>
 <body data-espaco="trabalho">
 
@@ -3294,9 +3325,13 @@ function v77CoberturaMensal(mes=formatoISO(new Date()).slice(0,7)){
 function v74AgendaInteligenteHTML(){
  const mes=formatoISO(new Date()).slice(0,7),total=v77CoberturaMensal(mes);
  const sugestoes=CLIENTES.filter(c=>clienteAtivoV37(c)&&c.tipoCliente!=='contratante').map(c=>({c,meta:Number(c.visitasPrevistasMes||0)||Number(c.visitasPrevistasSemana||0)*4,cobertas:total.get(String(c.id))||0})).filter(x=>x.meta>x.cobertas).sort((a,b)=>(b.meta-b.cobertas)-(a.meta-a.cobertas)||a.c.nome.localeCompare(b.c.nome,'pt-BR'));
- return `<section class="v74-inteligente"><h3>✧ Agenda inteligente · cobertura da equipe</h3><p>${sugestoes.length?'Clientes que ainda não atingiram a programação mensal de visitas.':'As visitas previstas do mês estão cobertas, ou não há frequência definida para os clientes.'}</p>
- <div class="v77-inteligente-info"><span>${sugestoes.length} cliente(s) com visita(s) por programar · considera sua agenda, a equipe e os treinamentos.</span><button onclick="v77AbrirCronograma()">+ Planner da equipe</button></div>
- <div class="v74-inteligente-lista">${sugestoes.map(x=>`<div class="v74-inteligente-item"><span><strong>${textoHTML(x.c.nome)}</strong><br>${x.cobertas} de ${x.meta} visitas cobertas no mês</span><button class="btn-secundario" onclick="v77AbrirCronograma('${x.c.id}')">Programar</button></div>`).join('')}</div></section>`;
+ const porProgramar=sugestoes.reduce((s,x)=>s+x.meta-x.cobertas,0);
+ const mesLegivel=new Date(mes+'-15T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+ return `<section class="v74-inteligente v81-inteligente" aria-label="Agenda inteligente · cobertura mensal">
+ <div class="v81-topo"><div class="v81-icone" aria-hidden="true">✧</div><div class="v81-titulo"><strong>Agenda inteligente</strong><span>Organização das visitas · ${textoHTML(mesLegivel)}</span></div><button type="button" class="v81-abrir-planner" onclick="v77AbrirCronograma()">Abrir planner</button></div>
+ <div class="v81-resumo"><strong>${sugestoes.length?`${sugestoes.length} cliente(s) · ${porProgramar} visita(s) a programar`:'Programação mensal coberta ✓'}</strong><small>${sugestoes.length?'Mês em andamento · há tempo para organizar':'Sua agenda + equipe + treinamentos'}</small></div>
+ ${sugestoes.length?`<details class="v81-detalhes"><summary>Ver clientes e distribuir visitas</summary><div class="v74-inteligente-lista">${sugestoes.map(x=>`<div class="v74-inteligente-item"><span><strong>${textoHTML(x.c.nome)}</strong><br>${x.cobertas} de ${x.meta} visitas cobertas no mês</span><button class="btn-secundario" onclick="v77AbrirCronograma('${x.c.id}')">Programar</button></div>`).join('')}</div></details>`:''}
+ </section>`;
 }
 function v74AgendarVisita(clienteId){
  const data=visaoAgenda==='dia'?dataAgendaDiaria:formatoISO(new Date());abrirFormularioAgenda(data,9);
@@ -9023,7 +9058,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='80',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='81',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
