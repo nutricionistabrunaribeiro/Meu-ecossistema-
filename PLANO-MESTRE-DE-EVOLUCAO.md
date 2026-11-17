@@ -37,3 +37,14 @@ Solicitação de Bruna Ribeiro: incorporar o conjunto de melhorias propostas, co
 **V70 — pessoal e espiritual:** planejamento anual, evolução da Jornada Bíblica e devocionais anuais.
 
 Cada versão depende de testes e das permissões de banco necessárias. Não ativar restauração ou escrita em massa sem um backup verificado e aprovação da usuária.
+
+
+## Status revisado em 17/11/2026 — entrega v66
+
+- **Entregue v66:** Central Integrada, busca global local sobre dados carregados, filtros para clientes ativos, lista de vencimentos com antecedência, previsão de movimentos financeiros de 30 dias, diagnóstico de leitura autenticada e histórico local de validação estrutural de JSON.
+- **Pendente v67:** validação de sincronização por dados reais entre dois aparelhos, lixeira por entidade (antes modelar exclusão lógica) e auditoria de histórico.
+- **Pendente v68:** regras de notificações e entregas no servidor, pesquisa global no backend para alto volume e sincronização offline completa.
+- **Pendente v69:** consolidação dos relatórios profissionais, evidências e simulador financeiro por cenários.
+- **Pendente v70:** refinamentos do plano de vida, devocionais e revisão final de usabilidade; teste e pacote mestre com inventário de dependências.
+
+Não tratar o plano como implementação. Não fazer restauração em produção antes de teste separado.
