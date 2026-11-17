@@ -2134,6 +2134,34 @@ body.v38-sem-rolagem{overflow:hidden!important}
 .v69-dia-contadores .v11-kpi strong{font-size:24px}
 .v69-dia .v68-section{margin-top:0}
 @media(max-width:600px){.v69-dia-contadores{gap:7px}.v69-dia-contadores .v11-kpi{padding:11px 9px}.v69-dia-contadores .v11-kpi strong{font-size:21px}}
+/* V70: resumo em um unico card, sem lista duplicada nem alterar atalhos existentes. */
+.v70-dia{padding:19px 21px!important;display:grid;gap:13px;min-width:0}
+.v70-dia-cabecalho{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.v70-dia-data{font-size:11px;letter-spacing:.03em;color:var(--cor-texto-suave);text-transform:capitalize}
+.v70-dia h3{font-family:Fraunces,Georgia,serif;font-size:22px;margin:4px 0 4px!important;color:var(--cor-texto)}
+.v70-dia h3 span{font:400 12px system-ui,sans-serif;opacity:.7}
+.v70-dia p{font-size:12px;line-height:1.45;color:var(--cor-texto-suave);margin:0}
+.v70-dia-atualizar{border:1px solid var(--cor-borda);border-radius:50%;width:38px;height:38px;min-width:38px;background:color-mix(in srgb,var(--cor-primaria) 10%,transparent);color:var(--cor-texto);font-size:19px;cursor:pointer}
+.v70-dia-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.v70-dia-atalho{position:relative;display:flex;align-items:center;gap:9px;border:1px solid var(--cor-borda);border-radius:15px;padding:11px 13px;background:color-mix(in srgb,var(--cor-primaria) 8%,transparent);color:var(--cor-texto);cursor:pointer;min-width:0;text-align:left}
+.v70-dia-atalho>span:first-child{font-size:18px;color:var(--cor-primaria)}
+.v70-dia-atalho strong{font-size:21px;font-weight:650}
+.v70-dia-atalho small{font-size:11px;color:var(--cor-texto-suave)}
+.v70-dia-seta{margin-left:auto;opacity:.55;font-size:12px}
+.v70-dia-atalho:hover,.v70-dia-atalho:focus-visible{border-color:var(--cor-primaria);outline-offset:3px}
+.v70-dia-nota{font-size:10px;color:var(--cor-texto-suave)}
+@media(max-width:600px){.v70-dia{padding:14px!important}.v70-dia-grid{gap:6px}.v70-dia-atalho{padding:10px 7px;flex-wrap:wrap;gap:3px 6px;justify-content:center;text-align:center}.v70-dia-atalho strong{font-size:19px}.v70-dia-atalho small{flex-basis:100%}.v70-dia-seta{display:none}}
+/* Cinco novas paletas discretas, em claro e escuro, no mesmo acabamento Glass. */
+html[data-paleta-v04="vinho"]{--tema-fundo:#281924;--tema-superficie:#412939;--tema-borda:#684758;--tema-primaria:#dca2b4;--tema-clara:#e7bccb;--tema-acento:#d2b8ac;--tema-texto:#faeef2;--tema-suave:#dac6d0;--v35-primaria-clara:#8e405d}
+html[data-paleta-v04="nude"]{--tema-fundo:#302627;--tema-superficie:#4b3a3c;--tema-borda:#735b5d;--tema-primaria:#e2b5a9;--tema-clara:#f3d5ca;--tema-acento:#d4bdad;--tema-texto:#fcf1ed;--tema-suave:#e1cac2;--v35-primaria-clara:#976b70}
+html[data-paleta-v04="ardosia"]{--tema-fundo:#222c3a;--tema-superficie:#344355;--tema-borda:#52657a;--tema-primaria:#b3c6de;--tema-clara:#d0ddec;--tema-acento:#d9bfc9;--tema-texto:#f0f4f9;--tema-suave:#c8d4e0;--v35-primaria-clara:#526b88}
+html[data-paleta-v04="perola"]{--tema-fundo:#302a36;--tema-superficie:#49404d;--tema-borda:#726675;--tema-primaria:#d9c9d8;--tema-clara:#ece1eb;--tema-acento:#dfc5b0;--tema-texto:#f7f2f6;--tema-suave:#dcd0dc;--v35-primaria-clara:#806b87}
+html[data-paleta-v04="grafite"]{--tema-fundo:#24252d;--tema-superficie:#383943;--tema-borda:#5b5b68;--tema-primaria:#c8b6cb;--tema-clara:#e0d5e2;--tema-acento:#d7bfaa;--tema-texto:#f7f4f6;--tema-suave:#d0cbd2;--v35-primaria-clara:#77617e}
+html[data-paleta-v04="vinho"][data-tema-interface="claro"]{--tema-fundo:#faf1f2;--tema-superficie:#f1e2e6;--tema-borda:#dac1ca;--tema-primaria:#8e405d;--tema-clara:#c99cab;--tema-acento:#85576b;--tema-texto:#36252f;--tema-suave:#725b65}
+html[data-paleta-v04="nude"][data-tema-interface="claro"]{--tema-fundo:#fcf5f0;--tema-superficie:#f3e9e3;--tema-borda:#dfcbc3;--tema-primaria:#976b70;--tema-clara:#dbb5aa;--tema-acento:#916d65;--tema-texto:#403031;--tema-suave:#796364}
+html[data-paleta-v04="ardosia"][data-tema-interface="claro"]{--tema-fundo:#f1f4f8;--tema-superficie:#e6ebf1;--tema-borda:#c8d3df;--tema-primaria:#526b88;--tema-clara:#a8bacf;--tema-acento:#6b6e86;--tema-texto:#263545;--tema-suave:#5d6c7d}
+html[data-paleta-v04="perola"][data-tema-interface="claro"]{--tema-fundo:#faf8fa;--tema-superficie:#f0ebf1;--tema-borda:#ded2e0;--tema-primaria:#806b87;--tema-clara:#d2bfd2;--tema-acento:#806f7b;--tema-texto:#342e3b;--tema-suave:#6a5f70}
+html[data-paleta-v04="grafite"][data-tema-interface="claro"]{--tema-fundo:#f4f3f6;--tema-superficie:#e8e6eb;--tema-borda:#d1cbd4;--tema-primaria:#77617e;--tema-clara:#c1b4c5;--tema-acento:#806c79;--tema-texto:#302c35;--tema-suave:#69616e}
 .v68-empty{padding:15px;background:var(--cor-superficie);border:1px dashed var(--cor-borda);border-radius:12px;font-size:12px;color:var(--cor-texto-suave)}
 .v68-urgent{border-left:4px solid #A54A55}
 .v68-today{border-left:4px solid var(--cor-primaria)}
@@ -6124,7 +6152,7 @@ function aplicarTemaInterface(escolha=preferenciaTemaInterface()){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=escuro?'#271c27':'#f6f1ee';
   const botao=document.getElementById('themeToggle');if(botao){botao.textContent=escuro?'☀':'☾';botao.title=escuro?'Usar modo claro':'Usar modo escuro';}
 }
-function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
+function selecionarPaletaV04(id){const permitidas=['lavanda','aurora','jardim','rose','oceano','ametista','terra','marsala','vinho','nude','ardosia','perola','grafite'];if(!permitidas.includes(id))return;localStorage.setItem('me-paleta-v04',id);document.documentElement.dataset.paletaV04=id;document.querySelectorAll('.tema-v04').forEach(b=>{const ativa=b.getAttribute('onclick')?.includes("'"+id+"'");b.classList.toggle('ativo',!!ativa);b.setAttribute('aria-pressed',String(!!ativa));});w47AgendarPreferencias();}
 document.documentElement.dataset.paletaV04=localStorage.getItem('me-paleta-v04')||'lavanda';
 // V35: um so acabamento de vidro, sem opcoes visuais concorrentes.
 const V25_ESTILOS=['liquidpremium'];
@@ -6220,7 +6248,7 @@ function configChecklistsHTML(){
 function configTemaHTML(){
   const temaEscolhido=preferenciaTemaInterface();
   return `
-    <div class="config-secao"><h4>Suas paletas</h4><div class="config-linha-desc">Escolha a cor que combina com seu momento. Todas utilizam o mesmo Liquid Glass e funcionam em modo claro e escuro.</div><div class="temas-v04 v35-paletas">${[['marsala','Marsala · Champagne · Rosa seco',['#93435d','#e6d2bb','#c89bab']],['lavanda','Lavanda Noturna',['#8d72b3','#d5c3e7','#e4d2bc']],['aurora','Aurora',['#6099b7','#b7d6ea','#e5d7ca']],['jardim','Jardim Secreto',['#548c70','#b8dcc6','#e3d6bb']],['rose','Rosé',['#b36987','#ebc0cd','#e8d7cb']],['oceano','Oceano',['#4c8c9c','#badfe0','#e0d7ca']],['ametista','Ametista',['#8362b2','#dbc8ec','#e6d4c8']],['terra','Terra Dourada',['#9a7450','#e7cca6','#eadbc9']]].map(([id,nome,cores])=>`<button type="button" class="tema-v04 ${document.documentElement.dataset.paletaV04===id?'ativo':''}" aria-pressed="${document.documentElement.dataset.paletaV04===id}" onclick="selecionarPaletaV04('${id}')"><span class="v35-amostras">${cores.map(c=>`<i style="background:${c}"></i>`).join('')}</span><strong>${nome}</strong></button>`).join('')}</div></div>
+    <div class="config-secao"><h4>Suas paletas</h4><div class="config-linha-desc">Escolha a cor que combina com seu momento. Todas utilizam o mesmo Liquid Glass e funcionam em modo claro e escuro.</div><div class="temas-v04 v35-paletas">${[['marsala','Marsala · Champagne · Rosa seco',['#93435d','#e6d2bb','#c89bab']],['lavanda','Lavanda Noturna',['#8d72b3','#d5c3e7','#e4d2bc']],['aurora','Aurora',['#6099b7','#b7d6ea','#e5d7ca']],['jardim','Jardim Secreto',['#548c70','#b8dcc6','#e3d6bb']],['rose','Rosé',['#b36987','#ebc0cd','#e8d7cb']],['oceano','Oceano',['#4c8c9c','#badfe0','#e0d7ca']],['ametista','Ametista',['#8362b2','#dbc8ec','#e6d4c8']],['terra','Terra Dourada',['#9a7450','#e7cca6','#eadbc9']],['vinho','Vinho & Blush',['#8e405d','#c99cab','#e9d7dc']],['nude','Nude Elegante',['#976b70','#dbb5aa','#f3e9e3']],['ardosia','Azul Ardósia',['#526b88','#a8bacf','#e6ebf1']],['perola','Pérola Lilás',['#806b87','#d2bfd2','#f0ebf1']],['grafite','Grafite Rosé',['#77617e','#c1b4c5','#e8e6eb']]].map(([id,nome,cores])=>`<button type="button" class="tema-v04 ${document.documentElement.dataset.paletaV04===id?'ativo':''}" aria-pressed="${document.documentElement.dataset.paletaV04===id}" onclick="selecionarPaletaV04('${id}')"><span class="v35-amostras">${cores.map(c=>`<i style="background:${c}"></i>`).join('')}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao"><h4>Modo de exibição</h4><div class="config-linha-desc">Claro e Escuro são duas versões reais de cada paleta. O modo Automático segue a aparência do seu dispositivo.</div><div class="theme-options">${[['claro','☀','Claro'],['escuro','☾','Escuro'],['automatico','◐','Automático']].map(([id,icone,nome])=>`<button type="button" class="theme-option ${temaEscolhido===id?'active':''}" onclick="definirTemaInterface('${id}')"><span>${icone}</span><strong>${nome}</strong></button>`).join('')}</div></div>
     <div class="config-secao v35-estilo-unico"><h4>Liquid Glass</h4><div class="config-linha-desc">Estilo único, com transparência intensa e bordas delicadas em todas as telas. Para renovar o visual, troque a paleta ou alterne entre Claro e Escuro.</div><div class="v35-vidro-selo"><span class="v35-vidro-icone">✧</span><div><strong>Liquid Glass Premium</strong><small>Ativo em todas as paletas</small></div><span class="v35-vidro-check" aria-label="Ativo">✓</span></div></div>
     <div class="config-secao"><h4>Aplicativo no celular</h4><div class="config-linha"><div><div class="config-linha-label">Instalar Meu Ecossistema</div><div class="config-linha-desc">Instala o atalho do aplicativo neste dispositivo.</div></div><button class="btn-primario" onclick="instalarPWA()">Instalar aplicativo</button></div></div>
@@ -7316,8 +7344,8 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
- ${v69VisaoDiaHTML()}
  ${v44ResumoCards()}
+ ${v69VisaoDiaHTML()}
  <div class="v11-kpis">
  ${resumo('▣','Projetos ativos',projetos.filter(p=>p.status!=='finalizado').length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
@@ -8026,7 +8054,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='69',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='70',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -8388,15 +8416,14 @@ function v68HojeHTML(){
   ${concluidos.length?`<details class="v66-panel"><summary style="cursor:pointer;font-size:13px;font-weight:650">Concluídos no dia (${concluidos.length})</summary>${concluidos.map(x=>`<div class="v66-entry"><div><strong>✓ ${v66Esc(x.titulo)}</strong><small>${v66Esc(x.detalhe)}</small></div></div>`).join('')}</details>`:''}`;
 }
 function v69VisaoDiaHTML(){
-  const itens=v68ItensDia(),atrasados=itens.filter(r=>r.dias<0),hoje=itens.filter(r=>r.dias===0),proximos=itens.filter(r=>r.dias>0);
+  const itens=v68ItensDia(),dia=v66Hoje();
+  const agenda=itens.filter(r=>r.grupo==='agenda'&&r.dias===0).length;
+  const tarefas=itens.filter(r=>r.dias===0&&r.grupo==='lista').length;
+  const atencao=itens.filter(r=>r.dias<0).length;
+  const proximo=eventosSemana.filter(e=>e.dataISO===dia&&!e.concluido).sort((a,b)=>String(a.hora||'').localeCompare(String(b.hora||'')))[0];
   const data=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
-  const indicador=(rotulo,numero)=>`<div class="v11-kpi"><span class="v11-kpi-label">${rotulo}</span><strong>${numero}</strong></div>`;
-  return `<section class="v69-dia" aria-label="Meu dia automático"><div class="v69-dia-top"><div><small style="color:var(--cor-texto-suave)">${v66Esc(data)}</small><h2>Meu dia</h2><span style="font-size:12px;color:var(--cor-texto-suave)">Atualizado com as informações do seu Ecossistema</span></div><button class="btn-secundario" onclick="v68RecarregarDados(this)">↻ Atualizar</button></div>
-  <div class="v69-dia-contadores">${indicador('Para hoje',hoje.length)}${indicador('Atrasados',atrasados.length)}${indicador('Próximos 7 dias',proximos.length)}</div>
-  ${v68SecaoHTML('Minha programação de hoje',hoje,'Tudo em dia por aqui. Nenhuma tarefa ou compromisso aberto.',6)}
-  ${atrasados.length?v68SecaoHTML('Precisam da minha atenção',atrasados,'',5):''}
-  ${proximos.length?`<details class="v66-panel"><summary style="cursor:pointer;font-weight:650">Próximos 7 dias (${proximos.length})</summary>${v68SecaoHTML('O que vem pela frente',proximos,'',6)}</details>`:''}
-  <div id="v68-atualizacao" role="status" style="font-size:11px;color:var(--cor-texto-suave)">Informações da última sincronização.</div></section>`;
+  const indicador=(icone,rotulo,numero,acao)=>`<button class="v70-dia-atalho" onclick="${acao}"><span aria-hidden="true">${icone}</span><strong>${numero}</strong><small>${rotulo}</small><span class="v70-dia-seta" aria-hidden="true">↗</span></button>`;
+  return `<section class="v70-dia card" aria-label="Resumo automático de hoje"><div class="v70-dia-cabecalho"><div><div class="v70-dia-data">${v66Esc(data)}</div><h3>✦ Meu dia <span>· em um olhar</span></h3><p>${proximo?'Próximo compromisso: '+v66Esc(proximo.titulo):atencao?'Há assuntos que merecem sua atenção.':'Seu dia, do seu jeito. Tudo em um só lugar.'}</p></div><button class="v70-dia-atualizar" onclick="v68RecarregarDados(this)" aria-label="Atualizar resumo do dia">↻</button></div><div class="v70-dia-grid">${indicador('▦','Agenda',agenda,"irPara('agenda')")}${indicador('✓','Tarefas',tarefas,"abrirListaDia()")}${indicador('◈','Atenção',atencao,"abrirDashboardGlobal()")}</div><span class="v70-dia-nota" id="v68-atualizacao" role="status">Os números vêm dos registros do seu Ecossistema.</span></section>`;
 }
 let V68_RECARREGANDO=false;
 async function v68RecarregarDados(botao){
