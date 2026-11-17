@@ -2126,6 +2126,14 @@ body.v38-sem-rolagem{overflow:hidden!important}
 .v68-section{margin-top:14px}
 .v68-section h3{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 9px;font-size:15px}
 .v68-section h3 span{font-family:inherit;font-size:11px;color:var(--cor-texto-suave);font-weight:500}
+.v69-dia{display:grid;gap:13px}
+.v69-dia-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.v69-dia-top h2{margin:3px 0 0;font-size:21px;color:var(--cor-texto)}
+.v69-dia-contadores{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.v69-dia-contadores .v11-kpi{min-width:0;cursor:default;text-align:left}
+.v69-dia-contadores .v11-kpi strong{font-size:24px}
+.v69-dia .v68-section{margin-top:0}
+@media(max-width:600px){.v69-dia-contadores{gap:7px}.v69-dia-contadores .v11-kpi{padding:11px 9px}.v69-dia-contadores .v11-kpi strong{font-size:21px}}
 .v68-empty{padding:15px;background:var(--cor-superficie);border:1px dashed var(--cor-borda);border-radius:12px;font-size:12px;color:var(--cor-texto-suave)}
 .v68-urgent{border-left:4px solid #A54A55}
 .v68-today{border-left:4px solid var(--cor-primaria)}
@@ -2462,7 +2470,6 @@ function renderSidebar(){
       </div>
     </div>
     <div style="padding:8px 12px"><button class="${telaAtual==='visao_geral'?'active':''}" style="width:100%;padding:11px;border-radius:9px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card);color:var(--cor-texto);cursor:pointer" onclick="abrirVisaoGeral()">◈ Visão Geral</button></div>
-    <div class="v40-global-dashboard"><button class="${telaAtual==='central_integrada'?'active':''}" onclick="irPara('central_integrada')">☷ &nbsp; Meu dia · automático</button></div>
     <div class="v40-global-dashboard"><button class="${telaAtual==='dashboard'?'active':''}" onclick="abrirDashboardGlobal()">▥ &nbsp; Dashboard geral</button></div>
     <div class="v12-global-settings"><button class="${telaAtual==='configuracoes'?'active':''}" onclick="abrirConfiguracoesGlobais()">⚙ &nbsp; Configurações gerais</button></div>
     <div class="space-switch">
@@ -2647,7 +2654,7 @@ function trocarEspaco(esp){
 
 function irPara(id){
   if(['pendencias','obrigacoes'].includes(id)) id='dashboard';
-  if(id==='central_integrada') V66_TAB='hoje';
+  if(id==='central_integrada'){abrirVisaoGeral();return;}
   if(id==='dashboard'){abrirDashboardGlobal();return;}
   if(modoConsultaOffline&&id!=='visitas'){alert('Sem conexão, continue os checklists já preparados neste aparelho. As outras áreas precisam de internet.');return;}
   telaAtual = id;
@@ -5088,6 +5095,15 @@ async function excluirProjetoSeguro(id){
  PROJETOS=PROJETOS.filter(x=>x.id!==id);projetoSelecionadoId=null;renderSidebar();renderTela();
 }
 
+async function alterarStatusProjeto(id){
+ const p=PROJETOS.find(x=>x.id===id);if(!p)return;
+ const finalizado=p.status==='finalizado',novo=finalizado?'ativo':'finalizado';
+ if(!confirm(finalizado?`Reativar o projeto "${p.nome}"?`:`Finalizar o projeto "${p.nome}"? Ele sairá do painel de projetos ativos, mas todo o histórico será preservado.`))return;
+ const {data,error}=await supa.from('projetos').update({status:novo,atualizado_em:new Date().toISOString()}).eq('id',id).select('id,status');
+ if(error||!data?.length){dispararAutomacao('Não foi possível atualizar o projeto',error?.message||'O banco não confirmou a alteração.');return;}
+ p.status=data[0].status;renderTela();
+}
+
 async function alternarChecklistProjeto(projId, etapaId, idx){
   const p = PROJETOS.find(x=>x.id===projId);
   const et = p.etapas.find(e=>e.id===etapaId);
@@ -5188,23 +5204,18 @@ function projetosHTML(){
     return fichaProjetoHTML(PROJETOS.find(p=>p.id===projetoSelecionadoId));
   }
   const projetos=PROJETOS.filter(p=>espacoAtual==='pessoal'?p.categoria==='pessoal':p.categoria!=='pessoal');
+  const ativos=projetos.filter(p=>p.status!=='finalizado'),finalizados=projetos.filter(p=>p.status==='finalizado');
+  const cartoes=lista=>lista.map(p=>{
+    const perc=progressoProjeto(p);
+    return `<div class="projeto-card" onclick="abrirProjeto('${p.id}')"><div class="projeto-card-nome">${textoHTML(p.nome)}</div><div class="projeto-card-cliente">${p.categoria==='pessoal'?'Pessoal'+(p.dataFim?' · até '+dataBR(p.dataFim):''):textoHTML(p.cliente||'')}</div><div class="proj-barra"><div style="width:${perc}%;"></div></div><div class="projeto-card-perc">${perc}% concluído ${p.status==='finalizado'?'· Finalizado':''}</div></div>`;
+  }).join('');
   return `
     <div class="projetos-topo">
-      <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${projetos.length} projeto(s) ${espacoAtual==='pessoal'?'pessoal(is)':'de clientes'}</div>
+      <div class="peq" style="color:var(--cor-texto-suave);font-size:12.5px;">${ativos.length} ativo(s) · ${finalizados.length} finalizado(s)</div>
       <button class="btn-novo-projeto" onclick="novoProjeto()">+ Novo projeto</button>
     </div>
-    <div class="projetos-grid">
-      ${projetos.map(p=>{
-        const perc = progressoProjeto(p);
-        return `
-        <div class="projeto-card" onclick="abrirProjeto('${p.id}')">
-          <div class="projeto-card-nome">${p.nome}</div>
-          <div class="projeto-card-cliente">${p.categoria==='pessoal'?'Pessoal'+(p.dataFim?' · até '+dataBR(p.dataFim):''):p.cliente}</div>
-          <div class="proj-barra"><div style="width:${perc}%;"></div></div>
-          <div class="projeto-card-perc">${perc}% concluído ${p.status!=='ativo'?'· '+p.status:''}</div>
-        </div>`;
-      }).join('')||semRegistro()}
-    </div>`;
+    <h3 style="margin:14px 0 10px">Projetos ativos</h3><div class="projetos-grid">${cartoes(ativos)||semRegistro()}</div>
+    ${finalizados.length?`<details style="margin-top:22px"><summary style="cursor:pointer;font-weight:650">Projetos finalizados (${finalizados.length})</summary><div class="projetos-grid" style="margin-top:12px">${cartoes(finalizados)}</div></details>`:''}`;
 }
 
 function fichaProjetoHTML(p){
@@ -5212,7 +5223,7 @@ function fichaProjetoHTML(p){
   const perc = progressoProjeto(p);
   const total=itensProjeto(p).length,feitos=itensProjeto(p).filter(i=>i.c).length;
   return `
-    <button class="ficha-voltar" onclick="voltarProjetos()">← Voltar para Projetos</button><button class="btn-secundario" style="float:right;color:#B0413E" onclick="excluirProjetoSeguro('${p.id}')">Excluir projeto</button>
+    <button class="ficha-voltar" onclick="voltarProjetos()">← Voltar para Projetos</button><div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn-secundario" onclick="alterarStatusProjeto('${p.id}')">${p.status==='finalizado'?'↻ Reativar projeto':'✓ Finalizar projeto'}</button><button class="btn-secundario" style="color:#B0413E" onclick="excluirProjetoSeguro('${p.id}')">Excluir projeto</button></div>
     <div class="ficha-cabecalho">
       <div class="ficha-ini">${iniciais(p.nome)}</div>
       <div>
@@ -7305,9 +7316,10 @@ function visaoGeralHTML(){
  const resumo=(icone,titulo,valor,rota)=>`<button class="v11-kpi" onclick="${rota}"><span class="v11-kpi-icon">${icone}</span><span class="v11-kpi-label">${titulo}</span><strong>${valor}</strong><small>Ver detalhes →</small></button>`;
  const atalho=(icone,titulo,sub,esp,id)=>`<button class="v11-link v15-link-${id}" onclick="trocarEspaco('${esp}');irPara('${id}')"><span class="v11-link-icon">${icone}</span><span><strong>${titulo}</strong><small>${sub}</small></span><span class="v11-arrow">→</span></button>`;
  return `<div class="v11-overview">
+ ${v69VisaoDiaHTML()}
  ${v44ResumoCards()}
  <div class="v11-kpis">
- ${resumo('▣','Projetos',projetos.length,"trocarEspaco('trabalho');irPara('projetos')")}
+ ${resumo('▣','Projetos ativos',projetos.filter(p=>p.status!=='finalizado').length,"trocarEspaco('trabalho');irPara('projetos')")}
  ${resumo('✓','Tarefas de hoje',tarefas.filter(t=>!t.concluido).length,"trocarEspaco('pessoal');irPara('lista_dia')")}
  ${resumo('◷','Pendências',pend.filter(t=>t.status!=='concluida').length,"trocarEspaco('trabalho');irPara('pendencias')")}
  ${resumo('☾','Média de sono',media,"trocarEspaco('pessoal');irPara('sono')")}
@@ -7612,6 +7624,7 @@ function dashboardHTML(){
   return `
   <section class="dashboard-hoje"><div class="hoje-chamada"><div class="hoje-eyebrow">Central de comando · hoje</div><div class="hoje-titulo">${atencaoAgora}</div><div class="hoje-sub">${proximoEvento?'Próximo compromisso às '+proximoEvento.hora+':00':'Veja abaixo tudo que merece sua atenção.'}</div></div><div class="hoje-metrica"><strong>${totalHoje-concluidosHoje}</strong><span>compromissos restantes</span></div><div class="hoje-metrica"><strong>${entregasAtrasadas}</strong><span>entregas atrasadas</span></div><div class="hoje-metrica"><strong>${checklistsRascunho}</strong><span>checklists em andamento</span></div></section>
   <div class="v09-atividade-destaque">${controleHorasDashboardHTML()}</div>
+  ${calendarioDocumentacoesDashboardHTML()}
   <div class="grid dashboard-grid">
     <div class="card card-destaque dash-arco">
       <h3>Arco do dia</h3>
@@ -7650,8 +7663,6 @@ function dashboardHTML(){
       <ul class="pend-list">${entregasAbertas.slice(0,3).map(e=>`<li>${e.titulo} <span class="tag" style="color:${e.prazo<hoje?'#B0413E':'var(--cor-texto-suave)'}">${dataBR(e.prazo)}</span></li>`).join('')||'<li style="color:var(--cor-texto-suave)">Nenhuma entrega pendente.</li>'}</ul>
     </div>
 
-    ${calendarioDocumentacoesDashboardHTML()}
-
     <div class="card dash-radar" style="border-top:4px solid var(--cor-acento)">
       <h3>Radar do mês <button onclick="irPara('planejamento')">abrir planejamento</button></h3>
       <div class="pend-num">${(()=>{const anterior=planejamentoMesOffset;planejamentoMesOffset=0;const m=metricasFechamento();planejamentoMesOffset=anterior;return m.check.pendentes+m.vinc.filter(v=>v.status!=='entregue').length+PROXIMOS_PASSOS_CLIENTE.filter(p=>p.status!=='concluido'&&p.prazo?.startsWith(m.pref)).length})()}</div>
@@ -7678,7 +7689,7 @@ function dashboardHTML(){
 
     <div class="card dash-projetos">
       <h3>Projetos ativos <button onclick="irPara('projetos')">ver tudo</button></h3>
-      ${projetosAtivos.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum projeto cadastrado ainda.</div>` :
+      ${projetosAtivos.length===0 ? `<div style="color:var(--cor-texto-suave);font-size:13px;">Nenhum projeto ativo no momento.</div>` :
         projetosAtivos.map(p=>{
           const total = p.etapas.reduce((s,e)=>s+e.checklist.length,0);
           const feitos = p.etapas.reduce((s,e)=>s+e.checklist.filter(i=>i.c).length,0);
@@ -8015,7 +8026,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='68',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='69',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
@@ -8376,6 +8387,17 @@ function v68HojeHTML(){
   ${proximos.length?v68SecaoHTML('Nos próximos 7 dias',proximos,'Sem novos vencimentos nos próximos dias.',8):''}
   ${concluidos.length?`<details class="v66-panel"><summary style="cursor:pointer;font-size:13px;font-weight:650">Concluídos no dia (${concluidos.length})</summary>${concluidos.map(x=>`<div class="v66-entry"><div><strong>✓ ${v66Esc(x.titulo)}</strong><small>${v66Esc(x.detalhe)}</small></div></div>`).join('')}</details>`:''}`;
 }
+function v69VisaoDiaHTML(){
+  const itens=v68ItensDia(),atrasados=itens.filter(r=>r.dias<0),hoje=itens.filter(r=>r.dias===0),proximos=itens.filter(r=>r.dias>0);
+  const data=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  const indicador=(rotulo,numero)=>`<div class="v11-kpi"><span class="v11-kpi-label">${rotulo}</span><strong>${numero}</strong></div>`;
+  return `<section class="v69-dia" aria-label="Meu dia automático"><div class="v69-dia-top"><div><small style="color:var(--cor-texto-suave)">${v66Esc(data)}</small><h2>Meu dia</h2><span style="font-size:12px;color:var(--cor-texto-suave)">Atualizado com as informações do seu Ecossistema</span></div><button class="btn-secundario" onclick="v68RecarregarDados(this)">↻ Atualizar</button></div>
+  <div class="v69-dia-contadores">${indicador('Para hoje',hoje.length)}${indicador('Atrasados',atrasados.length)}${indicador('Próximos 7 dias',proximos.length)}</div>
+  ${v68SecaoHTML('Minha programação de hoje',hoje,'Tudo em dia por aqui. Nenhuma tarefa ou compromisso aberto.',6)}
+  ${atrasados.length?v68SecaoHTML('Precisam da minha atenção',atrasados,'',5):''}
+  ${proximos.length?`<details class="v66-panel"><summary style="cursor:pointer;font-weight:650">Próximos 7 dias (${proximos.length})</summary>${v68SecaoHTML('O que vem pela frente',proximos,'',6)}</details>`:''}
+  <div id="v68-atualizacao" role="status" style="font-size:11px;color:var(--cor-texto-suave)">Informações da última sincronização.</div></section>`;
+}
 let V68_RECARREGANDO=false;
 async function v68RecarregarDados(botao){
   if(V68_RECARREGANDO)return;V68_RECARREGANDO=true;if(botao)botao.disabled=true;
@@ -8383,7 +8405,7 @@ async function v68RecarregarDados(botao){
   const funcoes=[carregarClientesSupabase,carregarEventosSupabase,carregarListaDiaSupabase,carregarHabitosSupabase,carregarVisitasSupabase,carregarEntregasSupabase,carregarPendenciasSupabase,carregarCentralComandoSupabase,carregarProximosPassosSupabase,carregarLancamentosSupabase,carregarContasPessoaisSupabase,carregarLiderancaSupabase,carregarPlanejamentoSupabase];
   try{
     const respostas=await Promise.allSettled(funcoes.map(f=>f()));
-    if(telaAtual==='central_integrada')renderTela();
+    if(telaAtual==='central_integrada'||telaAtual==='visao_geral')renderTela();
     const info=document.getElementById('v68-atualizacao');if(info)info.textContent=`Consulta concluída às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. ${respostas.some(r=>r.status==='rejected')?'Algumas áreas não responderam. Verifique sua conexão.':'Se houver dados ausentes, confira o login e as áreas de origem.'}`;
   }catch(e){const info=document.getElementById('v68-atualizacao');if(info)info.textContent='Não foi possível atualizar. Verifique a conexão.';}
   finally{V68_RECARREGANDO=false;if(botao)botao.disabled=false;}
