@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v81</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v83</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2489,6 +2489,51 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
  .v81-inteligente .v81-resumo{padding:8px;margin-top:9px}
  .v81-inteligente .v74-inteligente-item{font-size:11px}
 }
+</style>
+<style id="v82-treinamentos-vencidos">
+.v76-supervisao .v73-metrica.v82-metrica-abrir{position:relative;appearance:none;width:100%;font:inherit;cursor:pointer;color:inherit;transition:border-color .16s,box-shadow .16s,transform .16s}
+.v76-supervisao .v73-metrica.v82-metrica-abrir:hover{border-color:var(--cor-primaria);box-shadow:0 5px 18px rgba(0,0,0,.07);transform:translateY(-1px)}
+.v76-supervisao .v73-metrica.v82-metrica-abrir:focus-visible{outline:3px solid var(--cor-primaria);outline-offset:3px}
+.v76-supervisao .v73-metrica.v82-metrica-abrir>small{font-weight:700;color:var(--cor-primaria)}
+.v82-detalhes-vencidos .system-modal-head{align-items:flex-start}
+.v82-detalhes-vencidos .system-modal-head h2{font-size:clamp(21px,4vw,26px);line-height:1.15}
+.v82-detalhes-vencidos .system-modal-head p{font-size:12px;line-height:1.5}
+.v82-treinos-lista{display:grid;gap:12px;max-height:min(58dvh,560px);overflow-y:auto;overscroll-behavior:contain;padding:2px 3px 3px 0}
+.v82-treino-vencido{min-width:0;background:var(--cor-fundo);border:1px solid var(--cor-borda);border-radius:16px;padding:15px}
+.v82-treino-vencido-topo{display:flex;align-items:flex-start;gap:10px}
+.v82-treino-vencido-numero{flex:0 0 auto;display:grid;place-items:center;width:29px;height:29px;border-radius:10px;background:color-mix(in srgb,#a14352 11%,var(--cor-superficie));color:#a14352;font-size:12px;font-weight:800}
+.v82-treino-vencido-titulo{min-width:0;flex:1;display:grid;gap:5px}
+.v82-treino-vencido-titulo strong{color:var(--cor-texto);font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.v82-treino-vencido-titulo span{font-size:12px;line-height:1.4;color:var(--cor-texto-suave);overflow-wrap:anywhere}
+.v82-treino-vencido-etiqueta{flex:0 0 auto;border-radius:999px;background:color-mix(in srgb,#a14352 12%,var(--cor-superficie));color:#a14352;padding:6px 8px;font-size:10px;font-weight:750}
+.v82-treino-vencido-datas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0 0}
+.v82-treino-vencido-datas>div{border-radius:11px;background:var(--cor-superficie);padding:10px 11px;min-width:0}
+.v82-treino-vencido-datas dt{font-size:10px;color:var(--cor-texto-suave);margin-bottom:5px}
+.v82-treino-vencido-datas dd{margin:0;color:var(--cor-texto);font-size:13px;font-weight:750}
+.v82-treino-vencido-datas>div:last-child dd{color:#a14352}
+.v82-treinos-vazio{padding:28px 12px;text-align:center;color:var(--cor-texto-suave);font-size:13px;line-height:1.6}
+@media(max-width:470px){#modalSistema:has(.v82-detalhes-vencidos){padding:9px}#modalSistema:has(.v82-detalhes-vencidos) .system-modal{padding:16px;max-height:calc(100dvh - 18px)}.v82-treino-vencido{padding:12px}.v82-treino-vencido-titulo strong{font-size:13px}.v82-treino-vencido-etiqueta{font-size:9px;padding:6px}.v82-treino-vencido-datas dd{font-size:12px}}
+</style>
+<style id="v83-vencidos-expansivel-sem-javascript">
+.v76-supervisao .v83-versao{display:inline-block;margin-left:7px;border:1px solid var(--cor-borda);border-radius:999px;padding:2px 8px;font:600 10px/1.5 Arial,sans-serif;vertical-align:middle;color:var(--cor-texto-suave)}
+.v76-supervisao .v83-vencidos-check{position:absolute;width:1px;height:1px;padding:0;margin:0;opacity:0;overflow:hidden;clip-path:inset(50%)}
+.v76-supervisao .v73-metricas{grid-auto-flow:row dense}
+.v76-supervisao .v83-metrica-vencidos{cursor:pointer;user-select:none;position:relative;transition:background .15s,box-shadow .15s,border-color .15s}
+.v76-supervisao .v83-metrica-vencidos:hover{border-color:var(--cor-primaria);box-shadow:0 6px 18px rgba(0,0,0,.065)}
+.v76-supervisao .v83-metrica-vencidos>small{color:var(--cor-primaria);font-weight:750}
+.v76-supervisao .v83-vencidos-check:focus-visible+.v73-metricas .v83-metrica-vencidos{outline:3px solid var(--cor-primaria);outline-offset:3px}
+.v76-supervisao .v83-vencidos-painel{display:none;grid-column:1/-1;min-width:0;border:1px solid var(--cor-borda);border-radius:18px;padding:14px;background:var(--cor-superficie);box-shadow:0 9px 30px rgba(0,0,0,.055)}
+.v76-supervisao .v83-vencidos-check:checked+.v73-metricas .v83-vencidos-painel{display:block}
+.v76-supervisao .v83-vencidos-check:checked+.v73-metricas .v83-metrica-vencidos{border-color:var(--cor-primaria);box-shadow:inset 0 0 0 1px var(--cor-primaria)}
+.v83-vencidos-titulo{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px}
+.v83-vencidos-titulo>div{min-width:0}
+.v83-vencidos-titulo h3{font-size:15px;color:var(--cor-texto);line-height:1.3;margin:0 0 4px}
+.v83-vencidos-titulo p{font-size:11px;line-height:1.4;color:var(--cor-texto-suave);margin:0}
+.v83-vencidos-fechar{flex:0 0 auto;cursor:pointer;border:1px solid var(--cor-borda);border-radius:11px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--cor-texto);background:var(--cor-fundo)}
+.v83-vencidos-painel .v82-treinos-lista{max-height:min(46dvh,400px);overflow-y:auto;overscroll-behavior:contain}
+.v83-vencidos-painel .v82-treino-vencido{background:var(--cor-fundo)}
+.v83-vencidos-painel .v82-treino-vencido-datas>div{background:var(--cor-superficie)}
+@media(max-width:470px){.v76-supervisao .v83-vencidos-painel{padding:11px}.v83-vencidos-titulo h3{font-size:13px}.v83-vencidos-fechar{font-size:10px;padding:7px 9px}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7505,14 +7550,28 @@ function v75PainelSupervisaoHTML(){
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Os detalhes ficam no resumo anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v83</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; o histórico completo fica no resumo anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
- <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
+ <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
+ <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
  <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · ${d.visitasProgramadas.length} visitas programadas · ${d.visitasEquipe.length} realizadas pela equipe · treinamentos aplicados também contam como visita.</p>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
  ${v78PlannerEquipeHTML()}
  <p class="v75-info">${v75NomeEscopo()} · ${d.ano} · Uma visita por treinamento aplicado, sem contar duas vezes a visita própria no mesmo cliente e dia.</p>
  </section>`;
+}
+function v83ListaTreinamentosVencidosHTML(treinamentos){
+ const vencidos=[...(treinamentos||[])].sort((a,b)=>String(a.validade||'').localeCompare(String(b.validade||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
+ if(!vencidos.length)return '<p class="v82-treinos-vazio">Nenhum treinamento vencido nesta carteira. ✓</p>';
+ return vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl></article>`).join('');
+}
+function v82AbrirTreinamentosVencidos(){
+ const dados=v76DadosSupervisao();
+ const vencidos=[...dados.treinamentosVencidos].sort((a,b)=>String(a.validade||'').localeCompare(String(b.validade||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
+ const total=vencidos.length;
+ const referencia=formatoISO(new Date())<String(dados.ano)+'-12-31'?formatoISO(new Date()):String(dados.ano)+'-12-31';
+ const linhas=vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl></article>`).join('');
+ abrirModalSistema(`<div class="v82-detalhes-vencidos"><div class="system-modal-head"><div><h2>Treinamentos vencidos</h2><p>${textoHTML(v75NomeEscopo(dados.escopo))} · Situação até ${textoHTML(dataBR(referencia))} · ${total} ${total===1?'treinamento':'treinamentos'}</p></div><button class="system-modal-close" onclick="fecharModalSistema()" aria-label="Fechar detalhes">✕</button></div><div class="v82-treinos-lista" aria-label="Lista de treinamentos vencidos">${linhas||'<p class="v82-treinos-vazio">Nenhum treinamento vencido nessa carteira. As reciclagens mais recentes já estão consideradas. ✓</p>'}</div><div class="system-modal-actions"><button class="btn-primario" onclick="fecharModalSistema()">Fechar</button></div></div>`);
 }
 function v76OcultarResumoLegado(){
  if(typeof telaAtual==='undefined'||telaAtual!=='entregas'||typeof document==='undefined')return;
@@ -9058,7 +9117,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='81',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='83',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
