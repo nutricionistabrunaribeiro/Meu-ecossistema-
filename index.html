@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v83</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v84</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2534,6 +2534,39 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v83-vencidos-painel .v82-treino-vencido{background:var(--cor-fundo)}
 .v83-vencidos-painel .v82-treino-vencido-datas>div{background:var(--cor-superficie)}
 @media(max-width:470px){.v76-supervisao .v83-vencidos-painel{padding:11px}.v83-vencidos-titulo h3{font-size:13px}.v83-vencidos-fechar{font-size:10px;padding:7px 9px}}
+</style>
+<style id="v84-resumo-mensal-cliente">
+.v76-supervisao .v84-resumo-mensal{margin-top:17px;padding:14px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:19px;min-width:0}
+.v84-resumo-mensal>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;color:var(--cor-texto);font-weight:750;font-size:14px;line-height:1.35}
+.v84-resumo-mensal>summary::-webkit-details-marker{display:none}
+.v84-resumo-mensal>summary span{display:block;color:var(--cor-texto-suave);font-size:11px;font-weight:500;line-height:1.5;margin-top:4px}
+.v84-resumo-mensal>summary::after{content:'⌄';font-size:22px;line-height:1;color:var(--cor-primaria);transition:transform .16s;flex-shrink:0}
+.v84-resumo-mensal[open]>summary::after{transform:rotate(180deg)}
+.v84-resumo-corpo{padding-top:16px}
+.v84-resumo-controles{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.v84-resumo-mes{display:flex;align-items:center;gap:9px;border:1px solid var(--cor-borda);border-radius:13px;background:var(--cor-fundo);padding:5px}
+.v84-resumo-mes>strong{font-size:12px;min-width:125px;text-align:center;color:var(--cor-texto);text-transform:capitalize}
+.v84-resumo-mes button{width:31px;height:33px;border-radius:10px;background:var(--cor-superficie);color:var(--cor-texto);font-size:20px;cursor:pointer}
+.v84-resumo-escopo{display:grid;gap:4px;font-size:10px;color:var(--cor-texto-suave);font-weight:700}
+.v84-resumo-escopo select{border:1px solid var(--cor-borda);border-radius:11px;background:var(--cor-fundo);color:var(--cor-texto);padding:10px;font-size:12px;max-width:190px}
+.v84-resumo-somas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.v84-resumo-soma{padding:12px 9px;border:1px solid var(--cor-borda);border-radius:13px;background:var(--cor-fundo);text-align:center}
+.v84-resumo-soma small{display:block;color:var(--cor-texto-suave);font-size:10px;line-height:1.4}
+.v84-resumo-soma strong{display:block;color:var(--cor-primaria);font-family:Georgia,serif;font-size:28px;margin-top:5px}
+.v84-resumo-carteiras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:13px}
+.v84-resumo-carteiras>div{border:1px solid var(--cor-borda);border-radius:12px;padding:9px 11px;color:var(--cor-texto);font-size:11px;background:var(--cor-fundo)}
+.v84-resumo-carteiras strong{font-size:12px;display:block;margin-bottom:4px}
+.v84-resumo-carteiras span{font-size:10px;color:var(--cor-texto-suave)}
+.v84-resumo-rolagem{width:100%;max-width:100%;overflow-x:auto;border-radius:13px;border:1px solid var(--cor-borda);background:var(--cor-fundo)}
+.v84-resumo-tabela{width:100%;border-collapse:collapse;min-width:330px;font-size:12px;color:var(--cor-texto)}
+.v84-resumo-tabela th{background:color-mix(in srgb,var(--cor-primaria) 12%,var(--cor-superficie));color:var(--cor-texto);text-align:left;font-size:10px;padding:11px 8px}
+.v84-resumo-tabela th:not(:first-child),.v84-resumo-tabela td:not(:first-child){text-align:center;width:17%}
+.v84-resumo-tabela td{padding:11px 8px;border-top:1px solid var(--cor-borda);line-height:1.35;overflow-wrap:anywhere}
+.v84-resumo-tabela td:first-child{font-weight:650}
+.v84-resumo-tabela tfoot td{font-weight:800;background:color-mix(in srgb,var(--cor-primaria) 7%,var(--cor-superficie))}
+.v84-resumo-rodape{margin-top:11px;font-size:11px;line-height:1.5;color:var(--cor-texto-suave)}
+.v84-resumo-baixar{width:100%;margin-top:12px;border:0;border-radius:12px;padding:13px 11px;background:var(--cor-primaria);color:#fff;font-weight:750;font-size:12px;cursor:pointer}
+@media(max-width:480px){.v76-supervisao .v84-resumo-mensal{padding:11px}.v84-resumo-controles{align-items:stretch;flex-direction:column}.v84-resumo-mes{justify-content:space-between;width:100%}.v84-resumo-mes>strong{flex:1}.v84-resumo-escopo{width:100%}.v84-resumo-escopo select{width:100%;max-width:100%}.v84-resumo-somas{gap:5px}.v84-resumo-soma{padding:9px 4px}.v84-resumo-soma strong{font-size:24px}.v84-resumo-carteiras>div{padding:9px}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7550,15 +7583,45 @@ function v75PainelSupervisaoHTML(){
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v83</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; o histórico completo fica no resumo anual.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v84</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
  <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
  <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · ${d.visitasProgramadas.length} visitas programadas · ${d.visitasEquipe.length} realizadas pela equipe · treinamentos aplicados também contam como visita.</p>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
+ ${v84ResumoMensalHTML()}
  ${v78PlannerEquipeHTML()}
  <p class="v75-info">${v75NomeEscopo()} · ${d.ano} · Uma visita por treinamento aplicado, sem contar duas vezes a visita própria no mesmo cliente e dia.</p>
  </section>`;
+}
+let V84_MES_RESUMO=formatoISO(new Date()).slice(0,7),V84_RESUMO_ABERTO=false;
+function v84MudarMesResumo(delta){
+ const [ano,mes]=V84_MES_RESUMO.split('-').map(Number),data=new Date(ano,mes-1+delta,1,12);
+ V84_MES_RESUMO=formatoISO(data).slice(0,7);V84_RESUMO_ABERTO=true;renderTela();
+}
+function v84DadosResumoMensal(mes=V84_MES_RESUMO,escopo=V75_ESCOPO_SUPERVISAO){
+ const resumo=new Map(),carteiras={saber:{minhas:0,equipe:0,total:0},bruna:{minhas:0,equipe:0,total:0},sem_cliente:{minhas:0,equipe:0,total:0}},totais={minhas:0,equipe:0,total:0};
+ const visitas=v77VisitasEfetivas().filter(e=>String(e.dataISO||'').startsWith(mes)&&(escopo==='todos'||v75GrupoClienteRegistro(e)===escopo));
+ for(const visita of visitas){
+  const id=String(visita.clienteId||visita.clienteNomeVinculado||visita.clienteExterno||'sem-cliente'),carteira=v75GrupoClienteRegistro(visita),tipo=v77EhVisitaEquipe(visita)?'equipe':'minhas';
+  if(!resumo.has(id))resumo.set(id,{id,nome:v75NomeCliente(visita),carteira,minhas:0,equipe:0,total:0});
+  const linha=resumo.get(id);linha[tipo]++;linha.total++;totais[tipo]++;totais.total++;
+  const parte=carteiras[carteira]||carteiras.sem_cliente;parte[tipo]++;parte.total++;
+ }
+ const clientes=[...resumo.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+ return {mes,escopo,clientes,carteiras,totais};
+}
+function v84ResumoMensalHTML(){
+ const d=v84DadosResumoMensal(),[ano,mes]=d.mes.split('-').map(Number),nomeMes=new Date(ano,mes-1,15,12).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+ const linha=c=>`<tr><td>${textoHTML(c.nome)}</td><td>${c.minhas}</td><td>${c.equipe}</td><td><strong>${c.total}</strong></td></tr>`;
+ const carteiras=d.escopo==='todos'?`<div class="v84-resumo-carteiras"><div><strong>Saber Nutrir: ${d.carteiras.saber.total}</strong><span>${d.carteiras.saber.minhas} minhas · ${d.carteiras.saber.equipe} da equipe</span></div><div><strong>Bruna Ribeiro: ${d.carteiras.bruna.total}</strong><span>${d.carteiras.bruna.minhas} minhas · ${d.carteiras.bruna.equipe} da equipe</span></div></div>`:'';
+ return `<details class="v84-resumo-mensal" id="v84-resumo-mensal" ${V84_RESUMO_ABERTO?'open':''} ontoggle="V84_RESUMO_ABERTO=this.open"><summary><div>▤ Resumo mensal de visitas por cliente<span>Somente visitas realizadas · minhas e da equipe · relatório em PDF</span></div></summary><div class="v84-resumo-corpo">
+ <div class="v84-resumo-controles"><div class="v84-resumo-mes"><button type="button" onclick="v84MudarMesResumo(-1)" aria-label="Mês anterior">‹</button><strong>${textoHTML(nomeMes)}</strong><button type="button" onclick="v84MudarMesResumo(1)" aria-label="Mês seguinte">›</button></div><label class="v84-resumo-escopo">CARTEIRA<select aria-label="Carteira do resumo mensal" onchange="V75_ESCOPO_SUPERVISAO=this.value;V84_RESUMO_ABERTO=true;renderTela()">${[['todos','Todas as carteiras'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<option value="${id}" ${id===d.escopo?'selected':''}>${nome}</option>`).join('')}</select></label></div>
+ <div class="v84-resumo-somas"><div class="v84-resumo-soma"><small>Minhas visitas</small><strong>${d.totais.minhas}</strong></div><div class="v84-resumo-soma"><small>Visitas da equipe</small><strong>${d.totais.equipe}</strong></div><div class="v84-resumo-soma"><small>Total realizado</small><strong>${d.totais.total}</strong></div></div>
+ ${carteiras}
+ <div class="v84-resumo-rolagem"><table class="v84-resumo-tabela"><thead><tr><th scope="col">Cliente</th><th scope="col">Minhas</th><th scope="col">Equipe</th><th scope="col">Total</th></tr></thead><tbody>${d.clientes.map(linha).join('')||'<tr><td colspan="4">Nenhuma visita concluída neste mês e nesta carteira.</td></tr>'}</tbody><tfoot><tr><td>Total do mês</td><td>${d.totais.minhas}</td><td>${d.totais.equipe}</td><td>${d.totais.total}</td></tr></tfoot></table></div>
+ <p class="v84-resumo-rodape">Entram as visitas concluídas na Agenda e no planner da equipe. Treinamentos realizados também contam como uma visita, sem duplicar uma visita própria do mesmo cliente e dia. Programações futuras não entram no realizado.</p>
+ <button type="button" class="v84-resumo-baixar" onclick="v84BaixarResumoMensalPDF()">↓ Baixar resumo mensal em PDF</button></div></details>`;
 }
 function v83ListaTreinamentosVencidosHTML(treinamentos){
  const vencidos=[...(treinamentos||[])].sort((a,b)=>String(a.validade||'').localeCompare(String(b.validade||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
@@ -8033,6 +8096,74 @@ function v75GerarRelatorioPDF(){
  }
  const nomeArquivo={todos:'todas-as-carteiras',saber:'saber-nutrir',bruna:'bruna-ribeiro'}[d.escopo]||'todas-as-carteiras';
  doc.save(`supervisao-${nomeArquivo}-${d.ano}.pdf`);
+}
+
+/* V84 — Relatório mensal de visitas sem horários ou datas individuais.
+   Os totais usam a mesma fonte de visitas efetivas da Supervisão. */
+function v84BaixarResumoMensalPDF(){
+ if(!window.jspdf?.jsPDF){alert('O gerador de PDF ainda não carregou. Verifique sua conexão e tente novamente.');return;}
+ const d=v84DadosResumoMensal(),[ano,mes]=d.mes.split('-').map(Number);
+ const mesTitulo=new Date(ano,mes-1,15,12).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}),carteira=v75NomeEscopo(d.escopo);
+ const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210;
+ const C={marsala:[142,94,105],rosa:[199,166,167],fundo:[249,244,241],tinta:[57,43,47],suave:[119,99,105],borda:[228,212,207],branco:[255,255,255]};
+ const cor=(metodo,vetor)=>doc[metodo](...vetor),texto=s=>String(s??'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\r\n\t]+/g,' ').trim();
+ let y=0;
+ const cabecalho=(nova=false)=>{
+  if(nova)doc.addPage();y=45;cor('setFillColor',C.marsala);doc.rect(0,0,W,35,'F');
+  cor('setFillColor',C.branco);doc.roundedRect(16,9,16,16,4,4,'F');
+  cor('setTextColor',C.marsala);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('BR',24,19.5,{align:'center'});
+  cor('setTextColor',C.branco);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('RESUMO MENSAL DE VISITAS',39,17);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.text(texto(carteira)+'  |  '+texto(mesTitulo),39,25);
+ };
+ cabecalho();
+ cor('setTextColor',C.tinta);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('Visitas realizadas por cliente',16,y);y+=8;
+ cor('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(9);
+ doc.text('Competência: '+texto(mesTitulo)+'   |   Emitido em '+dataBR(formatoISO(new Date())),16,y);y+=11;
+ const resumo=(x,titulo,numero)=>{
+  cor('setFillColor',C.fundo);cor('setDrawColor',C.borda);doc.roundedRect(x,y,56,31,3,3,'FD');
+  cor('setTextColor',C.suave);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(titulo,x+5,y+9);
+  cor('setTextColor',C.marsala);doc.setFontSize(19);doc.text(String(numero),x+5,y+24);
+ };
+ resumo(16,'Minhas visitas',d.totais.minhas);resumo(77,'Visitas da equipe',d.totais.equipe);resumo(138,'Total realizado',d.totais.total);y+=39;
+ if(d.escopo==='todos'){
+  cor('setFillColor',C.fundo);doc.roundedRect(16,y,178,19,3,3,'F');
+  cor('setTextColor',C.tinta);doc.setFont('helvetica','bold');doc.setFontSize(9);
+  doc.text('Saber Nutrir: '+d.carteiras.saber.total+' visitas',21,y+7);doc.text('Bruna Ribeiro: '+d.carteiras.bruna.total+' visitas',109,y+7);
+  cor('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(7.7);
+  doc.text('Minhas '+d.carteiras.saber.minhas+'  |  Equipe '+d.carteiras.saber.equipe,21,y+14);
+  doc.text('Minhas '+d.carteiras.bruna.minhas+'  |  Equipe '+d.carteiras.bruna.equipe,109,y+14);y+=27;
+ }
+ const widths=[91,29,29,29],xPos=[16,107,136,165],cabecalhoTabela=()=>{
+  cor('setFillColor',C.marsala);doc.roundedRect(16,y,178,12,2,2,'F');
+  cor('setTextColor',C.branco);doc.setFont('helvetica','bold');doc.setFontSize(8);
+  ['Cliente','Minhas','Equipe','Total'].forEach((titulo,i)=>doc.text(titulo,xPos[i]+3,y+7.5,{maxWidth:widths[i]-6}));y+=12;
+ };
+ const novaPaginaTabela=()=>{cabecalho(true);cor('setTextColor',C.tinta);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Visitas por cliente · continuação',16,y);y+=12;cabecalhoTabela();};
+ cabecalhoTabela();
+ const linhas=d.clientes.length?d.clientes:[{nome:'Nenhuma visita realizada no período',minhas:'—',equipe:'—',total:'—'}];
+ linhas.forEach((linha,i)=>{
+  doc.setFont('helvetica','normal');doc.setFontSize(8.6);
+  const nome=doc.splitTextToSize(texto(linha.nome),widths[0]-6),altura=Math.max(12,nome.length*4.1+6);
+  if(y+altura>269)novaPaginaTabela();
+  cor('setFillColor',i%2?C.fundo:C.branco);doc.rect(16,y,178,altura,'F');
+  cor('setDrawColor',C.borda);doc.setLineWidth(.2);doc.line(16,y+altura,194,y+altura);
+  cor('setTextColor',C.tinta);doc.text(nome,xPos[0]+3,y+5.2,{lineHeightFactor:1.15});
+  doc.setFont('helvetica','bold');[linha.minhas,linha.equipe,linha.total].forEach((n,j)=>doc.text(String(n),xPos[j+1]+3,y+5.2));y+=altura;
+ });
+ if(y+15>269)novaPaginaTabela();
+ cor('setFillColor',C.fundo);doc.rect(16,y,178,13,'F');cor('setTextColor',C.marsala);doc.setFont('helvetica','bold');doc.setFontSize(9);
+ doc.text('TOTAL DO MÊS',19,y+8);[d.totais.minhas,d.totais.equipe,d.totais.total].forEach((n,j)=>doc.text(String(n),xPos[j+1]+3,y+8));y+=18;
+ if(y+20>270){cabecalho(true);}
+ cor('setTextColor',C.suave);doc.setFont('helvetica','normal');doc.setFontSize(8);
+ doc.text('Somente visitas concluídas. Treinamentos realizados contam como visita, sem duplicar',16,y);
+ doc.text('uma visita própria do mesmo cliente no mesmo dia. Programações não são somadas.',16,y+5);
+ const nPaginas=doc.internal.getNumberOfPages();for(let p=1;p<=nPaginas;p++){
+  doc.setPage(p);cor('setDrawColor',C.borda);doc.line(16,283,194,283);cor('setTextColor',C.suave);doc.setFontSize(8);
+  doc.text('Meu Ecossistema | Bruna Ribeiro · Consultoria e Supervisão',16,289);
+  doc.text('Página '+p+' de '+nPaginas,194,289,{align:'right'});
+ }
+ const carteiraArquivo={todos:'todos',saber:'saber-nutrir',bruna:'bruna-ribeiro'}[d.escopo]||'todos';
+ doc.save(`visitas-por-cliente-${carteiraArquivo}-${d.mes}.pdf`);
 }
 
 /* ---------- PLANEJAMENTO, DATAS DA ÁREA E FECHAMENTO MENSAL ---------- */
@@ -9117,7 +9248,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='83',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='84',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
