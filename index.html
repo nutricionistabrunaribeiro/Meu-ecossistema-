@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v85</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v86</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2579,6 +2579,14 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 #modalSistema .v85-repeticao .form-hint{line-height:1.5;margin-top:7px}
 #modalSistema #agendaSalvarBotao:disabled{opacity:.6;cursor:wait}
 @media(max-width:540px){#modalSistema .v85-repeticao{padding:11px}#modalSistema .v85-repeticao #v85RecorrenciaOpcoes{grid-template-columns:minmax(0,1fr)}#modalSistema .v85-repeticao #v85RecorrenciaResumo{grid-column:auto}#modalSistema:has(#v85AgendaRepeticao) .system-modal-actions{position:sticky;bottom:-17px;background:var(--cor-superficie);z-index:2;padding:14px 0 max(9px,env(safe-area-inset-bottom));margin-top:14px}}
+</style>
+<style id="v86-historico-asseio">
+.v86-asseio-mes{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 8px;padding:12px;border:1px solid var(--cor-borda);border-radius:13px;background:var(--cor-fundo)}
+.v86-asseio-mes label{font-size:12px;font-weight:700;color:var(--cor-texto-suave)}
+.v86-asseio-mes select{flex:1;min-width:135px;max-width:100%;border:1px solid var(--cor-borda);border-radius:9px;background:var(--cor-superficie);color:var(--cor-texto);padding:10px;font:inherit;font-size:13px}
+.v86-asseio-contagem{font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px}
+.v86-asseio-vazio{font-size:12px;color:var(--cor-texto-suave);background:var(--cor-fundo);border-radius:10px;padding:15px 12px;line-height:1.5}
+@media(max-width:480px){.v86-asseio-mes{align-items:stretch;flex-direction:column}.v86-asseio-mes select{width:100%}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7340,6 +7348,15 @@ const CRITERIOS_ASSEIO=[
   ['sintomas','Ausência de sintomas que possam comprometer os alimentos'],['epis','Utilização correta dos EPIs exigidos']
 ];
 let ASSEIO_COLABORADORES=[],ASSEIO_VERIFICACOES=[],ASSEIO_VERIFICACAO_ATIVA=null,RELATORIO_ASSEIO_PRONTO_CLIENTE=null;
+let ASSEIO_HISTORICO_MES_POR_CLIENTE={};
+function selecionarHistoricoMesAsseio(clienteId,mes){
+  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(String(mes||'')))return;
+  ASSEIO_HISTORICO_MES_POR_CLIENTE[clienteId]=mes;
+  renderTela();
+}
+function rotuloMesAsseio(mes){
+  return `${MESES_NOME[Number(mes.slice(5,7))-1]} de ${mes.slice(0,4)}`;
+}
 async function carregarAsseioSupabase(){
   const [c,v]=await Promise.all([supa.from('asseio_colaboradores').select('*').order('nome'),supa.from('asseio_verificacoes').select('*').order('data',{ascending:false})]);
   if(c.error||v.error){dispararAutomacao('Erro ao carregar Asseio Pessoal',(c.error||v.error).message);return;}
@@ -7357,7 +7374,7 @@ async function novaVerificacaoAsseio(clienteId){
   const dataV=await selecionarDataVisual({titulo:'Data da verificação de asseio',valor:formatoISO(new Date()),opcional:false});if(!dataV)return;
   const {data:{user}}=await supa.auth.getUser();const competencia=dataV.slice(0,7)+'-01';
   const {data,error}=await supa.from('asseio_verificacoes').insert({user_id:user.id,cliente_id:clienteId,data:dataV,competencia,avaliacoes:avaliacoesIniciaisAsseio(clienteId)}).select().single();
-  if(error){dispararAutomacao('Erro ao iniciar verificação',error.message);return;}ASSEIO_VERIFICACOES.unshift(data);ASSEIO_VERIFICACAO_ATIVA=data.id;renderTela();
+  if(error){dispararAutomacao('Erro ao iniciar verificação',error.message);return;}ASSEIO_VERIFICACOES.unshift(data);ASSEIO_HISTORICO_MES_POR_CLIENTE[clienteId]=dataV.slice(0,7);ASSEIO_VERIFICACAO_ATIVA=data.id;renderTela();
 }
 async function salvarVerificacaoAsseio(v){const {error}=await supa.from('asseio_verificacoes').update({avaliacoes:v.avaliacoes,observacoes:v.observacoes||null,orientacoes:v.orientacoes||null,atualizado_em:new Date().toISOString()}).eq('id',v.id);if(error){dispararAutomacao('Erro no autosave do asseio',error.message);return false;}return true;}
 function marcarAsseio(verId,colId,criterio,resultado){const v=ASSEIO_VERIFICACOES.find(x=>x.id===verId),a=v?.avaliacoes.find(x=>x.colaboradorId===colId);if(!a)return;a.respostas[criterio].resultado=resultado;salvarVerificacaoAsseio(v);renderTela();}
@@ -7383,7 +7400,39 @@ async function gerarRelatorioMensalAsseio(clienteId){
   const evidencias=[];lista.forEach(v=>v.avaliacoes.forEach(a=>CRITERIOS_ASSEIO.forEach(([k,nome])=>(a.respostas[k]?.fotos||[]).forEach(f=>evidencias.push({foto:f,data:v.data,nome:nomeRel(a.nome),criterio:nome})))));if(evidencias.length){doc.addPage();let ey=18;doc.setFont(undefined,'bold');doc.setFontSize(13);doc.setTextColor(34,35,31);doc.text('EVIDÊNCIAS FOTOGRÁFICAS',14,ey);ey+=9;evidencias.forEach(e=>{if(ey+61>282){doc.addPage();ey=18;}doc.setFontSize(8);doc.setFont(undefined,'bold');doc.text(`${dataBR(e.data)} · ${e.nome}`,14,ey);doc.setFont(undefined,'normal');doc.text(doc.splitTextToSize(e.criterio,86),14,ey+5);try{doc.addImage(e.foto,'JPEG',108,ey-4,84,56)}catch(err){}ey+=64;});}
   ultimoPDFBlob=doc.output('blob');ultimoPDFNome=`Asseio_Pessoal_${c.nome.replace(/\s+/g,'_')}_${mes}.pdf`;RELATORIO_ASSEIO_PRONTO_CLIENTE=clienteId;dispararAutomacao('Relatório mensal de asseio gerado',`${c.nome} · ${lista.length} verificação(ões)`);renderTela();
 }
-function asseioClienteHTML(c){if(ASSEIO_VERIFICACAO_ATIVA){const v=ASSEIO_VERIFICACOES.find(x=>x.id===ASSEIO_VERIFICACAO_ATIVA);if(v?.cliente_id===c.id)return verificacaoAsseioHTML(v);}const cols=ASSEIO_COLABORADORES.filter(x=>x.cliente_id===c.id),vers=ASSEIO_VERIFICACOES.filter(x=>x.cliente_id===c.id);return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"><button class="btn-primario" onclick="novaVerificacaoAsseio('${c.id}')">+ Nova verificação</button><button class="btn-secundario" onclick="novoColaboradorAsseio('${c.id}')">+ Colaborador</button><button class="btn-secundario" onclick="gerarRelatorioMensalAsseio('${c.id}')">📄 Relatório mensal</button></div>${RELATORIO_ASSEIO_PRONTO_CLIENTE===c.id?`<div class="card" style="margin-bottom:14px"><h3>Relatório pronto</h3><div style="display:flex;gap:8px"><button class="btn-primario" onclick="visualizarPDF()">Visualizar</button><button class="btn-secundario" onclick="baixarPDF()">Baixar</button><button class="btn-secundario" onclick="compartilharPDF()">Compartilhar</button></div></div>`:''}<div class="grid"><div class="card"><h3>Colaboradores (${cols.filter(x=>x.ativo).length} ativos)</h3>${cols.map(x=>`<div class="item-lista-simples" style="opacity:${x.ativo?1:.55}"><span>${x.nome}</span><button class="tag" onclick="alternarColaboradorAsseio('${x.id}')">${x.ativo?'Ativo':'Inativo'}</button></div>`).join('')||semRegistro()}</div><div class="card"><h3>Histórico mensal</h3>${vers.map(v=>`<div class="item-lista-simples"><button onclick="ASSEIO_VERIFICACAO_ATIVA='${v.id}';renderTela()" style="text-align:left"><strong>${dataBR(v.data)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${v.avaliacoes.length} colaborador(es)</div></button><span class="tag">${v.status==='finalizada'?'Finalizada':'Rascunho'}</span></div>`).join('')||semRegistro()}</div></div>`;}
+function asseioClienteHTML(c){
+  if(ASSEIO_VERIFICACAO_ATIVA){
+    const ativa=ASSEIO_VERIFICACOES.find(v=>v.id===ASSEIO_VERIFICACAO_ATIVA);
+    if(ativa?.cliente_id===c.id)return verificacaoAsseioHTML(ativa);
+  }
+  const cols=ASSEIO_COLABORADORES.filter(x=>x.cliente_id===c.id);
+  const vers=ASSEIO_VERIFICACOES.filter(x=>x.cliente_id===c.id);
+  const mesAtual=formatoISO(new Date()).slice(0,7);
+  const mesSelecionado=ASSEIO_HISTORICO_MES_POR_CLIENTE[c.id]||mesAtual;
+  const meses=[...new Set([mesAtual,mesSelecionado,...vers.map(v=>String(v.data||'').slice(0,7)).filter(m=>/^\d{4}-(0[1-9]|1[0-2])$/.test(m))])].sort().reverse();
+  const historico=vers.filter(v=>String(v.data||'').slice(0,7)===mesSelecionado).sort((a,b)=>String(b.data).localeCompare(String(a.data)));
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <button class="btn-primario" onclick="novaVerificacaoAsseio('${c.id}')">+ Nova verificação</button>
+    <button class="btn-secundario" onclick="novoColaboradorAsseio('${c.id}')">+ Colaborador</button>
+    <button class="btn-secundario" onclick="gerarRelatorioMensalAsseio('${c.id}')">📄 Relatório mensal</button>
+  </div>
+  ${RELATORIO_ASSEIO_PRONTO_CLIENTE===c.id?`<div class="card" style="margin-bottom:14px"><h3>Relatório pronto</h3><div style="display:flex;gap:8px"><button class="btn-primario" onclick="visualizarPDF()">Visualizar</button><button class="btn-secundario" onclick="baixarPDF()">Baixar</button><button class="btn-secundario" onclick="compartilharPDF()">Compartilhar</button></div></div>`:''}
+  <div class="grid">
+    <div class="card"><h3>Colaboradores (${cols.filter(x=>x.ativo).length} ativos)</h3>
+      ${cols.map(x=>`<div class="item-lista-simples" style="opacity:${x.ativo?1:.55}"><span>${textoHTML(x.nome)}</span><button class="tag" onclick="alternarColaboradorAsseio('${x.id}')">${x.ativo?'Ativo':'Inativo'}</button></div>`).join('')||semRegistro()}
+    </div>
+    <div class="card"><h3>Histórico mensal</h3>
+      <div class="v86-asseio-mes">
+        <label for="asseio-mes-${c.id}">Selecionar mês</label>
+        <select id="asseio-mes-${c.id}" aria-label="Mês do histórico de asseio" onchange="selecionarHistoricoMesAsseio('${c.id}',this.value)">
+          ${meses.map(m=>`<option value="${m}" ${m===mesSelecionado?'selected':''}>${rotuloMesAsseio(m)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="v86-asseio-contagem">${historico.length} verificação(ões) em ${rotuloMesAsseio(mesSelecionado)}</div>
+      ${historico.map(v=>`<div class="item-lista-simples"><button onclick="ASSEIO_VERIFICACAO_ATIVA='${v.id}';renderTela()" style="text-align:left"><strong>${dataBR(v.data)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${v.avaliacoes.length} colaborador(es)</div></button><span class="tag">${v.status==='finalizada'?'Finalizada':'Rascunho'}</span></div>`).join('')||`<div class="v86-asseio-vazio">Nenhuma verificação registrada em ${rotuloMesAsseio(mesSelecionado)}. Selecione outro mês para consultar o histórico.</div>`}
+    </div>
+  </div>`;
+}
 
 /* ---------- LIDERANÇA (área privada da titular) ---------- */
 let LIDERANCA_RESPONSAVEIS=[];
@@ -7660,7 +7709,7 @@ function v75PainelSupervisaoHTML(){
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v85</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v86</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
  <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
@@ -9325,7 +9374,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='85',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='86',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
