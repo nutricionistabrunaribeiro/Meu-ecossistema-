@@ -3431,7 +3431,7 @@ function v77VisitasEfetivas(){
   const chave=String(t.cliente_id)+'|'+t.data;
   if(proprias.has(chave)||treinamentoContado.has(chave))continue;
   treinamentoContado.add(chave);
-  extras.push({id:'treino-visita:'+chave,tipo:'visita',clienteId:t.cliente_id,dataISO:t.data,hora:null,titulo:'Visita técnica · treinamento realizado',concluido:true,origemTreinamento:true});
+  extras.push({id:'treino-visita:'+chave,tipo:'visita',clienteId:t.cliente_id,dataISO:t.data,hora:null,titulo:'Visita técnica · treinamento realizado',concluido:true,origemTreinamento:true,treinamentoId:t.id});
  }
  return visitas.concat(extras);
 }
@@ -3503,7 +3503,7 @@ function agendaSemanaHTML(){
       const idCel = `cel-${dataISO}-${hora}`;
       const eventos = eventosSemana.filter(e=>e.dataISO===dataISO && e.hora===hora&&!v77EhVisitaEquipe(e));
       let chips = eventos.map(e=>
-        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); classificarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Classificar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
+        `<div class="evento-chip ${e.concluido?'concluido':''}" style="background:${CATEGORIAS_EVENTO.find(t=>t.id===e.categoria).cor};" onclick="event.stopPropagation(); alternarConcluidoEvento('${e.id}')" title="${textoHTML(eventoResumoTexto(e))} · toque para marcar como feito">${textoHTML(nomeClienteEvento(e)||rotuloTipoEvento(e.tipo))}<small style="display:block;opacity:.86">${textoHTML(nomeClienteEvento(e)?rotuloTipoEvento(e.tipo):(e.titulo||''))}</small>${nomeClienteEvento(e)&&e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?`<small style="display:block;opacity:.78">${textoHTML(e.titulo)}</small>`:''}<span onclick="event.stopPropagation(); removerEvento('${e.id}')" style="float:right;opacity:.7;padding-left:4px;" title="Remover">✕</span><span onclick="event.stopPropagation(); v88EditarEvento('${e.id}')" style="float:right;opacity:.8;padding-left:4px;" title="Editar compromisso">${e.tipo==='visita'?'✓V':'⚙'}</span></div>`
       ).join('');
       grid += `<div class="planner-cell" id="${idCel}" onclick="abrirQuickAdd('${dataISO}', ${hora})">${chips}</div>`;
     });
@@ -3575,7 +3575,7 @@ function abrirDetalheAgendaV22(id){
  const horario=String(e.hora).padStart(2,'0')+':00';
  abrirModalSistema(`<div class="system-modal-head"><div><h2>Compromisso · ${horario}</h2><p>${textoHTML(cat.nome)}</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div>
  <div class="v22-modal-resumo">${eventoResumoHTML(e)}<p>${e.concluido?'Concluído':'Em aberto'}</p></div>
- <div class="v22-modal-acoes"><button class="btn-primario" onclick="fecharModalSistema();alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="fecharModalSistema()">Fechar</button></div>`);
+ <div class="v22-modal-acoes">${v88BotaoEditar(e.id)}<button class="btn-primario" onclick="fecharModalSistema();alternarConcluidoEvento('${e.id}')">${e.concluido?'Reabrir':'Concluir'}</button><button class="btn-secundario" onclick="fecharModalSistema()">Fechar</button></div>`);
 }
 function eventoResumoHTML(e,compacto=false){const cliente=nomeClienteEvento(e),tipo=rotuloTipoEvento(e.tipo),detalhe=e.titulo&&e.titulo!==tipo?e.titulo:'';return `${cliente?`<strong${compacto?' style="font-size:inherit"':''}>${textoHTML(cliente)}</strong>`:''}<div class="agenda-tipo">${textoHTML(tipo)}</div>${detalhe?`<div${compacto?' class="agenda-detalhe"':''}>${textoHTML(detalhe)}</div>`:''}`;}
 function eventoResumoTexto(e){return [nomeClienteEvento(e),rotuloTipoEvento(e.tipo),e.titulo&&e.titulo!==rotuloTipoEvento(e.tipo)?e.titulo:''].filter(Boolean).join(' · ');}
@@ -3583,9 +3583,9 @@ function categoriaPorTipo(tipo,clienteId){
   if(tipo==='visita'){const c=CLIENTES.find(x=>x.id===clienteId);return c?.tipoCliente==='vinculado'?'saber_nutrir':'brc';}
   return ({reuniao:'reuniao',treinamento:'treinamento',pessoal:'pessoal'})[tipo]||'outro';
 }
-function abrirFormularioAgenda(dataISO,hora){
-  const clientes=ordenarClientesAZ(CLIENTES.filter(clienteAtivoV37));
-  abrirModalSistema(`<div class="system-modal-head"><div><h2>Novo compromisso</h2><p>Preencha na ordem da sua rotina. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
+function abrirFormularioAgenda(dataISO,hora,evento=null){
+  const clientes=ordenarClientesAZ(CLIENTES.filter(c=>clienteAtivoV37(c)||String(c.id)===String(evento?.clienteId)));
+  abrirModalSistema(`<div class="system-modal-head"><div><h2>${evento?'Editar compromisso':'Novo compromisso'}</h2><p>Preencha na ordem da sua rotina. A cor será definida automaticamente.</p></div><button class="system-modal-close" onclick="fecharModalSistema()">✕</button></div><div class="form-grid">
     <div class="form-field full"><label>1. Cliente</label><select id="agendaCliente" onchange="atualizarFormularioAgenda()" autofocus><option value="">Sem cliente / compromisso pessoal</option>${clientes.map(c=>`<option value="${c.id}">${textoHTML(c.nome)}${c.tipoCliente==='vinculado'?' — Saber Nutrir':''}</option>`).join('')}</select><div class="form-hint" id="agendaClienteHint">Obrigatório para visitas.</div></div>
     <div class="form-field full"><label>2. Tipo do compromisso</label><select id="agendaTipo" onchange="atualizarFormularioAgenda()">${TIPOS_EVENTO_UI.map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
     <div class="form-field full"><label>3. Qual é o compromisso? <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><input id="agendaTitulo" placeholder="Ex.: Revisar FDS e EPIs"></div>
@@ -3594,6 +3594,21 @@ function abrirFormularioAgenda(dataISO,hora){
     <div class="form-field full v85-repeticao"><div class="form-field"><label>Repetir este compromisso?</label><select id="v85AgendaRepeticao" onchange="v85AtualizarRepeticaoAgenda()"><option value="nenhuma">Não repetir · apenas esta data</option><option value="diaria">Todos os dias</option><option value="dias_uteis">De segunda a sexta</option><option value="semanal">Uma vez por semana</option></select><p class="form-hint">Ex.: postar um produto da Shopee diariamente por 60 dias.</p></div><div id="v85RecorrenciaOpcoes" hidden><div class="form-field"><label>Por quanto tempo?</label><select id="v85DuracaoRecorrencia" onchange="v85AtualizarRepeticaoAgenda()"><option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="personalizada">Escolher a duração</option></select></div><div class="form-field" id="v85DuracaoPersonalizadaWrap" hidden><label>Quantidade de dias</label><input id="v85DuracaoPersonalizada" type="number" min="1" max="365" value="60" inputmode="numeric" oninput="v85AtualizarRepeticaoAgenda()"></div><div id="v85RecorrenciaResumo" role="status" aria-live="polite"></div></div></div>
     <div class="form-field full"><label>Identificação visual automática</label><div class="form-color-preview"><i id="agendaCorPreview"></i><span id="agendaCorTexto"></span></div></div>
   </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button id="agendaSalvarBotao" class="btn-primario" onclick="confirmarNovoEvento()">Salvar compromisso</button></div>`);
+  if(evento){
+    const campo=id=>document.getElementById(id);
+    campo('agendaCliente').value=evento.clienteId||'';
+    campo('agendaTipo').value=evento.tipo||(evento.categoria==='treinamento'?'treinamento':'outro');
+    campo('agendaTitulo').value=evento.titulo||'';
+    const horas=campo('agendaHora');
+    if(![...horas.options].some(o=>o.value===String(evento.hora)))horas.add(new Option(evento.hora==null?'Sem horário':evento.hora+'h',evento.hora??''));
+    horas.value=evento.hora??'';
+    const repeticao=campo('v85AgendaRepeticao').closest('.v85-repeticao');
+    repeticao.innerHTML='<label for="agendaConcluido">Situação</label><select id="agendaConcluido"><option value="aberto">Em aberto</option><option value="concluido">Concluído</option></select>';
+    campo('agendaConcluido').value=evento.concluido?'concluido':'aberto';
+    const salvar=campo('agendaSalvarBotao');
+    salvar.textContent='Salvar alterações';
+    salvar.onclick=()=>v88SalvarEvento(evento,salvar);
+  }
   atualizarFormularioAgenda();setTimeout(()=>document.getElementById('agendaCliente')?.focus(),0);
 }
 function atualizarFormularioAgenda(){
@@ -3657,6 +3672,22 @@ async function v85ConfirmarRecorrenciaAgenda(){
   dispararAutomacao('Recorrência criada',`${pendentes.length} compromisso(s) adicionados à Agenda.${jaExistentes?' '+jaExistentes+' dia(s) já existiam e não foram duplicados.':''}`);
  }catch(erro){dispararAutomacao('Erro ao criar recorrência',erro?.message||'Não foi possível salvar. Tente novamente.');}
  finally{if(botao){botao.disabled=false;botao.textContent='Salvar compromisso';}}
+}
+async function v88SalvarEvento(evento,botao){
+ if(botao.disabled)return;
+ const valor=id=>document.getElementById(id).value;
+ const tipo=valor('agendaTipo'),clienteId=valor('agendaCliente')||null,data=valor('agendaData'),hora=valor('agendaHora');
+ if(!data||(tipo==='visita'&&!clienteId&&!evento.clienteExterno)){alert('Confira a data e o cliente da visita.');return;}
+ const categoria=tipo===evento.tipo&&clienteId===(evento.clienteId||null)?evento.categoria:categoriaPorTipo(tipo,clienteId);
+ const alteracoes={tipo,categoria,data,concluido:valor('agendaConcluido')==='concluido',hora:hora===''?null:Number(hora),titulo:valor('agendaTitulo').trim()||rotuloTipoEvento(tipo),cliente_id:clienteId,cliente_externo:clienteId?null:evento.clienteExterno||null};
+ botao.disabled=true;
+ try{
+  const {data:row,error}=await supa.from('eventos').update(alteracoes).eq('id',evento.id).select('*, clientes(nome)').single();
+  if(error)throw error;
+  Object.assign(evento,{tipo:row.tipo,categoria:row.categoria,dataISO:row.data,hora:row.hora,titulo:row.titulo,clienteId:row.cliente_id,clienteNomeVinculado:row.clientes?.nome||null,clienteExterno:row.cliente_externo,concluido:row.concluido});
+  fecharModalSistema();renderTela();
+ }catch(erro){dispararAutomacao('Erro ao editar compromisso',erro.message);}
+ finally{botao.disabled=false;}
 }
 async function confirmarNovoEvento(){
   if((document.getElementById('v85AgendaRepeticao')?.value||'nenhuma')!=='nenhuma')return v85ConfirmarRecorrenciaAgenda();
@@ -7347,7 +7378,7 @@ function obrigacoesHTML(){const ativas=OBRIGACOES.filter(o=>o.status!=='realizad
 async function novoTreinamento(clienteId){abrirFormularioTreinamentoV73(clienteId);}
 async function statusTreinamento(id){const t=TREINAMENTOS.find(x=>x.id===id);if(!t)return;abrirFormularioTreinamentoV73(t.cliente_id,id);}
 async function excluirTreinamento(id){if(!confirm('Excluir este treinamento?'))return;const {error}=await supa.from('treinamentos_cliente').delete().eq('id',id);if(!error){TREINAMENTOS=TREINAMENTOS.filter(x=>x.id!==id);renderTela();}}
-function treinamentosClienteHTML(c){const itens=v74TreinamentosConsolidados().filter(t=>String(t.cliente_id)===String(c.id));return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Programar treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>{const situacao=v73SituacaoTreino(t);return `<div class="item-lista-simples"><div><strong>${textoHTML(t.tema)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · reciclagem '+dataBR(t.validade):''}</div><span class="v73-status ${situacao.classe}">${situacao.rotulo}</span></div><div><button class="tag" onclick="abrirFormularioTreinamentoV73('${c.id}','${t.id}')">${t.origem==='agenda'?'Agenda':'Editar'}</button>${t.origem!=='agenda'?` <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button>`:''}</div></div>`}).join(''):semRegistro()}</div>`;}
+function treinamentosClienteHTML(c){const itens=v74TreinamentosConsolidados().filter(t=>String(t.cliente_id)===String(c.id));return `<button class="btn-primario" onclick="novoTreinamento('${c.id}')">+ Programar treinamento</button><div style="margin-top:12px">${itens.length?itens.map(t=>{const situacao=v73SituacaoTreino(t);return `<div class="item-lista-simples"><div><strong>${textoHTML(t.tema)}</strong><div style="font-size:11px;color:var(--cor-texto-suave)">${dataBR(t.data)} · ${t.participantes||0} participante(s)${t.validade?' · reciclagem '+dataBR(t.validade):''}</div><span class="v73-status ${situacao.classe}">${situacao.rotulo}</span></div><div><button class="tag" onclick="abrirFormularioTreinamentoV73('${c.id}','${t.id}')">Editar</button>${t.origem!=='agenda'?` <button onclick="excluirTreinamento('${t.id}')" style="color:#B0413E">✕</button>`:''}</div></div>`}).join(''):semRegistro()}</div>`;}
 async function novaRota(){const operacionais=CLIENTES.filter(x=>x.tipoCliente!=='contratante');const escolhaCliente=await selecionarClientesVisual({titulo:'Cliente visitado',clientes:operacionais,opcional:true});if(escolhaCliente===null)return;const c=escolhaCliente||null;const dataR=await selecionarDataVisual({titulo:'Data do deslocamento',valor:formatoISO(new Date()),opcional:false});if(!dataR)return;const origem=prompt('Origem:','Campo Limpo')||'';const destino=prompt('Destino:',c?.nome||'')||'';const et=prompt('Transporte:\n1. Transporte público combinado\n2. Trem\n3. Metrô\n4. Ônibus\n5. Carro\n6. Moto\n7. Aplicativo/Táxi\n8. A pé','1');const tipos=['transporte_publico','trem','metro','onibus','carro','moto','aplicativo','a_pe'];const tipo=tipos[parseInt(et)-1]||'transporte_publico';const publico=['transporte_publico','trem','metro','onibus'].includes(tipo);const conducoes=publico?(parseInt(prompt('Quantidade total de conduções (ida e volta):','4'))||0):0;const passagens=(publico||tipo==='aplicativo')?(parseFloat((prompt(publico?'Custo total das passagens (R$):':'Custo total do aplicativo (R$):','0')||'0').replace(',','.'))||0):0;const km=parseFloat((prompt('Quilômetros totais (opcional):','0')||'0').replace(',','.'))||0;const tempo=parseInt(prompt('Tempo total de deslocamento em minutos:','0'))||0;const combustivel=['carro','moto'].includes(tipo)?(parseFloat((prompt('Combustível (R$):','0')||'0').replace(',','.'))||0):0;const pedagio=['carro','moto'].includes(tipo)?(parseFloat((prompt('Pedágio (R$):','0')||'0').replace(',','.'))||0):0;const estacionamento=['carro','moto'].includes(tipo)?(parseFloat((prompt('Estacionamento (R$):','0')||'0').replace(',','.'))||0):0;const outros=parseFloat((prompt('Outros custos (R$):','0')||'0').replace(',','.'))||0;const {data:{user}}=await supa.auth.getUser();const {data,error}=await supa.from('rotas_custos').insert({user_id:user.id,cliente_id:c?.id||null,data:dataR,origem,destino,tipo_transporte:tipo,quantidade_conducoes:conducoes,custo_passagens:passagens,quilometros:km,tempo_minutos:tempo,combustivel,pedagio,estacionamento,outros}).select().single();if(error){dispararAutomacao('Erro ao salvar rota',error.message);return;}ROTAS_CUSTOS.unshift(data);renderTela();}
 async function excluirRota(id){if(!confirm('Excluir este deslocamento?'))return;const {error}=await supa.from('rotas_custos').delete().eq('id',id);if(!error){ROTAS_CUSTOS=ROTAS_CUSTOS.filter(x=>x.id!==id);renderTela();}}
 function custoRota(r){return Number(r.custo_passagens||0)+Number(r.combustivel)+Number(r.pedagio)+Number(r.estacionamento)+Number(r.outros);}
@@ -7650,7 +7681,7 @@ function v73PainelEntregasHTML(){
  }).sort((a,b)=>String(a.data||'').localeCompare(String(b.data||'')));
  const linhasTreino=registros.map(t=>{
   const c=CLIENTES.find(x=>String(x.id)===String(t.cliente_id)),s=v73SituacaoTreino(t);
-  return `<div class="v73-treino-row"><div><strong>${textoHTML(t.tema)}</strong><small>${textoHTML(c?.nome||'Cliente não identificado')} · ${t.data?dataBR(t.data):'Sem data'}${t.validade?' · Próxima reciclagem '+dataBR(t.validade):''}</small><span class="v73-status ${s.classe}">${s.rotulo}</span></div><button class="btn-secundario" onclick="abrirFormularioTreinamentoV73('${t.cliente_id||''}','${t.id}')">${t.origem==='agenda'?'Agenda':'Editar'}</button></div>`;
+  return `<div class="v73-treino-row"><div><strong>${textoHTML(t.tema)}</strong><small>${textoHTML(c?.nome||'Cliente não identificado')} · ${t.data?dataBR(t.data):'Sem data'}${t.validade?' · Próxima reciclagem '+dataBR(t.validade):''}</small><span class="v73-status ${s.classe}">${s.rotulo}</span></div><button class="btn-secundario" onclick="abrirFormularioTreinamentoV73('${t.cliente_id||''}','${t.id}')">Editar</button></div>`;
  }).join('');
  return `<section class="v74-supervisao" aria-label="Resumo da Supervisão">
  <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO</span><h2>Minhas entregas</h2><p>Uma visão das visitas e dos treinamentos realmente realizados. Sem lançamentos repetidos.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Ano seguinte">›</button></div></div>
@@ -7725,12 +7756,23 @@ const V87_CARDS_SUPERVISAO={
  programados:{titulo:'Treinamentos programados',campo:'treinamentosProgramados',tipo:'treinamento'},
  a_vencer:{titulo:'A vencer em 30 dias',campo:'treinamentosAVencer',tipo:'treinamento'},
  tecnicas:{titulo:'Visitas técnicas',campo:'visitasTecnicas',tipo:'visita'},
+ visitas_programadas:{titulo:'Visitas programadas',campo:'visitasProgramadas',tipo:'visita'},
  supervisao:{titulo:'Visitas de supervisão',campo:'visitasSupervisao',tipo:'visita'}
 };
+function v88BotaoEditar(id,treinamento=false){
+ const acao=treinamento?"abrirFormularioTreinamentoV73('',this.dataset.id)":"v88EditarEvento(this.dataset.id)";
+ return `<button type="button" class="btn-secundario" data-id="${textoHTML(String(id))}" onclick="${acao}">Editar</button>`;
+}
+function v88EditarEvento(id){
+ const evento=eventosSemana.find(e=>String(e.id)===String(id));
+ if(!evento)return;
+ if(v77EhVisitaEquipe(evento)){v77FormularioVisitaEquipe(evento.clienteId,evento.id);return;}
+ abrirFormularioAgenda(evento.dataISO,evento.hora,evento);
+}
 function v87TreinamentosDetalheHTML(registros,tipo){
  const lista=[...(registros||[])].sort((a,b)=>tipo==='a_vencer'?String(a.validade||'').localeCompare(String(b.validade||'')):String(b.data||'').localeCompare(String(a.data||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
  if(!lista.length)return '<p class="v82-treinos-vazio">Nenhum treinamento encontrado para os filtros selecionados.</p>';
- return lista.map(t=>`<article class="v87-detalhes-registro"><strong>${textoHTML(v75NomeCliente(t))}</strong><p>${textoHTML(t.tema||'Treinamento sem tema informado')}</p><small>${tipo==='programados'?'Data programada':'Data realizada'}: ${textoHTML(dataBR(t.data))}${t.validade?' · Validade: '+textoHTML(dataBR(t.validade)):''}</small></article>`).join('');
+ return lista.map(t=>`<article class="v87-detalhes-registro"><strong>${textoHTML(v75NomeCliente(t))}</strong><p>${textoHTML(t.tema||'Treinamento sem tema informado')}</p><small>${tipo==='programados'?'Data programada':'Data realizada'}: ${textoHTML(dataBR(t.data))}${t.validade?' · Validade: '+textoHTML(dataBR(t.validade)):''}</small>${v88BotaoEditar(t.id,true)}</article>`).join('');
 }
 function v87VisitasDetalheHTML(registros){
  const grupos=new Map();
@@ -7740,11 +7782,11 @@ function v87VisitasDetalheHTML(registros){
   grupos.get(id).lista.push(v);
  }
  const ordenados=[...grupos.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
- if(!ordenados.length)return '<p class="v82-treinos-vazio">Nenhuma visita realizada para os filtros selecionados.</p>';
+ if(!ordenados.length)return '<p class="v82-treinos-vazio">Nenhuma visita para os filtros selecionados.</p>';
  return ordenados.map(grupo=>`<details class="v87-detalhes-cliente"><summary>${textoHTML(grupo.nome)}<span>${grupo.lista.length} ${grupo.lista.length===1?'visita':'visitas'} ▾</span></summary><ul>${grupo.lista.sort((a,b)=>String(b.dataISO||'').localeCompare(String(a.dataISO||''))).map(v=>{
   const responsavel=v77PessoaEquipe(v)||(v.origemTreinamento?'Treinamento aplicado':'Bruna Ribeiro');
   const titulo=v77EhVisitaEquipe(v)?v77TituloEquipe(v):v.titulo||'Visita técnica';
-  return `<li><strong>${textoHTML(dataBR(v.dataISO))}</strong> · ${textoHTML(responsavel)}${titulo?' · '+textoHTML(titulo):''}</li>`;
+  return `<li><strong>${textoHTML(dataBR(v.dataISO))}</strong> · ${textoHTML(responsavel)}${titulo?' · '+textoHTML(titulo):''} ${v88BotaoEditar(v.treinamentoId||v.id,!!v.origemTreinamento)}</li>`;
  }).join('')}</ul></details>`).join('');
 }
 function v87AbrirDetalhesSupervisao(chave){
@@ -7767,11 +7809,11 @@ function v75PainelSupervisaoHTML(){
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v87</span></span><h2>Minhas entregas</h2><p>Toque em qualquer indicador para consultar seus registros. Os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v88</span></span><h2>Minhas entregas</h2><p>Toque em qualquer indicador para consultar seus registros. Os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
  <div class="v73-metricas">${cards.map(([nome,total,descricao,classe,chave])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<button type="button" class="v73-metrica ${classe||''} v87-card-clicavel" onclick="v87AbrirDetalhesSupervisao('${chave}')" aria-label="Abrir ${nome.toLowerCase()}"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></button>`).join('')}</div>
- <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · ${d.visitasProgramadas.length} visitas programadas · ${d.visitasEquipe.length} realizadas pela equipe · treinamentos aplicados também contam como visita.</p>
+ <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · <button type="button" class="tag" onclick="v87AbrirDetalhesSupervisao('visitas_programadas')">${d.visitasProgramadas.length} visitas programadas</button> · ${d.visitasEquipe.length} realizadas pela equipe · treinamentos aplicados também contam como visita.</p>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
  ${v84ResumoMensalHTML()}
  ${v78PlannerEquipeHTML()}
@@ -7810,14 +7852,14 @@ function v84ResumoMensalHTML(){
 function v83ListaTreinamentosVencidosHTML(treinamentos){
  const vencidos=[...(treinamentos||[])].sort((a,b)=>String(a.validade||'').localeCompare(String(b.validade||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
  if(!vencidos.length)return '<p class="v82-treinos-vazio">Nenhum treinamento vencido nesta carteira. ✓</p>';
- return vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl></article>`).join('');
+ return vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl>${v88BotaoEditar(t.id,true)}</article>`).join('');
 }
 function v82AbrirTreinamentosVencidos(){
  const dados=v76DadosSupervisao();
  const vencidos=[...dados.treinamentosVencidos].sort((a,b)=>String(a.validade||'').localeCompare(String(b.validade||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
  const total=vencidos.length;
  const referencia=formatoISO(new Date())<String(dados.ano)+'-12-31'?formatoISO(new Date()):String(dados.ano)+'-12-31';
- const linhas=vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl></article>`).join('');
+ const linhas=vencidos.map((t,i)=>`<article class="v82-treino-vencido"><div class="v82-treino-vencido-topo"><span class="v82-treino-vencido-numero">${i+1}</span><div class="v82-treino-vencido-titulo"><strong>${textoHTML(v75NomeCliente(t))}</strong><span>${textoHTML(t.tema||'Treinamento sem tema informado')}</span></div><span class="v82-treino-vencido-etiqueta">Vencido</span></div><dl class="v82-treino-vencido-datas"><div><dt>Último treinamento</dt><dd>${textoHTML(dataBR(t.data))}</dd></div><div><dt>Validade encerrada em</dt><dd>${textoHTML(dataBR(t.validade))}</dd></div></dl>${v88BotaoEditar(t.id,true)}</article>`).join('');
  abrirModalSistema(`<div class="v82-detalhes-vencidos"><div class="system-modal-head"><div><h2>Treinamentos vencidos</h2><p>${textoHTML(v75NomeEscopo(dados.escopo))} · Situação até ${textoHTML(dataBR(referencia))} · ${total} ${total===1?'treinamento':'treinamentos'}</p></div><button class="system-modal-close" onclick="fecharModalSistema()" aria-label="Fechar detalhes">✕</button></div><div class="v82-treinos-lista" aria-label="Lista de treinamentos vencidos">${linhas||'<p class="v82-treinos-vazio">Nenhum treinamento vencido nessa carteira. As reciclagens mais recentes já estão consideradas. ✓</p>'}</div><div class="system-modal-actions"><button class="btn-primario" onclick="fecharModalSistema()">Fechar</button></div></div>`);
 }
 function v76OcultarResumoLegado(){
@@ -8085,7 +8127,7 @@ async function v77ExcluirVisitaEquipe(id){
 function entregasHTML(){return v75PainelSupervisaoHTML();}
 function abrirFormularioTreinamentoV73(clienteId='',id=''){
  const treino=TREINAMENTOS.find(t=>String(t.id)===String(id)),agenda=v74TreinamentosConsolidados().find(t=>String(t.id)===String(id)&&t.origem==='agenda');
- if(agenda){abrirDetalheAgendaV22(String(agenda.evento_id));return;}
+ if(agenda){v88EditarEvento(String(agenda.evento_id));return;}
  const cId=treino?.cliente_id||clienteId||'',clientes=ordenarClientesAZ(CLIENTES.filter(c=>String(c.id)===String(cId)||String(c.status||'ativo').toLowerCase()!=='inativo'));
  const opcoes=clientes.map(c=>`<option value="${c.id}" ${String(c.id)===String(cId)?'selected':''}>${textoHTML(rotuloClienteEntrega(c))}</option>`).join('');
  const data=treino?.data||'',validade=treino?.validade||(treino?.status==='realizado'?v74MaisSeisMeses(data):''),manual=!!(treino?.validade&&treino.validade!==v74MaisSeisMeses(data));
