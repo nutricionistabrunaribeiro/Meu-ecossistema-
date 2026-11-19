@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Ecossistema — Bruna Ribeiro · v86</title>
+<title>Meu Ecossistema — Bruna Ribeiro · v87</title>
 <script>
   (()=>{if(typeof document==='undefined'||!document.documentElement)return;document.documentElement.dataset=document.documentElement.dataset||{};try{const escolha=localStorage.getItem('me-tema-interface')||'automatico',consulta=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false},escuro=escolha==='escuro'||(escolha==='automatico'&&consulta.matches);document.documentElement.dataset.temaInterface=escuro?'escuro':'claro';document.documentElement.dataset.preferenciaTema=escolha;}catch(e){document.documentElement.dataset.temaInterface='claro';}})();
 </script>
@@ -2587,6 +2587,31 @@ html[data-paleta-v04="br"][data-tema-interface="claro"]{--tema-fundo:#f6f5ec;--t
 .v86-asseio-contagem{font-size:11px;color:var(--cor-texto-suave);margin-bottom:8px}
 .v86-asseio-vazio{font-size:12px;color:var(--cor-texto-suave);background:var(--cor-fundo);border-radius:10px;padding:15px 12px;line-height:1.5}
 @media(max-width:480px){.v86-asseio-mes{align-items:stretch;flex-direction:column}.v86-asseio-mes select{width:100%}}
+</style>
+<style id="v87-supervisao-e-carregamento">
+.v76-supervisao button.v87-card-clicavel{appearance:none;-webkit-appearance:none;font:inherit;width:100%;min-width:0;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.v76-supervisao button.v87-card-clicavel:hover,.v76-supervisao button.v87-card-clicavel:focus-visible{border-color:var(--cor-primaria);box-shadow:0 5px 15px rgba(0,0,0,.07);outline-offset:2px}
+.v76-supervisao button.v87-card-clicavel>small{color:var(--cor-primaria);font-weight:750}
+.v87-detalhes{min-width:0}
+.v87-detalhes-lista{display:grid;gap:10px;max-height:min(60dvh,560px);overflow-y:auto;overscroll-behavior:contain;padding:3px 4px 4px 0}
+.v87-detalhes-registro,.v87-detalhes-cliente{border:1px solid var(--cor-borda);background:var(--cor-fundo);border-radius:14px;padding:13px;min-width:0}
+.v87-detalhes-registro strong{display:block;color:var(--cor-texto);font-size:13px;overflow-wrap:anywhere}
+.v87-detalhes-registro p{color:var(--cor-texto-suave);font-size:12px;line-height:1.5;margin:5px 0}
+.v87-detalhes-registro small{display:block;color:var(--cor-texto-suave);font-size:11px;line-height:1.5}
+.v87-detalhes-cliente summary{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:700;color:var(--cor-texto);list-style:none}
+.v87-detalhes-cliente summary::-webkit-details-marker{display:none}
+.v87-detalhes-cliente summary span{font-size:11px;color:var(--cor-primaria);font-weight:750;white-space:nowrap}
+.v87-detalhes-cliente ul{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px solid var(--cor-borda)}
+.v87-detalhes-cliente li{padding:8px 0;font-size:11.5px;color:var(--cor-texto-suave);line-height:1.5;border-bottom:1px solid var(--cor-borda)}
+.v87-detalhes-cliente li:last-child{border-bottom:0}
+.v87-carregamento{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:var(--cor-fundo);padding:20px;text-align:center}
+.v87-carregamento>div{width:min(350px,100%);padding:25px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:22px;box-shadow:0 14px 38px rgba(0,0,0,.05)}
+.v87-carregamento strong{display:block;color:var(--cor-texto);font-size:19px;font-family:Georgia,serif;margin-bottom:9px}
+.v87-carregamento p{font-size:12px;color:var(--cor-texto-suave);line-height:1.6;margin:0}
+.v87-carregamento i{display:block;width:100%;height:5px;margin:18px 0;background:var(--cor-borda);border-radius:9px;overflow:hidden}
+.v87-carregamento i:after{content:"";display:block;height:100%;width:35%;background:var(--cor-primaria);border-radius:9px;animation:v87-progress 1.4s ease-in-out infinite alternate}
+@keyframes v87-progress{from{transform:translateX(0)}to{transform:translateX(190%)}}
+@media(max-width:470px){#modalSistema:has(.v87-detalhes){padding:9px}#modalSistema:has(.v87-detalhes) .system-modal{padding:16px;max-height:calc(100dvh - 18px)}}
 </style>
 </head>
 <body data-espaco="trabalho">
@@ -7695,24 +7720,57 @@ function v76DadosSupervisao(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
  const visitasRealizadas=v77VisitasEfetivas().filter(e=>String(e.dataISO||'').startsWith(String(ano))&&(escopo==='todos'||v75GrupoClienteRegistro(e)===escopo));
  return {...base,visitasRealizadas,visitasTecnicas:visitasRealizadas.filter(e=>!v76EhVisitaSupervisao(e)),visitasSupervisao:visitasRealizadas.filter(v76EhVisitaSupervisao),visitasEquipe:visitasRealizadas.filter(v77EhVisitaEquipe),treinamentosVencidos:alertas.vencidos,treinamentosAVencer:alertas.aVencer};
 }
+const V87_CARDS_SUPERVISAO={
+ realizados:{titulo:'Treinamentos realizados',campo:'treinamentosRealizados',tipo:'treinamento'},
+ programados:{titulo:'Treinamentos programados',campo:'treinamentosProgramados',tipo:'treinamento'},
+ a_vencer:{titulo:'A vencer em 30 dias',campo:'treinamentosAVencer',tipo:'treinamento'},
+ tecnicas:{titulo:'Visitas técnicas',campo:'visitasTecnicas',tipo:'visita'},
+ supervisao:{titulo:'Visitas de supervisão',campo:'visitasSupervisao',tipo:'visita'}
+};
+function v87TreinamentosDetalheHTML(registros,tipo){
+ const lista=[...(registros||[])].sort((a,b)=>tipo==='a_vencer'?String(a.validade||'').localeCompare(String(b.validade||'')):String(b.data||'').localeCompare(String(a.data||''))||v75NomeCliente(a).localeCompare(v75NomeCliente(b),'pt-BR'));
+ if(!lista.length)return '<p class="v82-treinos-vazio">Nenhum treinamento encontrado para os filtros selecionados.</p>';
+ return lista.map(t=>`<article class="v87-detalhes-registro"><strong>${textoHTML(v75NomeCliente(t))}</strong><p>${textoHTML(t.tema||'Treinamento sem tema informado')}</p><small>${tipo==='programados'?'Data programada':'Data realizada'}: ${textoHTML(dataBR(t.data))}${t.validade?' · Validade: '+textoHTML(dataBR(t.validade)):''}</small></article>`).join('');
+}
+function v87VisitasDetalheHTML(registros){
+ const grupos=new Map();
+ for(const v of registros||[]){
+  const id=String(v.clienteId||v.clienteNomeVinculado||v.clienteExterno||'sem-cliente');
+  if(!grupos.has(id))grupos.set(id,{nome:v75NomeCliente(v),lista:[]});
+  grupos.get(id).lista.push(v);
+ }
+ const ordenados=[...grupos.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+ if(!ordenados.length)return '<p class="v82-treinos-vazio">Nenhuma visita realizada para os filtros selecionados.</p>';
+ return ordenados.map(grupo=>`<details class="v87-detalhes-cliente"><summary>${textoHTML(grupo.nome)}<span>${grupo.lista.length} ${grupo.lista.length===1?'visita':'visitas'} ▾</span></summary><ul>${grupo.lista.sort((a,b)=>String(b.dataISO||'').localeCompare(String(a.dataISO||''))).map(v=>{
+  const responsavel=v77PessoaEquipe(v)||(v.origemTreinamento?'Treinamento aplicado':'Bruna Ribeiro');
+  const titulo=v77EhVisitaEquipe(v)?v77TituloEquipe(v):v.titulo||'Visita técnica';
+  return `<li><strong>${textoHTML(dataBR(v.dataISO))}</strong> · ${textoHTML(responsavel)}${titulo?' · '+textoHTML(titulo):''}</li>`;
+ }).join('')}</ul></details>`).join('');
+}
+function v87AbrirDetalhesSupervisao(chave){
+ const configuracao=V87_CARDS_SUPERVISAO[chave];if(!configuracao)return;
+ const d=v76DadosSupervisao(),registros=d[configuracao.campo]||[];
+ const lista=configuracao.tipo==='visita'?v87VisitasDetalheHTML(registros):v87TreinamentosDetalheHTML(registros,chave);
+ abrirModalSistema(`<div class="v87-detalhes"><div class="system-modal-head"><div><h2>${textoHTML(configuracao.titulo)}</h2><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${d.ano} · ${registros.length} registro(s)</p></div><button class="system-modal-close" onclick="fecharModalSistema()" aria-label="Fechar detalhes">✕</button></div><div class="v87-detalhes-lista">${lista}</div><div class="system-modal-actions"><button class="btn-primario" onclick="fecharModalSistema()">Fechar</button></div></div>`);
+}
 function v75PainelSupervisaoHTML(){
  const d=v76DadosSupervisao(),cards=[
-  ['Treinamentos realizados',d.treinamentosRealizados.length,'No período'],
-  ['Treinamentos programados',d.treinamentosProgramados.length,'A realizar'],
+  ['Treinamentos realizados',d.treinamentosRealizados.length,'No período','', 'realizados'],
+  ['Treinamentos programados',d.treinamentosProgramados.length,'A realizar','', 'programados'],
   ['Treinamentos vencidos',d.treinamentosVencidos.length,'Última reciclagem por cliente e tema','v76-vencidos'],
-  ['A vencer em 30 dias',d.treinamentosAVencer.length,'Reciclagens próximas','v76-a-vencer'],
-  ['Visitas técnicas',d.visitasTecnicas.length,'Inclui treinamentos aplicados'],
-  ['Visitas de supervisão',d.visitasSupervisao.length,`${d.visitasEquipe.length} feita(s) pela equipe`],
+  ['A vencer em 30 dias',d.treinamentosAVencer.length,'Reciclagens próximas','v76-a-vencer','a_vencer'],
+  ['Visitas técnicas',d.visitasTecnicas.length,'Inclui treinamentos aplicados','', 'tecnicas'],
+  ['Visitas de supervisão',d.visitasSupervisao.length,`${d.visitasEquipe.length} feita(s) pela equipe`,'', 'supervisao'],
  ];
  if(typeof document!=='undefined'&&typeof setTimeout==='function'){
   setTimeout(v76OcultarResumoLegado,0);
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v86</span></span><h2>Minhas entregas</h2><p>Seis indicadores em um só lugar. Toque nos vencidos para consultar a lista; os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v87</span></span><h2>Minhas entregas</h2><p>Toque em qualquer indicador para consultar seus registros. Os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
- <div class="v73-metricas">${cards.map(([nome,total,descricao,classe])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<article class="v73-metrica ${classe||''}"><span>${nome}</span><strong>${total}</strong><small>${descricao}</small></article>`).join('')}</div>
+ <div class="v73-metricas">${cards.map(([nome,total,descricao,classe,chave])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<button type="button" class="v73-metrica ${classe||''} v87-card-clicavel" onclick="v87AbrirDetalhesSupervisao('${chave}')" aria-label="Abrir ${nome.toLowerCase()}"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></button>`).join('')}</div>
  <p class="v75-info"><strong>${d.visitasRealizadas.length} visitas realizadas no total</strong> · ${d.visitasProgramadas.length} visitas programadas · ${d.visitasEquipe.length} realizadas pela equipe · treinamentos aplicados também contam como visita.</p>
  <div class="v73-actions"><button class="btn-primario" onclick="abrirFormularioTreinamentoV73()">+ Treinamento</button><button class="btn-secundario" onclick="abrirFormularioVisitaV73()">+ Visita de supervisão</button><button class="btn-secundario" onclick="v75GerarRelatorioPDF()">↓ Resumo anual em PDF</button></div>
  ${v84ResumoMensalHTML()}
@@ -9244,6 +9302,30 @@ async function tentarLogin(){
   }
   entrarNoApp();
 }
+function v87MostrarCarregamento(){
+ if(document.getElementById('v87-carregamento'))return;
+ const tela=document.createElement('div');tela.id='v87-carregamento';tela.className='v87-carregamento';tela.setAttribute('role','status');tela.setAttribute('aria-live','polite');
+ tela.innerHTML='<div><strong>Preparando seu Ecossistema</strong><p id="v87-carregamento-msg">Conectando aos seus registros…</p><i aria-hidden="true"></i></div>';
+ document.body.appendChild(tela);
+}
+function v87AtualizarCarregamento(mensagem){
+ const alvo=document.getElementById('v87-carregamento-msg');if(alvo)alvo.textContent=mensagem;
+}
+function v87OcultarCarregamento(){document.getElementById('v87-carregamento')?.remove();}
+async function v87CarregarModulosEmParalelo(tarefas,limite=6){
+ let proxima=0,terminadas=0;const erros=[];
+ const trabalhadores=Array.from({length:Math.min(limite,tarefas.length)},async()=>{
+  while(proxima<tarefas.length){
+   const [nome,acao]=tarefas[proxima++];
+   try{await acao()}catch(erro){erros.push({nome,erro});console.warn('Carregamento do módulo:',nome,erro);}
+   terminadas++;
+   v87AtualizarCarregamento(`Atualizando seus registros · ${terminadas} de ${tarefas.length} módulos`);
+  }
+ });
+ await Promise.all(trabalhadores);
+ if(erros.length)dispararAutomacao('Alguns módulos não carregaram',`${erros.length} módulo(s) apresentaram erro de conexão. Atualize a página para tentar novamente.`);
+ return erros.length===0;
+}
 async function entrarNoApp(){
   const {data:{session}}=await supa.auth.getSession();
   if(!session)return;
@@ -9263,55 +9345,66 @@ async function entrarNoApp(){
   document.getElementById('telaLogin').style.display = 'none';
   document.getElementById('appRoot').classList.add('ativo');
   const entradaHoras=w51PedidoHoras();
+  if(!entradaHoras)v87MostrarCarregamento();
   if(entradaHoras){
     w47Destino();renderSidebar();renderTela();
     try{await carregarClientesSupabase();if(!await carregarControleHorasSupabase())throw Error('Cronômetro indisponível');W51_HOURS_LOADING=false;W51_HOURS_ERROR=false;}
     catch(e){W51_HOURS_LOADING=false;W51_HOURS_ERROR=true;}
     renderTela();
   }
-  await carregarPerfilSupabase();
-  await sincronizarSono();
-  await carregarTemaMarcaSupabase();
-  if(!entradaHoras)await carregarClientesSupabase();
-  await carregarRadarRecorrencias();
-  await carregarEnviosMensaisSupabase();
-  await carregarEntregasSupabase();
-  await carregarProximosPassosSupabase();
-  await carregarModeloChecklistSupabase();
-  await carregarVisitasSupabase();
-  await carregarEventosSupabase();
-  await carregarLancamentosSupabase();
-  await carregarLeadsSupabase();
-  await carregarAtivosSupabase();
-  await carregarHabitosSupabase();
-  await v46Carregar();
-  await w47Carregar();
-  await carregarMetasPessoaisSupabase();
-  await carregarContasPessoaisSupabase();
-  await carregarComprasSupabase();
-  await carregarListaDiaSupabase();
-  await carregarBibliaSupabase();
-  await npCarregar();
-  if(!entradaHoras)await carregarControleHorasSupabase();
-  await carregarMercadoSupabase();
-  await carregarIdeiasPessoaisSupabase();
-  await carregarCicloSupabase();
-  await carregarHidratacaoSupabase();
-  await carregarPixelSupabase();
-  await carregarProjetosSupabase();
-  await carregarMarketingSupabase();
-  await carregarPendenciasSupabase();
-  await carregarLiderancaSupabase();
-  await carregarCentralComandoSupabase();
-  await carregarPlanejamentoSupabase();
-  await carregarAsseioSupabase();
-  aplicarRascunhosLocais();
-  await sincronizarRascunhos();
-  await salvarCopiaChecklist();
-  if(!entradaHoras){restaurarTelaAtualSessao();w47Destino();}
-  renderSidebar();
-  renderTela();
-  setTimeout(verificarPendenciasAtrasadas, 2200);
+  try{
+    // O perfil, o tema e os clientes são bases utilizadas por outros módulos.
+    await carregarPerfilSupabase();
+    await sincronizarSono();
+    await carregarTemaMarcaSupabase();
+    if(!entradaHoras)await carregarClientesSupabase();
+    v87AtualizarCarregamento('Organizando suas informações…');
+
+    // Carrega até seis módulos independentes simultaneamente. O checklist de
+    // visitas espera os modelos estarem prontos antes de montar suas fichas.
+    const tarefas=[
+      ['Radar',carregarRadarRecorrencias],
+      ['Controle mensal',carregarEnviosMensaisSupabase],
+      ['Entregas',carregarEntregasSupabase],
+      ['Próximos passos',carregarProximosPassosSupabase],
+      ['Checklists',async()=>{await carregarModeloChecklistSupabase();await carregarVisitasSupabase();}],
+      ['Agenda',carregarEventosSupabase],
+      ['Lançamentos',carregarLancamentosSupabase],
+      ['Leads',carregarLeadsSupabase],
+      ['Ativos',carregarAtivosSupabase],
+      ['Hábitos',carregarHabitosSupabase],
+      ['Minha clareza',v46Carregar],
+      ['Integrações',w47Carregar],
+      ['Metas',carregarMetasPessoaisSupabase],
+      ['Contas pessoais',carregarContasPessoaisSupabase],
+      ['Compras',carregarComprasSupabase],
+      ['Minha lista',carregarListaDiaSupabase],
+      ['Bíblia',carregarBibliaSupabase],
+      ['Na Presença',npCarregar],
+      ...(!entradaHoras?[['Controle de horas',carregarControleHorasSupabase]]:[]),
+      ['Mercado',carregarMercadoSupabase],
+      ['Ideias pessoais',carregarIdeiasPessoaisSupabase],
+      ['Ciclo',carregarCicloSupabase],
+      ['Hidratação',carregarHidratacaoSupabase],
+      ['Ano em pixels',carregarPixelSupabase],
+      ['Projetos',carregarProjetosSupabase],
+      ['Marketing',carregarMarketingSupabase],
+      ['Pendências',carregarPendenciasSupabase],
+      ['Liderança',carregarLiderancaSupabase],
+      ['Central de comando',carregarCentralComandoSupabase],
+      ['Planejamento',carregarPlanejamentoSupabase],
+      ['Asseio pessoal',carregarAsseioSupabase]
+    ];
+    await v87CarregarModulosEmParalelo(tarefas);
+    // A sincronização dos rascunhos continua após carregar modelos e visitas.
+    aplicarRascunhosLocais();
+    await sincronizarRascunhos();
+    await salvarCopiaChecklist();
+    if(!entradaHoras){restaurarTelaAtualSessao();w47Destino();}
+    renderSidebar();
+    renderTela();
+    setTimeout(verificarPendenciasAtrasadas,2200);
+  }finally{if(!entradaHoras)v87OcultarCarregamento();}
 }
 function restaurarTelaAtualSessao(){
   try{
@@ -9374,7 +9467,7 @@ function verificarPendenciasAtrasadas(){
 }
 
 /* V56 — Consolidação final sem substituir módulos ou dados antigos. */
-const V56_VERSAO='86',V56_PLANO='Meu 2027 • De forma leve';
+const V56_VERSAO='87',V56_PLANO='Meu 2027 • De forma leve';
 const V56_AREAS=[
  {nome:'Trabalho e propósito',icone:'✦',itens:['Escolher uma prioridade profissional por mês','Celebrar uma conquista profissional a cada trimestre']},
  {nome:'Família e vínculos',icone:'♡',itens:['Separar um momento intencional em família','Registrar uma memória especial do mês']},
