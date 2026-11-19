@@ -7627,19 +7627,42 @@ function v74TreinamentosConsolidados(){
 }
 function v73VisitasAno(ano=V73_ANO){return eventosSemana.filter(e=>e.tipo==='visita'&&e.concluido&&String(e.dataISO||'').startsWith(String(ano)));}
 function v73TreinosRealizadosAno(ano=V73_ANO){return v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&String(t.data||'').startsWith(String(ano)));}
-function v73TreinosAtuais(){
- const mapa=new Map();
- v74TreinamentosConsolidados().filter(t=>t.status==='realizado').sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))).forEach(t=>{
-  const chave=v74ChaveTreinamento(t);
-  if(!mapa.has(chave))mapa.set(chave,t);
+const V89_DATA_REVISAO='2026-11-19';
+function v89ExcecaoRevisao(t){
+ const cliente=CLIENTES.find(c=>String(c.id)===String(t.cliente_id));
+ const nome=v74TemaChave(cliente?.nome).replace(/[^a-z0-9 ]/g,'');
+ if(/\bguidal{1,2}a\b/.test(nome))return true;
+ return /\bcheck\s*in\b/.test(nome)&&/\bboas praticas\b/.test(v74TemaChave(t.tema));
+}
+function v89Regularizado(t,referencia){
+ return referencia>=V89_DATA_REVISAO&&t.validade&&t.validade<V89_DATA_REVISAO&&!v89ExcecaoRevisao(t);
+}
+function v89ClienteTreino(t){
+ return t.cliente_id?'cliente:'+t.cliente_id:'registro:'+t.id;
+}
+function v73TreinosAtuais(referencia=formatoISO(new Date())){
+ const registros=v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&t.data&&t.data<=referencia);
+ const ultimaData=new Map(),ultimaLinha=new Map(),novaAplicacao=new Map();
+ for(const t of registros){
+  const chave=v89ClienteTreino(t);
+  if(!ultimaData.has(chave)||t.data>ultimaData.get(chave))ultimaData.set(chave,t.data);
+  const linha=chave+'|'+v74ChaveTreinamento(t);
+  if(t.data>(ultimaLinha.get(linha)||''))ultimaLinha.set(linha,t.data);
+  const cadastro=String(t.criado_em||t.created_at||'').slice(0,10);
+  if((t.data>=V89_DATA_REVISAO||cadastro>V89_DATA_REVISAO)&&t.data>(novaAplicacao.get(chave)||''))novaAplicacao.set(chave,t.data);
+ }
+ return registros.filter(t=>{
+  const chave=v89ClienteTreino(t);
+  if(t.data===ultimaData.get(chave))return true;
+  return referencia>=V89_DATA_REVISAO&&t.validade&&t.validade<V89_DATA_REVISAO&&v89ExcecaoRevisao(t)
+   &&t.data===ultimaLinha.get(chave+'|'+v74ChaveTreinamento(t))&&!(novaAplicacao.get(chave)>t.data);
  });
- return [...mapa.values()];
 }
 function v73AlertasTreino(){
  const hoje=formatoISO(new Date()),limite=formatoISO(addDias(new Date(),30));
  const ativo=id=>String(CLIENTES.find(c=>String(c.id)===String(id))?.status||'Ativo').toLowerCase()!=='inativo';
  const atuais=v73TreinosAtuais().filter(t=>ativo(t.cliente_id));
- const vencidos=atuais.filter(t=>t.validade&&t.validade<hoje);
+ const vencidos=atuais.filter(t=>t.validade&&t.validade<hoje&&!v89Regularizado(t,hoje));
  const aVencer=atuais.filter(t=>t.validade&&t.validade>=hoje&&t.validade<=limite);
  const programados=v74TreinamentosConsolidados().filter(t=>(t.status||'planejado')==='planejado'&&ativo(t.cliente_id)&&!atuais.some(a=>v74ChaveTreinamento(a)===v74ChaveTreinamento(t)&&a.data>=t.data));
  return {vencidos,aVencer,programados};
@@ -7647,7 +7670,8 @@ function v73AlertasTreino(){
 function v73SituacaoTreino(t){
  const hoje=formatoISO(new Date()),estado=t.status||'planejado';
  if(estado==='cancelado')return {rotulo:'Cancelado',classe:'neutro'};
- if(estado==='realizado'&&v73TreinosAtuais().some(atual=>v74ChaveTreinamento(atual)===v74ChaveTreinamento(t)&&String(atual.id)!==String(t.id)&&String(atual.data)>String(t.data)))return {rotulo:'Histórico · renovado',classe:'neutro'};
+ if(estado==='realizado'&&t.data&&t.data<=hoje&&!v73TreinosAtuais().some(atual=>String(atual.id)===String(t.id)))return {rotulo:'Histórico · renovado',classe:'neutro'};
+ if(estado==='realizado'&&v89Regularizado(t,hoje))return {rotulo:'OK · revisado',classe:'feito'};
  if(estado==='realizado')return t.validade&&t.validade<hoje?{rotulo:'Vencido',classe:'vencido'}:t.validade&&t.validade<=formatoISO(addDias(new Date(),30))?{rotulo:'Vence em breve',classe:'atencao'}:{rotulo:'Realizado',classe:'feito'};
  if(t.data&&t.data<hoje)return {rotulo:'Programação atrasada',classe:'vencido'};
  return {rotulo:t.data?'Programado':'A programar',classe:'atencao'};
@@ -7736,15 +7760,11 @@ function v76EhVisitaSupervisao(e){
 function v76AlertasTreinoPorAno(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
  const hoje=formatoISO(new Date()),fimDoAno=String(ano)+'-12-31',referencia=hoje<fimDoAno?hoje:fimDoAno;
  const limite=formatoISO(addDias(new Date(referencia+'T12:00:00'),30));
- const maisRecentes=new Map();
- v74TreinamentosConsolidados().filter(t=>t.status==='realizado'&&t.data&&t.data<=referencia&&(escopo==='todos'||v75GrupoClienteRegistro(t)===escopo)).sort((a,b)=>String(b.data).localeCompare(String(a.data))).forEach(t=>{
+ const atuais=v73TreinosAtuais(referencia).filter(t=>{
   const cliente=CLIENTES.find(c=>String(c.id)===String(t.cliente_id));
-  if(String(cliente?.status||'ativo').toLowerCase()==='inativo')return;
-  const chave=v74ChaveTreinamento(t);
-  if(!maisRecentes.has(chave))maisRecentes.set(chave,t);
+  return String(cliente?.status||'ativo').toLowerCase()!=='inativo'&&(escopo==='todos'||v75GrupoClienteRegistro(t)===escopo);
  });
- const atuais=[...maisRecentes.values()];
- return {vencidos:atuais.filter(t=>t.validade&&t.validade<referencia),aVencer:atuais.filter(t=>t.validade&&t.validade>=referencia&&t.validade<=limite)};
+ return {vencidos:atuais.filter(t=>t.validade&&t.validade<referencia&&!v89Regularizado(t,referencia)),aVencer:atuais.filter(t=>t.validade&&t.validade>=referencia&&t.validade<=limite)};
 }
 function v76DadosSupervisao(ano=V73_ANO,escopo=V75_ESCOPO_SUPERVISAO){
  const base=v75DadosSupervisao(ano,escopo),alertas=v76AlertasTreinoPorAno(ano,escopo);
@@ -7799,7 +7819,7 @@ function v75PainelSupervisaoHTML(){
  const d=v76DadosSupervisao(),cards=[
   ['Treinamentos realizados',d.treinamentosRealizados.length,'No período','', 'realizados'],
   ['Treinamentos programados',d.treinamentosProgramados.length,'A realizar','', 'programados'],
-  ['Treinamentos vencidos',d.treinamentosVencidos.length,'Última reciclagem por cliente e tema','v76-vencidos'],
+  ['Treinamentos vencidos',d.treinamentosVencidos.length,'Última aplicação por cliente','v76-vencidos'],
   ['A vencer em 30 dias',d.treinamentosAVencer.length,'Reciclagens próximas','v76-a-vencer','a_vencer'],
   ['Visitas técnicas',d.visitasTecnicas.length,'Inclui treinamentos aplicados','', 'tecnicas'],
   ['Visitas de supervisão',d.visitasSupervisao.length,`${d.visitasEquipe.length} feita(s) pela equipe`,'', 'supervisao'],
@@ -7809,7 +7829,7 @@ function v75PainelSupervisaoHTML(){
   setTimeout(v76OcultarResumoLegado,250);
  }
  return `<section class="v74-supervisao v75-supervisao v76-supervisao" aria-label="Painel único de Supervisão">
- <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v88</span></span><h2>Minhas entregas</h2><p>Toque em qualquer indicador para consultar seus registros. Os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
+ <div class="v74-supervisao-topo"><span class="v73-kicker">MEU TRABALHO · SUPERVISÃO <span class="v83-versao">v89</span></span><h2>Minhas entregas</h2><p>Toque em qualquer indicador para consultar seus registros. Os resumos mensal e anual estão disponíveis abaixo.</p><div class="v73-year"><button onclick="V73_ANO--;renderTela()" aria-label="Ano anterior">‹</button><strong>${d.ano}</strong><button onclick="V73_ANO++;renderTela()" aria-label="Próximo ano">›</button></div></div>
  <div class="v75-escopo" role="group" aria-label="Carteira de clientes">${[['todos','Todos'],['saber','Saber Nutrir'],['bruna','Bruna Ribeiro']].map(([id,nome])=>`<button class="${V75_ESCOPO_SUPERVISAO===id?'ativo':''}" aria-pressed="${V75_ESCOPO_SUPERVISAO===id}" onclick="V75_ESCOPO_SUPERVISAO='${id}';renderTela()">${nome}</button>`).join('')}</div>
  <input type="checkbox" id="v83-abrir-vencidos" class="v83-vencidos-check" aria-label="Abrir ou fechar a lista de treinamentos vencidos" aria-controls="v83-vencidos-painel">
  <div class="v73-metricas">${cards.map(([nome,total,descricao,classe,chave])=>nome==='Treinamentos vencidos'?`<label for="v83-abrir-vencidos" class="v73-metrica ${classe||''} v83-metrica-vencidos" title="Toque para abrir a relação de treinamentos vencidos"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></label><div class="v83-vencidos-painel" id="v83-vencidos-painel"><div class="v83-vencidos-titulo"><div><h3>Treinamentos vencidos</h3><p>${textoHTML(v75NomeEscopo(d.escopo))} · ${total} ${total===1?'treinamento':'treinamentos'} · Vencimentos até ${textoHTML(dataBR(formatoISO(new Date())<String(d.ano)+'-12-31'?formatoISO(new Date()):String(d.ano)+'-12-31'))}</p></div><label for="v83-abrir-vencidos" class="v83-vencidos-fechar">Fechar ↑</label></div><div class="v82-treinos-lista">${v83ListaTreinamentosVencidosHTML(d.treinamentosVencidos)}</div></div>`:`<button type="button" class="v73-metrica ${classe||''} v87-card-clicavel" onclick="v87AbrirDetalhesSupervisao('${chave}')" aria-label="Abrir ${nome.toLowerCase()}"><span>${nome}</span><strong>${total}</strong><small>Toque para abrir ↓</small></button>`).join('')}</div>
@@ -8139,7 +8159,7 @@ function abrirFormularioTreinamentoV73(clienteId='',id=''){
  <div class="form-field"><label>Situação</label><select id="v73TreinoStatus" onchange="v74AtualizarValidadeTreino()">${[['planejado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']].map(([v,n])=>`<option value="${v}" ${v===(treino?.status||'planejado')?'selected':''}>${n}</option>`).join('')}</select></div>
  <div class="form-field"><label>Participantes</label><input id="v73TreinoParticipantes" type="number" min="0" step="1" value="${treino?.participantes??''}" placeholder="Opcional"></div>
  <div class="form-field full"><label>Observações</label><textarea id="v73TreinoObs" rows="3" placeholder="Conteúdo, público, responsável…">${textoHTML(treino?.observacoes||'')}</textarea></div></div>
- <p class="v74-avisos">A Agenda e a Supervisão entram na mesma contagem. Um treinamento novo do mesmo tema renova o prazo do cliente; os anteriores ficam no histórico.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button>${treino?`<button class="btn-secundario" onclick="excluirTreinamentoV73('${treino.id}')">Excluir</button>`:''}<button class="btn-primario" onclick="salvarTreinamentoV73('${treino?.id||''}')">Salvar treinamento</button></div></div>`);
+ <p class="v74-avisos">A Agenda e a Supervisão entram na mesma contagem. Um novo treinamento realizado renova o prazo do cliente; os anteriores ficam no histórico.</p><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button>${treino?`<button class="btn-secundario" onclick="excluirTreinamentoV73('${treino.id}')">Excluir</button>`:''}<button class="btn-primario" onclick="salvarTreinamentoV73('${treino?.id||''}')">Salvar treinamento</button></div></div>`);
  v74AtualizarValidadeTreino();
 }
 async function v74EscolherDataTreino(campo){
@@ -8312,7 +8332,7 @@ function v75GerarRelatorioPDF(){
  tabelaSupervisao();
  tabelaTreinos('Treinamentos realizados',d.treinamentosRealizados,'Data e cliente de cada treinamento concluído, incluindo reciclagens renovadas.');
  tabelaTreinos('Treinamentos programados',d.treinamentosProgramados,'Próximos treinamentos por cliente.','programado');
- tabelaTreinos('Reciclagens vencidas ou a vencer',[...d.treinamentosVencidos,...d.treinamentosAVencer],'Somente o registro mais recente de cada tema por cliente.','alerta');
+ tabelaTreinos('Reciclagens vencidas ou a vencer',[...d.treinamentosVencidos,...d.treinamentosAVencer],'Treinamentos da última data de aplicação de cada cliente.','alerta');
  const totalPaginas=doc.internal.getNumberOfPages();
  for(let i=1;i<=totalPaginas;i++){
   doc.setPage(i);rgb('setDrawColor',C.borda);doc.setLineWidth(.35);doc.line(15,282,195,282);
@@ -9830,7 +9850,7 @@ function v68ItensDia(){
     if(dias!==null&&dias<=7)add('treinamento',t.tema,`Treinamento programado · ${nomeCliente(t.cliente_id)}`,t.data,'entregas',t.cliente_id,'treinamento|'+t.id);
   }
   for(const t of v73TreinosAtuais()){
-    if(!ativo(t.cliente_id)||!t.validade)continue;
+    if(!ativo(t.cliente_id)||!t.validade||v89Regularizado(t,formatoISO(new Date())))continue;
     const dias=v66Diferenca(t.validade);
     if(dias!==null&&dias<=7)add('treinamento','Reciclagem: '+t.tema,`Validade do treinamento · ${nomeCliente(t.cliente_id)}`,t.validade,'entregas',t.cliente_id,'reciclagem|'+t.id);
   }
