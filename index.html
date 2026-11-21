@@ -3591,7 +3591,7 @@ function abrirFormularioAgenda(dataISO,hora,evento=null){
     <div class="form-field full"><label>3. Qual é o compromisso? <span style="font-weight:400;color:var(--cor-texto-suave)">(opcional)</span></label><input id="agendaTitulo" placeholder="Ex.: Revisar FDS e EPIs"></div>
     <div class="form-field"><label>Data</label><input type="date" id="agendaData" value="${dataISO}" onchange="v85AtualizarRepeticaoAgenda()"></div>
     <div class="form-field"><label>Horário</label><select id="agendaHora">${HORAS_PLANNER.map(h=>`<option value="${h}" ${h===hora?'selected':''}>${String(h).padStart(2,'0')}:00</option>`).join('')}</select></div>
-    <div class="form-field full v85-repeticao"><div class="form-field"><label>Repetir este compromisso?</label><select id="v85AgendaRepeticao" onchange="v85AtualizarRepeticaoAgenda()"><option value="nenhuma">Não repetir · apenas esta data</option><option value="diaria">Todos os dias</option><option value="dias_uteis">De segunda a sexta</option><option value="semanal">Uma vez por semana</option></select><p class="form-hint">Ex.: postar um produto da Shopee diariamente por 60 dias.</p></div><div id="v85RecorrenciaOpcoes" hidden><div class="form-field"><label>Por quanto tempo?</label><select id="v85DuracaoRecorrencia" onchange="v85AtualizarRepeticaoAgenda()"><option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="personalizada">Escolher a duração</option></select></div><div class="form-field" id="v85DuracaoPersonalizadaWrap" hidden><label>Quantidade de dias</label><input id="v85DuracaoPersonalizada" type="number" min="1" max="365" value="60" inputmode="numeric" oninput="v85AtualizarRepeticaoAgenda()"></div><div id="v85RecorrenciaResumo" role="status" aria-live="polite"></div></div></div>
+    <div class="form-field full v85-repeticao"><div class="form-field"><label>Repetir este compromisso?</label><select id="v85AgendaRepeticao" onchange="v85AtualizarRepeticaoAgenda()"><option value="nenhuma">Não repetir · apenas esta data</option><option value="diaria">Todos os dias</option><option value="dias_uteis">De segunda a sexta</option><option value="semanal">Uma vez por semana</option><option value="mensal">Uma vez por mês · mesmo dia</option></select><p class="form-hint">Ex.: postar um produto da Shopee diariamente por 60 dias, ou repetir todo dia 1 de cada mês.</p></div><div id="v85RecorrenciaOpcoes" hidden><div class="form-field"><label id="v85DuracaoRecorrenciaLabel">Por quanto tempo?</label><select id="v85DuracaoRecorrencia" onchange="v85AtualizarRepeticaoAgenda()"><option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="personalizada">Escolher a duração</option></select></div><div class="form-field" id="v85DuracaoPersonalizadaWrap" hidden><label id="v85DuracaoPersonalizadaLabel">Quantidade de dias</label><input id="v85DuracaoPersonalizada" type="number" min="1" max="365" value="60" inputmode="numeric" oninput="v85AtualizarRepeticaoAgenda()"></div><div id="v85RecorrenciaResumo" role="status" aria-live="polite"></div></div></div>
     <div class="form-field full"><label>Identificação visual automática</label><div class="form-color-preview"><i id="agendaCorPreview"></i><span id="agendaCorTexto"></span></div></div>
   </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button id="agendaSalvarBotao" class="btn-primario" onclick="confirmarNovoEvento()">Salvar compromisso</button></div>`);
   if(evento){
@@ -3620,12 +3620,20 @@ function atualizarFormularioAgenda(){
   if(hint)hint.textContent=tipo==='visita'?'Obrigatório para visitas.':tipo==='treinamento'?'Informe o cliente para contabilizar o treinamento também como visita.':'Opcional para este tipo de compromisso.';
   const bolinha=document.getElementById('agendaCorPreview'),texto=document.getElementById('agendaCorTexto');if(bolinha)bolinha.style.background=def.cor;if(texto)texto.textContent=def.nome+' · cor aplicada pelo sistema';
 }
-function v85DatasRecorrentes(inicioISO,frequencia,periodoDias){
+function v85DatasRecorrentes(inicioISO,frequencia,periodo){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(inicioISO||'')))return [];
- const periodo=Number(periodoDias),inicio=new Date(inicioISO+'T12:00:00');
- if(!Number.isInteger(periodo)||periodo<1||periodo>365||Number.isNaN(inicio.getTime()))return [];
+ const cantidad=Number(periodo),inicio=new Date(inicioISO+'T12:00:00');
+ if(!Number.isInteger(cantidad)||cantidad<1||cantidad>365||Number.isNaN(inicio.getTime()))return [];
  const datas=[];
- for(let i=0;i<periodo;i++){
+ if(frequencia==='mensal'){
+  const dia=inicio.getDate();
+  for(let i=0;i<cantidad;i++){
+   const ano=inicio.getFullYear(),mes=inicio.getMonth()+i,primeiro=new Date(ano,mes,1,12),ultimoDia=new Date(primeiro.getFullYear(),primeiro.getMonth()+1,0).getDate();
+   if(dia<=ultimoDia){const alvo=new Date(primeiro.getFullYear(),primeiro.getMonth(),dia,12);datas.push(formatoISO(alvo));}
+  }
+  return datas;
+ }
+ for(let i=0;i<cantidad;i++){
   const dia=new Date(inicio);dia.setDate(inicio.getDate()+i);
   if(frequencia==='semanal'&&i%7!==0)continue;
   if(frequencia==='dias_uteis'&&(dia.getDay()===0||dia.getDay()===6))continue;
@@ -3636,7 +3644,7 @@ function v85DatasRecorrentes(inicioISO,frequencia,periodoDias){
 }
 function v85ParametrosRecorrenciaAgenda(){
  const frequencia=document.getElementById('v85AgendaRepeticao')?.value||'nenhuma';
- const duracao=document.getElementById('v85DuracaoRecorrencia')?.value||'30';
+ const duracao=document.getElementById('v85DuracaoRecorrencia')?.value|| (frequencia==='mensal'?'12':'30');
  const periodoDias=Number(duracao==='personalizada'?document.getElementById('v85DuracaoPersonalizada')?.value:duracao);
  const inicioISO=document.getElementById('agendaData')?.value||'';
  return {frequencia,periodoDias,inicioISO,datas:v85DatasRecorrentes(inicioISO,frequencia,periodoDias)};
@@ -3645,11 +3653,14 @@ function v85AtualizarRepeticaoAgenda(){
  const frequencia=document.getElementById('v85AgendaRepeticao')?.value||'nenhuma';
  const opcoes=document.getElementById('v85RecorrenciaOpcoes');if(!opcoes)return;
  opcoes.hidden=frequencia==='nenhuma';
- const personalizada=document.getElementById('v85DuracaoPersonalizadaWrap');if(personalizada)personalizada.hidden=document.getElementById('v85DuracaoRecorrencia')?.value!=='personalizada';
+ const selectDur=document.getElementById('v85DuracaoRecorrencia'),labelDur=document.getElementById('v85DuracaoRecorrenciaLabel'),labelCustom=document.getElementById('v85DuracaoPersonalizadaLabel'),inputCustom=document.getElementById('v85DuracaoPersonalizada');
+ if(selectDur){const mensal=frequencia==='mensal',valorAnterior=selectDur.value;const opcoesDur=mensal?'<option value="1">1 mês</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option><option value="personalizada">Escolher a duração</option>':'<option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="personalizada">Escolher a duração</option>';if(selectDur.dataset.mode!==(mensal?'mensal':'dias')){selectDur.innerHTML=opcoesDur;selectDur.value=mensal?'12':'60';selectDur.dataset.mode=mensal?'mensal':'dias';if(inputCustom)inputCustom.value=mensal?'12':'60';}else if([...selectDur.options].some(o=>o.value===valorAnterior))selectDur.value=valorAnterior;}
+ if(labelDur)labelDur.textContent=frequencia==='mensal'?'Por quantos meses?':'Por quanto tempo?';if(labelCustom)labelCustom.textContent=frequencia==='mensal'?'Quantidade de meses':'Quantidade de dias';if(inputCustom){inputCustom.min='1';inputCustom.max=frequencia==='mensal'?'36':'365';}
+ const personalizada=document.getElementById('v85DuracaoPersonalizadaWrap');if(personalizada)personalizada.hidden=selectDur?.value!=='personalizada';
  const resumo=document.getElementById('v85RecorrenciaResumo'),botao=document.getElementById('agendaSalvarBotao');
  if(frequencia==='nenhuma'){if(botao)botao.textContent='Salvar compromisso';return;}
  const {periodoDias,datas}=v85ParametrosRecorrenciaAgenda();
- if(resumo)resumo.textContent=datas.length?`${datas.length} compromisso(s) de ${dataBR(datas[0])} até ${dataBR(datas[datas.length-1])}. Cada dia será um registro independente na Agenda.`:'Informe uma data válida e uma duração de 1 a 365 dias.';
+ if(resumo)resumo.textContent=datas.length?`${datas.length} compromisso(s) de ${dataBR(datas[0])} até ${dataBR(datas[datas.length-1])}. ${frequencia==='mensal'?'Cada mês no mesmo dia do mês selecionado será um registro independente.':'Cada dia será um registro independente na Agenda.'}`:'Informe uma data válida e uma duração de 1 a 365 dias.';
  if(botao){botao.textContent=datas.length?(botao.dataset.editing==='true'?`Salvar e criar ${datas.length} compromissos`:`Criar ${datas.length} compromissos`):(botao.dataset.editing==='true'?'Salvar alterações':'Criar compromissos');if(botao.dataset.editing==='true'){if(frequencia==='nenhuma'){const ev=eventosSemana.find(e=>String(e.id)===String(window.__v85EventoEdicaoId||''));botao.onclick=()=>ev&&v88SalvarEvento(ev,botao);}else botao.onclick=()=>v85ConfirmarRecorrenciaEdicaoAgenda();}}
 }
 async function v85ConfirmarRecorrenciaEdicaoAgenda(){
@@ -3660,10 +3671,10 @@ async function v85ConfirmarRecorrenciaEdicaoAgenda(){
  const clienteId=document.getElementById('agendaCliente')?.value||null,horaRaw=document.getElementById('agendaHora')?.value,hora=horaRaw===''?null:Number(horaRaw);
  const titulo=document.getElementById('agendaTitulo')?.value.trim()||rotuloTipoEvento(tipo),categoria=categoriaPorTipo(tipo,clienteId),concluido=document.getElementById('agendaConcluido')?.value==='concluido';
  if(tipo==='visita'&&!clienteId&&!evento.clienteExterno){dispararAutomacao('Selecione o cliente','Toda visita deve ter um cliente vinculado.');return;}
- if(!datas.length){dispararAutomacao('Revise a recorrência','Escolha uma data e um período de 1 a 365 dias.');return;}
+ if(!datas.length){dispararAutomacao('Revise a recorrência','Escolha uma data e uma duração válida (1 a 365 dias ou 1 a 36 meses, conforme a frequência).');return;}
  const futuras=datas.filter(d=>d!==inicioISO),identificador=String(clienteId||''),tituloNormal=titulo.toLocaleLowerCase('pt-BR').trim();
  const pendentes=futuras.filter(d=>!eventosSemana.some(e=>e.id!==evento.id&&e.dataISO===d&&e.hora===hora&&String(e.tipo||'')===tipo&&String(e.clienteId||'')===identificador&&String(e.titulo||'').toLocaleLowerCase('pt-BR').trim()===tituloNormal));
- if(!confirm(`Salvar as alterações deste compromisso e criar ${pendentes.length} ocorrência(s) adicionais ${frequencia==='semanal'?'semanais':frequencia==='dias_uteis'?'em dias úteis':'diários'} por ${periodoDias} dias, a partir de ${dataBR(inicioISO)}?`))return;
+ if(!confirm(`Salvar as alterações deste compromisso e criar ${pendentes.length} ocorrência(s) adicionais ${frequencia==='mensal'?'mensais (no mesmo dia de cada mês)':frequencia==='semanal'?'semanais':frequencia==='dias_uteis'?'em dias úteis':'diários'} por ${periodoDias} ${frequencia==='mensal'?'meses':'dias'}, a partir de ${dataBR(inicioISO)}?`))return;
  if(botao?.disabled)return;if(botao){botao.disabled=true;botao.textContent='Salvando…';}
  try{
   const alteracoes={tipo,categoria,data:inicioISO,hora,titulo,cliente_id:clienteId,cliente_externo:clienteId?null:evento.clienteExterno||null,concluido};
@@ -3679,12 +3690,12 @@ async function v85ConfirmarRecorrenciaAgenda(){
  const clienteId=document.getElementById('agendaCliente')?.value||null,hora=Number(document.getElementById('agendaHora')?.value||9);
  const titulo=document.getElementById('agendaTitulo')?.value.trim()||rotuloTipoEvento(tipo);
  if(tipo==='visita'&&!clienteId){document.getElementById('agendaCliente')?.focus();dispararAutomacao('Selecione o cliente','Toda visita deve ter um cliente vinculado.');return;}
- if(!datas.length){dispararAutomacao('Revise a recorrência','Escolha uma data e um período de 1 a 365 dias.');return;}
+ if(!datas.length){dispararAutomacao('Revise a recorrência','Escolha uma data e uma duração válida (1 a 365 dias ou 1 a 36 meses, conforme a frequência).');return;}
  const categoria=categoriaPorTipo(tipo,clienteId),identificador=String(clienteId||''),tituloNormal=titulo.toLocaleLowerCase('pt-BR').trim();
  const pendentes=datas.filter(dia=>!eventosSemana.some(e=>e.dataISO===dia&&Number(e.hora)===hora&&String(e.tipo||'')===tipo&&String(e.clienteId||'')===identificador&&String(e.titulo||'').toLocaleLowerCase('pt-BR').trim()===tituloNormal));
  const jaExistentes=datas.length-pendentes.length;
  if(!pendentes.length){dispararAutomacao('Compromissos já cadastrados','Este compromisso já está na Agenda em todas as datas selecionadas.');return;}
- if(!confirm(`Criar ${pendentes.length} compromisso(s) ${frequencia==='semanal'?'semanais':frequencia==='dias_uteis'?'em dias úteis':'diários'} para ${periodoDias} dias, de ${dataBR(inicioISO)} a ${dataBR(datas[datas.length-1])}?${jaExistentes?'\n\n'+jaExistentes+' data(s) já cadastrada(s) serão ignoradas.':''}`))return;
+ if(!confirm(`Criar ${pendentes.length} compromisso(s) ${frequencia==='mensal'?'mensais (no mesmo dia de cada mês)':frequencia==='semanal'?'semanais':frequencia==='dias_uteis'?'em dias úteis':'diários'} para ${periodoDias} ${frequencia==='mensal'?'meses':'dias'}, de ${dataBR(inicioISO)} a ${dataBR(datas[datas.length-1])}?${jaExistentes?'\n\n'+jaExistentes+' data(s) já cadastrada(s) serão ignoradas.':''}`))return;
  const botao=document.getElementById('agendaSalvarBotao');if(botao?.disabled)return;
  if(botao){botao.disabled=true;botao.textContent='Salvando compromissos…';}
  try{
