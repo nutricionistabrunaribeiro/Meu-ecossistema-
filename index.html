@@ -3595,6 +3595,7 @@ function abrirFormularioAgenda(dataISO,hora,evento=null){
     <div class="form-field full"><label>Identificação visual automática</label><div class="form-color-preview"><i id="agendaCorPreview"></i><span id="agendaCorTexto"></span></div></div>
   </div><div class="system-modal-actions"><button class="btn-secundario" onclick="fecharModalSistema()">Cancelar</button><button id="agendaSalvarBotao" class="btn-primario" onclick="confirmarNovoEvento()">Salvar compromisso</button></div>`);
   if(evento){
+    window.__v85EventoEdicaoId=evento.id;
     const campo=id=>document.getElementById(id);
     campo('agendaCliente').value=evento.clienteId||'';
     campo('agendaTipo').value=evento.tipo||(evento.categoria==='treinamento'?'treinamento':'outro');
@@ -3603,10 +3604,12 @@ function abrirFormularioAgenda(dataISO,hora,evento=null){
     if(![...horas.options].some(o=>o.value===String(evento.hora)))horas.add(new Option(evento.hora==null?'Sem horário':evento.hora+'h',evento.hora??''));
     horas.value=evento.hora??'';
     const repeticao=campo('v85AgendaRepeticao').closest('.v85-repeticao');
-    repeticao.innerHTML='<label for="agendaConcluido">Situação</label><select id="agendaConcluido"><option value="aberto">Em aberto</option><option value="concluido">Concluído</option></select>';
+    const situacao=document.createElement('div');situacao.className='form-field full';situacao.innerHTML='<label for="agendaConcluido">Situação</label><select id="agendaConcluido"><option value="aberto">Em aberto</option><option value="concluido">Concluído</option></select>';
+    repeticao.parentElement.insertBefore(situacao,repeticao.nextSibling);
     campo('agendaConcluido').value=evento.concluido?'concluido':'aberto';
     const salvar=campo('agendaSalvarBotao');
     salvar.textContent='Salvar alterações';
+    salvar.dataset.editing='true';
     salvar.onclick=()=>v88SalvarEvento(evento,salvar);
   }
   atualizarFormularioAgenda();setTimeout(()=>document.getElementById('agendaCliente')?.focus(),0);
@@ -3647,7 +3650,29 @@ function v85AtualizarRepeticaoAgenda(){
  if(frequencia==='nenhuma'){if(botao)botao.textContent='Salvar compromisso';return;}
  const {periodoDias,datas}=v85ParametrosRecorrenciaAgenda();
  if(resumo)resumo.textContent=datas.length?`${datas.length} compromisso(s) de ${dataBR(datas[0])} até ${dataBR(datas[datas.length-1])}. Cada dia será um registro independente na Agenda.`:'Informe uma data válida e uma duração de 1 a 365 dias.';
- if(botao)botao.textContent=datas.length?`Criar ${datas.length} compromissos`:'Criar compromissos';
+ if(botao){botao.textContent=datas.length?(botao.dataset.editing==='true'?`Salvar e criar ${datas.length} compromissos`:`Criar ${datas.length} compromissos`):(botao.dataset.editing==='true'?'Salvar alterações':'Criar compromissos');if(botao.dataset.editing==='true'){if(frequencia==='nenhuma'){const ev=eventosSemana.find(e=>String(e.id)===String(window.__v85EventoEdicaoId||''));botao.onclick=()=>ev&&v88SalvarEvento(ev,botao);}else botao.onclick=()=>v85ConfirmarRecorrenciaEdicaoAgenda();}}
+}
+async function v85ConfirmarRecorrenciaEdicaoAgenda(){
+ const evento=eventosSemana.find(e=>String(e.id)===String(window.__v85EventoEdicaoId||''));
+ const botao=document.getElementById('agendaSalvarBotao');
+ if(!evento){dispararAutomacao('Não foi possível editar','Abra novamente o compromisso e tente.');return;}
+ const {frequencia,periodoDias,inicioISO,datas}=v85ParametrosRecorrenciaAgenda(),tipo=document.getElementById('agendaTipo')?.value||'outro';
+ const clienteId=document.getElementById('agendaCliente')?.value||null,horaRaw=document.getElementById('agendaHora')?.value,hora=horaRaw===''?null:Number(horaRaw);
+ const titulo=document.getElementById('agendaTitulo')?.value.trim()||rotuloTipoEvento(tipo),categoria=categoriaPorTipo(tipo,clienteId),concluido=document.getElementById('agendaConcluido')?.value==='concluido';
+ if(tipo==='visita'&&!clienteId&&!evento.clienteExterno){dispararAutomacao('Selecione o cliente','Toda visita deve ter um cliente vinculado.');return;}
+ if(!datas.length){dispararAutomacao('Revise a recorrência','Escolha uma data e um período de 1 a 365 dias.');return;}
+ const futuras=datas.filter(d=>d!==inicioISO),identificador=String(clienteId||''),tituloNormal=titulo.toLocaleLowerCase('pt-BR').trim();
+ const pendentes=futuras.filter(d=>!eventosSemana.some(e=>e.id!==evento.id&&e.dataISO===d&&e.hora===hora&&String(e.tipo||'')===tipo&&String(e.clienteId||'')===identificador&&String(e.titulo||'').toLocaleLowerCase('pt-BR').trim()===tituloNormal));
+ if(!confirm(`Salvar as alterações deste compromisso e criar ${pendentes.length} ocorrência(s) adicionais ${frequencia==='semanal'?'semanais':frequencia==='dias_uteis'?'em dias úteis':'diários'} por ${periodoDias} dias, a partir de ${dataBR(inicioISO)}?`))return;
+ if(botao?.disabled)return;if(botao){botao.disabled=true;botao.textContent='Salvando…';}
+ try{
+  const alteracoes={tipo,categoria,data:inicioISO,hora,titulo,cliente_id:clienteId,cliente_externo:clienteId?null:evento.clienteExterno||null,concluido};
+  const {data:row,error}=await supa.from('eventos').update(alteracoes).eq('id',evento.id).select('*, clientes(nome)').single();if(error)throw error;
+  Object.assign(evento,{tipo:row.tipo,categoria:row.categoria,dataISO:row.data,hora:row.hora,titulo:row.titulo,clienteId:row.cliente_id,clienteNomeVinculado:row.clientes?.nome||null,clienteExterno:row.cliente_externo,concluido:row.concluido});
+  let criados=0;if(pendentes.length){const payloads=pendentes.map(data=>({titulo,categoria,tipo,data,hora,cliente_id:clienteId,cliente_externo:null}));const {data:rows,error:insertError}=await supa.from('eventos').insert(payloads).select('*, clientes(nome)');if(insertError)throw insertError;criados=rows?.length||0;for(const r of (rows||[]))eventosSemana.push({id:r.id,dataISO:r.data,hora:r.hora,titulo:r.titulo,categoria:r.categoria||categoria,tipo:r.tipo||tipo,concluido:false,clienteId:r.cliente_id||null,clienteNomeVinculado:r.clientes?.nome||null,clienteExterno:r.cliente_externo||null});}
+  fecharModalSistema();renderTela();dispararAutomacao('Compromisso atualizado',`Registro original salvo e ${criados} ocorrência(s) recorrente(s) criadas. Os compromissos já existentes foram preservados.`);
+ }catch(err){dispararAutomacao('Erro ao salvar recorrência',err.message||'Falha ao salvar.');}
+ finally{if(botao)botao.disabled=false;}
 }
 async function v85ConfirmarRecorrenciaAgenda(){
  const {frequencia,periodoDias,inicioISO,datas}=v85ParametrosRecorrenciaAgenda(),tipo=document.getElementById('agendaTipo')?.value||'outro';
