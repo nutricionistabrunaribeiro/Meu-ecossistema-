@@ -409,6 +409,20 @@
   .agente-financeiro-composer{display:flex;gap:8px;align-items:flex-end}.agente-financeiro-composer textarea{flex:1;min-width:0;resize:vertical;border:1px solid var(--cor-borda);border-radius:11px;padding:10px;background:var(--cor-fundo);color:var(--cor-texto);font:inherit;font-size:12px}
   .agente-financeiro-nota{font-size:10px;color:var(--cor-texto-suave);margin-top:9px}
 
+  /* Modulo Financeiro independente */
+  .space-switch .fin-space{border:1px solid rgba(161,129,79,.28);background:rgba(161,129,79,.08);}
+  .space-switch .fin-space.active{background:var(--cor-primaria);color:#fff;border-color:var(--cor-primaria);}
+  body[data-espaco="financeiro"] .agente-financeiro{border-radius:20px;padding:20px;background:linear-gradient(135deg,var(--cor-superficie),var(--cor-fundo));}
+  .fin-boas-vindas{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:20px;border:1px solid var(--cor-borda);border-radius:20px;background:var(--cor-superficie);}
+  .fin-boas-vindas h2{font-family:'Fraunces',serif;font-size:25px;font-weight:500;margin:0 0 5px;color:var(--cor-texto);}
+  .fin-boas-vindas p{font-size:12px;color:var(--cor-texto-suave);margin:0;max-width:560px;line-height:1.55;}
+  .fin-boas-vindas-icone{width:48px;height:48px;flex:0 0 48px;border-radius:16px;display:grid;place-items:center;background:var(--cor-fundo);color:var(--cor-primaria);font-size:24px;}
+  .fin-como-usar{border:1px solid var(--cor-borda);border-radius:16px;padding:15px;margin:16px 0;background:var(--cor-superficie);}
+  .fin-como-usar ol{margin:9px 0 0;padding-left:20px;color:var(--cor-texto-suave);font-size:12px;line-height:1.7;}
+  .fin-perguntas-rapidas{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .fin-perguntas-rapidas button{border:1px solid var(--cor-borda);background:var(--cor-fundo);border-radius:999px;padding:7px 10px;font-size:11px;color:var(--cor-texto);}
+  @media(max-width:600px){.fin-boas-vindas{padding:15px}.fin-boas-vindas h2{font-size:22px}}
+
   /* Modulo Financeiro */
   .fin-resumo{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px,1fr));gap:14px;margin-bottom:18px;}
   .fin-resumo-card{background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:var(--radius);padding:16px;}
@@ -2899,7 +2913,6 @@ const MODULOS = {
       {id:"ideias_pessoais", nome:"Banco de Ideias"},
       {id:"ano_pixels", nome:"Meu Ano em Pixels"},
       {id:"metas", nome:"Metas"},
-      {id:"contas", nome:"Meu Financeiro"},
       {id:"compras", nome:"Compras"},
       {id:"lista_dia", nome:"Lista do Dia"},
       {id:"rotina_casa", nome:"Rotina da Casa"},
@@ -2910,6 +2923,7 @@ const MODULOS = {
 };
 
 MODULOS.presenca=[{grupo:'Na Presença',itens:[{id:'na_presenca',nome:'Meu momento com Deus'},{id:'devocional_dezembro',nome:'Devocionais de dezembro'},{id:'jornada_biblica',nome:'Jornada Bíblica'},{id:'painel_oracao',nome:'Painel de oração'},{id:'diario_deus',nome:'Diário e gratidão'},{id:'versiculos_guardados',nome:'Versículos para guardar'},{id:'propositos_oracao',nome:'Propósitos de oração'}]}];
+MODULOS.financeiro=[{grupo:'Organização financeira',itens:[{id:'contas',nome:'Meu Financeiro'}]}];
 const TAB_PRINCIPAL = {
   trabalho: ["agenda","clientes","visitas","entregas"],
   pessoal: ["habitos","metas","contas","ideias_pessoais"]
@@ -2960,6 +2974,7 @@ function renderSidebar(){
       <button class="${espacoAtual==='trabalho'?'active':''}" onclick="trocarEspaco('trabalho')">Trabalho</button>
       <button class="${espacoAtual==='pessoal'?'active':''}" onclick="trocarEspaco('pessoal')">Pessoal</button>
       <button class="np-space ${espacoAtual==='presenca'?'active':''}" onclick="trocarEspaco('presenca')">✧ Na Presença</button>
+      <button class="fin-space ${espacoAtual==='financeiro'?'active':''}" onclick="trocarEspaco('financeiro')">$ Financeiro</button>
     </div>
     <nav>`;
   (grupos||[]).forEach(g=>{
@@ -3128,7 +3143,7 @@ function abrirDashboardGlobal(){espacoAtual="geral";document.body.setAttribute("
 function trocarEspaco(esp){
   espacoAtual = esp;
   document.body.setAttribute('data-espaco', esp);
-  telaAtual = esp === 'trabalho' ? 'agenda' : esp === 'presenca' ? 'na_presenca' : 'menu_pessoal';
+  telaAtual = esp === 'trabalho' ? 'agenda' : esp === 'presenca' ? 'na_presenca' : esp === 'financeiro' ? 'contas' : 'menu_pessoal';
   salvarTelaAtualSessao();
   renderSidebar();
   renderTela();
@@ -3142,6 +3157,7 @@ function irPara(id){
   if(id==='dashboard'){abrirDashboardGlobal();return;}
   if(modoConsultaOffline&&id!=='visitas'){alert('Sem conexão, continue os checklists já preparados neste aparelho. As outras áreas precisam de internet.');return;}
   telaAtual = id;
+  if(id==='contas'){espacoAtual='financeiro';document.body.setAttribute('data-espaco','financeiro');}
   if(id==='agenda'&&window.innerWidth<=640&&visaoAgenda==='semana')visaoAgenda='dia';
   if(id === 'visitas'){ visitaSelecionadaId = null; telaPosPdfVisitaId = null; }
   salvarTelaAtualSessao();
@@ -3208,7 +3224,7 @@ const NOMES_TELA = {devocional_dezembro:['Meus devocionais','Biblioteca anual de
   ideias_pessoais:["Banco de Ideias","Qualquer ideia, a qualquer hora"],
   ano_pixels:["Meu Ano em Pixels","Um quadradinho por dia"],
   metas:["Metas","Seus objetivos pessoais"],
-  contas:["Meu Financeiro","Agente financeiro pessoal · independente do Trabalho"],
+  contas:["Meu Financeiro","Organização financeira independente"],
   menu_pessoal:["Vida Pessoal","Escolha uma área no menu"],
   compras:["Compras","Sua lista"],
   lista_dia:["Lista do Dia","O que você quer concluir agora"],
@@ -6478,8 +6494,9 @@ function enviarMensagemAgenteFinanceiro(){
   conversaAgenteFinanceiro.push({papel:'agente',texto:respostaAgenteFinanceiro(pergunta)});
   renderTela();
 }
+function perguntarAgenteFinanceiro(pergunta){conversaAgenteFinanceiro.push({papel:'usuario',texto:pergunta},{papel:'agente',texto:respostaAgenteFinanceiro(pergunta)});renderTela();}
 function limparConversaAgenteFinanceiro(){conversaAgenteFinanceiro=[{papel:'agente',texto:'Conversa reiniciada. O que você gostaria de analisar nas suas finanças pessoais?'}];renderTela();}
-function agenteFinanceiroHTML(){return `<section class="agente-financeiro"><div class="agente-financeiro-topo"><div class="agente-financeiro-avatar">✦</div><div style="flex:1"><strong>Agente financeiro</strong><div>Seu espaço de conversa e organização pessoal</div></div><button type="button" onclick="limparConversaAgenteFinanceiro()" title="Reiniciar conversa">↻</button></div><div class="agente-financeiro-mensagens">${conversaAgenteFinanceiro.map(m=>`<div class="agente-msg ${m.papel==='usuario'?'agente-msg-usuario':'agente-msg-assistente'}"><span>${m.papel==='usuario'?'Você':'Agente'}</span><div>${textoHTML(m.texto)}</div></div>`).join('')}</div><div class="agente-financeiro-composer"><textarea id="agenteFinanceiroPergunta" rows="2" placeholder="Ex.: Quais contas preciso priorizar esta semana?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensagemAgenteFinanceiro();}"></textarea><button class="btn-primario" onclick="enviarMensagemAgenteFinanceiro()">Enviar</button></div><div class="agente-financeiro-nota">Respostas baseadas nos lançamentos manuais deste módulo. Não acessa dados do Trabalho nem contas bancárias.</div></section>`;}
+function agenteFinanceiroHTML(){return `<section class="agente-financeiro"><div class="agente-financeiro-topo"><div class="agente-financeiro-avatar">✦</div><div style="flex:1"><strong>Agente financeiro</strong><div>Converse sobre suas finanças pessoais</div></div><button type="button" onclick="limparConversaAgenteFinanceiro()" title="Reiniciar conversa">↻</button></div><div class="agente-financeiro-mensagens">${conversaAgenteFinanceiro.map(m=>`<div class="agente-msg ${m.papel==='usuario'?'agente-msg-usuario':'agente-msg-assistente'}"><span>${m.papel==='usuario'?'Você':'Agente'}</span><div>${textoHTML(m.texto)}</div></div>`).join('')}</div><div class="fin-perguntas-rapidas"><button onclick="perguntarAgenteFinanceiro('Quais contas estão atrasadas?')">Contas atrasadas</button><button onclick="perguntarAgenteFinanceiro('O que vence nesta semana?')">Vencimentos da semana</button><button onclick="perguntarAgenteFinanceiro('Qual é meu saldo dos lançamentos?')">Meu saldo</button><button onclick="perguntarAgenteFinanceiro('Como estão minhas receitas e despesas?')">Receitas e despesas</button></div><div class="agente-financeiro-composer"><textarea id="agenteFinanceiroPergunta" rows="2" placeholder="Escreva sua pergunta sobre os lançamentos cadastrados…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensagemAgenteFinanceiro();}"></textarea><button class="btn-primario" onclick="enviarMensagemAgenteFinanceiro()">Enviar</button></div><div class="agente-financeiro-nota">Nesta versão, o agente responde por regras aos dados lançados aqui. Não acessa Trabalho, bancos ou realiza pagamentos.</div></section>`;}
 
 function contasHTML(){
   const doMes = CONTAS_PESSOAIS.filter(l=>estaNoMes(l.vencimentoISO));
@@ -6494,7 +6511,9 @@ function contasHTML(){
     (filtroContasPessoais==='despesa' && l.tipo==='despesa' && l.status==='pago')
   );
   return `
+    <section class="fin-boas-vindas"><div><h2>Meu Financeiro</h2><p>Um espaço independente para registrar seu dinheiro, acompanhar compromissos e conversar com seu agente financeiro. Tudo começa pelos lançamentos manuais que você fizer aqui.</p></div><div class="fin-boas-vindas-icone">＄</div></section>
     ${agenteFinanceiroHTML()}
+    <div class="fin-como-usar"><strong>Como usar no dia a dia</strong><ol><li>Cadastre cada dinheiro que entrar em <b>Nova receita</b>, mesmo que ainda vá receber.</li><li>Cadastre cada conta ou gasto em <b>Nova despesa</b>, informando o vencimento quando souber.</li><li>Quando receber ou pagar, use <b>Dar baixa</b> para atualizar o status.</li><li>Converse com o agente para consultar atrasos, vencimentos e totais registrados.</li></ol><div style="font-size:11px;color:var(--cor-texto-suave);margin-top:8px;">Dica: registre também despesas pequenas para que os totais representem melhor sua realidade.</div></div>
     <div class="fin-resumo">
       <div class="fin-resumo-card"><div class="fin-resumo-label">Entradas Previstas do Mês</div><div class="fin-resumo-valor" style="color:var(--cor-acento);">${formatarMoeda(entradasPrevistas)}</div></div>
       <div class="fin-resumo-card"><div class="fin-resumo-label">Entradas Efetivadas do Mês</div><div class="fin-resumo-valor fin-pos">${formatarMoeda(entradasEfetivadas)}</div></div>
@@ -6540,7 +6559,7 @@ async function darBaixaContaPessoal(id){
 }
 function diasParaVencimentoConta(iso){if(!iso)return null;const hoje=new Date();hoje.setHours(0,0,0,0);const venc=dataISOParaLocal(iso);return venc?Math.round((venc-hoje)/86400000):null;}
 function rotuloPrazoConta(l){const dias=diasParaVencimentoConta(l.vencimentoISO);if(dias===null)return {texto:'Sem data',cor:'var(--cor-texto-suave)'};if(dias<0)return {texto:`Atrasada há ${Math.abs(dias)} dia${Math.abs(dias)!==1?'s':''}`,cor:'#B0413E'};if(dias===0)return {texto:'Vence hoje',cor:'#E36216'};if(dias<=7)return {texto:`Vence em ${dias} dia${dias!==1?'s':''}`,cor:'#E36216'};if(dias<=30)return {texto:`Vence em ${dias} dias`,cor:'#9A7518'};return {texto:dataBR(l.vencimentoISO),cor:'var(--cor-texto-suave)'};}
-function abrirContasPagar(){espacoAtual='pessoal';document.body.setAttribute('data-espaco','pessoal');telaAtual='contas';filtroContasPessoais='contas_pagar';salvarTelaAtualSessao();renderSidebar();renderTela();}
+function abrirContasPagar(){espacoAtual='financeiro';document.body.setAttribute('data-espaco','financeiro');telaAtual='contas';filtroContasPessoais='contas_pagar';salvarTelaAtualSessao();renderSidebar();renderTela();}
 function contasPagarDashboardHTML(){
   const abertas=(Array.isArray(CONTAS_PESSOAIS)?CONTAS_PESSOAIS:[]).filter(l=>l.tipo==='despesa'&&l.status!=='pago').sort((a,b)=>(a.vencimentoISO||'9999').localeCompare(b.vencimentoISO||'9999'));
   const vencidas=abertas.filter(l=>(diasParaVencimentoConta(l.vencimentoISO)??9999)<0),proximas30=abertas.filter(l=>{const d=diasParaVencimentoConta(l.vencimentoISO);return d!==null&&d>=0&&d<=30}),total30=[...vencidas,...proximas30].reduce((s,l)=>s+Number(l.valor||0),0);
