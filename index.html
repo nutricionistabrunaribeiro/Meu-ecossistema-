@@ -5180,15 +5180,28 @@ async function gerarPDFVisita(v){
     try{ doc.addImage(v.assinaturaTecnico, 'PNG', margem, y-14, 70, 14); }catch(e){}
   }
   if(v.assinaturaCliente){
-    try{ doc.addImage(v.assinaturaCliente, 'PNG', 120, y-14, 70, 14); }catch(e){}
+    try{ doc.addImage(v.assinaturaCliente, 'PNG', 108, y-14, 82, 14); }catch(e){}
   }
   doc.setDrawColor(34,35,31);
   doc.line(margem, y, margem+70, y);
-  doc.line(120, y, 190, y);
-  doc.setFontSize(8.5);
+  doc.line(108, y, 190, y);
   doc.setTextColor(34,35,31);
-  doc.text(`${v.nutricionista} — Nutricionista Responsável`, margem, y+4);
-  doc.text(`${v.clienteNome} — Responsável pelo Estabelecimento`, 120, y+4);
+  // Ajusta a largura das assinaturas e o texto do estabelecimento para não cortar no PDF.
+  const textoAssinaturaNutri = `${v.nutricionista} — Nutricionista Responsável`;
+  doc.setFontSize(8.5);
+  doc.text(textoAssinaturaNutri, margem, y+4);
+  const textoAssinaturaCliente = `${v.clienteNome} — Responsável pelo Estabelecimento`;
+  const assinaturaClienteX = 108, assinaturaClienteLargura = 82;
+  doc.setFontSize(8.5);
+  const larguraTextoCliente = doc.getTextWidth(textoAssinaturaCliente);
+  const tamanhoCliente = Math.max(6.2, Math.min(8.5, 8.5 * assinaturaClienteLargura / larguraTextoCliente));
+  doc.setFontSize(tamanhoCliente);
+  if(doc.getTextWidth(textoAssinaturaCliente) <= assinaturaClienteLargura){
+    doc.text(textoAssinaturaCliente, assinaturaClienteX, y+4);
+  } else {
+    const linhasAssinaturaCliente = doc.splitTextToSize(textoAssinaturaCliente, assinaturaClienteLargura);
+    doc.text(linhasAssinaturaCliente, assinaturaClienteX, y+4, {lineHeightFactor:1.05});
+  }
 
   doc.setFontSize(7.5);
   doc.setTextColor(108,107,98);
@@ -5723,11 +5736,16 @@ async function carregarProjetosSupabase(){
 }
 async function novoProjeto(clienteId=null){
   const pessoal=espacoAtual==='pessoal';
-  if(!pessoal&&CLIENTES.length===0){ alert('Cadastre um cliente antes de criar um projeto.'); return; }
   let clienteEscolhido = clienteId ? CLIENTES.find(c=>c.id===clienteId) : null;
-  if(!pessoal&&!clienteEscolhido){
-    clienteEscolhido=await selecionarClientesVisual({titulo:'Cliente do projeto'});
-    if(!clienteEscolhido)return;
+  let projetoProspect=false;
+  if(!pessoal&&!clienteId){
+    const escolha=prompt('Este projeto é para:\n\n1. Um cliente já cadastrado\n2. Um prospect / cliente ainda não cadastrado\n\nDigite 1 ou 2:');
+    if(escolha===null)return;
+    if(escolha.trim()==='2')projetoProspect=true;
+    else if(escolha.trim()==='1'){
+      if(!CLIENTES.length){alert('Ainda não há clientes cadastrados. Você pode criar um projeto para prospect.');const confirmar=confirm('Deseja criar este projeto sem vincular a um cliente, como prospect?');if(!confirmar)return;projetoProspect=true;}
+      else {clienteEscolhido=await selecionarClientesVisual({titulo:'Cliente do projeto'});if(!clienteEscolhido)return;}
+    } else {alert('Escolha inválida. Digite 1 ou 2.');return;}
   }
   const nome = prompt("Nome do projeto:");
   if(!nome || !nome.trim()) return;
@@ -5758,7 +5776,7 @@ async function novoProjeto(clienteId=null){
     id:et.id, nome:et.nome,
     checklist:(itensCriados||[]).filter(i=>i.etapa_id===et.id).map(i=>({id:i.id,t:i.item,c:i.concluido}))
   }));
-  PROJETOS.push({id:data.id,nome:nome.trim(),clienteId:clienteEscolhido?.id||null,cliente:clienteEscolhido?.nome||null,categoria:pessoal?'pessoal':'cliente',dataInicio,dataFim,status:'ativo',etapas:etapasTela});
+  PROJETOS.push({id:data.id,nome:nome.trim(),clienteId:clienteEscolhido?.id||null,cliente:clienteEscolhido?.nome||null,prospect:projetoProspect,categoria:pessoal?'pessoal':'cliente',dataInicio,dataFim,status:'ativo',etapas:etapasTela});
   dispararAutomacao('Projeto criado', nome.trim());
   renderTela();
 }
@@ -5893,7 +5911,7 @@ function projetosHTML(){
   const ativos=projetos.filter(p=>p.status!=='finalizado'),finalizados=projetos.filter(p=>p.status==='finalizado');
   const cartoes=lista=>lista.map(p=>{
     const perc=progressoProjeto(p);
-    return `<div class="projeto-card" onclick="abrirProjeto('${p.id}')"><div class="projeto-card-nome">${textoHTML(p.nome)}</div><div class="projeto-card-cliente">${p.categoria==='pessoal'?'Pessoal'+(p.dataFim?' · até '+dataBR(p.dataFim):''):textoHTML(p.cliente||'')}</div><div class="proj-barra"><div style="width:${perc}%;"></div></div><div class="projeto-card-perc">${perc}% concluído ${p.status==='finalizado'?'· Finalizado':''}</div></div>`;
+    return `<div class="projeto-card" onclick="abrirProjeto('${p.id}')"><div class="projeto-card-nome">${textoHTML(p.nome)}</div><div class="projeto-card-cliente">${p.categoria==='pessoal'?'Pessoal'+(p.dataFim?' · até '+dataBR(p.dataFim):''):textoHTML(p.cliente||'Prospect · sem cliente cadastrado')}</div><div class="proj-barra"><div style="width:${perc}%;"></div></div><div class="projeto-card-perc">${perc}% concluído ${p.status==='finalizado'?'· Finalizado':''}</div></div>`;
   }).join('');
   return `
     <div class="projetos-topo">
@@ -5914,7 +5932,7 @@ function fichaProjetoHTML(p){
       <div class="ficha-ini">${iniciais(p.nome)}</div>
       <div>
         <div class="ficha-nome">${p.nome}</div>
-        <div class="ficha-sub">${p.categoria==='pessoal'?'Projeto pessoal':p.cliente} · ${perc}% concluído</div>
+        <div class="ficha-sub">${p.categoria==='pessoal'?'Projeto pessoal':(p.cliente||'Prospect · projeto sem cliente cadastrado')} · ${perc}% concluído</div>
       </div>
     </div>
     ${p.categoria==='pessoal'?`<div class="projeto-meta-pessoal"><span>${dataBR(p.dataInicio)} a ${dataBR(p.dataFim)}</span><span>${feitos} de ${total} concluídas</span><span class="projeto-status-pill">${faseProjetoTemporario(p)==='historico'?'Finalizado':p.status}</span></div>`:''}
