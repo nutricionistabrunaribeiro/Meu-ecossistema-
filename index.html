@@ -5049,11 +5049,14 @@ async function gerarPDFVisita(v){
   // O logotipo já identifica a marca; não repetir o nome abaixo.
 
   doc.setFillColor(52,112,91);
-  doc.roundedRect(margem,y,largura,12,2,2,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(12);
-  const tituloPdf=doc.splitTextToSize((v.modeloNome||MODELOS_CHECKLIST?.find?.(m=>m.id===v.modeloId)?.nome||'CHECKLIST DE INSPEÇÃO').toUpperCase(),largura-14);
-  doc.text(tituloPdf[0]||'CHECKLIST DE INSPEÇÃO',105,y+7.5,{align:'center'});
-  y+=12;
+  const nomeModeloPdf=(v.modeloNome||MODELOS_CHECKLIST?.find?.(m=>m.id===v.modeloId)?.nome||'CHECKLIST DE INSPEÇÃO');
+  const tituloPdf=/principal/i.test(nomeModeloPdf) ? 'CHECKLIST DE BOAS PRÁTICAS DE MANIPULAÇÃO' : nomeModeloPdf.toUpperCase();
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(11);
+  const linhasTituloPdf=doc.splitTextToSize(tituloPdf,largura-14);
+  const alturaTituloPdf=Math.max(12,7+linhasTituloPdf.length*4.6);
+  doc.roundedRect(margem,y,largura,alturaTituloPdf,2,2,'F');
+  doc.text(linhasTituloPdf,105,y+alturaTituloPdf/2,{align:'center',valign:'middle',lineHeightFactor:1.05});
+  y+=alturaTituloPdf;
   doc.setFillColor(227,98,22);doc.rect(margem,y,largura,1.1,'F');y+=7;
 
   // Tabela de cabeçalho (Cliente / Mês-Ano / Nutricionista / Datas), igual ao modelo
